@@ -1,0 +1,938 @@
+2024-01-31 00:59:45,369 - DEBUG - Please Confirm the start mode
+2024-01-31 00:59:48,524 - DEBUG - Recovery mode canceled.
+2024-01-31 00:59:48,600 - INFO - Dropped Database
+2024-01-31 00:59:48,603 - INFO - Created Database
+2024-01-31 00:59:48,689 - INFO - Created Tables
+2024-01-31 00:59:48,690 - INFO - Trying to connect to TWS
+2024-01-31 00:59:53,291 - INFO - Waiting for connection with TWS...
+2024-01-31 00:59:53,347 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 00:59:53,347 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 00:59:53,348 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 00:59:53,349 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 00:59:53,349 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 00:59:53,349 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 00:59:53,349 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 00:59:53,794 - INFO - Connected to TWS
+2024-01-31 00:59:53,878 - DEBUG - Intializing GUI Screen
+2024-01-31 00:59:53,881 - DEBUG - Account download finished: DU6484447
+2024-01-31 00:59:55,082 - DEBUG - GUI Screen Initialized
+2024-01-31 00:59:56,459 - INFO - Close GUI button clicked
+2024-01-31 00:59:56,460 - INFO - Exiting Gracefully
+2024-01-31 00:59:56,583 - INFO - Stopped all the tasks, closing the GUI window now
+2024-01-31 00:59:56,584 - DEBUG - Screen Closed, Closing the app
+2024-01-31 00:59:56,584 - DEBUG - Disconnecting with TWS
+2024-01-31 00:59:56,585 - DEBUG - Disconnected with TWS
+2024-01-31 00:59:56,661 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 00:59:56,661 - INFO - All the tasks stopped, Closing the window
+2024-01-31 00:59:56,670 - DEBUG - main.py run_sceen: Screen Closed
+2024-01-31 01:00:31,335 - DEBUG - Please Confirm the start mode
+2024-01-31 01:00:33,804 - DEBUG - Recovery mode canceled.
+2024-01-31 01:00:33,877 - INFO - Dropped Database
+2024-01-31 01:00:33,881 - INFO - Created Database
+2024-01-31 01:00:33,972 - INFO - Created Tables
+2024-01-31 01:00:33,972 - INFO - Trying to connect to TWS
+2024-01-31 01:00:38,572 - INFO - Waiting for connection with TWS...
+2024-01-31 01:00:38,617 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:00:38,618 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:00:38,618 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:00:38,618 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:00:38,618 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:00:38,618 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:00:38,618 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:00:39,074 - INFO - Connected to TWS
+2024-01-31 01:00:39,146 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:39,152 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:00:39,353 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:39,553 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:39,754 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:39,956 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:40,158 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:40,359 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:40,561 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:40,762 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:40,964 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:41,165 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:41,366 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:41,567 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:41,768 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:41,969 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:42,171 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:42,373 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:42,574 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:42,775 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:42,976 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:43,177 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:43,379 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:43,580 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:43,781 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:43,982 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:44,184 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:44,385 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:44,586 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:44,787 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:44,989 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:45,190 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:45,391 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:45,592 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:45,793 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:45,995 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:46,196 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:46,397 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:46,598 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:46,799 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:47,000 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:47,201 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:47,402 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:47,603 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:47,804 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:48,005 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:48,206 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:48,408 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:48,610 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:48,811 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:49,014 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:49,215 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:49,416 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:49,618 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:49,818 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:50,019 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:50,220 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:50,422 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:50,622 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:50,823 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:51,024 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:51,225 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:51,425 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:51,626 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:51,827 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:52,028 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:52,229 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:52,430 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:52,631 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:52,832 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:53,034 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:53,235 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:53,437 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:53,638 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:53,839 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:54,040 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:54,242 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:54,443 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:54,644 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:54,845 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:55,046 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:55,247 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:55,448 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:55,650 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:55,851 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:56,053 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:56,254 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:56,456 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:56,657 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:56,859 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:57,061 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:57,262 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:57,464 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:57,664 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:57,865 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:58,066 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:58,268 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:58,470 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:58,671 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:58,872 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:59,073 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:59,274 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:59,476 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:59,677 - DEBUG - Intializing GUI Screen
+2024-01-31 01:00:59,878 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:00,079 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:00,281 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:00,482 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:00,683 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:00,884 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:01,086 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:01,287 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:01,488 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:01,688 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:01,889 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:02,090 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:02,291 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:02,492 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:02,693 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:02,894 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:03,095 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:03,298 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:03,499 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:03,700 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:03,901 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:04,103 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:04,304 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:04,505 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:04,706 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:04,907 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:05,108 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:05,308 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:05,509 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:05,710 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:05,911 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:06,112 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:06,313 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:06,514 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:06,715 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:06,916 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:07,118 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:07,319 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:07,520 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:07,721 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:07,922 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:08,123 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:08,324 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:08,525 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:08,725 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:08,926 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:09,127 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:09,328 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:09,540 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:09,742 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:09,943 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:10,144 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:10,345 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:10,545 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:10,746 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:10,947 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:11,148 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:11,349 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:11,550 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:11,751 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:11,952 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:12,152 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:12,354 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:12,555 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:12,756 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:12,956 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:13,157 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:13,359 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:13,560 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:13,761 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:13,962 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:14,163 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:14,364 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:14,565 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:14,765 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:14,966 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:15,167 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:30,176 - DEBUG - Please Confirm the start mode
+2024-01-31 01:01:31,787 - DEBUG - Recovery mode canceled.
+2024-01-31 01:01:31,841 - INFO - Dropped Database
+2024-01-31 01:01:31,848 - INFO - Created Database
+2024-01-31 01:01:31,990 - INFO - Created Tables
+2024-01-31 01:01:31,991 - INFO - Trying to connect to TWS
+2024-01-31 01:01:36,603 - INFO - Waiting for connection with TWS...
+2024-01-31 01:01:36,645 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:01:36,646 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:01:36,646 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:01:36,646 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:01:36,646 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:01:36,646 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:01:36,646 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:01:37,104 - INFO - Connected to TWS
+2024-01-31 01:01:37,168 - DEBUG - Intializing GUI Screen
+2024-01-31 01:01:37,171 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:01:38,372 - DEBUG - GUI Screen Initialized
+2024-01-31 01:04:20,915 - DEBUG - Please Confirm the start mode
+2024-01-31 01:04:23,047 - DEBUG - Recovery mode canceled.
+2024-01-31 01:04:23,097 - INFO - Dropped Database
+2024-01-31 01:04:23,104 - INFO - Created Database
+2024-01-31 01:04:23,188 - INFO - Created Tables
+2024-01-31 01:04:23,188 - INFO - Trying to connect to TWS
+2024-01-31 01:04:27,790 - INFO - Waiting for connection with TWS...
+2024-01-31 01:04:27,840 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:04:27,840 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:04:27,840 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:04:27,840 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:04:27,841 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:04:27,841 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:04:27,841 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:04:28,291 - INFO - Connected to TWS
+2024-01-31 01:04:28,350 - DEBUG - Intializing GUI Screen
+2024-01-31 01:04:28,354 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:04:29,556 - DEBUG - GUI Screen Initialized
+2024-01-31 01:07:25,435 - INFO - Close GUI button clicked
+2024-01-31 01:07:25,435 - INFO - Exiting Gracefully
+2024-01-31 01:07:25,636 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:07:25,787 - INFO - Stopped all the tasks, closing the GUI window now
+2024-01-31 01:07:25,787 - DEBUG - Screen Closed, Closing the app
+2024-01-31 01:07:25,787 - DEBUG - Disconnecting with TWS
+2024-01-31 01:07:25,787 - DEBUG - Disconnected with TWS
+2024-01-31 01:07:25,837 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:07:25,837 - INFO - All the tasks stopped, Closing the window
+2024-01-31 01:07:25,874 - DEBUG - main.py run_sceen: Screen Closed
+2024-01-31 01:07:30,533 - DEBUG - Please Confirm the start mode
+2024-01-31 01:07:32,475 - DEBUG - Recovery mode canceled.
+2024-01-31 01:07:32,518 - INFO - Dropped Database
+2024-01-31 01:07:32,522 - INFO - Created Database
+2024-01-31 01:07:32,610 - INFO - Created Tables
+2024-01-31 01:07:32,611 - INFO - Trying to connect to TWS
+2024-01-31 01:07:37,230 - INFO - Waiting for connection with TWS...
+2024-01-31 01:07:37,277 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:07:37,277 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:07:37,277 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:07:37,277 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:07:37,277 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:07:37,278 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:07:37,278 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:07:37,731 - INFO - Connected to TWS
+2024-01-31 01:07:37,808 - DEBUG - Intializing GUI Screen
+2024-01-31 01:07:37,812 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:07:39,013 - DEBUG - GUI Screen Initialized
+2024-01-31 01:09:20,143 - INFO - Close GUI button clicked
+2024-01-31 01:09:20,143 - INFO - Exiting Gracefully
+2024-01-31 01:09:20,162 - INFO - Stopped all the tasks, closing the GUI window now
+2024-01-31 01:09:20,162 - DEBUG - Screen Closed, Closing the app
+2024-01-31 01:09:20,163 - DEBUG - Disconnecting with TWS
+2024-01-31 01:09:20,163 - DEBUG - Disconnected with TWS
+2024-01-31 01:09:20,345 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:09:20,345 - INFO - All the tasks stopped, Closing the window
+2024-01-31 01:09:20,375 - DEBUG - main.py run_sceen: Screen Closed
+2024-01-31 01:09:32,498 - DEBUG - Please Confirm the start mode
+2024-01-31 01:09:34,580 - DEBUG - Recovery mode canceled.
+2024-01-31 01:09:34,649 - INFO - Dropped Database
+2024-01-31 01:09:34,657 - INFO - Created Database
+2024-01-31 01:09:34,867 - INFO - Created Tables
+2024-01-31 01:09:34,868 - INFO - Trying to connect to TWS
+2024-01-31 01:09:39,479 - INFO - Waiting for connection with TWS...
+2024-01-31 01:09:39,553 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:09:39,555 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:09:39,557 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:09:39,559 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:09:39,560 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:09:39,561 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:09:39,563 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:09:39,981 - INFO - Connected to TWS
+2024-01-31 01:09:40,054 - DEBUG - Intializing GUI Screen
+2024-01-31 01:09:40,057 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:09:41,259 - DEBUG - GUI Screen Initialized
+2024-01-31 01:35:37,259 - DEBUG - Please Confirm the start mode
+2024-01-31 01:35:37,289 - INFO - Dropped Database
+2024-01-31 01:35:37,292 - INFO - Created Database
+2024-01-31 01:35:37,417 - INFO - Created Tables
+2024-01-31 01:35:37,417 - INFO - Trying to connect to TWS
+2024-01-31 01:35:42,048 - INFO - Waiting for connection with TWS...
+2024-01-31 01:35:42,103 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:35:42,103 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:35:42,103 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:35:42,103 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:35:42,103 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:35:42,103 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:35:42,103 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:35:42,549 - INFO - Connected to TWS
+2024-01-31 01:35:42,632 - DEBUG - Intializing GUI Screen
+2024-01-31 01:35:42,635 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:35:43,834 - DEBUG - GUI Screen Initialized
+2024-01-31 01:36:26,351 - INFO - Close GUI button clicked
+2024-01-31 01:36:26,352 - INFO - Exiting Gracefully
+2024-01-31 01:36:26,389 - INFO - Stopped all the tasks, closing the GUI window now
+2024-01-31 01:36:26,389 - DEBUG - Screen Closed, Closing the app
+2024-01-31 01:36:26,389 - DEBUG - Disconnecting with TWS
+2024-01-31 01:36:26,390 - DEBUG - Disconnected with TWS
+2024-01-31 01:36:26,553 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:36:26,553 - INFO - All the tasks stopped, Closing the window
+2024-01-31 01:36:26,590 - DEBUG - main.py run_sceen: Screen Closed
+2024-01-31 01:36:34,158 - DEBUG - Please Confirm the start mode
+2024-01-31 01:36:34,187 - INFO - Dropped Database
+2024-01-31 01:36:34,190 - INFO - Created Database
+2024-01-31 01:36:34,295 - INFO - Created Tables
+2024-01-31 01:36:34,295 - INFO - Trying to connect to TWS
+2024-01-31 01:36:38,901 - INFO - Waiting for connection with TWS...
+2024-01-31 01:36:38,955 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:36:38,955 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:36:38,955 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:36:38,956 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:36:38,956 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:36:38,956 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:36:38,956 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:36:39,403 - INFO - Connected to TWS
+2024-01-31 01:36:39,512 - DEBUG - Intializing GUI Screen
+2024-01-31 01:36:39,516 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:36:40,714 - DEBUG - GUI Screen Initialized
+2024-01-31 01:40:28,932 - DEBUG - Please Confirm the start mode
+2024-01-31 01:40:28,968 - INFO - Dropped Database
+2024-01-31 01:40:28,970 - INFO - Created Database
+2024-01-31 01:40:29,043 - INFO - Created Tables
+2024-01-31 01:40:29,043 - INFO - Trying to connect to TWS
+2024-01-31 01:40:33,645 - INFO - Waiting for connection with TWS...
+2024-01-31 01:40:33,699 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:40:33,700 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:40:33,700 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:40:33,700 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:40:33,701 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:40:33,701 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:40:33,701 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:40:34,146 - INFO - Connected to TWS
+2024-01-31 01:40:34,302 - DEBUG - Intializing GUI Screen
+2024-01-31 01:40:34,305 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:40:35,505 - DEBUG - GUI Screen Initialized
+2024-01-31 01:43:21,795 - DEBUG - Please Confirm the start mode
+2024-01-31 01:43:21,825 - INFO - Dropped Database
+2024-01-31 01:43:21,828 - INFO - Created Database
+2024-01-31 01:43:21,919 - INFO - Created Tables
+2024-01-31 01:43:21,920 - INFO - Trying to connect to TWS
+2024-01-31 01:43:26,519 - INFO - Waiting for connection with TWS...
+2024-01-31 01:43:26,568 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:43:26,568 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:43:26,568 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:43:26,568 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:43:26,568 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:43:26,568 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:43:26,568 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:43:27,020 - INFO - Connected to TWS
+2024-01-31 01:43:27,099 - DEBUG - Intializing GUI Screen
+2024-01-31 01:43:27,103 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:43:28,301 - DEBUG - GUI Screen Initialized
+2024-01-31 01:44:41,695 - INFO - Close GUI button clicked
+2024-01-31 01:44:41,695 - INFO - Exiting Gracefully
+2024-01-31 01:44:41,896 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:42,097 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:42,298 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:42,499 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:42,699 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:42,900 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:43,100 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:43,301 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:43,501 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:43,702 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:43,903 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:44,104 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:44,305 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:44,506 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:44,707 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:44,908 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:45,109 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:45,309 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:45,510 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:45,711 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:45,912 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:46,113 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:46,314 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:46,515 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:46,716 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:46,916 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:47,117 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:47,318 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:47,519 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:47,720 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:47,921 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:48,122 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:48,323 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:48,524 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:48,724 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:48,925 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:49,126 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:49,327 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:49,528 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:49,728 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:49,928 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:50,129 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:50,330 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:50,531 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:50,731 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:50,932 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:51,133 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:51,334 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:51,535 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:51,736 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:51,937 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:52,138 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:52,338 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:52,539 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:52,740 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:52,941 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:53,142 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:53,343 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:53,544 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:53,745 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:53,946 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:54,146 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:54,347 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:54,547 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:54,748 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:54,948 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:55,148 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:55,349 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:55,550 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:55,751 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:55,952 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:56,152 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:56,353 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:56,554 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:56,755 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:56,956 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:57,157 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:57,358 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:57,559 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:57,760 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:57,960 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:58,161 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:58,362 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:58,563 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:58,764 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:58,965 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:59,165 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:59,366 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:59,567 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:59,767 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:44:59,967 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:00,168 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:00,368 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:00,569 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:00,770 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:00,971 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:01,172 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:01,373 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:01,573 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:01,774 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:01,975 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:02,176 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:02,377 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:02,577 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:02,778 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:02,979 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:03,180 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:03,381 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:03,582 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:03,783 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:03,984 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:04,184 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:04,385 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:04,585 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:04,786 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:04,987 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:05,188 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:05,389 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:05,590 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:05,791 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:05,992 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:06,192 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:06,393 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:06,594 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:06,795 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:06,996 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:07,197 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:07,398 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:07,599 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:07,800 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:08,000 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:08,201 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:08,402 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:08,603 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:08,804 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:09,004 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:09,205 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:09,406 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:09,607 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:09,807 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:10,008 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:10,209 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:10,411 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:10,612 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:10,813 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:11,013 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:11,214 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:11,415 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:11,616 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:11,816 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:12,017 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:12,218 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:12,419 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:12,620 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:12,821 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:13,022 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:13,223 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:13,426 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:13,627 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:13,828 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:14,029 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:14,230 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:14,431 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:14,632 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:14,833 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:15,033 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:15,234 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:15,435 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:15,636 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:15,837 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:16,037 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:16,238 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:45:26,159 - DEBUG - Please Confirm the start mode
+2024-01-31 01:45:26,194 - INFO - Dropped Database
+2024-01-31 01:45:26,199 - INFO - Created Database
+2024-01-31 01:45:26,295 - INFO - Created Tables
+2024-01-31 01:45:26,295 - INFO - Trying to connect to TWS
+2024-01-31 01:45:30,904 - INFO - Waiting for connection with TWS...
+2024-01-31 01:45:30,946 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture.nj AdvancedOrderRejectJson: 
+2024-01-31 01:45:30,947 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm.nj AdvancedOrderRejectJson: 
+2024-01-31 01:45:30,947 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfuture AdvancedOrderRejectJson: 
+2024-01-31 01:45:30,947 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:cashfarm AdvancedOrderRejectJson: 
+2024-01-31 01:45:30,947 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2104 Msg: Market data farm connection is OK:usfarm AdvancedOrderRejectJson: 
+2024-01-31 01:45:30,947 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2106 Msg: HMDS data farm connection is OK:ushmds AdvancedOrderRejectJson: 
+2024-01-31 01:45:30,947 - DEBUG - Error returned by TWS: reqId: -1 Error Code: 2158 Msg: Sec-def data farm connection is OK:secdefil AdvancedOrderRejectJson: 
+2024-01-31 01:45:31,406 - INFO - Connected to TWS
+2024-01-31 01:45:31,491 - DEBUG - Intializing GUI Screen
+2024-01-31 01:45:31,495 - DEBUG - Account download finished: DU6484447
+2024-01-31 01:45:32,693 - DEBUG - GUI Screen Initialized
+2024-01-31 01:47:35,030 - DEBUG - Please Confirm the start mode
+2024-01-31 01:47:35,064 - INFO - Dropped Database
+2024-01-31 01:47:35,067 - INFO - Created Database
+2024-01-31 01:47:35,148 - INFO - Created Tables
+2024-01-31 01:47:35,226 - DEBUG - Intializing GUI Screen
+2024-01-31 01:47:36,428 - DEBUG - GUI Screen Initialized
+2024-01-31 01:48:59,039 - DEBUG - Please Confirm the start mode
+2024-01-31 01:48:59,071 - INFO - Dropped Database
+2024-01-31 01:48:59,074 - INFO - Created Database
+2024-01-31 01:48:59,151 - INFO - Created Tables
+2024-01-31 01:48:59,221 - DEBUG - Intializing GUI Screen
+2024-01-31 01:49:00,423 - DEBUG - GUI Screen Initialized
+2024-01-31 01:51:49,955 - DEBUG - Please Confirm the start mode
+2024-01-31 01:52:53,303 - DEBUG - Please Confirm the start mode
+2024-01-31 01:54:07,758 - DEBUG - Please Confirm the start mode
+2024-01-31 01:54:13,439 - DEBUG - Intializing GUI Screen
+2024-01-31 01:54:14,641 - DEBUG - GUI Screen Initialized
+2024-01-31 01:56:30,390 - INFO - Close GUI button clicked
+2024-01-31 01:56:30,391 - INFO - Exiting Gracefully
+2024-01-31 01:56:30,592 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:56:30,793 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:56:30,824 - INFO - Stopped all the tasks, closing the GUI window now
+2024-01-31 01:56:30,824 - DEBUG - Screen Closed, Closing the app
+2024-01-31 01:56:30,824 - DEBUG - Disconnecting with TWS
+2024-01-31 01:56:30,993 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 01:56:30,993 - INFO - All the tasks stopped, Closing the window
+2024-01-31 01:56:31,044 - DEBUG - main.py run_sceen: Screen Closed
+2024-01-31 01:56:44,740 - DEBUG - Please Confirm the start mode
+2024-01-31 01:56:50,419 - DEBUG - Intializing GUI Screen
+2024-01-31 01:56:51,622 - DEBUG - GUI Screen Initialized
+2024-01-31 02:00:06,777 - INFO - Close GUI button clicked
+2024-01-31 02:00:06,777 - INFO - Exiting Gracefully
+2024-01-31 02:00:06,965 - INFO - Stopped all the tasks, closing the GUI window now
+2024-01-31 02:00:06,965 - DEBUG - Screen Closed, Closing the app
+2024-01-31 02:00:06,965 - DEBUG - Disconnecting with TWS
+2024-01-31 02:00:06,978 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 02:00:06,978 - INFO - All the tasks stopped, Closing the window
+2024-01-31 02:00:07,050 - DEBUG - main.py run_sceen: Screen Closed
+2024-01-31 02:00:18,405 - DEBUG - Please Confirm the start mode
+2024-01-31 02:00:24,097 - DEBUG - Intializing GUI Screen
+2024-01-31 02:00:25,312 - DEBUG - GUI Screen Initialized
+2024-01-31 02:02:09,151 - DEBUG - Please Confirm the start mode
+2024-01-31 02:02:14,843 - DEBUG - Intializing GUI Screen
+2024-01-31 02:02:16,046 - DEBUG - GUI Screen Initialized
+2024-01-31 02:04:56,735 - DEBUG - Please Confirm the start mode
+2024-01-31 02:05:02,410 - DEBUG - Intializing GUI Screen
+2024-01-31 02:05:03,615 - DEBUG - GUI Screen Initialized
+2024-01-31 02:14:25,817 - DEBUG - Please Confirm the start mode
+2024-01-31 02:14:31,560 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:31,763 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:31,964 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:32,165 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:32,366 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:32,566 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:32,768 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:32,969 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:33,170 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:33,371 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:33,572 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:33,773 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:33,974 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:34,175 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:34,375 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:34,576 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:34,777 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:34,978 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:35,179 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:35,380 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:35,581 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:35,782 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:35,982 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:36,183 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:36,384 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:36,585 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:36,786 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:36,987 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:37,188 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:37,389 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:37,590 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:37,790 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:37,991 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:38,192 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:38,393 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:38,594 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:38,795 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:38,996 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:39,197 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:39,398 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:39,598 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:39,799 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:40,000 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:40,201 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:40,402 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:40,603 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:40,804 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:41,005 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:41,206 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:41,406 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:41,607 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:41,808 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:42,009 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:42,211 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:42,412 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:42,613 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:42,814 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:43,014 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:43,223 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:43,432 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:43,633 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:43,834 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:44,035 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:44,237 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:44,438 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:44,639 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:44,839 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:45,040 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:45,241 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:45,442 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:45,643 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:45,844 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:46,045 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:46,246 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:46,446 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:46,647 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:46,848 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:47,049 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:47,250 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:47,451 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:47,652 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:47,853 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:48,054 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:48,255 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:48,455 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:48,656 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:48,857 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:49,061 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:49,262 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:49,463 - DEBUG - Intializing GUI Screen
+2024-01-31 02:14:49,664 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:38,417 - DEBUG - Please Confirm the start mode
+2024-01-31 02:17:44,089 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:44,291 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:44,492 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:44,693 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:44,894 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:45,095 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:45,296 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:45,496 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:45,697 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:45,898 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:46,099 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:46,300 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:46,501 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:46,702 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:46,903 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:47,104 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:47,304 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:47,505 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:47,706 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:47,907 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:48,107 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:48,308 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:48,509 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:48,710 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:48,911 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:49,112 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:49,315 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:49,516 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:49,717 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:49,917 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:50,118 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:50,319 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:50,520 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:50,722 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:50,923 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:51,124 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:51,326 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:51,527 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:51,727 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:51,928 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:52,129 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:52,330 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:52,531 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:52,732 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:52,932 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:53,132 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:53,333 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:53,534 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:53,735 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:53,936 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:54,137 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:54,338 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:54,539 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:54,739 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:54,940 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:55,141 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:55,342 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:55,543 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:55,744 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:55,945 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:56,146 - DEBUG - Intializing GUI Screen
+2024-01-31 02:17:56,347 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:09,821 - DEBUG - Please Confirm the start mode
+2024-01-31 02:18:15,498 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:15,699 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:15,900 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:16,100 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:16,301 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:16,502 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:16,709 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:16,941 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:17,142 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:17,343 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:17,544 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:17,744 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:17,945 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:18,146 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:18,347 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:18,548 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:18,749 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:18,950 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:19,151 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:19,351 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:19,552 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:19,753 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:19,954 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:20,155 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:20,356 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:20,557 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:20,758 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:20,959 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:21,159 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:21,360 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:21,561 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:21,762 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:21,963 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:22,164 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:22,365 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:22,566 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:22,767 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:22,967 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:23,168 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:23,369 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:23,570 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:23,771 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:23,972 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:24,173 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:24,374 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:24,575 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:24,806 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:25,028 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:25,229 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:25,430 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:25,631 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:25,832 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:26,033 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:26,234 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:26,434 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:26,635 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:26,837 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:27,040 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:27,241 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:27,442 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:27,643 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:27,844 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:28,046 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:28,247 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:28,448 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:28,650 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:28,853 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:29,054 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:29,255 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:29,456 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:29,657 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:29,858 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:30,058 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:30,259 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:30,460 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:30,661 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:30,862 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:31,063 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:31,264 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:31,465 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:31,665 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:31,866 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:32,067 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:47,259 - DEBUG - Please Confirm the start mode
+2024-01-31 02:18:53,001 - DEBUG - Intializing GUI Screen
+2024-01-31 02:18:54,209 - DEBUG - GUI Screen Initialized
+2024-01-31 02:21:23,893 - DEBUG - Please Confirm the start mode
+2024-01-31 02:21:29,615 - DEBUG - Intializing GUI Screen
+2024-01-31 02:21:30,817 - DEBUG - GUI Screen Initialized
+2024-01-31 02:23:01,723 - DEBUG - Please Confirm the start mode
+2024-01-31 02:23:07,422 - DEBUG - Intializing GUI Screen
+2024-01-31 02:23:08,629 - DEBUG - GUI Screen Initialized
+2024-01-31 02:24:03,094 - DEBUG - Please Confirm the start mode
+2024-01-31 02:24:08,798 - DEBUG - Intializing GUI Screen
+2024-01-31 02:24:10,006 - DEBUG - GUI Screen Initialized
+2024-01-31 02:25:22,145 - DEBUG - Please Confirm the start mode
+2024-01-31 02:25:27,861 - DEBUG - Intializing GUI Screen
+2024-01-31 02:25:29,067 - DEBUG - GUI Screen Initialized
+2024-01-31 02:28:44,930 - DEBUG - Please Confirm the start mode
+2024-01-31 02:28:50,650 - DEBUG - Intializing GUI Screen
+2024-01-31 02:28:51,851 - DEBUG - GUI Screen Initialized
+2024-01-31 02:29:35,414 - DEBUG - Please Confirm the start mode
+2024-01-31 02:29:41,125 - DEBUG - Intializing GUI Screen
+2024-01-31 02:29:42,330 - DEBUG - GUI Screen Initialized
+2024-01-31 02:49:34,142 - DEBUG - Please Confirm the start mode
+2024-01-31 02:49:39,915 - DEBUG - Intializing GUI Screen
+2024-01-31 02:49:41,116 - DEBUG - GUI Screen Initialized
+2024-01-31 02:53:03,825 - DEBUG - Please Confirm the start mode
+2024-01-31 02:53:09,552 - DEBUG - Intializing GUI Screen
+2024-01-31 02:53:10,755 - DEBUG - GUI Screen Initialized
+2024-01-31 02:53:36,645 - DEBUG - Please Confirm the start mode
+2024-01-31 02:53:42,320 - DEBUG - Intializing GUI Screen
+2024-01-31 02:53:43,523 - DEBUG - GUI Screen Initialized
+2024-01-31 02:53:57,313 - DEBUG - Please Confirm the start mode
+2024-01-31 02:54:03,003 - DEBUG - Intializing GUI Screen
+2024-01-31 02:54:04,206 - DEBUG - GUI Screen Initialized
+2024-01-31 02:55:21,904 - DEBUG - Please Confirm the start mode
+2024-01-31 02:55:27,617 - DEBUG - Intializing GUI Screen
+2024-01-31 02:55:28,819 - DEBUG - GUI Screen Initialized
+2024-01-31 02:56:13,834 - INFO - Close GUI button clicked
+2024-01-31 02:56:13,835 - INFO - Exiting Gracefully
+2024-01-31 02:56:13,900 - INFO - Stopped all the tasks, closing the GUI window now
+2024-01-31 02:56:13,901 - DEBUG - Screen Closed, Closing the app
+2024-01-31 02:56:13,901 - DEBUG - Disconnecting with TWS
+2024-01-31 02:56:13,902 - DEBUG - Disconnected with TWS
+2024-01-31 02:56:14,037 - INFO - Waiting for the all the tasks to be stopped
+2024-01-31 02:56:14,037 - INFO - All the tasks stopped, Closing the window
+2024-01-31 02:56:14,100 - DEBUG - main.py run_sceen: Screen Closed
+2024-01-31 02:56:28,606 - DEBUG - Please Confirm the start mode
+2024-01-31 02:56:34,325 - DEBUG - Intializing GUI Screen
+2024-01-31 02:56:35,527 - DEBUG - GUI Screen Initialized
+2024-01-31 15:22:57,297 - DEBUG - Please Confirm the start mode
+2024-01-31 15:23:03,032 - DEBUG - Intializing GUI Screen
+2024-01-31 15:23:04,233 - DEBUG - GUI Screen Initialized
+2024-01-31 15:25:56,377 - DEBUG - Please Confirm the start mode
+2024-01-31 15:26:00,456 - DEBUG - Please Confirm the start mode
+2024-01-31 15:26:06,670 - DEBUG - Intializing GUI Screen
+2024-01-31 15:26:07,877 - DEBUG - GUI Screen Initialized
+2024-01-31 15:26:51,359 - DEBUG - Please Confirm the start mode
+2024-01-31 15:26:57,050 - DEBUG - Intializing GUI Screen
+2024-01-31 15:26:58,293 - DEBUG - GUI Screen Initialized
+2024-01-31 15:27:25,009 - DEBUG - Please Confirm the start mode
+2024-01-31 15:27:30,702 - DEBUG - Intializing GUI Screen
+2024-01-31 15:27:31,908 - DEBUG - GUI Screen Initialized
+2024-01-31 15:29:35,654 - DEBUG - Please Confirm the start mode
+2024-01-31 15:29:41,382 - DEBUG - Intializing GUI Screen
+2024-01-31 15:29:42,583 - DEBUG - GUI Screen Initialized
+2024-01-31 15:30:31,773 - DEBUG - Please Confirm the start mode
+2024-01-31 15:30:37,446 - DEBUG - Intializing GUI Screen
+2024-01-31 15:30:38,652 - DEBUG - GUI Screen Initialized
+2024-01-31 15:30:59,512 - DEBUG - Please Confirm the start mode
+2024-01-31 15:31:05,182 - DEBUG - Intializing GUI Screen
+2024-01-31 15:31:06,384 - DEBUG - GUI Screen Initialized

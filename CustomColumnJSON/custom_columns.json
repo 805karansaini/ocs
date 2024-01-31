@@ -1,0 +1,10 @@
+{
+  "Custom Columns": {
+    "1": {
+      "Column ID": 1,
+      "Column Name": "custom",
+      "Column Expression": "Beta",
+      "Column Description": "test"
+    }
+  }
+}

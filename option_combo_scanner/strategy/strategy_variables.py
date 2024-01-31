@@ -1,0 +1,53 @@
+import configparser
+import datetime
+import threading
+from typing import List, Tuple
+
+# Read the config file
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+# Settings from config file
+execution_engine_config = config["ExecutionEngine"]
+time_zone_config = config["TimeZone"]
+
+
+class StrategyVariables:
+    """
+    Class Variables for the strategy
+    will be used to store variables that are used across different modules
+    mainly the GUI and the monitoring and the execution modules
+    """
+
+    screen = None
+
+    # Execution Engine Settings
+    number_of_trades_allowed = int(execution_engine_config["number_of_trades_allowed"])
+    max_ba_spread = float(execution_engine_config["max_ba_spread"])
+    price_gap_threshold = float(execution_engine_config["price_gap_threshold"])
+    stoploss_threshold = float(execution_engine_config["stoploss_threshold"])
+    number_of_iterations = int(execution_engine_config["number_of_iterations"])
+    sleep_time_between_iterations = float(
+        execution_engine_config["sleep_time_between_iterations"]
+    )
+
+    trade_start_time = execution_engine_config["trade_start_time"]
+    trade_end_time = execution_engine_config["trade_end_time"]
+
+    max_nlv_exposure_per_trade = float(
+        execution_engine_config["max_nlv_exposure_per_trade"]
+    )
+
+    # Timezone object for the target time zone
+    target_time_zone = time_zone_config["target_timezone"]
+
+    # Order Execution Lock
+    order_execution_lock = threading.Lock()
+
+    # Set of symbols for which the order execution is sent only used inside the lock/critical section
+    set_symbols_for_which_order_execution_sent = set()
+    map_symbol_to_sent_completed_execution = {}
+
+    map_con_id_to_contract = {}
+    map_unique_id_to_order_preset_obj = {}
+    list_of_unique_ids_for_which_entry_order_is_pending: List[Tuple[int, int]] = []

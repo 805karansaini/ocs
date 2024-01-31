@@ -1,0 +1,20 @@
+# Ignore virtual environment
+.venv/
+.vscode/
+
+# Ignore build, dist, main.spec and logs
+build/
+dist/
+Logs/
+main.spec
+
+# Ignore documents directory
+.documents/
+
+# Ignore Python cache
+__pycache__/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/__pycache__/
