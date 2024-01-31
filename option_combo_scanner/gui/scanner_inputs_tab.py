@@ -34,6 +34,10 @@ class TradingRulesTab:
         self.create_trading_rules_tab()
 
     def create_trading_rules_tab(self):
+        self.create_instrument_table()
+        self.create_configuration_inputs_and_table()
+    
+    def create_instrument_table(self, ):
         # Create Treeview Frame for active combo table
         add_instrument_frame = ttk.Frame(self.trading_rules_tab, padding=20)
         add_instrument_frame.pack(pady=20)
@@ -93,41 +97,40 @@ class TradingRulesTab:
         # Back ground
         self.instrument_table.tag_configure("oddrow", background="white")
         self.instrument_table.tag_configure("evenrow", background="lightblue")
-        ttk.Label(input_frame, text="SecType", width=12, anchor="center").grid(
-            column=0, row=0, padx=5, pady=5
-        )
 
-        # # Label for Config box
-        # ttk.Label(instrument_table_frame, text="Config").grid(
-        #     row=4, column=0, padx=10, pady=5, sticky="w"
-        # )
+    def create_configuration_inputs_and_table(self,):
 
-        # # Description box for config
-        # self.config_description = ttk.Treeview(
-        #     instrument_table_frame,
-        #     columns=("ConfigID", "Legs", "DTE"),
-        #     show="headings",
-        #     height=8,
-        # )
-        # self.config_description.grid(
-        #     row=5, column=0, padx=(10, 50), pady=(5, 20), rowspan=2, sticky="ew"
-        # )
+        # Create a frame for input fields
+        input_fields_frame = ttk.Frame(self.trading_rules_tab, padding=20)
+        input_fields_frame.pack()
 
-        # # Set column headings and styles for config table
-        # self.config_description.heading("ConfigID", text="Config ID")
-        # self.config_description.heading("Legs", text="Legs")
-        # self.config_description.heading("DTE", text="DTE")
+        # Place the input fields frame just below the instrument table
+        input_fields_frame.place(relx=0.5, anchor=tk.CENTER, rely=0.2, y=250)
 
-        # self.config_description.column("ConfigID", width=300)
-        # self.config_description.column("Legs", width=300)
-        # self.config_description.column("DTE", width=300)
-        # style.configure(
-        #     "Config.Treeview",
-        #     background="#D3D3D3",
-        #     foreground="black",
-        #     rowheight=25,
-        #     fieldbackground="#D3D3D3",
+        right_label = ttk.Label(input_fields_frame, text="Right", anchor="center", width=12)
+        right_label.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
+        right_var = tk.StringVar()
+        right_dropdown = ttk.Combobox(input_fields_frame, textvariable=right_var, values=["Call", "Put"], state="readonly")
+        right_dropdown.grid(column=0, row=1, padx=5, pady=5)
+        # Add Entry for "dte leg" with label above
+        dte_leg_label = ttk.Label(input_fields_frame, text="List of DTE", anchor="center", width=12)
+        dte_leg_label.grid(column=1, row=0, padx=5, pady=(0, 5), sticky="n")
+        dte_leg_entry = ttk.Entry(input_fields_frame)
+        dte_leg_entry.grid(column=1, row=1, padx=5, pady=5)
+        # ttk.Label(input_frame, text="SecType", width=12, anchor="center").grid(
+        #     column=0, row=0, padx=5, pady=5
         # )
+        leg_label = ttk.Label(input_fields_frame, text="#Legs", anchor="center", width=12)
+        leg_label.grid(column=2, row=0, padx=5, pady=(0, 5), sticky="n")
+        leg_entry = ttk.Entry(input_fields_frame)
+        leg_entry.grid(column=2, row=1, padx=5, pady=5)
+
+        update_button = ttk.Button(input_fields_frame, text="Update Legs Config")
+        update_button.grid(column=5, row=1, padx=5, pady=5)
+
+        # Add Save button
+        save_button = ttk.Button(input_fields_frame, text="Save Config")
+        save_button.grid(column=6, row=1, padx=5, pady=5)
 
 
     def add_instrument(
