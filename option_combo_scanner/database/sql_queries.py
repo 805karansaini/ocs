@@ -117,7 +117,7 @@ class SqlQueries:
 
         if where_clause:
             query += f"""
-                WHERE {where_clause}
+                {where_clause}
             """
 
         return query
