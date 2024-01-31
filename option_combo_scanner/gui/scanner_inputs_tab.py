@@ -5,13 +5,15 @@ import time
 import tkinter as tk
 from tkinter import Scrollbar, messagebox, ttk
 from com.identify_trading_class_for_fop import identify_the_trading_class_for_all_the_fop_leg_in_combination_async
+from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
 
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.strategy.strategy_variables import (
     StrategyVariables as strategy_variables,
 )
 from com.variables import variables
-
+from option_combo_scanner.database.sql_queries import SqlQueries 
+from option_combo_scanner.strategy.instrument import Instrument
 MESSAGE_TIME_IN_SECONDS = 6  # in seconds
 
 # Name, Width, Heading
@@ -43,7 +45,10 @@ class ScannerInputsTab:
     def create_scanner_inputs_tab(self):
         self.create_instrument_table()
         self.create_configuration_inputs_and_table()
-    
+
+        HouseKeepingGUI.dump_all_instruments_in_instrument_tab(
+            self
+        )
     def create_instrument_table(self, ):
         # Create Treeview Frame for active combo table
         add_instrument_frame = ttk.Frame(self.scanner_inputs_tab, padding=20)
@@ -104,7 +109,64 @@ class ScannerInputsTab:
         # Back ground
         self.instrument_table.tag_configure("oddrow", background="white")
         self.instrument_table.tag_configure("evenrow", background="lightblue")
-    
+
+        
+        self.instrument_table.bind(
+            "<Button-3>", self.instrument_table_right_click_menu
+        )
+
+    def instrument_table_right_click_menu(self, event):
+        # get the Treeview row that was clicked
+        row = self.instrument_table.identify_row(event.y)
+        if row:
+            # select the row
+            self.instrument_table.selection_set(row)
+
+            # create a context menu
+            menu = tk.Menu(self.instrument_table, tearoff=0)
+            menu.add_command(
+                label="Delete Instrument",
+                command=lambda: self.delete_selected_instrument(),
+            )
+
+            # display the context menu at the location of the mouse cursor
+            menu.post(event.x_root, event.y_root)
+
+    def remove_row_from_instrument_table(self, list_of_instrument_ids: list):
+        all_instrument_ids = self.instrument_table.get_children()
+
+        for instrument_id in list_of_instrument_ids:
+            if str(instrument_id) in all_instrument_ids:
+                self.instrument_table.delete(instrument_id)
+
+    def delete_selected_instrument(
+        self,
+    ):
+        # Instrument ID
+        instrument_id = self.instrument_table.selection()[0]  # get the item ID of the selected row
+        instrument_id = int(instrument_id)
+
+        self.remove_instruments([int(instrument_id)])
+
+    def remove_instruments(self, list_of_instrument_ids: list):
+        for instrument_id in list_of_instrument_ids:
+            where_clause = f"WHERE instrument_id = {instrument_id}"
+            # Database Remove
+            is_deleted = SqlQueries.delete_from_db_table(table_name="instrument_table", where_clause=where_clause)
+            
+            if not is_deleted:
+                Utils.display_message_popup(
+                    "Error",
+                    f"Unable to delete the Instrument, Instrument ID: {instrument_id}",
+                )
+            
+            # Remove GUI
+            self.remove_row_from_instrument_table([instrument_id])
+            
+            # Remove from system
+            instrument_obj = strategy_variables.map_instrument_id_to_instrument_object[int(instrument_id)]
+            instrument_obj.remove_from_system()
+
     def add_instrument(
         self, 
         sec_type,
@@ -116,7 +178,7 @@ class ScannerInputsTab:
         conid,
         primary_exchange,
     ):
-        data_dict = {
+        values_dict = {
             'symbol': symbol,
             'sec_type': sec_type,
             'currency': currency,
@@ -126,19 +188,26 @@ class ScannerInputsTab:
             'conid': conid,
             'primary_exchange': primary_exchange,
         }
+        
+        # TODO Validaitons
 
+        # Insert in the database
+        res, instrument_id = SqlQueries.insert_into_db_table(table_name="instrument_table", values_dict=values_dict)
+
+        # if not inserted
+        if not res:
+            # show error TODO
+            return
+        
+        values_dict['instrument_id']  = instrument_id
+        instrument_obj = Instrument(values_dict) 
+
+        self.insert_into_instrument_table(instrument_obj)
+
+    def insert_into_instrument_table(self, instrument_obj):
+        
         # Add instrument details to the instrument tree
-        row_values = (
-                instrument_id,
-                symbol,
-                sec_type,
-                currency,
-                multiplier,
-                exchange,
-                trading_class,
-                "coni ",
-                "Pri Exh",
-            )
+        row_values = instrument_obj.get_instrument_tuple_for_gui()
 
         # Get the current number of items in the treeview
         num_items = len(self.instrument_table.get_children())
@@ -147,7 +216,7 @@ class ScannerInputsTab:
             self.instrument_table.insert(
                 "",
                 "end",
-                iid=instrument_id,
+                iid=row_values[0],
                 text=num_items + 1,
                 values=row_values,
                 tags=("oddrow",),
@@ -156,7 +225,7 @@ class ScannerInputsTab:
             self.instrument_table.insert(
                 "",
                 "end",
-                iid=instrument_id,
+                iid=row_values[0],
                 text=num_items + 1,
                 values=row_values,
                 tags=("evenrow",),
@@ -675,8 +744,11 @@ class ScannerInputsTab:
 
             print("Combo Values: ", combo_values)
 
-            self.add_instrument(*combo_values[0])
+            # TODO - get result
+            res = self.add_instrument(*combo_values[0])
 
+            # if res
+            popup.destroy()
             # Enabling the Button again
             add_combo_button.config(state="normal")
 
@@ -713,7 +785,6 @@ class ScannerInputsTab:
             ),
         )
         search_trading_classes_for_fop_button.grid(row=0, column=1, padx=10)
-
     
     def create_configuration_inputs_and_table(self,):
 
