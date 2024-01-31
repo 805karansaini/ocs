@@ -18,6 +18,13 @@ class StrategyVariables:
     will be used to store variables that are used across different modules
     mainly the GUI and the monitoring and the execution modules
     """
+    map_instrument_id_to_instrument_object = {}
+
+
+
+
+
+
 
     screen = None
 
