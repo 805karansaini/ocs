@@ -104,47 +104,7 @@ class ScannerInputsTab:
         # Back ground
         self.instrument_table.tag_configure("oddrow", background="white")
         self.instrument_table.tag_configure("evenrow", background="lightblue")
-
-    def create_configuration_inputs_and_table(self,):
-
-        # Create a frame for input fields
-        input_fields_frame = ttk.Frame(self.scanner_inputs_tab, padding=20)
-        input_fields_frame.pack()
-
-        # Place the input fields frame just below the instrument table
-        input_fields_frame.place(relx=0.5, anchor=tk.CENTER, rely=0.2, y=250)
-
-        # Labels
-        right_label = ttk.Label(input_fields_frame, text="Right", anchor="center", width=12)
-        right_label.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
-        
-        dte_leg_label = ttk.Label(input_fields_frame, text="List of DTE", anchor="center", width=12)
-        dte_leg_label.grid(column=1, row=0, padx=5, pady=(0, 5), sticky="n")
-        
-        leg_label = ttk.Label(input_fields_frame, text="#Legs", anchor="center", width=12)
-        leg_label.grid(column=2, row=0, padx=5, pady=(0, 5), sticky="n")
-        
-        # Entry and Combo box Inputs 
-        right_var = tk.StringVar()
-        right_dropdown = ttk.Combobox(input_fields_frame, textvariable=right_var, values=["Call", "Put"], state="readonly")
-        right_dropdown.grid(column=0, row=1, padx=5, pady=5)
-
-        # Add Entry for "dte leg" with label above
-        dte_leg_entry = ttk.Entry(input_fields_frame)
-        dte_leg_entry.grid(column=1, row=1, padx=5, pady=5)
-        
-        leg_entry = ttk.Entry(input_fields_frame)
-        leg_entry.grid(column=2, row=1, padx=5, pady=5)
-
-        update_leg_config_button = ttk.Button(input_fields_frame, text="Update Legs Config")
-        update_leg_config_button.grid(column=5, row=1, padx=5, pady=5)
-
-        # Add Save button
-        save_config_button = ttk.Button(input_fields_frame, text="Save Config")
-        save_config_button.grid(column=6, row=1, padx=5, pady=5)
-
-        self.create_leg_config_editable_table()
-
+    
     def add_instrument(
         self, 
         sec_type,
@@ -754,6 +714,47 @@ class ScannerInputsTab:
         )
         search_trading_classes_for_fop_button.grid(row=0, column=1, padx=10)
 
+    
+    def create_configuration_inputs_and_table(self,):
+
+        # Create a frame for input fields
+        input_fields_frame = ttk.Frame(self.scanner_inputs_tab, padding=20)
+        input_fields_frame.pack()
+
+        # Place the input fields frame just below the instrument table
+        input_fields_frame.place(relx=0.5, anchor=tk.CENTER, rely=0.2, y=250)
+
+        # Labels
+        right_label = ttk.Label(input_fields_frame, text="Right", anchor="center", width=12)
+        right_label.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
+        
+        dte_leg_label = ttk.Label(input_fields_frame, text="List of DTE", anchor="center", width=12)
+        dte_leg_label.grid(column=1, row=0, padx=5, pady=(0, 5), sticky="n")
+        
+        leg_label = ttk.Label(input_fields_frame, text="#Legs", anchor="center", width=12)
+        leg_label.grid(column=2, row=0, padx=5, pady=(0, 5), sticky="n")
+        
+        # Entry and Combo box Inputs 
+        right_var = tk.StringVar()
+        right_dropdown = ttk.Combobox(input_fields_frame, textvariable=right_var, values=["Call", "Put"], state="readonly")
+        right_dropdown.grid(column=0, row=1, padx=5, pady=5)
+
+        # Add Entry for "dte leg" with label above
+        dte_leg_entry = ttk.Entry(input_fields_frame)
+        dte_leg_entry.grid(column=1, row=1, padx=5, pady=5)
+        
+        leg_entry = ttk.Entry(input_fields_frame)
+        leg_entry.grid(column=2, row=1, padx=5, pady=5)
+
+        update_leg_config_button = ttk.Button(input_fields_frame, text="Update Legs Config")
+        update_leg_config_button.grid(column=5, row=1, padx=5, pady=5)
+
+        # Add Save button
+        save_config_button = ttk.Button(input_fields_frame, text="Save Config")
+        save_config_button.grid(column=6, row=1, padx=5, pady=5)
+
+        self.create_leg_config_editable_table()
+
     def create_leg_config_editable_table(self):
         # Table, 
         # Editable
@@ -857,7 +858,6 @@ class ScannerInputsTab:
 
         # update filter table
         # self.update_uer_inputs_table()
-
 
     def on_scroll(self, event):
 
