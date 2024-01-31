@@ -11,9 +11,9 @@ class SqlQueries:
         pass
 
     @staticmethod
-    def insert_order_preset(values_dict):
+    def insert_into_db_table(table_name, values_dict):
         query = SqlQueries.create_insert_query(
-            table_name="order_specs",
+            table_name=table_name,
             values_dict=values_dict,
         )
 
@@ -21,9 +21,9 @@ class SqlQueries:
         return SqlQueries.execute_insert_query(query)
 
     @staticmethod
-    def get_preset_orders(columns, where_clause=False):
+    def select_from_db_table(table_name, columns, where_clause=False):
         query = SqlQueries.create_select_query(
-            table_name="order_specs",
+            table_name=table_name,
             columns=columns,
         )
 
@@ -31,9 +31,9 @@ class SqlQueries:
         return SqlQueries.execute_select_query(query)
 
     @staticmethod
-    def update_preset_order(values_dict, where_clause=False):
+    def update_db_table(table_name, values_dict, where_clause=False):
         query = SqlQueries.create_update_query(
-            table_name="order_specs",
+            table_name=table_name,
             values_dict=values_dict,
             where_clause=where_clause,
         )
@@ -42,47 +42,22 @@ class SqlQueries:
         return SqlQueries.execute_update_query(query)
 
     @staticmethod
-    def insert_into_orders(values_dict):
-        query = SqlQueries.create_insert_query(
-            table_name="orders",
-            values_dict=values_dict,
-        )
-
-        # Execute the query
-        return SqlQueries.execute_insert_query(query)
-
-    @staticmethod
-    def get_orders(columns, where_clause=False):
-        query = SqlQueries.create_select_query(
-            table_name="orders",
-            columns=columns,
+    def delete_from_db_table(table_name, where_clause=False):
+        query = SqlQueries.create_delete_query(
+            table_name=table_name,
             where_clause=where_clause,
         )
 
         # Execute the query
-        return SqlQueries.execute_select_query(query)
+        return SqlQueries.execute_delete_query(query)
 
-    @staticmethod
-    def insert_into_executions(values_dict):
-        query = SqlQueries.create_insert_query(
-            table_name="executions",
-            values_dict=values_dict,
-        )
+    
 
-        # Execute the query
-        return SqlQueries.execute_insert_query(query)
 
-    @staticmethod
-    def update_orders(values_dict, where_clause=False):
-        query = SqlQueries.create_update_query(
-            table_name="orders",
-            values_dict=values_dict,
-            where_clause=where_clause,
-        )
 
-        # Execute the query
-        return SqlQueries.execute_update_query(query)
 
+
+    
     # Create Insert Query
     @staticmethod
     def create_insert_query(table_name, values_dict):

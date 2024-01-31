@@ -7,90 +7,92 @@ config.read("config.ini")
 dbconfig = config["Database"]
 
 DB_NAME = dbconfig["database"]
-query0 = f"""DROP DATABASE IF EXISTS {DB_NAME};"""
-query1 = f"""CREATE DATABASE IF NOT EXISTS {DB_NAME};"""
-query2 = f"""CREATE TABLE IF NOT EXISTS `order_specs` (
-        `UniqueID` INT AUTO_INCREMENT PRIMARY KEY,
-        `AccountID` VARCHAR(50),
-        `Ticker` VARCHAR(50),
-        `SecType` VARCHAR(20),
-        `Exchange` VARCHAR(20),
-        `Currency` VARCHAR(20),
-        `Conid` VARCHAR(20),
-        `RiskPercentage` VARCHAR(50),
-        `RiskDollar` VARCHAR(50),
-        `NetLiquidationValue` VARCHAR(50),
-        `EntryPrice` DECIMAL(18, 2),
-        `TP1Price` DECIMAL(18, 2),
-        `TP2Price` VARCHAR(50),
-        `SL1Price` DECIMAL(18, 2),
-        `SL2Price` VARCHAR(50),
-        
-        `EntryQuantity` VARCHAR(20),
+query0 = f"DROP DATABASE IF EXISTS {DB_NAME};"
+query1 = f"CREATE DATABASE IF NOT EXISTS {DB_NAME};"
 
-        `Status` VARCHAR(50),
-
-        `EntryQuantityFilled` VARCHAR(20),
-        `AverageEntryPrice` DECIMAL(18, 2),
-        `ExitQuantityFilled` VARCHAR(20),
-        `AverageExitPrice` DECIMAL(18, 2),
-        `PNL` VARCHAR(50),
-        `EntryOrderID` VARCHAR(20),
-        `FlagEntryOrderSent` INT,
-        `FlagExitOrderSent` INT,
-        `FailureReason` VARCHAR(160)
+query2 = """CREATE TABLE IF NOT EXISTS `instrument_table` (
+        `instrument_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `symbol` VARCHAR(50),
+        `sec_type` VARCHAR(20),
+        `multiplier` INT,
+        `exchange` VARCHAR(20),
+        `trading_class` VARCHAR(20),
+        `currency` VARCHAR(20),
+        `conid` VARCHAR(20),
+        `primary_exchange` VARCHAR(20)
     );"""
-query3 = f"""CREATE TABLE IF NOT EXISTS `orders` (
-        `OrderID` INT PRIMARY KEY,
-        `UniqueID` INT,
-        `AccountID` VARCHAR(50),
-        `Ticker` VARCHAR(50),
-        `Action` VARCHAR(50),
-        `OrderType` VARCHAR(50),
-        
-        `OrderPrice` DECIMAL(18, 2),
-        `OrderQuantity` VARCHAR(20),
-        `OrderTime` VARCHAR(100),
-        `LastUpdateTime` VARCHAR(100),
 
-        `OrderStatus` VARCHAR(50),
-        
-        `FilledQuantity` VARCHAR(20),
-        `AverageFillPrice` VARCHAR(20),
-        
-        `OrderRef` VARCHAR(255),
-        `OCAGroup` VARCHAR(255),
-        `OCAType` VARCHAR(255),
-        `FailureReason` VARCHAR(500),
-        `FlagPurged` INT,
-        FOREIGN KEY (`UniqueID`) REFERENCES `order_specs`(`UniqueID`) ON DELETE CASCADE
-        );"""
-query4 = f"""CREATE TABLE IF NOT EXISTS `executions` (
-        `ExecutionID` VARCHAR(255) PRIMARY KEY,
-        `OrderID` INT,
-        `AccountID` VARCHAR(50),
-        `ExecutionPrice` DECIMAL(18, 2),
-        `ExecutionQuantity` VARCHAR(20),
-        `ExecutionTime` VARCHAR(255),
-        `PermID` VARCHAR(255),
-        `CumExecutionQuantity` DECIMAL(18, 2),
-        `AverageExecutionPrice` DECIMAL(18, 2),
-        FOREIGN KEY (`OrderID`) REFERENCES `orders`(`OrderID`) ON DELETE CASCADE
-        );"""
+query3 = """CREATE TABLE IF NOT EXISTS `config_table` (
+        `config_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `leg` INT,
+        `right` VARCHAR(50),
+        `list_of_dte` VARCHAR(50)
+    );"""
 
-query5 = f"""
-    CREATE TRIGGER update_order_status_and_price_from_executions
-    AFTER INSERT ON executions
-    FOR EACH ROW
-    BEGIN        
-    IF NEW.CumExecutionQuantity = (SELECT OrderQuantity FROM Orders WHERE OrderID = NEW.OrderID AND AccountID = NEW.AccountID) THEN
-        UPDATE Orders
-        SET OrderStatus = 'Filled',
-            AverageFillPrice = NEW.AverageExecutionPrice,
-            FilledQuantity = NEW.CumExecutionQuantity,
-            LastUpdateTime = NEW.ExecutionTime
-        WHERE AccountID = NEW.AccountID AND OrderID = NEW.OrderID;
-    END IF;
-    END;"""
+query4 = """CREATE TABLE IF NOT EXISTS `config_legs_table` (
+        `config_leg_id` VARCHAR(255) PRIMARY KEY,
+        `config_id`  INT, 
+        `leg_number` INT,
+        `action` VARCHAR(50),
+        `delta_range_min` VARCHAR(50),
+        `delta_range_max` VARCHAR(50),
+        FOREIGN KEY (`config_id`) REFERENCES `config_table`(`config_id`) ON DELETE CASCADE
+    );"""
 
-all_queries = [query2, query3, query4, query5]
+query5 = """CREATE TABLE IF NOT EXISTS `combination_table` (
+        `combo_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `legs` INT,
+        `symbol` VARCHAR(50),
+        `sec_type` VARCHAR(20),
+        `expiry` VARCHAR(20),
+        `right` VARCHAR(20),
+        `multiplier` INT,
+        `trading_class` VARCHAR(20),
+        `exchange` VARCHAR(20),
+        `combo_net_delta` VARCHAR(20)
+    );"""
+
+query6 = """CREATE TABLE IF NOT EXISTS `legs_table` (
+        `leg_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `combo_id` INT,
+        `leg_number` INT,
+        `con_id` VARCHAR(15),
+        `strike` VARCHAR(15),
+        `qty` VARCHAR(15),
+        `delta_found` VARCHAR(15),
+        `action` VARCHAR(15),
+        `min_delta_range` VARCHAR(15),
+        `max_delta_range` VARCHAR(15),
+        FOREIGN KEY (`combo_id`) REFERENCES `combination_table`(`combo_id`)
+    );"""
+
+query7 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
+        `indicator_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `symbol` VARCHAR(15),
+        `sec_type` VARCHAR(15), 
+        `expiry` VARCHAR(15), 
+        `hv` VARCHAR(15),
+        `iv` VARCHAR(15),
+        `hv_iv` VARCHAR(15),
+        `rr_25` VARCHAR(15),
+        `rr_50` VARCHAR(15),
+        `rr_2550` VARCHAR(15),
+        `rr_change_last_close` VARCHAR(15),
+        `max_pain` VARCHAR(15),
+        `min_pain` VARCHAR(15),
+        `avg_iv` VARCHAR(15),
+        `avg_hv` VARCHAR(15),
+        `open_interest_support` VARCHAR(15),
+        `open_interest_resistance` VARCHAR(15),
+        `put_volume` VARCHAR(15),
+        `call_volume` VARCHAR(15),
+        `put_call_volume_ratio` VARCHAR(15),
+        `put_call_volume_average` VARCHAR(15),
+        `change_underlying_option_price` VARCHAR(15),
+        `change_underlying_option_price_14_days` VARCHAR(15),
+        `pc_change` VARCHAR(15),
+        `iv_change` VARCHAR(15),
+        `pc_change_iv_change` VARCHAR(15)
+    );"""
+
+all_queries = [query2, query3, query4, query5, query6, query7]

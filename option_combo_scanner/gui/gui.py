@@ -7,7 +7,7 @@ from tkinter import Scrollbar, ttk
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.order_book_tab import OrderBookTab
 from option_combo_scanner.gui.order_presets_tab import OrderPresetTab
-from option_combo_scanner.gui.scanner_inputs_tab import TradingRulesTab
+from option_combo_scanner.gui.scanner_inputs_tab import ScannerInputsTab
 
 logger = CustomLogger.logger
 
@@ -32,7 +32,7 @@ class ScreenGUI(threading.Thread):
         # Create the Tradeing Rules tab
         self.trading_rules_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.trading_rules_tab, text="ComboScanner Inputs")
-        self.trading_rules_tab_object = TradingRulesTab(self.trading_rules_tab)
+        self.trading_rules_tab_object = ScannerInputsTab(self.trading_rules_tab)
 
         # Create the Order Preset tab
         self.order_preset_tab_frame = ttk.Frame(self.notebook)

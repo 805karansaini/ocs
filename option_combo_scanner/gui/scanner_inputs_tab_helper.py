@@ -34,19 +34,21 @@ leg_config_table_columns_width = [
     ("MaxDelta", 382, "MaxDelta"),
     ]
 
-class ScannerInputsTab:
-    def __init__(self, scanner_inputs_tab):
-        self.last_update_settings_mssg_time = None
-        self.scanner_inputs_tab = scanner_inputs_tab
-        self.create_scanner_inputs_tab()
 
-    def create_scanner_inputs_tab(self):
+
+class ScannerInputsTab:
+    def __init__(self, trading_rules_tab):
+        self.last_update_settings_mssg_time = None
+        self.trading_rules_tab = trading_rules_tab
+        self.create_trading_rules_tab()
+
+    def create_trading_rules_tab(self):
         self.create_instrument_table()
         self.create_configuration_inputs_and_table()
     
     def create_instrument_table(self, ):
         # Create Treeview Frame for active combo table
-        add_instrument_frame = ttk.Frame(self.scanner_inputs_tab, padding=20)
+        add_instrument_frame = ttk.Frame(self.trading_rules_tab, padding=20)
         add_instrument_frame.pack(pady=20)
 
         # Create the "Clear Table" button
@@ -63,7 +65,7 @@ class ScannerInputsTab:
         add_instrument_frame.place(y=30)
 
 
-        instrument_table_frame = ttk.Frame(self.scanner_inputs_tab, padding=20)
+        instrument_table_frame = ttk.Frame(self.trading_rules_tab, padding=20)
         instrument_table_frame.pack(pady=20)
 
         # Place in center
@@ -108,7 +110,7 @@ class ScannerInputsTab:
     def create_configuration_inputs_and_table(self,):
 
         # Create a frame for input fields
-        input_fields_frame = ttk.Frame(self.scanner_inputs_tab, padding=20)
+        input_fields_frame = ttk.Frame(self.trading_rules_tab, padding=20)
         input_fields_frame.pack()
 
         # Place the input fields frame just below the instrument table
@@ -759,7 +761,7 @@ class ScannerInputsTab:
         # Editable
         # Header: ["LegNo", "Action", "MinDelta",, "MaxDelta"] 
         
-        leg_config_table_frame = ttk.Frame(self.scanner_inputs_tab, padding=20)
+        leg_config_table_frame = ttk.Frame(self.trading_rules_tab, padding=20)
         leg_config_table_frame.pack(pady=20)
 
         # Place in center

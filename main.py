@@ -26,6 +26,35 @@ logger = CustomLogger.logger
 def run_loop(app):
     app.run()
 
+def ask_for_user_confirmation():
+    """
+    Do the user want to start app in recovery mode?
+    or delete the database and start fresh?
+    """
+    # Create a tkinter root window
+    root = tk.Tk()
+    root.withdraw()
+
+    # Show a messagebox with the confirmation message
+    result = messagebox.askyesno(
+        "Start in Recovery Mode?",
+        "Do you want to start application in 'Recovery Mode'?\n\nClick 'Yes' to start in Recovery Mode, 'No' to clear the database and start fresh.",
+    )
+
+    # Check the user's response
+    if result:
+        # User clicked 'Yes'
+        logger.debug("Recovery mode confirmed.")
+        print("Recovery mode confirmed.")
+    else:
+        # User clicked 'No'
+        logger.debug("Recovery mode canceled.")
+        print("Recovery mode canceled.")
+
+    # Destroy the root window
+    root.destroy()
+
+    return result
 
 if __name__ == "__main__":
 
@@ -44,12 +73,11 @@ if __name__ == "__main__":
     print("Please Confirm the start mode")
 
     # # Check if the user wants to delete the database
-    # # flag_start_in_recovery_mode = ask_for_user_confirmation()
-    # flag_start_in_recovery_mode = False
+    flag_start_in_recovery_mode = ask_for_user_confirmation()
 
-    # # Recovery Mode is False, start fresh
-    # if not flag_start_in_recovery_mode:
-    #     SetupDatabase()
+    # Recovery Mode is False, start fresh
+    if not flag_start_in_recovery_mode:
+        SetupDatabase()
 
     # Module start time
     module_start_time = datetime.datetime.now(variables.target_timezone_obj)

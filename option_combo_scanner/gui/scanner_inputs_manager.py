@@ -34,6 +34,34 @@ class ScreenUserInputs(object):
         user_inputs_table_frame.place(relx=0.5, anchor=tk.N)
         user_inputs_table_frame.place(y=10)
 
+        # Create Treeview Frame for filter instances
+        '''buttons_frame = ttk.Frame(self.user_inputs_tab, padding=0)
+        buttons_frame.pack(pady=0)
+
+        # Initialize button to add filter
+        add_user_inputs_button = ttk.Button(
+            buttons_frame,
+            text="Add Condition",
+            command=lambda: self.add_user_inputs_condition(),
+        )
+
+        # Place add custom column button
+        add_user_inputs_button.grid(row=0, column=0, padx=10, pady=10)'''
+
+        # Initialize button to delte custom column
+        '''self.activate_deactivate_button = ttk.Button(
+            buttons_frame,
+            text="Activate Filter",
+            command=lambda: self.activate_deactivated_filter_condition(),
+        )
+
+        # Place delete custom column button
+        self.activate_deactivate_button.grid(row=0, column=1, padx=10, pady=10)
+
+        # Place in center
+        buttons_frame.place(relx=0.5, anchor=tk.N)
+        buttons_frame.place(y=10)'''
+
         # Treeview Scrollbar
         tree_scroll = Scrollbar(user_inputs_table_frame)
         tree_scroll.pack(side="right", fill="y")
@@ -121,23 +149,198 @@ class ScreenUserInputs(object):
 
 
 
-        dropdown_list = ['Action',
-                          ]
+        dropdown_list = ['flag_recovery_mode',
+                         'flag_enable_hv_annualized',
+                         'flag_identification_print',
+                         'flag_simulate_prices',
+                         'flag_debug_mode',
+                         'flag_store_cas_tab_csv_files',
+                         'flag_hv_daily',
+                         'flag_since_start_of_day_candles_for_relative_fields',
+                         'flag_enable_rm_account_rules',
+                         'flag_enable_trade_level_rm',
+                         'flag_use_execution_engine',
+                         'target_timezone',
+                         'account_parameter_for_order_quantity',
+                         'flag_series_condition',
+                         'limit_price_selection_for_execution_engine',
+                         'ib_algo_priority',
+                         'flag_relative_atr_in_range',
+                         'hv_method',
+                         'hv_candle_size',
+                         'volume_related_fileds_candle_size',
+                         'volume_magnet_candle_size',
+                         'support_resistance_and_relative_fields_candle_size',
+                         'index_select_for_beta_column',
+                         'last_n_minutes_fields_candle_size',
+                         'order_parameter_atr_candle_size',
+                         'flag_rm_checks_trade_volume_and_or',
+                         'order_parameter_candle_candle_size',
+                         'flag_range_order',
+                         'flag_stop_loss_premium',
+                         'flag_take_profit_premium',
+                         'flag_trailing_stop_loss_premium', ]
 
-        entry_list = []
+        entry_list = ['ibkr_tws_host',
+                      'ibkr_tws_port',
+                      'ibkr_tws_connection_id',
+                      'ibkr_tws_connection_id_for_cas',
+                      'ibkr_account_number',
+                      'offset_value_execution_engine',
+                      'lookback_period_for_cache',
+                      'time_frame_for_price_comparison_in_intraday',
+                      'time_frame_for_price_range_ratio_in_intraday',
+                      'max_wait_time_for_order_fill',
+                      'cas_number_of_days',
+                      'atr_number_of_days',
+                      'relative_atr_in_range_number_of_buckets',
+                      'hv_look_back_days',
+                      'volume_related_fileds_look_back_days',
 
-        
-        int_valid_list = []
-        
+                      'relative_volume_derivation_lookback_mins',
+                      'relative_atr_derivation_lookback_mins',
+                      'volume_magnet_max_lookback_days',
+                      'support_resistance_and_relative_fields_look_back_days',
+                      'last_n_minutes_fields_lookback_days',
+                      'order_parameter_atr_lookback_days',
+                      'support_resistance_range_percent',
+                      'cas_long_term_fields_update_interval',
+
+                      'cas_intraday_fields_update_interval',
+                      'hv_related_fields_update_interval_time',
+                      'volume_related_fields_update_interval_time',
+                      'support_resistance_and_relative_fields_update_interval_time',
+                      'atr_for_order_interval',
+                      'account_table_update_interval',
+                      'rm_checks_interval_if_failed',
+                      'trade_rm_check_update_interval',
+                      'filter_conditions_update_interval',
+                      'candle_for_order_interval',
+                      'trade_level_rm_check_volume_lookback_mins',
+                      'volume_threshold_trade_rm_check',
+                      'bid_ask_spread_threshold_trade_rm_check',
+                      'bid_ask_qty_threshold_trade_rm_check',
+                      'cas_tab_csv_file_path',
+                      'custom_columns_json_csv_file_path',
+                      'buy_sell_csv',
+
+                      'stk_currency',
+                      'opt_currency',
+                      'fut_currency',
+                      'fop_currency',
+                      'stk_exchange',
+                      'opt_exchange',
+                      'fut_exchange',
+                      'fop_exchange',
+                      'opt_lot_size',
+                      'fut_lot_size',
+                      'fop_lot_size', ]
+
+        int_valid_list = ['ibkr_tws_port',
+                        'ibkr_tws_connection_id',
+                        'ibkr_tws_connection_id_for_cas',
+                        'lookback_period_for_cache',
+                      'time_frame_for_price_comparison_in_intraday',
+                      'time_frame_for_price_range_ratio_in_intraday',
+                      'max_wait_time_for_order_fill',
+                      'cas_number_of_days',
+                      'atr_number_of_days',
+                      'relative_atr_in_range_number_of_buckets',
+                      'hv_look_back_days',
+                      'volume_related_fileds_look_back_days',
+
+                      'relative_volume_derivation_lookback_mins',
+                      'relative_atr_derivation_lookback_mins',
+                      'volume_magnet_max_lookback_days',
+                      'support_resistance_and_relative_fields_look_back_days',
+                      'last_n_minutes_fields_lookback_days',
+                      'order_parameter_atr_lookback_days',
+					  'cas_long_term_fields_update_interval',
+
+                      'cas_intraday_fields_update_interval',
+                      'hv_related_fields_update_interval_time',
+                      'volume_related_fields_update_interval_time',
+                      'support_resistance_and_relative_fields_update_interval_time',
+                      'atr_for_order_interval',
+                      'account_table_update_interval',
+                      'rm_checks_interval_if_failed',
+                      'trade_rm_check_update_interval',
+                      'filter_conditions_update_interval',
+                      'candle_for_order_interval',
+                      'trade_level_rm_check_volume_lookback_mins',
+					  'opt_lot_size',
+                      'fut_lot_size',
+                      'fop_lot_size',]
+
         float_valid_list = ['offset_value_execution_engine',
                         'support_resistance_range_percent',
-                        ]
+                        'volume_threshold_trade_rm_check',
+                      'bid_ask_spread_threshold_trade_rm_check',
+                      'bid_ask_qty_threshold_trade_rm_check',]
 
 
 
-        true_or_false_inputs = []
+        true_or_false_inputs = ['flag_recovery_mode',
+                                'flag_enable_hv_annualized',
+                                'flag_identification_print',
+                                'flag_simulate_prices',
+                                'flag_debug_mode',
+                                'flag_store_cas_tab_csv_files',
+                                'flag_hv_daily',
+                                'flag_since_start_of_day_candles_for_relative_fields',
+                                'flag_enable_rm_account_rules',
+                                'flag_enable_trade_level_rm',
+                                'flag_use_execution_engine',
+                                'flag_cache_data',]
 
         true_false_list = ['True', 'False']
+
+        time_zone_list = ['US/Eastern', 'Israel']
+
+        account_parameters_list = ['SMA', 'NLV', 'CEL']
+
+        and_or_list = ['AND','OR']
+
+        and_or_parameters = ['flag_rm_checks_trade_volume_and_or', 'flag_series_condition']
+
+        limit_price_for_execution_engine_parameter = ['limit_price_selection_for_execution_engine']
+
+        limit_price_for_execution_engine_parameter_list = ['Limit_Bid', 'Limit_Ask', 'Limit_Mid', 'Pegged_Midpoint']
+
+        ib_algo_priority_list = ['Urgent', 'Normal', 'Patient']
+
+        flag_relative_atr_in_range_list = ['Open In Range', 'Close In Range', 'Open Or Close In Range']
+
+        hv_methods_list = ['STANDARD_DEVIATION', 'PARKINSON_WITH_GAP', 'PARKINSON_WITHOUT_GAP', 'NATR']
+
+        candle_size_list = ['ONE_MIN', 'TWO_MIN', 'THREE_MIN', 'FIVE_MIN', 'TEN_MIN' , 'FIFTEEN_MIN', 'TWENTY_MIN', 'THIRTY_MIN',
+                            'ONE_HOUR', 'TWO_HOUR', 'THREE_HOUR', 'FOUR_HOUR',]
+
+        candle_input_parameters = ['volume_related_fileds_candle_size','volume_magnet_candle_size', 'support_resistance_and_relative_fields_candle_size', 'last_n_minutes_fields_candle_size',
+                                   'order_parameter_atr_candle_size', 'order_parameter_candle_candle_size', 'hv_candle_size']
+
+        flag_range_order_values_list = ['Intraday', 'Week', 'Month']
+
+        premium_order_parameter_list = ['flag_stop_loss_premium', 'flag_take_profit_premium', 'flag_trailing_stop_loss_premium']
+
+        premium_order_flag_values_list = ['Positive Only', 'Negative Only', 'Both']
+
+        index_values_list = ['SPY', 'QQQ']
+
+        default_values_for_sec_type_parameters = ['stk_currency','opt_lot_size',
+            'stk_exchange',
+            'opt_currency',
+            'opt_exchange',
+
+            'fut_currency',
+            'fut_exchange',
+            'fut_lot_size',
+
+            'fop_currency',
+            'fop_exchange',
+            'fop_lot_size',]
+
+        self.selected_row = None
 
         def on_double_click(event):
 
@@ -777,4 +980,75 @@ class ScreenUserInputs(object):
 
             counter += 1
 
-   
+    # Method to group user inputs
+    def group_user_inputs(self, user_input_grouping_map_dict, map_user_input_to_description, map_user_input_to_value):
+
+        # Init
+        user_input_list = []
+
+        user_input_value_list = []
+
+        user_input_desciption_list = []
+
+        flag_first_group = True
+
+        # Iterate every group
+        for group, subgroup in user_input_grouping_map_dict.items():
+
+            # Check flag for first group
+            if not flag_first_group:
+
+                # Append empty values
+                user_input_list.append('')
+
+                user_input_value_list.append('')
+
+                user_input_desciption_list.append('')
+
+            # Append group to table
+            user_input_list.append(group)
+
+            user_input_value_list.append('')
+
+            user_input_desciption_list.append('')
+
+            # Make flag false after first group
+            flag_first_group = False
+
+            # Check if subgroup is dictionary
+            if isinstance(subgroup, dict):
+
+                # Iterate items in subgroup
+                for sub_group, user_inputs_list in subgroup.items():
+
+                    # Append subgroup to table values
+                    user_input_list.append(sub_group)
+
+                    user_input_value_list.append('')
+
+                    user_input_desciption_list.append('')
+
+                    # Iterate user input names in subgroup
+                    for user_input_item in user_inputs_list:
+
+                        # Append values to table values
+                        user_input_list.append(user_input_item)
+
+                        user_input_value_list.append(map_user_input_to_value[user_input_item])
+
+                        user_input_desciption_list.append(map_user_input_to_description[user_input_item])
+
+            else:
+
+                # Iterate user inputs in group
+                for user_input_item_in_subgroup in subgroup:
+
+                    # Append values to table values
+                    user_input_list.append(user_input_item_in_subgroup)
+
+                    user_input_value_list.append(map_user_input_to_value[user_input_item_in_subgroup])
+
+                    user_input_desciption_list.append(map_user_input_to_description[user_input_item_in_subgroup])
+
+
+        return user_input_list, user_input_value_list, user_input_desciption_list
