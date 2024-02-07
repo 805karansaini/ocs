@@ -25,7 +25,7 @@ async def get_opt_delta(contract, flag_market_open, genericTickList=""):
     variables.req_error[reqId] = False
     variables.req_mkt_data_end[reqId] = False
 
-    # Data - TODO added here
+
     variables.ask_price[reqId] = None
     variables.bid_price[reqId] = None
 

@@ -41,7 +41,7 @@ class ScreenGUI(threading.Thread):
         
         # Create the Order Book tab
         self.order_book_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.order_book_tab, text="   Order Book  ")
+        self.notebook.add(self.order_book_tab, text="Combination Tab")
         self.order_book_tab_object = OrderBookTab(self.order_book_tab)
 
 

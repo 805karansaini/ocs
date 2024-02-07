@@ -1725,12 +1725,9 @@ def update_combination_status_in_db_and_order_book(flag_update_scale_trade_order
 
 # Method to map unique id to combo legs
 def get_unique_id_combolegs_dict(dataframe_containing_legs):
-
     # Creating a dict
     unique_id_to_combolegs_dict = {}
-
     for _, row in dataframe_containing_legs.iterrows():
-
         # Init Variables
         unique_id = int(row["Unique ID"])
         action = row["Action"]
@@ -1738,7 +1735,6 @@ def get_unique_id_combolegs_dict(dataframe_containing_legs):
         symbol = row["Symbol"]
         dte = row["DTE"]
         delta = row["Delta"]
-
         exchange = row["Exchange"]
         currency = row["Currency"]
         quantity = row["#Lots"]

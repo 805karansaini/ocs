@@ -4,6 +4,8 @@ from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.order_presets_tab_helper import OrderPresetHelper
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.contracts import get_contract
+from option_combo_scanner.strategy.Config import Config
+from option_combo_scanner.strategy.ConfigLeg import ConfigLeg
 from option_combo_scanner.strategy.instrument import Instrument
 from option_combo_scanner.strategy.order_preset import OrderPreset
 
@@ -17,7 +19,7 @@ class HouseKeepingGUI:
     def dump_all_instruments_in_instrument_tab(
         scanner_inputs_tab_obj,
     ):
-        # TODO Get the preset orders from option_combo_scanner.the database
+        # Get the Instrument from instrument table
         all_instruments = SqlQueries.select_from_db_table(table_name="instrument_table", columns="*")
         
         # Insert the preset orders in the preset order tab[table]
@@ -26,7 +28,44 @@ class HouseKeepingGUI:
 
             ### Add in the preset order table ###
             scanner_inputs_tab_obj.insert_into_instrument_table(intrument_obj)
-    
+
+
+    @staticmethod
+    def dump_config_in_gui(
+            scanner_inputs_tab_obj,
+    ):
+
+        list_of_config_leg_object = HouseKeepingGUI.dump_all_config_in_config_tab(scanner_inputs_tab_obj)
+        HouseKeepingGUI.dump_all_common_config_in_config_tab(scanner_inputs_tab_obj, list_of_config_leg_object)
+
+    @staticmethod
+    def dump_all_config_in_config_tab(
+            scanner_inputs_tab_obj,
+    ):
+        # Get the config leg wise from Config Legs table
+        all_legs_config = SqlQueries.select_from_db_table(table_name="config_legs_table", columns="*")
+        list_of_config_leg_object = []
+
+        # Insert the preset orders in the preset order tab[table]
+        for values_dict in all_legs_config:
+            config_leg_obj = ConfigLeg(values_dict)  # Mapping
+            list_of_config_leg_object.append(config_leg_obj)
+            scanner_inputs_tab_obj.insert_into_config_leg_table_helper(config_leg_obj)
+
+        return list_of_config_leg_object
+
+    @staticmethod
+    def dump_all_common_config_in_config_tab(
+            scanner_inputs_tab_obj, list_of_config_leg_object
+    ):
+        # Get the config from Config Table
+        all_config = SqlQueries.select_from_db_table(table_name="config_table", columns="*")
+        # print(all_config)
+        for values in all_config:
+            values['list_of_config_leg_object'] = list_of_config_leg_object
+            config_obj = Config(values)
+            scanner_inputs_tab_obj.insert_into_common_config_table_helper(config_obj)
+
     @staticmethod
     def dump_all_preset_order_in_preset_order_tab(
         order_preset_helper_obj: OrderPresetHelper,

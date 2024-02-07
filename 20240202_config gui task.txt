@@ -1,0 +1,128 @@
+
+
+
+N = 3 Legs
+
+Table
+-- 1
+-- 2
+-- 3
+
+[Disable editing]User Change <- No change should be allowed
+
+
+Config Change:
+	Call   [List of DTE]  [Legs 2]  <Update Legs>
+
+Update Legs Config:
+	--- 1
+	--- 2
+	Table will be editable
+	new config
+	
+Save Config:
+	Validation
+	DB updation <Config> <ConfigLeg>
+	
+	N = 2 Legs
+
+	Table
+	-- 1
+	-- 2
+
+	[Disable editing of table]
+
+
+
+
+########################################
+
+N = 3 Legs
+
+Table
+-- 1
+-- 2
+-- 3
+
+[Disable editing]User Change <- No change should be allowed
+
+
+Config Change:
+	PUT [List of DTE]  [Legs 3]  <Update Legs>
+
+Update Legs Config:
+	--- 1
+	--- 2
+	--- 3
+	Table will be editable
+	new config
+	
+Save Config:
+	Validation
+	DB updation <Config> <ConfigLeg>
+	
+	N = 3 Legs
+
+	Table
+	-- 1
+	-- 2
+	-- 3
+
+	[Disable editing of table]
+
+
+< 4, Updated Leg Config >
+	4 Row in table
+	Save:
+		Valdation, DB, non editable
+update_legs?
+update_leg_config
+change_table_statee(bool: True/False)
+	Editable = True
+	Non-Editable = False
+
+non_negative_float(x):
+	True, False
+
+
+App Restart:
+	Database for config:
+	Shoud be dispalye din the Config GUI table
+	
+Class:
+	Configuration	ConfigurtionLegs
+
+def rows(3):
+	current_row = 3
+	add a row in table
+
+table: 	delete, add row
+-> [Complete  Functonality]
+
+ 
+1. rows addition based on leg input
+2. editable table for each row
+3. save config click then 
+4. validation 
+5. DB insertion
+6. two class config, configlegdetail
+7. restart gui then data visual will come from db
+
+
+
+
+
+Update Legs:
+	1. Rows in table as per the user input
+	2. Change Table State
+Save Config:
+	4. validation 
+	5. DB insertion
+	6. Update GUI, Change Table State
+	7. Update Objects: two class config, configlegdetail  [Must be easily accessable from a dictionary]
+	8. Restart gui, get data, 6, 7
+
+
+
+
+

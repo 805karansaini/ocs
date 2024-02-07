@@ -1,0 +1,50 @@
+from pprint import pprint
+
+from option_combo_scanner.custom_logger.logger import CustomLogger
+from option_combo_scanner.gui.utils import Utils
+from option_combo_scanner.ibapi_ao.variables import Variables as variables
+from option_combo_scanner.strategy.manage_mkt_data_sub import ManageMktDataSubscription
+from option_combo_scanner.strategy.monitor_order_preset import MonitorOrderPreset
+from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+
+logger = CustomLogger.logger
+
+
+class Config:
+    def __init__(self, values_dict,):
+        [setattr(self, key, value) for key, value in values_dict.items()]
+
+        # Manage Conid, contract, Subscription
+        self.map_config_id_to_config_object()
+
+        
+    def map_config_id_to_config_object(self):
+        # Map instrument_id to Instrument Object
+        strategy_variables.config_object = self
+
+    def __str__(self) -> str:
+        
+        return f"Config:\n{pprint(vars(self))}"
+
+    def change_value(self, key, value):
+        """
+        Change value of an attribute of this class
+        """
+        if hasattr(self, key):
+            setattr(self, key, value)
+        else:
+            logger.error(
+                f"Inside OrdePreset Object change_value UID: {self.unique_id} '{key}' is not an attribute of this class. new value: {value}"
+            )
+
+    def get_config_tuple_for_gui(self, ):
+        # Create a tuple with object attributes in the specified order
+        config_tuple = (
+            # self.config_id,
+            self.no_of_leg,
+            self.right,
+            self.list_of_dte,
+            self.list_of_config_leg_object
+        )
+
+        return config_tuple

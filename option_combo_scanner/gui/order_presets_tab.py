@@ -414,7 +414,7 @@ class OrderPresetTab:
 
         # Values Dict
         values_dict = {}
-        values_dict["AccountID"] = ACCOUNT_ID  # TODO
+        values_dict["AccountID"] = ACCOUNT_ID 
         values_dict["Ticker"] = ticker
         values_dict["SecType"] = "STK"
         values_dict["Currency"] = "USD"

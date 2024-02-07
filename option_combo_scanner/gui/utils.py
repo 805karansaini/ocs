@@ -61,6 +61,25 @@ class Utils:
             return False
 
     @staticmethod
+    def is_positive_greater_than_equal_one_integer(string):
+        try:
+            _ = float(string)
+            if _ >= 1 and _ % 1 == 0:
+                return True
+            return False
+        except ValueError:
+            return False
+
+    @staticmethod
+    def is_between_zero_to_one(string):
+        try:
+            _ = float(string)
+            if 0 <= _ <= 1:
+                return True
+            return False
+        except ValueError:
+            return False
+    @staticmethod
     def is_time(string):
         """
         Should we in HH:MM:SS format

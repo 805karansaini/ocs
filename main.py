@@ -4,6 +4,7 @@ import threading
 import time
 import tkinter as tk
 from tkinter import messagebox
+import traceback
 
 from com.variables import variables as com_variables
 from option_combo_scanner.custom_logger.logger import CustomLogger
@@ -19,6 +20,7 @@ from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.strategy.monitor_order_preset import MonitorOrderPreset
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 from option_combo_scanner.strategy.utilities import StrategyUtils
+from option_combo_scanner.strategy.scanner import Scanner
 
 logger = CustomLogger.logger
 
@@ -150,8 +152,16 @@ if __name__ == "__main__":
 
     # While Screen is open
     while IsScreenRunning.flag_is_screen_running:
+
         try:
-            time.sleep(0.1)
+            
+            try:
+                Scanner().start_scanner()
+            except Exception as e:
+                # Print the traceback
+                traceback.print_exc()
+            time.sleep(5)
+            
             # try:
             #     # Update Order Book from the database
             #     screen.order_book_tab_object.update_order_book_table()
@@ -188,6 +198,7 @@ if __name__ == "__main__":
 
         except Exception as e:
             logger.error(f"Exception in main screen loop: {e}")
+            print(f"Exception in main screen loop: {e}")
 
         c += 1
     else:

@@ -24,18 +24,18 @@ query2 = """CREATE TABLE IF NOT EXISTS `instrument_table` (
 
 query3 = """CREATE TABLE IF NOT EXISTS `config_table` (
         `config_id` INT AUTO_INCREMENT PRIMARY KEY,
-        `leg` INT,
+        `no_of_leg` INT,
         `right` VARCHAR(50),
         `list_of_dte` VARCHAR(50)
     );"""
 
 query4 = """CREATE TABLE IF NOT EXISTS `config_legs_table` (
-        `config_leg_id` VARCHAR(255) PRIMARY KEY,
+        `config_leg_id` INT AUTO_INCREMENT PRIMARY KEY,
         `config_id`  INT, 
         `leg_number` INT,
         `action` VARCHAR(50),
-        `delta_range_min` VARCHAR(50),
-        `delta_range_max` VARCHAR(50),
+        `delta_range_min` DECIMAL(10, 8),
+        `delta_range_max` DECIMAL(10, 8),
         FOREIGN KEY (`config_id`) REFERENCES `config_table`(`config_id`) ON DELETE CASCADE
     );"""
 
@@ -48,8 +48,9 @@ query5 = """CREATE TABLE IF NOT EXISTS `combination_table` (
         `right` VARCHAR(20),
         `multiplier` INT,
         `trading_class` VARCHAR(20),
+        `currency` VARCHAR(20),
         `exchange` VARCHAR(20),
-        `combo_net_delta` VARCHAR(20)
+        `combo_net_delta` DECIMAL(10, 8)
     );"""
 
 query6 = """CREATE TABLE IF NOT EXISTS `legs_table` (
@@ -59,10 +60,10 @@ query6 = """CREATE TABLE IF NOT EXISTS `legs_table` (
         `con_id` VARCHAR(15),
         `strike` VARCHAR(15),
         `qty` VARCHAR(15),
-        `delta_found` VARCHAR(15),
+        `delta_found` DECIMAL(10, 8),
         `action` VARCHAR(15),
-        `min_delta_range` VARCHAR(15),
-        `max_delta_range` VARCHAR(15),
+        `delta_range_min` DECIMAL(10, 8),
+        `delta_range_max` DECIMAL(10, 8),
         FOREIGN KEY (`combo_id`) REFERENCES `combination_table`(`combo_id`)
     );"""
 
