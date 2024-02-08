@@ -8,6 +8,8 @@ from option_combo_scanner.strategy.Config import Config
 from option_combo_scanner.strategy.ConfigLeg import ConfigLeg
 from option_combo_scanner.strategy.instrument import Instrument
 from option_combo_scanner.strategy.order_preset import OrderPreset
+from option_combo_scanner.strategy.scanner_combination import ScannerCombination
+from option_combo_scanner.strategy.scanner_leg import ScannerLeg
 
 
 class HouseKeepingGUI:
@@ -93,3 +95,54 @@ class HouseKeepingGUI:
 
     def insert_order_status_in_order_book_tab(self):
         pass
+
+    
+    @staticmethod
+    def dump_all_scanner_combinations_in_scanner_combination_tab(
+        scanner_combination_tab_obj,
+    ):
+        # Get the Combintaion from combintation table
+        all_combinations = SqlQueries.select_from_db_table(table_name="combination_table", columns="*")
+        
+        # Get the Combintaion Leg from legs table
+        all_legs = SqlQueries.select_from_db_table(table_name="legs_table", columns="*")
+        
+        # Dictionary for quick look up
+        legs_look_up_dict = {}
+
+        # Mapping leg in the above dict
+        for leg in all_legs:
+            combo_id = int(leg['combo_id'])
+            leg_number = int(leg['leg_number'])
+
+            if combo_id in legs_look_up_dict:
+                pass
+            else:
+                legs_look_up_dict[combo_id] = {}
+            legs_look_up_dict[combo_id][leg_number] = leg
+        
+        # Iterating over all the combinations
+        for combination in all_combinations:
+            
+            combo_id = int(combination['combo_id'])
+            legs = int(combination['legs'])
+            
+            # list of leg object
+            list_of_all_leg_objects = []
+
+            # Creating the Leg Objects
+            for leg_number in range(1, legs+1):
+
+                leg_values_dict = legs_look_up_dict[combo_id][leg_number]
+            
+                list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
+
+            # Added the list of leg object
+            combination['list_of_all_leg_objects'] = list_of_all_leg_objects
+
+            # Creating the Scanner Combination Object
+            scanner_combination_object = ScannerCombination(combination)
+            
+            # Insert the Scanner combination in GUI
+            scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
+                
