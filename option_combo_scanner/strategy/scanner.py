@@ -8,6 +8,9 @@ from com.leg_identifier import (
     find_nearest_expiry_for_future_given_fut_dte,
 )
 from option_combo_scanner.database.sql_queries import SqlQueries
+from option_combo_scanner.gui.scanner_combination_tab import ScannerCombinationTab
+from option_combo_scanner.strategy.scanner_combination import ScannerCombination
+from option_combo_scanner.strategy.scanner_leg import ScannerLeg
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 from tabulate import tabulate
 import pandas as pd
@@ -418,6 +421,7 @@ class Scanner:
         list_of_config_leg_object = config_obj.list_of_config_leg_object
 
         values_dict = {
+            'instrument_id': instrument_object.instrument_id,
             'legs': config_obj.no_of_leg,
             'symbol': instrument_object.symbol,
             'sec_type': instrument_object.sec_type,
@@ -436,7 +440,8 @@ class Scanner:
                 print(f"Unable to insert Combination in the table: {combination}")
                 continue
                 
-            
+            # list of leg object
+            list_of_all_leg_objects = []
             for index, ((strike,delta,con_id), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
                 leg_values_dict = {
                 'combo_id': combo_id,
@@ -453,6 +458,21 @@ class Scanner:
                 if not res:
                     print(f"Unable to insert leg in the table: {leg_values_dict}")
 
+                list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
+
+            # Add the combo_id and leg objects
+            values_dict['combo_id'] = combo_id
+            values_dict['list_of_all_leg_objects'] = list_of_all_leg_objects
+            
+            # Scanner Combination Object
+            scanner_combination_object = ScannerCombination(values_dict)
+            
+            try:
+                # Insert the Scanner combination in GUI
+                scanner_combination_object.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
+            except Exception as e:
+                print(f"Unable to insert the scanned combination in the GUI")
+                
     # Calulation of Combo Net Delta
     def get_list_combo_net_delta(self, config_obj, list_of_all_generated_combination):
         list_of_config_leg_object = config_obj.list_of_config_leg_object
