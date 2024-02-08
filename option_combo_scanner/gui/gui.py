@@ -35,17 +35,15 @@ class ScreenGUI(threading.Thread):
         self.notebook.add(self.scanner_inputs_tab_frame, text="  Scanner Inputs  ")
         self.scanner_inputs_tab_object = ScannerInputsTab(self.scanner_inputs_tab_frame)
 
-
-        # Create the Order Preset tab
-        self.order_preset_tab_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.order_preset_tab_frame, text="  Order Presets  ")
-        self.order_preset_tab_object = OrderPresetTab(self.order_preset_tab_frame)
-        
         # Create the Scanner Combination Tab
         self.combination_tab_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.combination_tab_frame, text="   Scanned Combination Tab  ")
         self.combination_tab_object = ScannerCombinationTab(self.combination_tab_frame)
 
+        # Create the Order Preset tab
+        self.order_preset_tab_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.order_preset_tab_frame, text="  Order Presets  ")
+        self.order_preset_tab_object = OrderPresetTab(self.order_preset_tab_frame)
 
         # # Bind the event to the Trading Rules tab
         # self.notebook.bind(
