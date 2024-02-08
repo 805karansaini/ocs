@@ -1,0 +1,40 @@
+from pprint import pprint
+
+from option_combo_scanner.custom_logger.logger import CustomLogger
+from option_combo_scanner.gui.utils import Utils
+from option_combo_scanner.ibapi_ao.variables import Variables as variables
+from option_combo_scanner.strategy.manage_mkt_data_sub import ManageMktDataSubscription
+from option_combo_scanner.strategy.monitor_order_preset import MonitorOrderPreset
+from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+
+logger = CustomLogger.logger
+
+
+class Leg:
+    def __init__(self, values_dict,):
+        [setattr(self, key, value) for key, value in values_dict.items()]
+
+        self.combo_id = int(self.combo_id)
+        self.leg_number = int(self.leg_number)
+        self.con_id = int(self.con_id)
+        self.strike = float(self.strike)
+        self.qty = int(self.qty)
+
+    def __str__(self) -> str:
+        return f"Scanner Leg Object: {pprint(vars(self))}"
+    
+    def get_leg_tuple_for_gui(self, ):
+        # Create a tuple with object attributes in the specified order
+        leg_tuple = (
+            self.combo_id,
+            self.leg_number,
+            self.con_id,
+            self.strike,
+            self.qty,
+            self.delta_found,
+            self.action,
+            self.delta_range_min,
+            self.delta_range_max
+        )
+
+        return leg_tuple
