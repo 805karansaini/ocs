@@ -387,8 +387,11 @@ class Scanner:
                     strike_and_delta_dataframe=df,
 
                 )
+            # Get the list of net combo delta for the list of combinations
+            list_of_combo_net_deltas = self.get_list_combo_net_delta(config_obj=config_obj,
+                                     list_of_all_generated_combination=list_of_all_generated_combination)
             
-            self.insert_combinations_into_db(list_of_all_generated_combination, instrument_object, expiry)
+            self.insert_combinations_into_db(list_of_all_generated_combination, instrument_object, expiry, list_of_combo_net_deltas)
 
     def generate_combinations(
         self, config_obj, instrument_object, strike_and_delta_dataframe
@@ -409,7 +412,7 @@ class Scanner:
         # print("---", res)
         return res
         
-    def insert_combinations_into_db(self, list_of_all_generated_combination, instrument_object, expiry):
+    def insert_combinations_into_db(self, list_of_all_generated_combination, instrument_object, expiry, list_of_combo_net_deltas):
         
         config_obj = self.get_config_from_variables()
         list_of_config_leg_object = config_obj.list_of_config_leg_object
@@ -424,10 +427,10 @@ class Scanner:
             'trading_class': instrument_object.trading_class,
             'currency': instrument_object.currency,
             'exchange': instrument_object.exchange,
-            
         }
             
-        for combination in list_of_all_generated_combination:
+        for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_deltas):
+            values_dict['combo_net_delta'] = combo_net_delta
             res, combo_id = SqlQueries.insert_into_db_table(table_name="combination_table", values_dict=values_dict)
             if not res:
                 print(f"Unable to insert Combination in the table: {combination}")
@@ -450,9 +453,22 @@ class Scanner:
                 if not res:
                     print(f"Unable to insert leg in the table: {leg_values_dict}")
 
-
-    
-
-# #         #   2
-# #         #   0.5 to 0.7,
-# #         #   -0.1 to 0.2
+    # Calulation of Combo Net Delta
+    def get_list_combo_net_delta(self, config_obj, list_of_all_generated_combination):
+        list_of_config_leg_object = config_obj.list_of_config_leg_object
+        list_of_combo_net_deltas= []
+        # Loop over list of combination
+        for combination in list_of_all_generated_combination:
+            net_combo = 0
+            # Loop over leg object to get action for the leg
+            for leg_tuple, leg_object in zip(combination, list_of_config_leg_object):
+                action = leg_object.action
+                _, delta, _ = leg_tuple
+                # if Buy will add the delta
+                if action == 'Buy':
+                    net_combo += delta
+                # If Sell will substract the delta
+                else:
+                    net_combo -= delta
+            list_of_combo_net_deltas.append(net_combo)    
+        return list_of_combo_net_deltas    
