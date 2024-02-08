@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import Scrollbar, ttk
 
 from option_combo_scanner.custom_logger.logger import CustomLogger
+from option_combo_scanner.gui.scanner_combination_tab import ScannerCombinationTab
 from option_combo_scanner.gui.order_book_tab import OrderBookTab
 from option_combo_scanner.gui.order_presets_tab import OrderPresetTab
 from option_combo_scanner.gui.scanner_inputs_tab import ScannerInputsTab
@@ -29,20 +30,21 @@ class ScreenGUI(threading.Thread):
         self.notebook = ttk.Notebook(self.window)
         self.notebook.pack(expand=True, fill="both")
 
-        # Create the Tradeing Rules tab
-        self.trading_rules_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.trading_rules_tab, text="ComboScanner Inputs")
-        self.trading_rules_tab_object = ScannerInputsTab(self.trading_rules_tab)
+        # Create the Scanner Inputs Tab
+        self.scanner_inputs_tab_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.scanner_inputs_tab_frame, text="  Scanner Inputs  ")
+        self.scanner_inputs_tab_object = ScannerInputsTab(self.scanner_inputs_tab_frame)
+
 
         # Create the Order Preset tab
         self.order_preset_tab_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.order_preset_tab_frame, text="  Order Presets  ")
         self.order_preset_tab_object = OrderPresetTab(self.order_preset_tab_frame)
         
-        # Create the Order Book tab
-        self.order_book_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.order_book_tab, text="Combination Tab")
-        self.order_book_tab_object = OrderBookTab(self.order_book_tab)
+        # Create the Scanner Combination Tab
+        self.combination_tab_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.combination_tab_frame, text="   Scanned Combination Tab  ")
+        self.combination_tab_object = ScannerCombinationTab(self.combination_tab_frame)
 
 
         # # Bind the event to the Trading Rules tab
