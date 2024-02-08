@@ -2,7 +2,7 @@ import configparser
 import copy
 import datetime
 import tkinter as tk
-from tkinter import ttk
+from tkinter import Scrollbar, ttk
 
 import pandas as pd
 
@@ -32,7 +32,7 @@ ORDER_PRESET_COLUMNS = [
     "Filled Exit Qty",
     "Avg. Exit Price",
     "PNL",
-    "Failure Reason"
+    "Failure Reason",
 ]
 
 
@@ -79,6 +79,7 @@ class Utils:
             return False
         except ValueError:
             return False
+
     @staticmethod
     def is_time(string):
         """
@@ -399,3 +400,102 @@ class Utils:
             pnl,
             failure_reason,
         )
+
+    @staticmethod
+    # Display table/treeview popup
+    def display_treeview_popup(title, list_of_columns_header, list_of_row_tuple):
+
+        # Add some style
+        style = ttk.Style()
+
+        # Pick a theme
+        style.theme_use("default")
+
+        # Configure our treeview colors
+        style.configure(
+            "Treeview",
+            background="#D3D3D3",
+            foreground="black",
+            rowheight=25,
+            fieldbackground="#D3D3D3",
+        )
+
+        # Change selected color
+        style.map("Treeview", background=[("selected", "blue")])
+
+        # Get the number of rows entered by the user
+        try:
+            num_rows = len(list_of_row_tuple)
+        except:
+            Utils.display_message_popup("Error", "Unable to get the combination data.")
+            return
+
+        # Create a popup window with the table
+        treeview_popup = tk.Toplevel()
+        treeview_popup.title(title)
+        custom_height = min(max((num_rows * 20) + 100, 150), 210)
+
+        custom_width = (
+            80 * len(list_of_row_tuple[0]) + 60
+        )  # 60 = 20 * 2(padding) + 20(scrollbar)
+        treeview_popup.geometry(f"{custom_width}x{custom_height}")
+
+        # Create a frame for the input fields
+        treeview_table_frame = ttk.Frame(treeview_popup, padding=20)
+        treeview_table_frame.pack(fill="both", expand=True)
+
+        # Treeview Scrollbar
+        tree_scroll = Scrollbar(treeview_table_frame)
+        tree_scroll.pack(side="right", fill="y")
+
+        # Create Treeview
+        treeview_table = ttk.Treeview(
+            treeview_table_frame,
+            yscrollcommand=tree_scroll.set,
+            selectmode="extended",
+        )
+
+        # Pack to the screen
+        treeview_table.pack()
+
+        # Configure the scrollbar
+        tree_scroll.config(command=treeview_table.yview)
+
+        # Define Our Columns
+        treeview_table["columns"] = list_of_columns_header
+
+        # First Column hiding it
+        treeview_table.column("#0", width=0, stretch="no")
+        treeview_table.heading("#0", text="", anchor="w")
+
+        for column_name in list_of_columns_header:
+            treeview_table.column(column_name, anchor="center", width=80)
+            treeview_table.heading(column_name, text=column_name, anchor="center")
+
+        # Create striped row tags
+        treeview_table.tag_configure("oddrow", background="white")
+        treeview_table.tag_configure("evenrow", background="lightblue")
+
+        count = 0
+
+        for record in list_of_row_tuple:
+            if count % 2 == 0:
+                treeview_table.insert(
+                    parent="",
+                    index="end",
+                    iid=count,
+                    text="",
+                    values=record,
+                    tags=("evenrow",),
+                )
+            else:
+                treeview_table.insert(
+                    parent="",
+                    index="end",
+                    iid=count,
+                    text="",
+                    values=record,
+                    tags=("oddrow",),
+                )
+
+            count += 1
