@@ -36,6 +36,8 @@ class StrategyVariables:
 
     screen = None
 
+    
+        
     # Execution Engine Settings
     number_of_trades_allowed = int(execution_engine_config["number_of_trades_allowed"])
     max_ba_spread = float(execution_engine_config["max_ba_spread"])
@@ -66,3 +68,25 @@ class StrategyVariables:
     map_con_id_to_contract = {}
     map_unique_id_to_order_preset_obj = {}
     list_of_unique_ids_for_which_entry_order_is_pending: List[Tuple[int, int]] = []
+
+
+
+
+
+
+    # For View detials of scanner combo
+    leg_columns_combo_detail_gui = [
+        "Action",
+        "Symbol",
+        "SecType",
+        "Exchange",
+        "Currency",
+        "#Lots",
+        "Expiry",
+        "Strike",
+        "Right",
+        "Multiplier",
+        "ConID",
+        "Primary Exchange",
+        "Trading Class",
+    ]
