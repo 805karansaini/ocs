@@ -19,6 +19,7 @@ class ConfigLeg:
 
         self.delta_range_max = float(self.delta_range_max)
         self.delta_range_min = float(self.delta_range_min)
+    
     def __str__(self) -> str:
         return f"ConfigLeg: {pprint(vars(self))}"
 
@@ -29,6 +30,7 @@ class ConfigLeg:
         if hasattr(self, key):
             setattr(self, key, value)
         else:
+            # TODO 
             logger.error(
                 f"Inside OrdePreset Object change_value UID: {self.unique_id} '{key}' is not an attribute of this class. new value: {value}"
             )

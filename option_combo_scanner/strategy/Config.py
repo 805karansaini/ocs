@@ -14,12 +14,13 @@ class Config:
     def __init__(self, values_dict,):
         [setattr(self, key, value) for key, value in values_dict.items()]
 
-        # Manage Conid, contract, Subscription
+        # Manage Conid, contract, Subscription # TODO
         self.map_config_id_to_config_object()
 
         
     def map_config_id_to_config_object(self):
-        # Map instrument_id to Instrument Object
+        
+        # TODO 
         strategy_variables.config_object = self
 
     def __str__(self) -> str:
@@ -33,6 +34,7 @@ class Config:
         if hasattr(self, key):
             setattr(self, key, value)
         else:
+            # TODO
             logger.error(
                 f"Inside OrdePreset Object change_value UID: {self.unique_id} '{key}' is not an attribute of this class. new value: {value}"
             )
