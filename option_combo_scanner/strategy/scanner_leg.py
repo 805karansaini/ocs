@@ -10,7 +10,7 @@ from option_combo_scanner.strategy.strategy_variables import StrategyVariables a
 logger = CustomLogger.logger
 
 
-class Leg:
+class ScannerLeg:
     def __init__(self, values_dict,):
         [setattr(self, key, value) for key, value in values_dict.items()]
 
