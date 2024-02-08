@@ -26,7 +26,13 @@ class StrategyVariables:
     nextorderId = None
 
 
+    # TODO - comment
+    flag_enable_filter_based_delta_threshold = True
+    min_delta_threshold = 0.009
+    max_delta_threshold = 0.990
 
+    # comment TODO
+    map_combo_id_to_scanner_combination_object = {}
 
     screen = None
 
