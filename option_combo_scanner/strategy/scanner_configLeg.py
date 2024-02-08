@@ -23,17 +23,7 @@ class ConfigLeg:
     def __str__(self) -> str:
         return f"ConfigLeg: {pprint(vars(self))}"
 
-    def change_value(self, key, value):
-        """
-        Change value of an attribute of this class
-        """
-        if hasattr(self, key):
-            setattr(self, key, value)
-        else:
-            # TODO 
-            logger.error(
-                f"Inside OrdePreset Object change_value UID: {self.unique_id} '{key}' is not an attribute of this class. new value: {value}"
-            )
+    
 
     def get_config_leg_tuple_for_gui(self, ):
         # Create a tuple with object attributes in the specified order
