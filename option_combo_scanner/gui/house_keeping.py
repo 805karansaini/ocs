@@ -4,8 +4,8 @@ from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.order_presets_tab_helper import OrderPresetHelper
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.contracts import get_contract
-from option_combo_scanner.strategy.Config import Config
-from option_combo_scanner.strategy.ConfigLeg import ConfigLeg
+from option_combo_scanner.strategy.scanner_config import Config
+from option_combo_scanner.strategy.scanner_configLeg import ConfigLeg
 from option_combo_scanner.strategy.instrument import Instrument
 from option_combo_scanner.strategy.order_preset import OrderPreset
 from option_combo_scanner.strategy.scanner_combination import ScannerCombination
@@ -95,7 +95,6 @@ class HouseKeepingGUI:
 
     def insert_order_status_in_order_book_tab(self):
         pass
-
     
     @staticmethod
     def dump_all_scanner_combinations_in_scanner_combination_tab(

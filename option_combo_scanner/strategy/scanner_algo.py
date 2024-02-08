@@ -88,7 +88,7 @@ class ScannerAlgo:
         #   0.5 to 0.7,  
         #   -0.1 to 0.2
         """
-        print("generate_combinations", remaining_no_of_legs, range_low, range_high)
+        # print("generate_combinations", remaining_no_of_legs, range_low, range_high)
         list_of_filter_legs = self.filter_strikes(range_low, range_high)
 
         list_of_partial_combination = []
@@ -126,7 +126,7 @@ class ScannerAlgo:
                     temp.extend(next_legs_strike_delta_and_con_id)
                     list_of_partial_combination.append(temp)
 
-        print(f"remaining_no_of_legs {remaining_no_of_legs} list_of_partial_combination", list_of_partial_combination)
+        # print(f"remaining_no_of_legs {remaining_no_of_legs} list_of_partial_combination", list_of_partial_combination)
         return list_of_partial_combination
     
     def filter_list_of_combination(self, list_of_combination):
@@ -197,7 +197,7 @@ class ScannerAlgo:
             range_high,
         )
         
-        print("list_of_combination", list_of_combination)
+        # print("list_of_combination", list_of_combination)
         list_of_filter_combination = self.filter_list_of_combination(list_of_combination)
         list_of_filter_combination_without_dup = self.remove_duplicate_combo_different_order(list_of_filter_combination)
         

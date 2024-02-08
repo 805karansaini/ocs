@@ -8,7 +8,6 @@ from com.leg_identifier import (
     find_nearest_expiry_for_future_given_fut_dte,
 )
 from option_combo_scanner.database.sql_queries import SqlQueries
-from option_combo_scanner.gui.scanner_combination_tab import ScannerCombinationTab
 from option_combo_scanner.strategy.scanner_combination import ScannerCombination
 from option_combo_scanner.strategy.scanner_leg import ScannerLeg
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
@@ -18,11 +17,12 @@ from option_combo_scanner.strategy.scanner_algo import ScannerAlgo
 
 
 class Scanner:
+    x = f"Scanner Class: scanner_combination_tab_obj".upper()
+    print(x)
 
-    # def __init__(self):
-    def __init__(
-        self,
-    ):
+    scanner_combination_tab_obj = None
+    
+    def __init__(self,):
         pass
 
     """
@@ -434,6 +434,14 @@ class Scanner:
         }
             
         for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_deltas):
+            
+            # Remove the key, val if exists form prev iter
+            if 'combo_id' in values_dict:
+                del values_dict['combo_id']
+            # Remove the key, val if exists form prev iter
+            if 'list_of_all_leg_objects' in values_dict:
+                del values_dict['list_of_all_leg_objects']
+            
             values_dict['combo_net_delta'] = combo_net_delta
             res, combo_id = SqlQueries.insert_into_db_table(table_name="combination_table", values_dict=values_dict)
             if not res:
@@ -467,12 +475,9 @@ class Scanner:
             # Scanner Combination Object
             scanner_combination_object = ScannerCombination(values_dict)
             
-            try:
-                # Insert the Scanner combination in GUI
-                scanner_combination_object.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
-            except Exception as e:
-                print(f"Unable to insert the scanned combination in the GUI")
-                
+            # Insert the Scanner combination in GUI
+            Scanner.scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
+            
     # Calulation of Combo Net Delta
     def get_list_combo_net_delta(self, config_obj, list_of_all_generated_combination):
         list_of_config_leg_object = config_obj.list_of_config_leg_object

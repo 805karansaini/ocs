@@ -9,7 +9,9 @@ from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
 from option_combo_scanner.gui.utils import Utils
+from option_combo_scanner.strategy.scanner import Scanner
 from option_combo_scanner.strategy.scanner_combination import get_scanner_combination_details_column_and_data_from_combo_object
+from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
 logger = CustomLogger.logger
 
@@ -31,6 +33,9 @@ class ScannerCombinationTab:
         # Dumping all the combinations in the GUI and system
         HouseKeepingGUI.dump_all_scanner_combinations_in_scanner_combination_tab(self)
         
+        # Set the scanner_combination_tab in the class variables
+        Scanner.scanner_combination_tab_obj = self
+
     def create_scanner_combination_tab(self):
 
         # Create Treeview Frame for active combo table
@@ -96,12 +101,20 @@ class ScannerCombinationTab:
         self.scanner_combination_table.bind(
             "<Button-3>", self.scanner_combination_table_right_click_menu
         )
+
+        # Bind the sort_treeview function to the TreeviewColumnHeader event for each column
+        for column in self.scanner_combination_table["columns"]:
+            self.scanner_combination_table.heading(
+                column, command=lambda c=column: self.sort_scanner_combination_table(c, False)
+            )
+
+
     # def clear_order_book_table(self):
     #     # Set FlagPurged = 1 for all Filled or Cancelled orders
     #     data = {"FlagPurged": 1}
     #     where_clause = "WHERE OrderStatus = 'Filled' OR OrderStatus = 'Cancelled' OR OrderStatus = 'Inactive'"
     #     SqlQueries.update_orders(data, where_clause=where_clause)
-
+    
     def insert_combination_in_scanner_combination_table_gui(self, scanner_combination_object):
         """
         # Name, Width, Heading
@@ -195,5 +208,49 @@ class ScannerCombinationTab:
         # DISPLAY DETAILS of combo
         Utils.display_treeview_popup(title, columns, row_data_list)
 
+    # def refresh_scanner_combination_table(self):
 
-    # Sortable table # TODO - Aryan
+    #     self.x 
+        
+    #     # Move According to data Color here, Change Color
+    #     for i, row in scanner_combo_df.iterrows():
+
+    #         # Unique_id
+    #         unique_id = str(row["Unique ID"])
+
+    #         # If unique_id in table
+    #         if unique_id in all_unique_id_in_cas_table:
+    #             self.cas_table.move(unique_id, "", counter_row)
+
+    #             if counter_row % 2 == 0:
+    #                 self.cas_table.item(unique_id, tags="evenrow")
+    #             else:
+    #                 self.cas_table.item(unique_id, tags="oddrow")
+
+    #             # Increase row count
+    #             counter_row += 1
+
+    # function to sort the scanner combo table
+    def sort_scanner_combination_table(self, column, reverse):
+
+        data = [
+            (self.scanner_combination_table.set(child, column), child)
+            for child in self.scanner_combination_table.get_children("")
+        ]
+        data = sorted(data, key=lambda val: Utils.custom_sort(val[0]), reverse=reverse)
+
+        for counter_row, (_, unique_id) in enumerate(data):
+            self.scanner_combination_table.move(unique_id, "", counter_row)
+
+            if counter_row % 2 == 0:
+                self.scanner_combination_table.item(unique_id, tags="evenrow")
+            else:
+                self.scanner_combination_table.item(unique_id, tags="oddrow")
+
+        # Change the reverse flag
+        self.scanner_combination_table.heading(
+            column, command=lambda: self.sort_scanner_combination_table(column, not reverse)
+        )
+
+        # Change the Reverse Flag in variables Dict
+        StrategyVariables.scanner_combination_table_sort_by_column = {column: reverse}

@@ -26,17 +26,20 @@ class StrategyVariables:
     nextorderId = None
 
 
-    # TODO - comment
+
+    # Variables used in filtering in range 0 to 1 threshold
     flag_enable_filter_based_delta_threshold = True
     min_delta_threshold = 0.009
     max_delta_threshold = 0.990
 
-    # comment TODO
+    # Variable to map combo id to combination object
     map_combo_id_to_scanner_combination_object = {}
 
     screen = None
 
-    
+    scanner_combination_table_sort_by_column = {
+        "Combo ID": False
+    } 
         
     # Execution Engine Settings
     number_of_trades_allowed = int(execution_engine_config["number_of_trades_allowed"])

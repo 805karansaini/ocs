@@ -9,8 +9,8 @@ from com.identify_trading_class_for_fop import identify_the_trading_class_for_al
 from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
 
 from option_combo_scanner.gui.utils import Utils
-from option_combo_scanner.strategy.Config import Config
-from option_combo_scanner.strategy.ConfigLeg import ConfigLeg
+from option_combo_scanner.strategy.scanner_config import Config
+from option_combo_scanner.strategy.scanner_configLeg import ConfigLeg
 from option_combo_scanner.strategy.strategy_variables import (
     StrategyVariables as strategy_variables,
 )

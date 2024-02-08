@@ -499,3 +499,43 @@ class Utils:
                 )
 
             count += 1
+
+    
+    # Method to sort string numeric values
+    @staticmethod     
+    def custom_sort(val):
+
+        # Replace 'N/A' with a large value
+        if val == "N/A":
+            return 10**15
+
+        elif type(val) == str and (val[0].isnumeric() or val[0] == "-"):
+
+            # Replace "," with ""
+            val = val.replace(",", "")
+            val = val.replace(":", "")
+
+            # Remove %
+            if val[-1] == "%":
+                return float(val[:-1])
+
+            return float(val)
+        else:
+            return val
+        
+    @staticmethod
+    # Method to sort cas rows
+    def sort_cas_row_values_by_column(values):
+
+        # Sort Values Based on the User selected column
+        key, reverse = list(variables.cas_table_sort_by_column.items())[0]
+
+        # Col_index
+        col_index = variables.map_cas_column_name_to_index[key]
+
+        # Sort Values
+        values = sorted(
+            values, key=lambda row: Utils.custom_sort(row[col_index]), reverse=reverse
+        )
+
+        return values
