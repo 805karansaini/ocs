@@ -56,5 +56,5 @@ class CustomLogger:
     Custom logger class to log the responses from the cTrader server
     """
 
-    name = f"Log-{datetime.datetime.now().strftime('%Y-%m-%d')}"
+    name = f"Log-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
     logger = get_logger(name=name)
