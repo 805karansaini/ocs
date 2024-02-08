@@ -1,6 +1,8 @@
 from functools import cache
 import pandas as pd
 
+from option_combo_scanner.strategy.strategy_variables import StrategyVariables
+
 
 class ScannerAlgo:
 
@@ -37,9 +39,18 @@ class ScannerAlgo:
         self.strike_and_delta_dataframe = self.strike_and_delta_dataframe.apply(
             pd.to_numeric, errors="coerce"
         )
-        # Converting Delta values to absolute
 
+        # Converting Delta values to absolute
         self.strike_and_delta_dataframe['Delta'] = self.strike_and_delta_dataframe['Delta'].abs()
+        
+        # Remove all the row that have delta less than min_delta_threshold
+        if StrategyVariables.flag_enable_filter_based_delta_threshold:
+            self.strike_and_delta_dataframe = self.strike_and_delta_dataframe[
+                (self.strike_and_delta_dataframe['Delta'] > StrategyVariables.min_delta_threshold)]
+
+            # Remove all the row that have delta higher than max_delta_threshold
+            self.strike_and_delta_dataframe = self.strike_and_delta_dataframe[
+                (self.strike_and_delta_dataframe['Delta'] < StrategyVariables.max_delta_threshold)]
 
 
     def filter_strikes(self, delta_range_low, delta_range_high):
@@ -152,22 +163,22 @@ class ScannerAlgo:
             
             # Temp Combintaion will be in new format, [(Leg1-Strike, Leg1-Action), (Leg2-Strike, Leg2-Action),...]
             temp_combination = []
+    
             # Loop leg_tuple in combination and the leg_object in the list_of_config_leg_object
             for leg_tuple, leg_object in zip(combination, list_of_config_leg_object):
 
                 # Get the leg number & action for the leg, from the respective leg_object
                 leg_number = leg_object.leg_number
                 action = leg_object.action
-                
                 # Unpack the Strike Delta & Conid from a Leg:  (5100.0B, 0.6981448441368908, 0)
                 strike, delta, conid = leg_tuple
                 
                 temp_leg_tuple = (strike, action)
                 temp_combination.append(temp_leg_tuple)
-
+            
             # Cast to Tuple: so combination can be hashed
             temp_combination = tuple(temp_combination)
-
+            
             # if not in seen add sublist to uniique
             if temp_combination not in seen_combination:
                 unique_filter_combination.append(combination)
@@ -189,107 +200,5 @@ class ScannerAlgo:
         print("list_of_combination", list_of_combination)
         list_of_filter_combination = self.filter_list_of_combination(list_of_combination)
         list_of_filter_combination_without_dup = self.remove_duplicate_combo_different_order(list_of_filter_combination)
-        print("\n\nlist_of", list_of_filter_combination_without_dup)
+        
         return list_of_filter_combination_without_dup
-
-
-"""
-
-valid_combos = []
-
-Step 1: Find leg1_strikes
-
-# Find leg1 strikes
-leg1_strikes = filter_legs(leg1_delta_min, leg1_delta_max)
-
-# For each such leg1 strike, build the rest of the combo
-For leg1_strike in leg1_strikes:
-
-	combo = [(leg1_strike,leg1_delta)]
-	find_remaining_legs(2, combo)
-
-Step 2:
-
-def find_remaining_legs(I, combo):
-
-	if(i==N):
-
-		# Find all possible final legs
-		legi_strikes = filter_legs(legi-1_delta + legi_legi-1_diff_min, legi-1_delta + legi_legi-1_diff_max)
-
-
-		# Append all combos to valid_combos
-		for legi_strike in legi_strikes:
-
-			combo = combo + [strike, delta]
-			
-			valid_combos.append(combo)
-
-	else:
-	
-		# Find leg1 strikes
-
-		legi_strikes = filter_legs(legi-1_delta + legi_legi-1_diff_min, legi-1_delta + legi_legi-1_diff_max)
-
-		# For each chosen strike for legs, build the rest of the combo
-
-		for strike in legi_strikes:
-
-			combo = combo + [strike, delta]
-			find_remaining_legs(i+1, combo)
-
-	
-	
-
-	
-
-
-
->>>	Sample Code:
-
-def filter_legs(delta_range_low, delta_range_high):
-    # Placeholder implementation, replace this with your actual filtering logic
-    return [(strike, strike_delta)]
-
-def generate_combinations(no_legs, min_diff, max_diff, base_strike_and_delta):
-    # Base case: If no_legs is 0, return the base case combination
-    if no_legs == 0:
-        return [base_strike_and_delta]
-
-    # Get the initial delta range from the base_strike_and_delta
-    base_strike, base_delta = base_strike_and_delta
-    range_low = base_delta - min_diff
-    range_high = base_delta + max_diff
-
-    # Step 1: Filter strikes based on the delta range
-    leg_list = filter_legs(range_low, range_high)
-
-    result_combinations = []
-
-    # Step 2: For each (strike, strike_delta) in leg_list
-    for strike, strike_delta in leg_list:
-        # Step 2.1: Recursively generate combinations for the remaining legs
-        sub_combinations = generate_combinations(no_legs - 1, min_diff, max_diff, (strike, strike_delta))
-
-        # Step 2.2: Combine the base_strike_and_delta with each sub_combination
-        for sub_combination in sub_combinations:
-            result_combinations.append([base_strike_and_delta, *sub_combination])
-
-    return result_combinations
-
-
->>>>>>>>>>>>>
-<!-- # Example usage:
-no_legs = 3
-min_diff = 0.1
-max_diff = 0.2
-base_strike_and_delta = (100, 0.31)
-
-result = generate_combinations(no_legs, min_diff, max_diff, base_strike_and_delta)
-
-# Print the result
-for combination in result:
-    print(combination) -->
-
-
-"""
