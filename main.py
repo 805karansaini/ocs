@@ -150,13 +150,16 @@ if __name__ == "__main__":
     logger.debug("GUI Screen Initialized")
     print("GUI Screen Initialized")
 
+    # Creating the Scanner Object
+    scanner_object = Scanner()
+    
     # While Screen is open
     while IsScreenRunning.flag_is_screen_running:
 
         try:
             
             try:
-                Scanner().start_scanner()
+                scanner_object.start_scanner()
             except Exception as e:
                 # Print the traceback
                 traceback.print_exc()
