@@ -22,6 +22,9 @@ scanner_combination_table_columns_width = [
     ("Description", 700, "Description"),
     ("#Legs", 119, "#Legs"),
     ("Combo Net  Delta", 119, "Combo Net Delta"),    
+    ("Max Profit", 119, "Max Profit"),
+    ("Max Loss", 119, "Max Loss"),
+    ("Max Profit/Loss Ratio", 119, "Max Profit/Loss Ratio"),
 ]
 
 
@@ -133,8 +136,11 @@ class ScannerCombinationTab:
             combo_id,
             scanner_combination_object.instrument_id,
             scanner_combination_object.description,
-            scanner_combination_object.legs,
+            scanner_combination_object.number_of_legs,
             scanner_combination_object.combo_net_delta,
+            scanner_combination_object.max_profit,
+            scanner_combination_object.max_loss,
+            scanner_combination_object.max_profit_max_loss_ratio
         )
 
         # Get the current number of items in the treeview
@@ -231,6 +237,7 @@ class ScannerCombinationTab:
     #             counter_row += 1
 
     # function to sort the scanner combo table
+        
     def sort_scanner_combination_table(self, column, reverse):
 
         data = [
