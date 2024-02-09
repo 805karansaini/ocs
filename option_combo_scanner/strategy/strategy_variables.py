@@ -21,8 +21,8 @@ class StrategyVariables:
     map_instrument_id_to_instrument_object = {}
     map_config_id_to_config_object = {}         # not using it anywhere, aryan created this but since there will be a single config in system, hence we are usign 'config_object'
     map_configleg_id_to_config_object = {}
+    map_indicator_id_to_indicator_object = {}
     config_object = None
-
     nextorderId = None
 
 

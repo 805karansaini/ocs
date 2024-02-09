@@ -203,7 +203,8 @@ class Scanner:
 
             except AttributeError:
                 # Handle the case where local_config_object does not have the expected attributes
-                print("Error: local_config_object does not have the expected attributes.")
+                print(f"Add Configuration Values")
+                # print("Error: local_config_object does not have the expected attributes.")
                 
                 right = None
                 list_of_dte = []
@@ -312,7 +313,9 @@ class Scanner:
                 instrument_object=instrument_object,
                 strike_and_delta_dataframe=df,
             )
-            self.insert_combinations_into_db(list_of_all_generated_combination, instrument_object, expiry)
+            list_of_combo_net_deltas = self.get_list_combo_net_delta(config_obj=config_obj,
+                                     list_of_all_generated_combination=list_of_all_generated_combination)
+            self.insert_combinations_into_db(list_of_all_generated_combination, instrument_object, list_of_combo_net_deltas)
 
     def run_scan_for_fop(self, config_obj, instrument_object, list_of_dte, right):
         symbol = instrument_object.symbol
@@ -422,7 +425,7 @@ class Scanner:
 
         values_dict = {
             'instrument_id': instrument_object.instrument_id,
-            'legs': config_obj.no_of_leg,
+            'number_of_legs': config_obj.no_of_leg,
             'symbol': instrument_object.symbol,
             'sec_type': instrument_object.sec_type,
             'expiry': expiry,
@@ -495,5 +498,6 @@ class Scanner:
                 # If Sell will substract the delta
                 else:
                     net_combo -= delta
+            net_combo = f"{float(net_combo):,.4f}"
             list_of_combo_net_deltas.append(net_combo)    
         return list_of_combo_net_deltas    
