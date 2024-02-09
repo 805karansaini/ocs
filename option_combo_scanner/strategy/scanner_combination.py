@@ -71,7 +71,7 @@ class ScannerCombination:
         combination_tuple = (
             self.combo_id,
             self.instrument_id,
-            self.legs,
+            self.number_of_legs,
             self.symbol,
             self.sec_type,
             self.expiry,
@@ -81,6 +81,9 @@ class ScannerCombination:
             self.currency,
             self.exchange,
             self.combo_net_delta,
+            self.max_profit,
+            self.max_loss,
+            self.max_profit_max_loss_ratio,
             self.list_of_all_leg_objects
         )
 
@@ -123,7 +126,10 @@ def get_scanner_combination_details_column_and_data_from_combo_object(
     multiplier = combo_obj.multiplier
     primary_exchange = combo_obj.primary_exchange
     trading_class = combo_obj.trading_class
-    
+    max_profit = combo_obj.max_profit
+    max_loss = combo_obj.max_loss
+    max_profit = combo_obj.max_profit
+    max_profit_max_loss_ratio = combo_obj.max_profit_max_loss_ratio
     # Processing legs and getting data for row.
     for leg_obj in all_legs:
 
@@ -149,6 +155,7 @@ def get_scanner_combination_details_column_and_data_from_combo_object(
                 con_id,
                 primary_exchange,
                 trading_class,
+                max_profit,
             )
         )
 
