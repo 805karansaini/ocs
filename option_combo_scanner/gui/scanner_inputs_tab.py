@@ -184,7 +184,7 @@ class ScannerInputsTab:
             primary_exchange,
     ):
         values_dict = {
-            'symbol': symbol,
+            'symbol': symbol.upper(),
             'sec_type': sec_type,
             'currency': currency,
             'multiplier': multiplier,
@@ -788,7 +788,7 @@ class ScannerInputsTab:
 
             # Entry and Combo box Inputs
             desc = current_row_number + i + 1
-            action_value = "Buy"
+            action_value = "BUY"
             delta_min_value = "0.0"
             delta_max_value = "0.0"
 
@@ -844,7 +844,7 @@ class ScannerInputsTab:
 
         # Entry and Combo box Inputs 
         self.right_var = tk.StringVar()
-        self.right_dropdown = ttk.Combobox(input_fields_frame, textvariable=self.right_var, values=["Call", "Put"],
+        self.right_dropdown = ttk.Combobox(input_fields_frame, textvariable=self.right_var, values=["CALL", "PUT"],
                                       state="readonly")
         self.right_dropdown.grid(column=0, row=1, padx=5, pady=5)
 
@@ -872,7 +872,7 @@ class ScannerInputsTab:
 
         values_dict = {
             'no_of_leg': int(self.no_of_legs_entry.get()),
-            'right': self.right_var.get(),
+            'right': self.right_var.get().upper(),
             'list_of_dte': self.list_of_dte_entry.get(),
         }
         # Validation on no of legs if it is greater than zero
@@ -917,7 +917,7 @@ class ScannerInputsTab:
 
             leg_data = {
                 'leg_number': i + 1,
-                'action': item_values[1],
+                'action': item_values[1].upper(),
                 'delta_range_min': item_values[2],
                 'delta_range_max': item_values[3],
                 # Add other leg-wise data as needed
