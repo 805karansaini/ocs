@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import Scrollbar, ttk
 
 from option_combo_scanner.custom_logger.logger import CustomLogger
+from option_combo_scanner.gui.option_indicator_data_tab import OptionIndicator
 from option_combo_scanner.gui.scanner_combination_tab import ScannerCombinationTab
 from option_combo_scanner.gui.order_book_tab import OrderBookTab
 from option_combo_scanner.gui.order_presets_tab import OrderPresetTab
@@ -40,10 +41,10 @@ class ScreenGUI(threading.Thread):
         self.notebook.add(self.combination_tab_frame, text="   Scanned Combination Tab  ")
         self.combination_tab_object = ScannerCombinationTab(self.combination_tab_frame)
 
-        # Create the Order Preset tab
-        self.order_preset_tab_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.order_preset_tab_frame, text="  Order Presets  ")
-        self.order_preset_tab_object = OrderPresetTab(self.order_preset_tab_frame)
+        # Create the Option Indicator tab
+        self.option_indicator_data_tab_frame = ttk.Frame(self.notebook)
+        self.notebook.add(self.option_indicator_data_tab_frame, text="  Option Indicator Tab ")
+        self.option_indicator_data_tab_object = OptionIndicator(self.option_indicator_data_tab_frame)
 
         # # Bind the event to the Trading Rules tab
         # self.notebook.bind(
