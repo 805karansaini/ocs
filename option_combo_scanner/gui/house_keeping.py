@@ -4,6 +4,7 @@ from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.order_presets_tab_helper import OrderPresetHelper
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.contracts import get_contract
+from option_combo_scanner.strategy.indicator import Indicator
 from option_combo_scanner.strategy.scanner_config import Config
 from option_combo_scanner.strategy.scanner_configLeg import ConfigLeg
 from option_combo_scanner.strategy.instrument import Instrument
@@ -124,7 +125,7 @@ class HouseKeepingGUI:
         for combination in all_combinations:
             
             combo_id = int(combination['combo_id'])
-            legs = int(combination['legs'])
+            legs = int(combination['number_of_legs'])
             
             # list of leg object
             list_of_all_leg_objects = []
@@ -144,4 +145,17 @@ class HouseKeepingGUI:
             
             # Insert the Scanner combination in GUI
             scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
-                
+    
+
+    @staticmethod
+    def dump_all_indicator_values_in_indicator_tab(
+        option_indicator_tab_obj,
+    ):
+        # Get the Indicators from Indicator table
+        all_indicator = SqlQueries.select_from_db_table(table_name="indicator_table", columns="*")
+        
+        for values_dict in all_indicator:
+            indicator_obj = Indicator(values_dict)  # Mapping
+
+            ### Add in the Indicator table
+            option_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
