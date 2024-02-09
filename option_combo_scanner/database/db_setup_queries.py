@@ -42,7 +42,7 @@ query4 = """CREATE TABLE IF NOT EXISTS `config_legs_table` (
 query5 = """CREATE TABLE IF NOT EXISTS `combination_table` (
         `combo_id` INT AUTO_INCREMENT PRIMARY KEY,
         `instrument_id` INT,
-        `legs` INT,
+        `number_of_legs` INT,
         `symbol` VARCHAR(50),
         `sec_type` VARCHAR(20),
         `expiry` VARCHAR(20),
@@ -52,6 +52,9 @@ query5 = """CREATE TABLE IF NOT EXISTS `combination_table` (
         `currency` VARCHAR(20),
         `exchange` VARCHAR(20),
         `combo_net_delta` DECIMAL(8, 8),
+        `max_profit` DECIMAL(8, 8),
+        `max_loss` DECIMAL(8, 8),
+        `max_profit_max_loss_ratio` DECIMAL(8, 8),
         `primary_exchange` VARCHAR(10),
         FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE
     );"""
@@ -80,7 +83,7 @@ query7 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
         `hv_iv` VARCHAR(15),
         `rr_25` VARCHAR(15),
         `rr_50` VARCHAR(15),
-        `rr_2550` VARCHAR(15),
+        `rr_25_50` VARCHAR(15),
         `rr_change_last_close` VARCHAR(15),
         `max_pain` VARCHAR(15),
         `min_pain` VARCHAR(15),
