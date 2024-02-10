@@ -422,7 +422,7 @@ class Scanner:
         
         config_obj = self.get_config_from_variables()
         list_of_config_leg_object = config_obj.list_of_config_leg_object
-
+        # TODO max loss/profit
         values_dict = {
             'instrument_id': instrument_object.instrument_id,
             'number_of_legs': config_obj.no_of_leg,
@@ -434,6 +434,9 @@ class Scanner:
             'trading_class': instrument_object.trading_class,
             'currency': instrument_object.currency,
             'exchange': instrument_object.exchange,
+            'max_profit': 1.2,
+            'max_loss': 1.7,
+            'max_profit_max_loss_ratio': 1.3
         }
             
         for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_deltas):
