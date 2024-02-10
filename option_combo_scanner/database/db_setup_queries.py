@@ -52,8 +52,8 @@ query5 = """CREATE TABLE IF NOT EXISTS `combination_table` (
         `currency` VARCHAR(20),
         `exchange` VARCHAR(20),
         `combo_net_delta` DECIMAL(8, 8),
-        `max_profit` DECIMAL(8, 8),
-        `max_loss` DECIMAL(8, 8),
+        `max_profit` DECIMAL(8, 2),
+        `max_loss` DECIMAL(8, 2),
         `max_profit_max_loss_ratio` DECIMAL(8, 8),
         `primary_exchange` VARCHAR(10),
         FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE
