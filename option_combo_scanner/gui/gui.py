@@ -33,17 +33,17 @@ class ScreenGUI(threading.Thread):
 
         # Create the Scanner Inputs Tab
         self.scanner_inputs_tab_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.scanner_inputs_tab_frame, text="  Scanner Inputs  ")
+        self.notebook.add(self.scanner_inputs_tab_frame, text=" Scanner Inputs ")
         self.scanner_inputs_tab_object = ScannerInputsTab(self.scanner_inputs_tab_frame)
 
         # Create the Scanner Combination Tab
         self.combination_tab_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.combination_tab_frame, text="   Scanned Combination Tab  ")
+        self.notebook.add(self.combination_tab_frame, text=" Scanned Combo ")
         self.combination_tab_object = ScannerCombinationTab(self.combination_tab_frame)
 
         # Create the Option Indicator tab
         self.option_indicator_data_tab_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.option_indicator_data_tab_frame, text="  Option Indicator Tab ")
+        self.notebook.add(self.option_indicator_data_tab_frame, text=" Option Indicator ")
         self.option_indicator_data_tab_object = OptionIndicator(self.option_indicator_data_tab_frame)
 
         # # Bind the event to the Trading Rules tab
