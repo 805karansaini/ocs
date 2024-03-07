@@ -208,7 +208,6 @@ def calculate_parkinson_range_without_gaps(
             rf"{file_path}\parkinson_volatility_HV_Unique_id_{conid}.csv",
             index=False,
         )
-        
 
     return parkinson_range_result
 
@@ -239,7 +238,7 @@ def calculate_parkinson_range_with_gaps(
 
     # If we are calculating the Parksionson's range with gaps for Intraday values and for individual legs, columns will be Open x, Close x
     # TODO ARYAN COMMMENT
-    
+
     open_price_column_name = "Combination Open"
     close_price_column_name = "Combination Close"
 
@@ -326,6 +325,7 @@ def calculate_parkinson_range_with_gaps(
 
     return parkinson_range_result
 
+
 # Method to calculate ATR
 def calculate_combo_atr(
     conid,
@@ -409,6 +409,7 @@ def calculate_combo_atr(
         atr = None
 
     return atr
+
 
 # Method to calculate ATR for positive and negative candles
 def calculate_combo_atr_for_positive_negative_candles(combo_daily_open_close_df):
@@ -529,7 +530,6 @@ def get_timestamp_of_lowest_and_highest_point_of_price(latest_day_dataframe):
     highest_timestamp = highest_timestamp.strftime("%H:%M:%S")
 
     return lowest_timestamp, highest_timestamp
-
 
 
 # Sum of abs(Change) for each period since the market opened

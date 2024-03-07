@@ -13,16 +13,18 @@ from com.greeks import async_get_deltas
 from com.option_comobo_scanner_idetif import (
     find_closest_expiry_for_fop_given_fut_expiries_and_trading_class,
     find_nearest_expiry_and_all_strikes_for_stk_given_dte,
-    find_nearest_expiry_for_future_given_fut_dte)
+    find_nearest_expiry_for_future_given_fut_dte,
+)
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.utils import Utils
-from option_combo_scanner.indicators_calculator.market_data_fetcher import \
-    MarketDataFetcher
+from option_combo_scanner.indicators_calculator.market_data_fetcher import (
+    MarketDataFetcher,
+)
 from option_combo_scanner.strategy.indicator import Indicator
 from option_combo_scanner.strategy.scanner_algo import ScannerAlgo
+
 # from option_combo_scanner.strategy import strategy_variables
-from option_combo_scanner.strategy.scanner_combination import \
-    ScannerCombination
+from option_combo_scanner.strategy.scanner_combination import ScannerCombination
 from option_combo_scanner.strategy.scanner_leg import ScannerLeg
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
@@ -69,7 +71,7 @@ class Scanner:
             multiplier,
             trading_class,
         )
-        
+
         # only call once (not for N-DTEs)
         all_fut_expiries = find_nearest_expiry_for_future_given_fut_dte(
             symbol,
@@ -321,9 +323,9 @@ class Scanner:
                 f"{old_indicator_dict['expiry']}{old_indicator_dict['trading_class']}"
             )
 
-            map_indicator_id_to_expiry_and_trading_class_str[indicator_id] = (
-                expiry_and_trading_class_str
-            )
+            map_indicator_id_to_expiry_and_trading_class_str[
+                indicator_id
+            ] = expiry_and_trading_class_str
             map_expiry_and_trading_class_str_to_indicator_id[
                 expiry_and_trading_class_str
             ] = indicator_id
@@ -436,24 +438,26 @@ class Scanner:
 
             # OPT/FOP
             # Get all the expiry from the list of DTE
-            all_strikes_string, closest_expiry, underlying_conid = (
-                self.get_strike_and_closet_expiry_for_opt(
-                    symbol=symbol,
-                    dte=dte,
-                    underlying_sec_type="STK",
-                    exchange=exchange,
-                    currency=currency,
-                    multiplier=multiplier,
-                    trading_class="",
-                )
+            (
+                all_strikes_string,
+                closest_expiry,
+                underlying_conid,
+            ) = self.get_strike_and_closet_expiry_for_opt(
+                symbol=symbol,
+                dte=dte,
+                underlying_sec_type="STK",
+                exchange=exchange,
+                currency=currency,
+                multiplier=multiplier,
+                trading_class="",
             )
             if all_strikes_string == None or closest_expiry == None:
                 continue
 
             set_of_all_closest_expiry.add(closest_expiry)
-            map_closest_expiry_to_underlying_conid[int(closest_expiry)] = (
-                underlying_conid
-            )
+            map_closest_expiry_to_underlying_conid[
+                int(closest_expiry)
+            ] = underlying_conid
 
             # Removing  {  }
             all_strikes = [float(_) for _ in all_strikes_string[1:-1].split(",")]
@@ -494,23 +498,40 @@ class Scanner:
             # Fetch Data for all the  Contracts
             list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple = asyncio.run(
                 MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
-                    list_of_all_option_contracts, flag_market_open=False, generic_tick_list=""
+                    list_of_all_option_contracts,
+                    flag_market_open=False,
+                    generic_tick_list="",
                 )
             )
 
-            columns = ["Strike", "Delta", "ConId", "Bid", "Ask",]
+            columns = [
+                "Strike",
+                "Delta",
+                "ConId",
+                "Bid",
+                "Ask",
+            ]
             data_frame_dict = {col: [] for col in columns}
 
-            for contract, (delta, iv_ask, iv_bid, iv_last, bid_price, ask_price, call_oi, put_oi) in zip(
-                list_of_all_option_contracts, list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple
+            for contract, (
+                delta,
+                iv_ask,
+                iv_bid,
+                iv_last,
+                bid_price,
+                ask_price,
+                call_oi,
+                put_oi,
+            ) in zip(
+                list_of_all_option_contracts,
+                list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple,
             ):
                 data_frame_dict["Strike"].append(contract.strike)
                 data_frame_dict["Delta"].append(str(delta))
                 data_frame_dict["ConId"].append(contract.conId)
-                
+
                 data_frame_dict["Bid"].append(bid_price)
                 data_frame_dict["Ask"].append(ask_price)
-
 
             df = pd.DataFrame(data_frame_dict)
             # print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
@@ -545,7 +566,7 @@ class Scanner:
                 instrument_object,
                 expiry,
                 list_of_combo_net_deltas,
-                df, 
+                df,
             )
 
     def run_scan_for_fop(self, instrument_object, list_of_dte, right):
@@ -566,25 +587,27 @@ class Scanner:
 
             # OPT/FOP
             # Get all the expiry from the list of DTE
-            all_strikes, closest_expiry, underlying_conid = (
-                self.get_strike_and_closet_expiry_for_fop(
-                    symbol=symbol,
-                    dte=dte,
-                    underlying_sec_type="FUT",
-                    exchange=exchange,
-                    currency=currency,
-                    multiplier=multiplier,
-                    trading_class=trading_class,
-                )
+            (
+                all_strikes,
+                closest_expiry,
+                underlying_conid,
+            ) = self.get_strike_and_closet_expiry_for_fop(
+                symbol=symbol,
+                dte=dte,
+                underlying_sec_type="FUT",
+                exchange=exchange,
+                currency=currency,
+                multiplier=multiplier,
+                trading_class=trading_class,
             )
 
             # print("Scanner: FOP underlying_coind:", underlying_conid)
             if all_strikes is None or closest_expiry == None:
                 continue
 
-            map_closest_expiry_to_underlying_conid[int(closest_expiry)] = (
-                underlying_conid
-            )
+            map_closest_expiry_to_underlying_conid[
+                int(closest_expiry)
+            ] = underlying_conid
             set_of_all_closest_expiry.add(closest_expiry)
 
         # Update Indicator table with Unique Rows
@@ -621,25 +644,42 @@ class Scanner:
             # Fetch Data for all the  Contracts
             list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple = asyncio.run(
                 MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
-                    list_of_all_option_contracts, flag_market_open=False, generic_tick_list=""
+                    list_of_all_option_contracts,
+                    flag_market_open=False,
+                    generic_tick_list="",
                 )
             )
 
             # pprint.pprint(list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple)
 
-            columns = ["Strike", "Delta", "ConId", "Bid", "Ask",]
+            columns = [
+                "Strike",
+                "Delta",
+                "ConId",
+                "Bid",
+                "Ask",
+            ]
             data_frame_dict = {col: [] for col in columns}
 
-            for contract, (delta, iv_ask, iv_bid, iv_last, bid_price, ask_price, call_oi,put_oi) in zip(
-                list_of_all_option_contracts, list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple
+            for contract, (
+                delta,
+                iv_ask,
+                iv_bid,
+                iv_last,
+                bid_price,
+                ask_price,
+                call_oi,
+                put_oi,
+            ) in zip(
+                list_of_all_option_contracts,
+                list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple,
             ):
                 data_frame_dict["Strike"].append(contract.strike)
                 data_frame_dict["Delta"].append(str(delta))
                 data_frame_dict["ConId"].append(contract.conId)
-                
+
                 data_frame_dict["Bid"].append(bid_price)
                 data_frame_dict["Ask"].append(ask_price)
-                
 
             df = pd.DataFrame(data_frame_dict)
             # print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
@@ -679,10 +719,12 @@ class Scanner:
             )
 
     def generate_combinations(self, strike_and_delta_dataframe):
-        
+
         # Drop extra columns
-        columns_to_drop = ['Bid', 'Ask']
-        columns_to_drop_existing = [col for col in columns_to_drop if col in strike_and_delta_dataframe.columns]
+        columns_to_drop = ["Bid", "Ask"]
+        columns_to_drop_existing = [
+            col for col in columns_to_drop if col in strike_and_delta_dataframe.columns
+        ]
 
         df_copy = strike_and_delta_dataframe.copy()
         if columns_to_drop_existing:
@@ -695,7 +737,7 @@ class Scanner:
 
         # print("\nGenerate Combintaions: ")
         # print(tabulate(strike_and_delta_dataframe, headers="keys", tablefmt="psql", showindex=False))
-        
+
         # List
         res = ScannerAlgo(
             config_obj=self.config_obj,
@@ -784,7 +826,9 @@ class Scanner:
                 del values_dict["list_of_all_leg_objects"]
 
             values_dict["combo_net_delta"] = combo_net_delta
-            values_dict["max_profit"] = "inf" if max_profit == float("inf") else max_profit
+            values_dict["max_profit"] = (
+                "inf" if max_profit == float("inf") else max_profit
+            )
             values_dict["max_loss"] = "-inf" if max_loss == float("-inf") else max_loss
             res, combo_id = SqlQueries.insert_into_db_table(
                 table_name="combination_table", values_dict=values_dict
@@ -860,8 +904,8 @@ class Scanner:
                         * combination_multiplier
                     )
                 else:
-                    payoff += 0    
-                
+                    payoff += 0
+
             else:
 
                 # CALL SELL
@@ -873,7 +917,6 @@ class Scanner:
                     )
                 else:
                     payoff += 0
-
 
         else:
             if buy_or_sell == "BUY":
@@ -899,13 +942,12 @@ class Scanner:
                         * (option_strike - underlying_price_expiry)
                         * combination_multiplier
                     )
-        
+
         # Option Premium
         if buy_or_sell == "BUY":
             payoff -= leg_premium * combination_multiplier
         else:
             payoff += leg_premium * combination_multiplier
-
 
         return payoff
 
@@ -925,11 +967,15 @@ class Scanner:
         slope_right = 0
 
         # Sort list_of_legs_tuple
-        sorted_legs_tuple = sorted(list_of_legs_tuple, key=lambda x: x[0])  # Assuming tuple elements to be sorted based on the first element
+        sorted_legs_tuple = sorted(
+            list_of_legs_tuple, key=lambda x: x[0]
+        )  # Assuming tuple elements to be sorted based on the first element
 
         # Rearrange list_of_config_leg_objects based on the sorting of list_of_legs_tuple
         sorted_indices = [list_of_legs_tuple.index(leg) for leg in sorted_legs_tuple]
-        sorted_config_leg_objects = [list_of_config_leg_objects[i] for i in sorted_indices]
+        sorted_config_leg_objects = [
+            list_of_config_leg_objects[i] for i in sorted_indices
+        ]
 
         list_of_legs_tuple = sorted_legs_tuple
         list_of_config_leg_objects = sorted_config_leg_objects
@@ -952,7 +998,7 @@ class Scanner:
             # Max Profit is max of (Payoff Strike1, PayoffStrike2...)
             max_profit = max(max_profit, combo_pay_off_for_current_strike)
             max_loss = min(max_loss, combo_pay_off_for_current_strike)
-            
+
             # print(f"LegTuple: {leg_tuple} {combo_pay_off_for_current_strike=} {max_profit=} {max_loss=}")
             # Get the Slope left for Strike 1
             if i == 0:
@@ -994,7 +1040,6 @@ class Scanner:
 
         return max_loss, max_profit
 
-
     # Calulating Combination Payoff for Strike
     def get_combination_payoff(
         self,
@@ -1007,13 +1052,22 @@ class Scanner:
     ):
         combination_payoff = 0
         for leg, config_leg_obj in zip(list_of_legs_tuple, list_of_config_leg_object):
-            
+
             option_strike = leg[0]
 
             leg_premium = 0
             try:
-                bid_value, ask_value = tuple(df_with_strike_delta_bid_ask[df_with_strike_delta_bid_ask['Strike'] == float(option_strike)][['Bid', 'Ask']].iloc[0])
-                if bid_value == float('nan') or pd.isna(bid_value) or ask_value == float('nan') or pd.isna(ask_value): 
+                bid_value, ask_value = tuple(
+                    df_with_strike_delta_bid_ask[
+                        df_with_strike_delta_bid_ask["Strike"] == float(option_strike)
+                    ][["Bid", "Ask"]].iloc[0]
+                )
+                if (
+                    bid_value == float("nan")
+                    or pd.isna(bid_value)
+                    or ask_value == float("nan")
+                    or pd.isna(ask_value)
+                ):
                     leg_premium = 0
                 else:
                     leg_premium = (bid_value + ask_value) / 2

@@ -43,8 +43,12 @@ class ScreenGUI(threading.Thread):
 
         # Create the Option Indicator tab
         self.option_indicator_data_tab_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.option_indicator_data_tab_frame, text=" Option Indicator ")
-        self.option_indicator_data_tab_object = OptionIndicator(self.option_indicator_data_tab_frame)
+        self.notebook.add(
+            self.option_indicator_data_tab_frame, text=" Option Indicator "
+        )
+        self.option_indicator_data_tab_object = OptionIndicator(
+            self.option_indicator_data_tab_frame
+        )
 
         # # Bind the event to the Trading Rules tab
         # self.notebook.bind(

@@ -126,9 +126,7 @@ if __name__ == "__main__":
                 # Update Order Book from the database
                 screen.order_book_tab_object.update_order_book_table()
             except Exception as exp:
-                logger.error(
-                    f"Exception in main-update_order_book_table exp: {exp}"
-                )
+                logger.error(f"Exception in main-update_order_book_table exp: {exp}")
 
             try:
                 # Accumulate the latest Prices

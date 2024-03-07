@@ -3,8 +3,7 @@ Copyright (C) 2019 Interactive Brokers LLC. All rights reserved. This code is su
  and conditions of the IB API Non-Commercial License or the IB API Commercial License, as applicable.
 """
 
-from ibapi.common import (DOUBLE_INFINITY, UNSET_DECIMAL, UNSET_DOUBLE,
-                          UNSET_INTEGER)
+from ibapi.common import DOUBLE_INFINITY, UNSET_DECIMAL, UNSET_DOUBLE, UNSET_INTEGER
 from ibapi.object_implem import Object
 from ibapi.softdollartier import SoftDollarTier
 from ibapi.utils import decimalMaxString, floatMaxString, intMaxString

@@ -14,8 +14,14 @@ import logging
 import sys
 from decimal import Decimal
 
-from ibapi.common import (DOUBLE_INFINITY, INFINITY_STR, UNSET_DECIMAL,
-                          UNSET_DOUBLE, UNSET_INTEGER, UNSET_LONG)
+from ibapi.common import (
+    DOUBLE_INFINITY,
+    INFINITY_STR,
+    UNSET_DECIMAL,
+    UNSET_DOUBLE,
+    UNSET_INTEGER,
+    UNSET_LONG,
+)
 
 logger = logging.getLogger(__name__)
 

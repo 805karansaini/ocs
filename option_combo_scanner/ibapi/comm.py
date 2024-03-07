@@ -13,8 +13,7 @@ import logging
 import struct
 import sys
 
-from ibapi.common import (DOUBLE_INFINITY, INFINITY_STR, UNSET_DOUBLE,
-                          UNSET_INTEGER)
+from ibapi.common import DOUBLE_INFINITY, INFINITY_STR, UNSET_DOUBLE, UNSET_INTEGER
 from ibapi.errors import INVALID_SYMBOL
 from ibapi.utils import ClientException, isAsciiPrintable
 

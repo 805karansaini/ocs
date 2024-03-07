@@ -25,7 +25,7 @@ class Indicator:
 
         self.indicator_id = int(self.indicator_id)
         self.underlying_conid = int(self.underlying_conid)
-        self.currency = 'USD'  # TODO ARYAN
+        self.currency = "USD"  # TODO ARYAN
         self.map_indicator_id_to_indicator_object()
 
     def map_indicator_id_to_indicator_object(self):
@@ -36,15 +36,19 @@ class Indicator:
         underlying_contract = get_contract(
             self.symbol,
             underlying_sec_type,
-            "SMART" if underlying_sec_type == 'STK' else 'CME', # TODO ARYAN
+            "SMART" if underlying_sec_type == "STK" else "CME",  # TODO ARYAN
             self.currency,
             multiplier=self.multiplier,
             con_id=self.underlying_conid,
         )
-        strategy_variables.map_con_id_to_contract[self.underlying_conid] = underlying_contract
-        
+        strategy_variables.map_con_id_to_contract[
+            self.underlying_conid
+        ] = underlying_contract
+
         # Assigning the current object to the 'indicator_object' variable within the 'strategy_variables'
-        strategy_variables.map_indicator_id_to_indicator_object[self.indicator_id] = self
+        strategy_variables.map_indicator_id_to_indicator_object[
+            self.indicator_id
+        ] = self
         row = pd.DataFrame(
             {
                 "Indicator ID": self.indicator_id,
@@ -64,30 +68,26 @@ class Indicator:
                 "change_rr_d1_14D": None,
                 "change_rr_d2_14D": None,
                 "hv_14d_avg_14d": None,
-                'hv_14d_avg_iv': None,
-                'open_interest_support': None,
-                'open_interest_resistance': None,
+                "hv_14d_avg_iv": None,
+                "open_interest_support": None,
+                "open_interest_resistance": None,
                 "pc_change": None,
-                'pc_change_iv_change': None,
+                "pc_change_iv_change": None,
                 "put_call_ratio_avg": None,
                 "put_call_ratio_current": None,
-                'Change_underlying_options_price_today':None,
-                'chg_uderlying_opt_price_14d': None,
-                'max_pain': None,
-                'min_pain': None,
-            
-                
+                "Change_underlying_options_price_today": None,
+                "chg_uderlying_opt_price_14d": None,
+                "max_pain": None,
+                "min_pain": None,
             },
             index=[0],
         )
-
 
         # Add Row to dataframe (concat)
         strategy_variables.scanner_indicator_table_df = pd.concat(
             [strategy_variables.scanner_indicator_table_df, row],
             ignore_index=True,
         )
-
 
     def __str__(self) -> str:
 
@@ -107,7 +107,7 @@ class Indicator:
         )
 
         del strategy_variables.map_indicator_id_to_indicator_object[self.indicator_id]
-    
+
     # TODO: Change RR IV names as per df
     def get_indicator_tuple_for_gui(
         self,

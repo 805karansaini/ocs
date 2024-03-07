@@ -5,7 +5,9 @@ from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.strategy.manage_mkt_data_sub import ManageMktDataSubscription
 from option_combo_scanner.strategy.monitor_order_preset import MonitorOrderPreset
-from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import (
+    StrategyVariables as strategy_variables,
+)
 
 logger = CustomLogger.logger
 
@@ -19,19 +21,19 @@ class ConfigLeg:
 
         self.delta_range_max = float(self.delta_range_max)
         self.delta_range_min = float(self.delta_range_min)
-    
+
     def __str__(self) -> str:
         return f"ConfigLeg: {pprint(vars(self))}"
 
-    
-
-    def get_config_leg_tuple_for_gui(self, ):
+    def get_config_leg_tuple_for_gui(
+        self,
+    ):
         # Create a tuple with object attributes in the specified order
         config_leg_tuple = (
             self.leg_number,
             self.action,
             self.delta_range_min,
-            self.delta_range_max
+            self.delta_range_max,
         )
 
         return config_leg_tuple

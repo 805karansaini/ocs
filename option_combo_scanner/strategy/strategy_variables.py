@@ -20,17 +20,20 @@ class StrategyVariables:
     will be used to store variables that are used across different modules
     mainly the GUI and the monitoring and the execution modules
     """
+
     map_instrument_id_to_instrument_object = {}
-    map_config_id_to_config_object = {}         # not using it anywhere, aryan created this but since there will be a single config in system, hence we are usign 'config_object'
+    map_config_id_to_config_object = (
+        {}
+    )  # not using it anywhere, aryan created this but since there will be a single config in system, hence we are usign 'config_object'
     map_configleg_id_to_config_object = {}
     map_indicator_id_to_indicator_object = {}
     config_object = None
     nextorderId = None
-    hv_look_back_days=14
+    hv_look_back_days = 14
     # Input for delta
     delta_d1_indicator_input = 0.25
     delta_d2_indicator_input = 0.50
-    riskfree_rate1=0.04
+    riskfree_rate1 = 0.04
     date_input = 14
     date_input_for_1d_rr = 1
 
@@ -46,7 +49,7 @@ class StrategyVariables:
     bar_size_historical_volatility = "2 hours"
     duration_size_historical_volatility = "28 D"
     lookback_days_historical_volatility = "14 D"
-    
+
     # If the flag is False it will calcluate for all put-call strike otherwise for speicfic deltas
     flag_indication_values_based_on_selected_deltas = False
     ###########################
@@ -54,7 +57,7 @@ class StrategyVariables:
     ###########################
     flag_force_restart_scanner = False
     rescan_time_in_seconds = 10 * 60
-    
+
     # Scanner Combination Table Column for df
     scanner_combination_table_columns = [
         "Combo ID",
@@ -64,7 +67,7 @@ class StrategyVariables:
         "Combo Net Delta",
         "Max Profit",
         "Max Loss",
-        "Max Profit/Loss Ratio"
+        "Max Profit/Loss Ratio",
     ]
     # scanner combo table dataframe
     scanner_combo_table_df = pd.DataFrame(columns=scanner_combination_table_columns)
@@ -86,22 +89,19 @@ class StrategyVariables:
         "change_rr_d2_1D",
         "change_rr_d1_14D",
         "change_rr_d2_14D",
-        'hv_14d_avg_14d',
-        'hv_14d_avg_iv',
-        'open_interest_support',
-        'open_interest_resistance',
+        "hv_14d_avg_14d",
+        "hv_14d_avg_iv",
+        "open_interest_support",
+        "open_interest_resistance",
         "pc_change",
         "put_call_ratio_avg",
         "put_call_ratio_current",
-        'Change_underlying_options_price_today',
-        'chg_uderlying_opt_price_14d',
-        'change_in_iv',
-        'pc_change_iv_change',
-        'min_pain',
-        'max_pain'
-            
-            
-    
+        "Change_underlying_options_price_today",
+        "chg_uderlying_opt_price_14d",
+        "change_in_iv",
+        "pc_change_iv_change",
+        "min_pain",
+        "max_pain",
     ]
     # scanner combo table dataframe
     scanner_indicator_table_df = pd.DataFrame(columns=scanner_indicator_table_columns)
@@ -117,10 +117,8 @@ class StrategyVariables:
 
     screen = None
 
-    scanner_combination_table_sort_by_column = {
-        "Combo ID": False
-    } 
-        
+    scanner_combination_table_sort_by_column = {"Combo ID": False}
+
     # Execution Engine Settings
     number_of_trades_allowed = int(execution_engine_config["number_of_trades_allowed"])
     max_ba_spread = float(execution_engine_config["max_ba_spread"])
@@ -151,11 +149,6 @@ class StrategyVariables:
     map_con_id_to_contract = {}
     map_unique_id_to_order_preset_obj = {}
     list_of_unique_ids_for_which_entry_order_is_pending: List[Tuple[int, int]] = []
-
-
-
-
-
 
     # For View detials of scanner combo
     leg_columns_combo_detail_gui = [

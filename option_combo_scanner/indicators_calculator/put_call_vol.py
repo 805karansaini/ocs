@@ -18,10 +18,18 @@ from com.option_comobo_scanner_idetif import (
 from com.variables import variables
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.utils import Utils
-from option_combo_scanner.ibapi_ao.greeks import get_underlying_implied_volatility_and_cmp
-from option_combo_scanner.indicators_calculator.historical_data_fetcher import HistoricalDataFetcher
-from option_combo_scanner.indicators_calculator.historical_volatility import HistoricalVolatility
-from option_combo_scanner.indicators_calculator.market_data_fetcher import MarketDataFetcher
+from option_combo_scanner.ibapi_ao.greeks import (
+    get_underlying_implied_volatility_and_cmp,
+)
+from option_combo_scanner.indicators_calculator.historical_data_fetcher import (
+    HistoricalDataFetcher,
+)
+from option_combo_scanner.indicators_calculator.historical_volatility import (
+    HistoricalVolatility,
+)
+from option_combo_scanner.indicators_calculator.market_data_fetcher import (
+    MarketDataFetcher,
+)
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
 
@@ -108,16 +116,19 @@ class PutCallVol:
         and closest expiry for OPT sec_type
 
         """
-        (all_expiry_dates_ticker, all_strikes, closest_expiry_date, underlying_conid) = (
-            find_nearest_expiry_and_all_strikes_for_stk_given_dte(
-                ticker=symbol,
-                days_to_expiry=dte,
-                underlying_sec_type=underlying_sec_type,
-                exchange=exchange,
-                currency=currency,
-                multiplier=multiplier,
-                fop_trading_class="",
-            )
+        (
+            all_expiry_dates_ticker,
+            all_strikes,
+            closest_expiry_date,
+            underlying_conid,
+        ) = find_nearest_expiry_and_all_strikes_for_stk_given_dte(
+            ticker=symbol,
+            days_to_expiry=dte,
+            underlying_sec_type=underlying_sec_type,
+            exchange=exchange,
+            currency=currency,
+            multiplier=multiplier,
+            fop_trading_class="",
         )
 
         if all_strikes is not None:
@@ -139,7 +150,9 @@ class PutCallVol:
         """
 
         # Local local_map_indicator_id_to_indicator_object
-        local_map_indicator_id_to_indicator_object = copy.deepcopy(StrategyVariables.map_indicator_id_to_indicator_object)
+        local_map_indicator_id_to_indicator_object = copy.deepcopy(
+            StrategyVariables.map_indicator_id_to_indicator_object
+        )
 
         # All the indicator rows are unique data needs to be fethced for all, can not reduce the requests call
         for (
@@ -151,18 +164,26 @@ class PutCallVol:
             """
 
             # if the indictor was removed, do not compute the values for this
-            if indicator_id not in StrategyVariables.map_indicator_id_to_indicator_object:
+            if (
+                indicator_id
+                not in StrategyVariables.map_indicator_id_to_indicator_object
+            ):
                 continue
 
             # Intrument ID
             instrument_id = indicator_object.instrument_id
 
             # if the instrument was removed, do not compute the values for this
-            if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
+            if (
+                instrument_id
+                not in StrategyVariables.map_instrument_id_to_instrument_object
+            ):
                 continue
 
             # Create the local copy of instrument_obj
-            local_instrument_obj = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
+            local_instrument_obj = copy.deepcopy(
+                StrategyVariables.map_instrument_id_to_instrument_object[instrument_id]
+            )
 
             symbol = indicator_object.symbol
             expiry = indicator_object.expiry  # OPT/FOP expiry
@@ -192,18 +213,34 @@ class PutCallVol:
             map_date_to_call_volume = {}
 
             # Getting the underlying_contarct, and all the call and put option contracts
-            underlying_contract, list_of_all_call_option_contracts, list_of_all_put_option_contracts = (
-                PutCallVol.get_underlying_and_list_of_call_and_put_option_contracts(
-                    symbol, sec_type, expiry, dte, underlying_sec_type, exchange, currency, multiplier, trading_class
-                )
+            (
+                underlying_contract,
+                list_of_all_call_option_contracts,
+                list_of_all_put_option_contracts,
+            ) = PutCallVol.get_underlying_and_list_of_call_and_put_option_contracts(
+                symbol,
+                sec_type,
+                expiry,
+                dte,
+                underlying_sec_type,
+                exchange,
+                currency,
+                multiplier,
+                trading_class,
             )
 
-            if underlying_contract is None or list_of_all_call_option_contracts is None or list_of_all_put_option_contracts is None:
+            if (
+                underlying_contract is None
+                or list_of_all_call_option_contracts is None
+                or list_of_all_put_option_contracts is None
+            ):
                 # TODO KARAN
                 continue
 
             # Get Market Data for underlying contract
-            underlying_bid, underlying_ask = asyncio.run(MarketDataFetcher.get_current_price_for_contract(underlying_contract))
+            underlying_bid, underlying_ask = asyncio.run(
+                MarketDataFetcher.get_current_price_for_contract(underlying_contract)
+            )
 
             if underlying_bid is None or underlying_ask is None:
                 # TODO KARAN
@@ -213,7 +250,10 @@ class PutCallVol:
                 current_underlying_price = (underlying_ask + underlying_bid) / 2
 
             # Getting the DataFrames with Mkt data colums = [Strike, Delta, ConId, Bid, Ask]
-            call_option_mkt_data_df, put_option_mkt_data_df = PutCallVol.get_mkt_data_df_for_call_and_put_options(
+            (
+                call_option_mkt_data_df,
+                put_option_mkt_data_df,
+            ) = PutCallVol.get_mkt_data_df_for_call_and_put_options(
                 list_of_all_call_option_contracts, list_of_all_put_option_contracts
             )
 
@@ -240,20 +280,24 @@ class PutCallVol:
                 # bar_size = StrategyVariables.bar_size_pc_vol_avg
                 # duration_size = StrategyVariables.lookback_days_pc_vol_avg
                 what_to_show = "TRADES"
-                
-                
+
                 call_list_of_daily_volume_data_df = []
                 put_list_of_daily_volume_data_df = []
-                
+
                 # Fetch Historical data
-                for right, list_option_contracts in [("CALL", list_of_all_call_option_contracts), ("PUT", list_of_all_put_option_contracts)]:
+                for right, list_option_contracts in [
+                    ("CALL", list_of_all_call_option_contracts),
+                    ("PUT", list_of_all_put_option_contracts),
+                ]:
                     middle_index = len(list_option_contracts) // 2
 
                     # TODO REMOVE THIS TEST CODE
-                    middle_5_contracts = list_option_contracts[middle_index - 2 : middle_index + 3]
+                    middle_5_contracts = list_option_contracts[
+                        middle_index - 2 : middle_index + 3
+                    ]
                     # bar_size = "4 hours"
-                    # duration_size = "2 D" 
-                    
+                    # duration_size = "2 D"
+
                     list_of_req_ids_for_volume = PutCallVol.fetch_historical_data(
                         middle_5_contracts,
                         StrategyVariables.bar_size_pc_vol_avg,
@@ -264,53 +308,74 @@ class PutCallVol:
                     # Historical Data for N-Days now we can need to create daily candles
                     for req_id in list_of_req_ids_for_volume:
                         df = variables.map_req_id_to_historical_data_dataframe[req_id]
-                        
-                        daily_data_df = PutCallVol.create_daily_candle_df_from_raw_df(df)
-                        
+
+                        daily_data_df = PutCallVol.create_daily_candle_df_from_raw_df(
+                            df
+                        )
+
                         if right == "CALL":
                             call_list_of_daily_volume_data_df.append(daily_data_df)
-                        elif right == 'PUT':
+                        elif right == "PUT":
                             put_list_of_daily_volume_data_df.append(daily_data_df)
-                            
+
                 # Map to store total volume for Call and Put
                 total_put_volume = {}
                 total_call_volume = {}
                 put_call_volume_ratio = {}
 
                 # Get the Sorted Date Set
-                combined_list_of_daily_volume_data_df = call_list_of_daily_volume_data_df + put_list_of_daily_volume_data_df
+                combined_list_of_daily_volume_data_df = (
+                    call_list_of_daily_volume_data_df + put_list_of_daily_volume_data_df
+                )
 
                 # print(combined_list_of_daily_volume_data_df)
-                all_dates = pd.concat([df['date'] for df in combined_list_of_daily_volume_data_df if not df.empty])
+                all_dates = pd.concat(
+                    [
+                        df["date"]
+                        for df in combined_list_of_daily_volume_data_df
+                        if not df.empty
+                    ]
+                )
 
                 # Drop duplicates and sort the dates in reverse order
                 sorted_dates = sorted(all_dates.drop_duplicates(), reverse=True)
 
                 # Convert sorted_dates to a set
                 sorted_dates_set = sorted(list(set(sorted_dates)), reverse=True)
-                
+
                 latest_date = sorted_dates_set[0]
                 # print(latest_date)
 
                 for date in sorted_dates_set:
                     # get the total volume for Call and Put
-                    total_call_vol_for_date, total_put_vol_for_date = PutCallVol.get_total_vol_for_date(date, call_list_of_daily_volume_data_df, put_list_of_daily_volume_data_df )
+                    (
+                        total_call_vol_for_date,
+                        total_put_vol_for_date,
+                    ) = PutCallVol.get_total_vol_for_date(
+                        date,
+                        call_list_of_daily_volume_data_df,
+                        put_list_of_daily_volume_data_df,
+                    )
                     total_put_volume[date] = total_put_vol_for_date
                     total_call_volume[date] = total_call_vol_for_date
 
                     # Calculate the put-call volume ratio
                     if total_call_vol_for_date != 0:
-                        put_call_volum_ratio = total_put_vol_for_date / total_call_vol_for_date
+                        put_call_volum_ratio = (
+                            total_put_vol_for_date / total_call_vol_for_date
+                        )
                     else:
                         put_call_volum_ratio = None  # Handle division by zero case
-                    
+
                     # Store the put-call volume ratio for the date
                     put_call_volume_ratio[date] = put_call_volum_ratio
 
             # Make Sure length of dict >= 2  sorted_dates_set
             put_call_volume_ratio_current = put_call_volume_ratio[latest_date]
             # print(put_call_volume_ratio)
-            non_none_pc_values = filter(lambda x: x is not None, put_call_volume_ratio.values())
+            non_none_pc_values = filter(
+                lambda x: x is not None, put_call_volume_ratio.values()
+            )
             if sum(total_call_volume.values()) != 0:
                 pc_ratio_avg = sum(non_none_pc_values) / len(put_call_volume_ratio)
             else:
@@ -322,19 +387,21 @@ class PutCallVol:
             # Calcluating PC Change from Yesterday
             if len(sorted_dates_set) > 1:
                 yesterday_date = sorted_dates_set[1]
-                put_call_vol_ratio_yesterday = (put_call_volume_ratio[yesterday_date])
+                put_call_vol_ratio_yesterday = put_call_volume_ratio[yesterday_date]
 
                 if put_call_volume_ratio_current and put_call_vol_ratio_yesterday:
-                    pc_change = put_call_volume_ratio_current - put_call_vol_ratio_yesterday
+                    pc_change = (
+                        put_call_volume_ratio_current - put_call_vol_ratio_yesterday
+                    )
                 else:
                     pc_change = None
             else:
                 pc_change = None
 
-            print(f'PC Change', pc_change)
-            PutCallVol.update_values_in_db_gui(indicator_id, pc_change, pc_ratio_avg, put_call_volume_ratio_current)
-
-
+            print(f"PC Change", pc_change)
+            PutCallVol.update_values_in_db_gui(
+                indicator_id, pc_change, pc_ratio_avg, put_call_volume_ratio_current
+            )
 
             """
                 for req_id, contract in zip(list_of_req_ids_for_volume, middle_5_contracts):
@@ -596,9 +663,10 @@ class PutCallVol:
             return pc_change
             """
 
-
     @staticmethod
-    def fetch_historical_data(list_of_all_option_contracts, bar_size, duration_size, what_to_show):
+    def fetch_historical_data(
+        list_of_all_option_contracts, bar_size, duration_size, what_to_show
+    ):
 
         # List of all request ids TODO
         list_of_req_id_for_historical_data = []
@@ -610,16 +678,25 @@ class PutCallVol:
             variables.cas_app.nextorderId += 1
 
             # Send the request
-            HistoricalDataFetcher.request_historical_data_for_contract(contract, bar_size, duration_size, what_to_show, reqId)
+            HistoricalDataFetcher.request_historical_data_for_contract(
+                contract, bar_size, duration_size, what_to_show, reqId
+            )
 
             # Append the reqId to list
             list_of_req_id_for_historical_data.append(reqId)
 
         counter = 0
-        while variables.cas_wait_time_for_historical_data > (counter * variables.sleep_time_between_iters):
+        while variables.cas_wait_time_for_historical_data > (
+            counter * variables.sleep_time_between_iters
+        ):
 
             # Waitting for the request to end or give error
-            if all([variables.req_mkt_data_end[req_id] or variables.req_error[req_id] for req_id in list_of_req_id_for_historical_data]):
+            if all(
+                [
+                    variables.req_mkt_data_end[req_id] or variables.req_error[req_id]
+                    for req_id in list_of_req_id_for_historical_data
+                ]
+            ):
                 break
 
             # Sleep for sleep_time_waiting_for_tws_response
@@ -631,7 +708,9 @@ class PutCallVol:
         return list_of_req_id_for_historical_data
 
     @staticmethod
-    def update_values_in_db_gui(indicator_id, pc_change, put_call_ratio_avg, put_call_ratio_current):
+    def update_values_in_db_gui(
+        indicator_id, pc_change, put_call_ratio_avg, put_call_ratio_current
+    ):
 
         values_dict = {
             "pc_change": pc_change,
@@ -654,28 +733,38 @@ class PutCallVol:
             # return
 
         if indicator_id in StrategyVariables.map_indicator_id_to_indicator_object:
-            StrategyVariables.map_indicator_id_to_indicator_object[indicator_id].pc_change = pc_change
-            StrategyVariables.map_indicator_id_to_indicator_object[indicator_id].put_call_ratio_avg = put_call_ratio_avg
-            StrategyVariables.map_indicator_id_to_indicator_object[indicator_id].put_call_ratio_current = put_call_ratio_current
+            StrategyVariables.map_indicator_id_to_indicator_object[
+                indicator_id
+            ].pc_change = pc_change
+            StrategyVariables.map_indicator_id_to_indicator_object[
+                indicator_id
+            ].put_call_ratio_avg = put_call_ratio_avg
+            StrategyVariables.map_indicator_id_to_indicator_object[
+                indicator_id
+            ].put_call_ratio_current = put_call_ratio_current
 
             StrategyVariables.scanner_indicator_table_df.loc[
-                StrategyVariables.scanner_indicator_table_df["Indicator ID"] == indicator_id,
+                StrategyVariables.scanner_indicator_table_df["Indicator ID"]
+                == indicator_id,
                 "pc_change",
             ] = pc_change
             StrategyVariables.scanner_indicator_table_df.loc[
-                StrategyVariables.scanner_indicator_table_df["Indicator ID"] == indicator_id,
+                StrategyVariables.scanner_indicator_table_df["Indicator ID"]
+                == indicator_id,
                 "put_call_ratio_avg",
             ] = put_call_ratio_avg
             StrategyVariables.scanner_indicator_table_df.loc[
-                StrategyVariables.scanner_indicator_table_df["Indicator ID"] == indicator_id,
+                StrategyVariables.scanner_indicator_table_df["Indicator ID"]
+                == indicator_id,
                 "put_call_ratio_current",
             ] = put_call_ratio_current
 
         else:
             print(f"Indicator object not found for indicator_id: {indicator_id}")
 
-        
-        PutCallVol.scanner_indicator_tab_pc_obj.update_into_indicator_table(StrategyVariables.scanner_indicator_table_df)
+        PutCallVol.scanner_indicator_tab_pc_obj.update_into_indicator_table(
+            StrategyVariables.scanner_indicator_table_df
+        )
 
     @staticmethod
     def get_underlying_and_list_of_call_and_put_option_contracts(
@@ -693,7 +782,11 @@ class PutCallVol:
         if underlying_sec_type == "FUT":
 
             # Get all the strike for the FOP and underlying FUT conid
-            all_strikes, closest_expiry_date, underlying_conid = PutCallVol.get_strike_and_closet_expiry_for_fop(
+            (
+                all_strikes,
+                closest_expiry_date,
+                underlying_conid,
+            ) = PutCallVol.get_strike_and_closet_expiry_for_fop(
                 symbol,
                 dte,
                 underlying_sec_type,
@@ -715,7 +808,10 @@ class PutCallVol:
 
         elif underlying_sec_type == "STK":
             # Get all the strike for the OPT
-            all_strikes, closest_expiry_date = PutCallVol.get_strike_and_closet_expiry_for_opt(
+            (
+                all_strikes,
+                closest_expiry_date,
+            ) = PutCallVol.get_strike_and_closet_expiry_for_opt(
                 symbol,
                 dte,
                 underlying_sec_type,
@@ -768,10 +864,16 @@ class PutCallVol:
                 else:
                     list_of_all_put_option_contracts.append(opt_contract)
 
-        return underlying_contract, list_of_all_call_option_contracts, list_of_all_put_option_contracts
+        return (
+            underlying_contract,
+            list_of_all_call_option_contracts,
+            list_of_all_put_option_contracts,
+        )
 
     @staticmethod
-    def get_mkt_data_df_for_call_and_put_options(list_of_all_call_option_contracts, list_of_all_put_option_contracts):
+    def get_mkt_data_df_for_call_and_put_options(
+        list_of_all_call_option_contracts, list_of_all_put_option_contracts
+    ):
         generic_tick_list = ""
         snapshot = False
 
@@ -787,14 +889,27 @@ class PutCallVol:
         # CALL: Fetch Data for all the  Contracts will only use bid ask for market premium
         call_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple = asyncio.run(
             MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
-                list_of_all_call_option_contracts, True, generic_tick_list=generic_tick_list, snapshot=snapshot
+                list_of_all_call_option_contracts,
+                True,
+                generic_tick_list=generic_tick_list,
+                snapshot=snapshot,
             )
         )
 
         call_option_data_frame_dict = {col: [] for col in columns}
 
-        for contract, (delta, iv_ask, iv_bid, iv_last, bid_price, ask_price, call_oi, put_oi) in zip(
-            list_of_all_call_option_contracts, call_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple
+        for contract, (
+            delta,
+            iv_ask,
+            iv_bid,
+            iv_last,
+            bid_price,
+            ask_price,
+            call_oi,
+            put_oi,
+        ) in zip(
+            list_of_all_call_option_contracts,
+            call_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple,
         ):
             call_option_data_frame_dict["Strike"].append(contract.strike)
             call_option_data_frame_dict["Delta"].append(str(delta))
@@ -807,14 +922,27 @@ class PutCallVol:
         # PUT: Fetch Data for all the  Contracts will only use bid ask for market premium
         put_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple = asyncio.run(
             MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
-                list_of_all_put_option_contracts, True, generic_tick_list=generic_tick_list, snapshot=snapshot
+                list_of_all_put_option_contracts,
+                True,
+                generic_tick_list=generic_tick_list,
+                snapshot=snapshot,
             )
         )
 
         put_option_data_frame_dict = {col: [] for col in columns}
 
-        for contract, (delta, iv_ask, iv_bid, iv_last, bid_price, ask_price, call_oi, put_oi) in zip(
-            list_of_all_put_option_contracts, call_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple
+        for contract, (
+            delta,
+            iv_ask,
+            iv_bid,
+            iv_last,
+            bid_price,
+            ask_price,
+            call_oi,
+            put_oi,
+        ) in zip(
+            list_of_all_put_option_contracts,
+            call_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple,
         ):
             put_option_data_frame_dict["Strike"].append(contract.strike)
             put_option_data_frame_dict["Delta"].append(str(delta))
@@ -828,7 +956,7 @@ class PutCallVol:
 
     @staticmethod
     def create_daily_candle_df_from_raw_df(df):
-        df_daily_sum = pd.DataFrame() 
+        df_daily_sum = pd.DataFrame()
         if not df.empty:
             # Convert 'date' column to datetime if it's not already in datetime format
             df["Time"] = pd.to_datetime(df["Time"])
@@ -864,21 +992,23 @@ class PutCallVol:
         return df_daily_sum
 
     @staticmethod
-    def get_total_vol_for_date(date, call_list_of_daily_volume_data_df, put_list_of_daily_volume_data_df):
+    def get_total_vol_for_date(
+        date, call_list_of_daily_volume_data_df, put_list_of_daily_volume_data_df
+    ):
         total_call_vol_for_date = 0
         total_put_vol_for_date = 0
-        
+
         # Iterate through call_list_of_daily_volume_data_df and put_list_of_daily_volume_data_df to find volumes for the given date
         for df in call_list_of_daily_volume_data_df:
 
             # get vol for date
             if not df.empty:
-                vol_for_date = df[df['date'] == date]['volume'].sum()
+                vol_for_date = df[df["date"] == date]["volume"].sum()
                 total_call_vol_for_date += float(vol_for_date)
-        
+
         for df in put_list_of_daily_volume_data_df:
             if not df.empty:
-                vol_for_date = df[df['date'] == date]['volume'].sum()
+                vol_for_date = df[df["date"] == date]["volume"].sum()
                 total_put_vol_for_date += float(vol_for_date)
-        
+
         return total_call_vol_for_date, total_put_vol_for_date

@@ -10,13 +10,11 @@ logger = CustomLogger.logger
 
 
 class HistoricalDataFetcher:
-
     def __init__(
         self,
     ):
         pass
-    
-    
+
     # Method to request historical data
     @staticmethod
     def request_historical_data_for_contract(

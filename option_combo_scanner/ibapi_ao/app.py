@@ -234,7 +234,7 @@ class IBapi(
 
     def tickGeneric(self, reqId, tickType, value):
         if tickType == 24 and reqId in variables.implied_volatility:
-            
+
             variables.implied_volatility[reqId] = value
 
             # Log
@@ -244,7 +244,7 @@ class IBapi(
 
     # def tickSize(self, reqId, tickType, value):
     #     if tickType == 27 and reqId in variables.call_option_open_interest:
-            
+
     #         variables.call_option_open_interest[reqId] = value
 
     #         # Log

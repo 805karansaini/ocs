@@ -5,7 +5,6 @@ from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
 
 class BinarySearchDeltaIV:
-
     def __init__(self) -> None:
         pass
 
@@ -24,7 +23,7 @@ class BinarySearchDeltaIV:
         current_underlying_price,
         right: str,
         time_to_expiration: float,
-        dataframe_with_current_mkt_data: pd.DataFrame, # Righ C / P only
+        dataframe_with_current_mkt_data: pd.DataFrame,  # Righ C / P only
         list_of_target_deltas: list,
     ):
         """
@@ -34,7 +33,10 @@ class BinarySearchDeltaIV:
         list_of_target_deltas should sorted
         """
         list_of_all_strikes = list(dataframe_with_current_mkt_data["Strike"])
-        temp = (dataframe_with_current_mkt_data["BID"] + dataframe_with_current_mkt_data["ASK"]) / 2
+        temp = (
+            dataframe_with_current_mkt_data["BID"]
+            + dataframe_with_current_mkt_data["ASK"]
+        ) / 2
         list_of_all_strike_premium = list(temp)
 
         N = len(list_of_all_strikes)
@@ -42,7 +44,10 @@ class BinarySearchDeltaIV:
         list_of_calculated_iv = [None] * N
 
         for target_delta in list_of_target_deltas:
-            list_of_calculated_delta, list_of_calculated_iv = BinarySearchDeltaIV.custom_binary_search(
+            (
+                list_of_calculated_delta,
+                list_of_calculated_iv,
+            ) = BinarySearchDeltaIV.custom_binary_search(
                 current_underlying_price,
                 right,
                 time_to_expiration,
@@ -56,22 +61,26 @@ class BinarySearchDeltaIV:
             print(f"Cal Delta: {list_of_calculated_delta}")
             print(f"Cal IV: {list_of_calculated_iv}")
 
-
         # Cal Delta, Indx computed delta, iv
-        list_of_strike_delta_iv_tuple = [(None, None, None) for _ in list_of_target_deltas]
+        list_of_strike_delta_iv_tuple = [
+            (None, None, None) for _ in list_of_target_deltas
+        ]
 
-        for indx, (strike, delta, iv) in enumerate(zip(list_of_all_strikes, list_of_calculated_delta, list_of_calculated_iv)):
+        for indx, (strike, delta, iv) in enumerate(
+            zip(list_of_all_strikes, list_of_calculated_delta, list_of_calculated_iv)
+        ):
             if delta is not None and iv is not None:
                 for i, target_delta in enumerate(list_of_target_deltas):
                     if list_of_strike_delta_iv_tuple[i] == (None, None, None):
                         list_of_strike_delta_iv_tuple[i] = (strike, delta, iv)
                     else:
-                        old_strike, old_delta, old_iv =  list_of_strike_delta_iv_tuple[i]
-                        
+                        old_strike, old_delta, old_iv = list_of_strike_delta_iv_tuple[i]
+
                         if abs(target_delta - old_delta) <= abs(target_delta - delta):
                             list_of_strike_delta_iv_tuple[i] = (strike, delta, iv)
-        
+
         return list_of_strike_delta_iv_tuple
+
     @staticmethod
     def custom_binary_search(
         current_underlying_price,
@@ -92,11 +101,20 @@ class BinarySearchDeltaIV:
             strike = list_of_all_strikes[mid]
             market_premium = list_of_all_strike_premium[mid]
             # if value of delta already exists for the given strike, do binary search
-            if list_of_calculated_delta[mid] is not None and list_of_calculated_delta[mid] == target_delta:
+            if (
+                list_of_calculated_delta[mid] is not None
+                and list_of_calculated_delta[mid] == target_delta
+            ):
                 return mid
-            elif list_of_calculated_delta[mid] is not None and list_of_calculated_delta[mid] < target_delta:
+            elif (
+                list_of_calculated_delta[mid] is not None
+                and list_of_calculated_delta[mid] < target_delta
+            ):
                 left = mid + 1
-            elif list_of_calculated_delta[mid] is not None and list_of_calculated_delta[mid] > target_delta:
+            elif (
+                list_of_calculated_delta[mid] is not None
+                and list_of_calculated_delta[mid] > target_delta
+            ):
                 right = mid - 1
             else:
                 # Mid Delta, IV is not computed so compte it

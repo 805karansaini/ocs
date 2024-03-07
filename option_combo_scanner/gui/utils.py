@@ -44,6 +44,7 @@ class Utils:
     # Setted while the object is created in constructor
     scanner_combination_tab_object = None
     scanner_indicator_tab_object = None
+
     def __init__(self):
         pass
 
@@ -234,13 +235,12 @@ class Utils:
 
             count += 1
 
-    
     # Method to sort string numeric values
-    @staticmethod     
+    @staticmethod
     def custom_sort(val):
 
         # Replace 'N/A' with a large value
-        if val in ["N/A",  "inf", "-inf"]:
+        if val in ["N/A", "inf", "-inf"]:
             return 10**15
 
         elif type(val) == str and (val[0].isnumeric() or val[0] == "-"):
@@ -256,7 +256,7 @@ class Utils:
             return float(val)
         else:
             return val
-        
+
     @staticmethod
     # Method to sort cas rows
     def sort_cas_row_values_by_column(values):
@@ -274,70 +274,98 @@ class Utils:
 
         return values
 
-
     @staticmethod
     def clear_scanner_combination_table():
-        
-        list_of_combo_ids = Utils.scanner_combination_tab_object.scanner_combination_table.get_children()
+
+        list_of_combo_ids = (
+            Utils.scanner_combination_tab_object.scanner_combination_table.get_children()
+        )
 
         # Remove rows from scanned combo table
-        Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(list_of_combo_ids)
+        Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(
+            list_of_combo_ids
+        )
 
     @staticmethod
-    def remove_row_from_scanner_combination_table(list_of_combo_ids=None, instrument_id=None, ):
+    def remove_row_from_scanner_combination_table(
+        list_of_combo_ids=None,
+        instrument_id=None,
+    ):
         """
-        Remove all the scanned combinations on the give list of combo_ids 
+        Remove all the scanned combinations on the give list of combo_ids
         Remove all the rows such that the instrument id is same
         """
-        
+
         # Remove all the combinations based on the list_of_combo_ids
         if list_of_combo_ids is not None:
             # Remove rows from scanned combo table
-            Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(list_of_combo_ids)
+            Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(
+                list_of_combo_ids
+            )
 
         if instrument_id is not None:
             list_of_combo_ids = []
-            list_of_all_combo_ids_in_table = Utils.scanner_combination_tab_object.scanner_combination_table.get_children()
-            
+            list_of_all_combo_ids_in_table = (
+                Utils.scanner_combination_tab_object.scanner_combination_table.get_children()
+            )
+
             for combo_id in list_of_all_combo_ids_in_table:
-                row_value = Utils.scanner_combination_tab_object.scanner_combination_table.item(combo_id , "values")
+                row_value = (
+                    Utils.scanner_combination_tab_object.scanner_combination_table.item(
+                        combo_id, "values"
+                    )
+                )
 
                 row_instrume_id = row_value[1]
                 if int(row_instrume_id) == int(instrument_id):
                     list_of_combo_ids.append(str(combo_id))
 
             # Remove rows from scanned combo table
-            Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(list_of_combo_ids)
+            Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(
+                list_of_combo_ids
+            )
 
     @staticmethod
-    def remove_row_from_indicator_table(list_of_indicator_ids=None, instrument_id=None,):      
+    def remove_row_from_indicator_table(
+        list_of_indicator_ids=None,
+        instrument_id=None,
+    ):
         # Remove all the indicator based on the list_of_indicator_ids
         if list_of_indicator_ids is not None:
             # Remove rows from indicator table
-            Utils.scanner_indicator_tab_object.remove_row_from_indicator_table(list_of_indicator_ids)
+            Utils.scanner_indicator_tab_object.remove_row_from_indicator_table(
+                list_of_indicator_ids
+            )
 
         if instrument_id is not None:
             list_of_indicator_ids = []
-            list_of_all_indicator_ids_in_table = Utils.scanner_indicator_tab_object.option_indicator_table.get_children()
-            
+            list_of_all_indicator_ids_in_table = (
+                Utils.scanner_indicator_tab_object.option_indicator_table.get_children()
+            )
+
             for indicator_id in list_of_all_indicator_ids_in_table:
-                row_value = Utils.scanner_indicator_tab_object.option_indicator_table.item(indicator_id , "values")
+                row_value = (
+                    Utils.scanner_indicator_tab_object.option_indicator_table.item(
+                        indicator_id, "values"
+                    )
+                )
 
                 row_instrume_id = row_value[1]
                 if int(row_instrume_id) == int(instrument_id):
                     list_of_indicator_ids.append(str(indicator_id))
 
-    #         # Remove rows from indicator table
-            Utils.scanner_indicator_tab_object.remove_row_from_indicator_table(list_of_indicator_ids)
+            #         # Remove rows from indicator table
+            Utils.scanner_indicator_tab_object.remove_row_from_indicator_table(
+                list_of_indicator_ids
+            )
 
-    
     @staticmethod
     def get_implied_volatility(S, r1, r2, t, X, market_premium, opt_type):
-        
+
         max_iters = 50
         max_iv = 8.0
-            
-        '''
+
+        """
         # Print diagnostics
         print("S=" + str(S))
         print("r1=" + str(r1))
@@ -346,66 +374,77 @@ class Utils:
         print("X=" + str(X))
         print("market_premium=" + str(market_premium))
         print("opt_type=" + str(opt_type))    
-        '''
-        
+        """
+
         # Inits
         tolerance = 0.0001
         guess_mid = float("NaN")
         theoretical_premium = float("NaN")
         cur_iter = 0
-        
+
         # Set guess range
         guess_lower = 0.0001
         guess_upper = 0.50
-        while(Utils.get_theoretical_premium(S, r1, r2, t, X, guess_upper, opt_type) < market_premium):    
-            
+        while (
+            Utils.get_theoretical_premium(S, r1, r2, t, X, guess_upper, opt_type)
+            < market_premium
+        ):
+
             # Update upper bound
             guess_upper = guess_upper * 2.0
 
             # Exit if upper bound exceed max_iv
-            if(guess_upper >= max_iv):
+            if guess_upper >= max_iv:
                 return guess_upper
-            
+
         # Run iteration
-        while(pd.isnull(guess_mid) or (abs(market_premium - theoretical_premium) / market_premium > tolerance)):
+        while pd.isnull(guess_mid) or (
+            abs(market_premium - theoretical_premium) / market_premium > tolerance
+        ):
 
             # Calculate mid
             guess_mid = (guess_upper + guess_lower) / 2.0
 
             # Get theoretical premium
-            theoretical_premium = Utils.get_theoretical_premium(S, r1, r2, t, X, guess_mid, opt_type)        
+            theoretical_premium = Utils.get_theoretical_premium(
+                S, r1, r2, t, X, guess_mid, opt_type
+            )
 
-            '''
+            """
             # Print diagnostics
             print(str(guess_lower) + " - " + str(guess_upper) + " : " + str(guess_mid) + " = " + str(theoretical_premium))
-            '''
-            
+            """
+
             # Update guess range
-            if(theoretical_premium == market_premium):
+            if theoretical_premium == market_premium:
                 break
-            elif(theoretical_premium > market_premium):
+            elif theoretical_premium > market_premium:
                 guess_upper = guess_mid
             else:
                 guess_lower = guess_mid
-            
+
             # Break condition
             cur_iter = cur_iter + 1
-            if(cur_iter >= max_iters):
+            if cur_iter >= max_iters:
                 break
-                
+
         return guess_mid
-    
+
     @staticmethod
     def get_theoretical_premium(S, r1, r2, t, X, sigma, opt_type):
-        
+
         sigma_t = sigma * math.sqrt(t)
-        d1 = (math.log(S/X) + ((r1 + math.pow(sigma,2) / 2) * t)) / sigma_t
+        d1 = (math.log(S / X) + ((r1 + math.pow(sigma, 2) / 2) * t)) / sigma_t
         d2 = d1 - sigma_t
-        
-        if(opt_type == "CALL"):
-            return (S * math.exp((r1 - r2) * t) * norm.cdf(d1) - X * math.exp(-r2 * t) * norm.cdf(d2))
-        elif(opt_type == "PUT"):
-            return (X * math.exp(-r2 * t) * norm.cdf(-d2) - S * math.exp((r1 - r2) * t) * norm.cdf(-d1))
+
+        if opt_type == "CALL":
+            return S * math.exp((r1 - r2) * t) * norm.cdf(d1) - X * math.exp(
+                -r2 * t
+            ) * norm.cdf(d2)
+        elif opt_type == "PUT":
+            return X * math.exp(-r2 * t) * norm.cdf(-d2) - S * math.exp(
+                (r1 - r2) * t
+            ) * norm.cdf(-d1)
         else:
             sys.exit("Unknown opt_type = " + opt_type)
 
@@ -421,25 +460,25 @@ class Utils:
         right,
         """
         sigma = Utils.get_implied_volatility(S, r1, r2, t, X, market_premium, opt_type)
-        
-        if(sigma is float("NaN")):        
+
+        if sigma is float("NaN"):
             return float("NaN"), float("NaN")
-        
+
         try:
-            
+
             sigma_t = sigma * math.sqrt(t)
             d1 = (math.log(S / X) + ((r1 + math.pow(sigma, 2) / 2) * t)) / sigma_t
-            
+
             if opt_type == "CALL":
 
                 return scipy.stats.norm.cdf(d1), sigma
-            
+
             elif opt_type == "PUT":
                 return (scipy.stats.norm.cdf(d1) - 1), sigma
-        
+
         except Exception as e:
             return float("NaN"), float("NaN")
-        
+
     """
 
     # Method to update cas table rows in GUI table
@@ -576,46 +615,6 @@ class Utils:
 
 
     """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     ###############################
     ### DEP
@@ -902,5 +901,3 @@ class Utils:
             pnl,
             failure_reason,
         )
-
-    

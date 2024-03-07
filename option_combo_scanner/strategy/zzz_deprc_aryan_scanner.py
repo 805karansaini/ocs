@@ -6,14 +6,14 @@ from com.contracts import get_contract, get_contract_details
 from ibapi.contract import Contract
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
+
 class Scanner:
-    
+
     # def __init__(self):
     def __init__(
         self,
     ):
         pass
-        
 
     """
     Instrument: AAPL, STK, SMART
@@ -24,19 +24,22 @@ class Scanner:
         contrac deatils
         contract
     """
+
     @staticmethod
     def get_instrument_from_variables():
-        local_map_instrument_id_to_instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object)
+        local_map_instrument_id_to_instrument_object = copy.deepcopy(
+            StrategyVariables.map_instrument_id_to_instrument_object
+        )
         return local_map_instrument_id_to_instrument_object
 
     @staticmethod
     def get_config_from_variables():
-        local_config_object =  copy.deepcopy(StrategyVariables.config_object)
+        local_config_object = copy.deepcopy(StrategyVariables.config_object)
         return local_config_object
 
     @staticmethod
     def get_list_of_strikes_and_expiries(
-            ticker, conid, underlying_sec_type, fop_trading_class, reqId=None
+        ticker, conid, underlying_sec_type, fop_trading_class, reqId=None
     ):
 
         # Get reqId
@@ -69,12 +72,12 @@ class Scanner:
 
             # Received Response, or request ended
             if (
-                    (
-                            (StrategyVariables.expiry_dates[reqId] is not None)
-                            and (StrategyVariables.strike_prices[reqId] is not None)
-                    )
-                    or (StrategyVariables.req_sec_def_end[reqId] == True)
-                    or (StrategyVariables.req_error[reqId] == True)
+                (
+                    (StrategyVariables.expiry_dates[reqId] is not None)
+                    and (StrategyVariables.strike_prices[reqId] is not None)
+                )
+                or (StrategyVariables.req_sec_def_end[reqId] == True)
+                or (StrategyVariables.req_error[reqId] == True)
             ):
 
                 # Print to console
@@ -84,12 +87,17 @@ class Scanner:
                     )
 
                 # Answer received successfully
-                return (StrategyVariables.expiry_dates[reqId], StrategyVariables.strike_prices[reqId])
+                return (
+                    StrategyVariables.expiry_dates[reqId],
+                    StrategyVariables.strike_prices[reqId],
+                )
 
             else:
 
                 # Timeout of 11 secs
-                if counter >= int(11 / StrategyVariables.sleep_time_waiting_for_tws_response):
+                if counter >= int(
+                    11 / StrategyVariables.sleep_time_waiting_for_tws_response
+                ):
 
                     # Print to console
                     if StrategyVariables.flag_debug_mode:
@@ -98,7 +106,10 @@ class Scanner:
                         )
 
                     # Returning None
-                    return (StrategyVariables.expiry_dates[reqId], StrategyVariables.strike_prices[reqId])
+                    return (
+                        StrategyVariables.expiry_dates[reqId],
+                        StrategyVariables.strike_prices[reqId],
+                    )
 
                 if StrategyVariables.flag_debug_mode and (counter % 20 == 0):
                     print(
@@ -122,11 +133,8 @@ class Scanner:
             # Get reqId
             reqId = req_id
 
-
         # Request contract details
         StrategyVariables.app.reqContractDetails(reqId, contract)
-
-
 
     # @staticmethod
     # def get_contract_from_limited_info(symbol=None, sec_type=None, exchange=None, currency=None):
@@ -156,21 +164,25 @@ class Scanner:
 
     @staticmethod
     def start_scanner():
-        local_map_instrument_id_to_instrument_object = Scanner.get_instrument_from_variables()
+        local_map_instrument_id_to_instrument_object = (
+            Scanner.get_instrument_from_variables()
+        )
         local_config_object = Scanner.get_config_from_variables()
 
-        for instrument_id, instrument_object in local_map_instrument_id_to_instrument_object.items():
+        for (
+            instrument_id,
+            instrument_object,
+        ) in local_map_instrument_id_to_instrument_object.items():
             # print(instrument_id)
             underlying_contract = Scanner.get_underlying_contract(instrument_object)
-            if underlying_contract == None: continue
+            if underlying_contract == None:
+                continue
             else:
                 con_id = underlying_contract.conId
             all_expiry, all_strike_ith = Scanner.get_list_of_strikes_and_expiries(
-                instrument_object.symbol, con_id, instrument_object.sec_type, instrument_object.trading_class
+                instrument_object.symbol,
+                con_id,
+                instrument_object.sec_type,
+                instrument_object.trading_class,
             )
             print(underlying_contract)
-
-
-
-
-

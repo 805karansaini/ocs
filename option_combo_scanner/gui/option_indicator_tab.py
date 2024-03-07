@@ -14,9 +14,15 @@ from option_combo_scanner.ibapi_ao.contracts import (
     get_contract,
     get_contract_details_async,
 )
-from option_combo_scanner.indicators_calculator.change_underlying_price import ChangeUnderlyingOptionsPrice
-from option_combo_scanner.indicators_calculator.historical_volatility import HistoricalVolatility
-from option_combo_scanner.indicators_calculator.implied_volatility import ImpliedVolatility
+from option_combo_scanner.indicators_calculator.change_underlying_price import (
+    ChangeUnderlyingOptionsPrice,
+)
+from option_combo_scanner.indicators_calculator.historical_volatility import (
+    HistoricalVolatility,
+)
+from option_combo_scanner.indicators_calculator.implied_volatility import (
+    ImpliedVolatility,
+)
 from option_combo_scanner.indicators_calculator.max_min_pain import Max_Min_Pain
 from option_combo_scanner.indicators_calculator.put_call_vol import PutCallVol
 from option_combo_scanner.strategy.scanner import Scanner
@@ -64,8 +70,6 @@ option_indicator_table_columns_width = [
     ("max_pain", 165, "Max Pain"),
     ("min_pain", 165, "Min Pain"),
     ("change_in_iv", 165, "Change in Iv"),
-    
-    
 ]
 
 
@@ -78,8 +82,7 @@ class OptionIndicator:
         Scanner.scanner_indicator_tab_obj = self
         PutCallVol.scanner_indicator_tab_pc_obj = self
         HistoricalVolatility.scanner_hv_indicator_tab_obj = self
-        
-        
+
         ImpliedVolatility.scanner_indicator_tab_iv_obj = self
         ChangeUnderlyingOptionsPrice.scanner_indicator_tab_chgopt_obj = self
         Max_Min_Pain.scanner_indicator_tab_pain_obj = self
@@ -188,25 +191,29 @@ class OptionIndicator:
         indicator_ids_in_indicator_table = self.option_indicator_table.get_children()
 
         for indicator_id in list_of_indicator_ids:
-            # Remove the scanned combination from system 
-            if int(indicator_id) in StrategyVariables.map_indicator_id_to_indicator_object:
-                StrategyVariables.map_indicator_id_to_indicator_object[int(indicator_id)].remove_indicator_from_system()
+            # Remove the scanned combination from system
+            if (
+                int(indicator_id)
+                in StrategyVariables.map_indicator_id_to_indicator_object
+            ):
+                StrategyVariables.map_indicator_id_to_indicator_object[
+                    int(indicator_id)
+                ].remove_indicator_from_system()
 
             indicator_id = str(indicator_id)
             if indicator_id in indicator_ids_in_indicator_table:
                 self.option_indicator_table.delete(indicator_id)
+
     # Insertion of Indicator data in GUI
     def insert_into_indicator_table(self, scanner_indicator_object):
         indicator_id = scanner_indicator_object.indicator_id
-        
+
         row_values = (
             indicator_id,
             scanner_indicator_object.instrument_id,
             scanner_indicator_object.symbol,
             scanner_indicator_object.sec_type,
             scanner_indicator_object.expiry,
-            
-            
         )
 
         # Get the current number of items in the treeview
@@ -230,70 +237,114 @@ class OptionIndicator:
                 values=row_values,
                 tags=("evenrow",),
             )
-    
-    
+
     def update_into_indicator_table(self, indicator_df):
-        
+
         indicator_id_in_indicator_table = self.option_indicator_table.get_children()
-        
+
         for index, rows in indicator_df.iterrows():
-            indicator_id = str(rows['Indicator ID'])
+            indicator_id = str(rows["Indicator ID"])
             if indicator_id in indicator_id_in_indicator_table:
-                hv = ("None" if rows['hv'] == None else f"{rows['hv']:,.4f}")
-                iv_d1 = ("None" if rows['iv_d1'] == None else f"{rows['iv_d1']:,.4f}")
-                iv_d2 = ("None" if rows['iv_d2'] == None else f"{rows['iv_d2']:,.4f}")
-                avg_iv = ("None" if rows['avg_iv'] == None else f"{rows['avg_iv']:,.4f}")
-                rr_d1 = ("None" if rows['rr_d1'] == None else f"{rows['rr_d1']:,.4f}")
-                rr_d2 = ("None" if rows['rr_d2'] == None else f"{rows['rr_d2']:,.4f}")
-                avg_iv_avg_14d = ("None" if rows['avg_iv_avg_14d'] == None else f"{rows['avg_iv_avg_14d']:,.4f}")
-                change_rr_d1_1D = ("None" if rows['change_rr_d1_1D'] == None else f"{rows['change_rr_d1_1D']:,.4f}")
-                change_rr_d2_1D = ("None" if rows['change_rr_d2_1D'] == None else f"{rows['change_rr_d2_1D']:,.4f}")
-                change_rr_d1_14D = ("None" if rows['change_rr_d1_14D'] == None else f"{rows['change_rr_d1_14D']:,.4f}")
-                change_rr_d2_14D = ("None" if rows['change_rr_d2_14D'] == None else f"{rows['change_rr_d2_14D']:,.4f}")
-                hv_14d_avg_14d = ("None" if rows['hv_14d_avg_14d'] == None else f"{rows['hv_14d_avg_14d']:,.4f}")
+                hv = "None" if rows["hv"] == None else f"{rows['hv']:,.4f}"
+                iv_d1 = "None" if rows["iv_d1"] == None else f"{rows['iv_d1']:,.4f}"
+                iv_d2 = "None" if rows["iv_d2"] == None else f"{rows['iv_d2']:,.4f}"
+                avg_iv = "None" if rows["avg_iv"] == None else f"{rows['avg_iv']:,.4f}"
+                rr_d1 = "None" if rows["rr_d1"] == None else f"{rows['rr_d1']:,.4f}"
+                rr_d2 = "None" if rows["rr_d2"] == None else f"{rows['rr_d2']:,.4f}"
+                avg_iv_avg_14d = (
+                    "None"
+                    if rows["avg_iv_avg_14d"] == None
+                    else f"{rows['avg_iv_avg_14d']:,.4f}"
+                )
+                change_rr_d1_1D = (
+                    "None"
+                    if rows["change_rr_d1_1D"] == None
+                    else f"{rows['change_rr_d1_1D']:,.4f}"
+                )
+                change_rr_d2_1D = (
+                    "None"
+                    if rows["change_rr_d2_1D"] == None
+                    else f"{rows['change_rr_d2_1D']:,.4f}"
+                )
+                change_rr_d1_14D = (
+                    "None"
+                    if rows["change_rr_d1_14D"] == None
+                    else f"{rows['change_rr_d1_14D']:,.4f}"
+                )
+                change_rr_d2_14D = (
+                    "None"
+                    if rows["change_rr_d2_14D"] == None
+                    else f"{rows['change_rr_d2_14D']:,.4f}"
+                )
+                hv_14d_avg_14d = (
+                    "None"
+                    if rows["hv_14d_avg_14d"] == None
+                    else f"{rows['hv_14d_avg_14d']:,.4f}"
+                )
 
-                open_interest_support = ("None" if rows['open_interest_support'] == None else f"{rows['open_interest_support']:,.4f}")
-                open_interest_resistance = ("None" if rows['open_interest_resistance'] == None else f"{rows['open_interest_resistance']:,.4f}")
-                put_call_ratio_avg = ("None" if rows['put_call_ratio_avg'] == None else f"{rows['put_call_ratio_avg']:,.4f}")
-                put_call_ratio_current = ("None" if rows['put_call_ratio_current'] == None else f"{rows['put_call_ratio_current']:,.4f}")
+                open_interest_support = (
+                    "None"
+                    if rows["open_interest_support"] == None
+                    else f"{rows['open_interest_support']:,.4f}"
+                )
+                open_interest_resistance = (
+                    "None"
+                    if rows["open_interest_resistance"] == None
+                    else f"{rows['open_interest_resistance']:,.4f}"
+                )
+                put_call_ratio_avg = (
+                    "None"
+                    if rows["put_call_ratio_avg"] == None
+                    else f"{rows['put_call_ratio_avg']:,.4f}"
+                )
+                put_call_ratio_current = (
+                    "None"
+                    if rows["put_call_ratio_current"] == None
+                    else f"{rows['put_call_ratio_current']:,.4f}"
+                )
 
-                Change_underlying_options_price_today = ("None" if rows['Change_underlying_options_price_today'] == None else f"{rows['Change_underlying_options_price_today']:,.4f}")
-                chg_uderlying_opt_price_14d = ("None" if rows['chg_uderlying_opt_price_14d'] == None else f"{rows['chg_uderlying_opt_price_14d']:,.4f}")
+                Change_underlying_options_price_today = (
+                    "None"
+                    if rows["Change_underlying_options_price_today"] == None
+                    else f"{rows['Change_underlying_options_price_today']:,.4f}"
+                )
+                chg_uderlying_opt_price_14d = (
+                    "None"
+                    if rows["chg_uderlying_opt_price_14d"] == None
+                    else f"{rows['chg_uderlying_opt_price_14d']:,.4f}"
+                )
 
-                max_pain = ("None" if rows['max_pain'] == None else f"{rows['max_pain']:,.4f}")
-                min_pain = ("None" if rows['min_pain'] == None else f"{rows['min_pain']:,.4f}")
-                change_in_iv = ("None" if rows['change_in_iv'] == None else f"{rows['change_in_iv']:,.4f}")
+                max_pain = (
+                    "None" if rows["max_pain"] == None else f"{rows['max_pain']:,.4f}"
+                )
+                min_pain = (
+                    "None" if rows["min_pain"] == None else f"{rows['min_pain']:,.4f}"
+                )
+                change_in_iv = (
+                    "None"
+                    if rows["change_in_iv"] == None
+                    else f"{rows['change_in_iv']:,.4f}"
+                )
 
-                
-                pc_change = rows['pc_change']
-                
-                
+                pc_change = rows["pc_change"]
 
-                
-                hv_14d_avg_14d = rows['hv_14d_avg_14d']
+                hv_14d_avg_14d = rows["hv_14d_avg_14d"]
 
-                if pc_change and (change_in_iv != 0 or change_in_iv != 'None'):
-                    pc_change_iv_change = float(pc_change/float(change_in_iv))
+                if pc_change and (change_in_iv != 0 or change_in_iv != "None"):
+                    pc_change_iv_change = float(pc_change / float(change_in_iv))
                 else:
-                    pc_change_iv_change = 'None'
+                    pc_change_iv_change = "None"
 
                 print("hvvv and avgivvv", hv, avg_iv)
-                if avg_iv != 'None' and hv != 'None':
-                    hv_14d_avg_iv = (float(hv) - float((avg_iv))*100)
+                if avg_iv != "None" and hv != "None":
+                    hv_14d_avg_iv = float(hv) - float((avg_iv)) * 100
                 else:
-                    hv_14d_avg_iv = 'None'
+                    hv_14d_avg_iv = "None"
 
-
-
-
-
-            
                 # HV(14D)-AvgIV
-                
-
 
                 # print(f"indicator_id: ", indicator_id, pc_change, put_call_ratio_avg)
-                
+
                 self.option_indicator_table.set(indicator_id, 5, hv)
                 self.option_indicator_table.set(indicator_id, 6, iv_d1)
                 self.option_indicator_table.set(indicator_id, 7, iv_d2)
@@ -307,35 +358,33 @@ class OptionIndicator:
                 self.option_indicator_table.set(indicator_id, 12, change_rr_d2_14D)
                 self.option_indicator_table.set(indicator_id, 16, hv_14d_avg_14d)
                 self.option_indicator_table.set(indicator_id, 17, open_interest_support)
-                self.option_indicator_table.set(indicator_id, 18, open_interest_resistance)
+                self.option_indicator_table.set(
+                    indicator_id, 18, open_interest_resistance
+                )
                 self.option_indicator_table.set(indicator_id, 19, hv_14d_avg_iv)
-                self.option_indicator_table.set(indicator_id, 20, put_call_ratio_current)
+                self.option_indicator_table.set(
+                    indicator_id, 20, put_call_ratio_current
+                )
                 self.option_indicator_table.set(indicator_id, 21, put_call_ratio_avg)
                 # self.option_indicator_table.set(indicator_id, 22, pc_change)
                 self.option_indicator_table.set(indicator_id, 22, pc_change_iv_change)
-                self.option_indicator_table.set(indicator_id, 23, Change_underlying_options_price_today)
-                self.option_indicator_table.set(indicator_id, 24, chg_uderlying_opt_price_14d)
-                
-            
+                self.option_indicator_table.set(
+                    indicator_id, 23, Change_underlying_options_price_today
+                )
+                self.option_indicator_table.set(
+                    indicator_id, 24, chg_uderlying_opt_price_14d
+                )
+
                 self.option_indicator_table.set(indicator_id, 25, max_pain)
                 self.option_indicator_table.set(indicator_id, 26, min_pain)
                 self.option_indicator_table.set(indicator_id, 27, change_in_iv)
-                
-#
 
-    
-
-        
-                
-
-        
-
+    #
 
     def add_indicator_values(
         self,
     ):
-        """
-        """
+        """ """
 
         where_condition = f" WHERE `symbol` = '{self.indicator_obj.symbol}' AND `sec_type` = '{self.indicator_obj.sec_type}' AND `expiry` = '{self.indicator_obj.expiry}';"
 
@@ -427,29 +476,29 @@ class OptionIndicator:
     #             tags=("evenrow",),
     #         )
 
-        # self.option_indicator_table.bind(
-        #     "<Button-3>", self.order_presets_table_right_click_menu
-        # )
+    # self.option_indicator_table.bind(
+    #     "<Button-3>", self.order_presets_table_right_click_menu
+    # )
 
-        # Add a button to create New Preset Order
-        # create_order_preset_button = ttk.Button(
-        #     input_frame,
-        #     text="  Create Preset Order  ",
-        #     command=lambda: self.create_order_preset_popup(),
-        # )
-        # create_order_preset_button.grid(column=0, row=0, padx=5, pady=5)
+    # Add a button to create New Preset Order
+    # create_order_preset_button = ttk.Button(
+    #     input_frame,
+    #     text="  Create Preset Order  ",
+    #     command=lambda: self.create_order_preset_popup(),
+    # )
+    # create_order_preset_button.grid(column=0, row=0, padx=5, pady=5)
 
-        # Add a button to Cancel all Preset Order
-        # cancel_all_preset_orders_button = ttk.Button(
-        #     input_frame,
-        #     text="Cancel All Preset Order",
-        #     command=lambda: threading.Thread(
-        #         target=StrategyUtils.cancel_all_pending_preset_orders
-        #     ).start(),
-        # )
-        # cancel_all_preset_orders_button.grid(column=1, row=0, padx=(5, 50), pady=5)
+    # Add a button to Cancel all Preset Order
+    # cancel_all_preset_orders_button = ttk.Button(
+    #     input_frame,
+    #     text="Cancel All Preset Order",
+    #     command=lambda: threading.Thread(
+    #         target=StrategyUtils.cancel_all_pending_preset_orders
+    #     ).start(),
+    # )
+    # cancel_all_preset_orders_button.grid(column=1, row=0, padx=(5, 50), pady=5)
 
-        # Place in center
+    # Place in center
 
     #     input_frame.place(relx=0.5, anchor=tk.CENTER)
     #     input_frame.place(y=30)

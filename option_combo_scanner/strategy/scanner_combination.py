@@ -27,19 +27,24 @@ class ScannerCombination:
 
         # Case to inf
         try:
-            self.max_loss = float("-inf") if "inf" in self.max_loss else int(float(self.max_loss))
+            self.max_loss = (
+                float("-inf") if "inf" in self.max_loss else int(float(self.max_loss))
+            )
         except Exception as e:
             pass
             # print(f"Error for COmbo ID: ", self.combo_id, "max_loss", self.max_loss)
-        
+
         try:
-            self.max_profit = float("inf") if "inf" in self.max_profit else int(float(self.max_profit))
+            self.max_profit = (
+                float("inf")
+                if "inf" in self.max_profit
+                else int(float(self.max_profit))
+            )
         except Exception as e:
             pass
 
             # print(f"Error for COmbo ID: ", self.combo_id, "max_profit", self.max_profit)
 
-    
         # Set the combination description
         self.description = self.get_combo_description()
 
@@ -48,9 +53,9 @@ class ScannerCombination:
 
     def map_combo_id_to_scanner_combination_object(self):
 
-        strategy_variables.map_combo_id_to_scanner_combination_object[self.combo_id] = (
-            self
-        )
+        strategy_variables.map_combo_id_to_scanner_combination_object[
+            self.combo_id
+        ] = self
 
         # Create a new row data based on the retrieved values
         row = pd.DataFrame(
@@ -74,7 +79,7 @@ class ScannerCombination:
         )
 
     def remove_scanned_combo_from_system(self):
-        
+
         # Remove row from dataframe
         # TODO Check
         strategy_variables.scanner_combo_table_df = (

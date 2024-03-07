@@ -1,11 +1,12 @@
 import asyncio
 import time
 from com.variables import variables
-from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import (
+    StrategyVariables as strategy_variables,
+)
 
 
 class MarketDataFetcher:
-
     @staticmethod
     async def get_option_delta_and_implied_volatility(
         contract, flag_market_open=True, generic_tick_list="", snapshot=True
@@ -31,8 +32,6 @@ class MarketDataFetcher:
         variables.call_option_open_interest[reqId] = None
         # TODO
         variables.put_option_open_interest[reqId] = None
-        
-
 
         # Set request type depending on whether the market is live or not
         if flag_market_open:
@@ -85,7 +84,7 @@ class MarketDataFetcher:
                     and variables.put_option_open_interest[reqId] is not None
                 )
             ):
-                
+
                 # Unsubscribe market data
                 variables.app.cancelMktData(reqId)
 
@@ -97,7 +96,7 @@ class MarketDataFetcher:
                         " -> delta = ",
                         variables.implied_volatility[reqId],
                     )
-                
+
                 # Return Implied Volatility
                 return (
                     variables.options_delta[reqId],
@@ -108,7 +107,6 @@ class MarketDataFetcher:
                     variables.ask_price[reqId],
                     variables.call_option_open_interest[reqId],
                     variables.put_option_open_interest[reqId],
-                    
                 )
 
             # Response not yet ended
@@ -138,7 +136,7 @@ class MarketDataFetcher:
             ]
         )
         return result
-        """        
+        """
 
         # TODO - Put in variable
         batch_size = strategy_variables.batch_size
@@ -154,7 +152,7 @@ class MarketDataFetcher:
         for indx, contract_batch in enumerate(contract_batches):
             # TODO - REMOVE
             print(f"Fetching data for batch: {indx + 1}")
-            
+
             result += await asyncio.gather(
                 *[
                     MarketDataFetcher.get_option_delta_and_implied_volatility(
@@ -163,10 +161,8 @@ class MarketDataFetcher:
                     for contract in contract_batch
                 ]
             )
-            
+
         return result
-
-
 
     # Get bid and ask for contract, snapshot = False, Uses reqMktData
     @staticmethod
@@ -186,8 +182,6 @@ class MarketDataFetcher:
 
         variables.ask_price[reqId] = None
         variables.bid_price[reqId] = None
-        
-        
 
         # Print to console
         if True or variables.flag_debug_mode:
@@ -233,7 +227,6 @@ class MarketDataFetcher:
                 or (
                     variables.bid_price[reqId] is not None
                     and variables.ask_price[reqId] is not None
-                    
                 )
             ):
                 # Unsubscribe market data
@@ -245,7 +238,6 @@ class MarketDataFetcher:
                 return (
                     variables.bid_price[reqId],
                     variables.ask_price[reqId],
-                    
                 )
 
             # Response not yet ended

@@ -9,7 +9,10 @@ from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
 from option_combo_scanner.gui.order_presets_tab_helper import OrderPresetHelper
 from option_combo_scanner.gui.utils import Utils
-from option_combo_scanner.ibapi_ao.contracts import get_contract, get_contract_details_async
+from option_combo_scanner.ibapi_ao.contracts import (
+    get_contract,
+    get_contract_details_async,
+)
 from option_combo_scanner.strategy.order_preset import OrderPreset
 from option_combo_scanner.strategy.utilities import StrategyUtils
 
@@ -414,7 +417,7 @@ class OrderPresetTab:
 
         # Values Dict
         values_dict = {}
-        values_dict["AccountID"] = ACCOUNT_ID 
+        values_dict["AccountID"] = ACCOUNT_ID
         values_dict["Ticker"] = ticker
         values_dict["SecType"] = "STK"
         values_dict["Currency"] = "USD"

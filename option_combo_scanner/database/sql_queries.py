@@ -51,10 +51,6 @@ class SqlQueries:
         # Execute the query
         return SqlQueries.execute_delete_query(query)
 
-
-    
-
-    
     # Create Insert Query
     @staticmethod
     def create_insert_query(table_name, values_dict):
@@ -73,7 +69,7 @@ class SqlQueries:
         query = query[:-1] + ")"
 
         return query
-    
+
     # Create Update Query
     @staticmethod
     def create_update_query(table_name, values_dict, where_clause=False):
@@ -256,8 +252,16 @@ class SqlQueries:
         Returns True if the transaction is successful
         """
         list_of_all_queries = []
-        list_of_all_queries.append(SqlQueries.create_delete_query(table_name='config_table', where_clause=" WHERE `config_id` > 0;"))
-        list_of_all_queries.append(SqlQueries.create_insert_query(table_name="config_table", values_dict=common_config_dict))
+        list_of_all_queries.append(
+            SqlQueries.create_delete_query(
+                table_name="config_table", where_clause=" WHERE `config_id` > 0;"
+            )
+        )
+        list_of_all_queries.append(
+            SqlQueries.create_insert_query(
+                table_name="config_table", values_dict=common_config_dict
+            )
+        )
 
         connection = DB_CONN.get_connection_to_database()
 
@@ -269,18 +273,20 @@ class SqlQueries:
 
             # Start the transaction
             connection.start_transaction()
-            
+
             for query in list_of_all_queries:
                 cursor.execute(query)
             if cursor.rowcount < 1:
                 raise "Unable to insert common config in the database"
-            
+
             # Get the last insert ID
             config_id = cursor.lastrowid
 
             for config_leg_dict in list_of_config_legs_dict:
-                config_leg_dict['config_id'] = config_id
-                query = SqlQueries.create_insert_query(table_name="config_legs_table", values_dict=config_leg_dict)
+                config_leg_dict["config_id"] = config_id
+                query = SqlQueries.create_insert_query(
+                    table_name="config_legs_table", values_dict=config_leg_dict
+                )
                 cursor.execute(query)
 
             # If all queries are executed successfully, commit the transaction
@@ -290,9 +296,7 @@ class SqlQueries:
 
         except Exception as e:
             # Log the error and rollback the transaction in case of any exception
-            logger.error(
-                f"Transaction failed. Exception occurred: {e}"
-            )
+            logger.error(f"Transaction failed. Exception occurred: {e}")
             connection.rollback()
             return False, False
 

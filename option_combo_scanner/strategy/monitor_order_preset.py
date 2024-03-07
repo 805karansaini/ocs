@@ -11,7 +11,9 @@ from option_combo_scanner.database.sql_queries import SqlQueries
 # from gui.gui import IsScreenRunning Used in local import tho avoid circular imports
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.strategy.order_generator import OrderGenerator
-from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import (
+    StrategyVariables as strategy_variables,
+)
 from option_combo_scanner.strategy.utilities import StrategyUtils
 
 logger = CustomLogger.logger

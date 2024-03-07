@@ -2,7 +2,9 @@ import math
 
 from option_combo_scanner.ibapi.order import Order
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import (
+    StrategyVariables as strategy_variables,
+)
 
 
 class OrderGenerator:
