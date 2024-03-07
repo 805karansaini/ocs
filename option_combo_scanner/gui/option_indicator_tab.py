@@ -335,7 +335,6 @@ class OptionIndicator:
                 else:
                     pc_change_iv_change = "None"
 
-                print("hvvv and avgivvv", hv, avg_iv)
                 if avg_iv != "None" and hv != "None":
                     hv_14d_avg_iv = float(hv) - float((avg_iv)) * 100
                 else:
