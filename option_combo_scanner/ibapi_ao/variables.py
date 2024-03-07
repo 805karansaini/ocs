@@ -53,7 +53,7 @@ class Variables(object):
     map_conid_to_subscripiton_req_id = {}
 
     # Flags
-    flag_market_open = True
+    flag_market_open = False
     flag_debug_mode = False
     flag_use_rth = 1  # Historical data
     flag_cancel_subscription = True  # Currently not being used anywhere, this is typically used when we make a call to reqMktData
@@ -87,6 +87,7 @@ class Variables(object):
     low_price = {}
     close_price = {}
     implied_volatility = {}
+    call_option_open_interest = {}
     price_data_update_time = {}
 
     req_error = {}  # dict used to check if error received for the request

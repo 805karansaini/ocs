@@ -52,6 +52,11 @@ class ScannerAlgo:
             self.strike_and_delta_dataframe = self.strike_and_delta_dataframe[
                 (self.strike_and_delta_dataframe['Delta'] < StrategyVariables.max_delta_threshold)]
 
+        # print("\nFiltered DF")
+        # from tabulate import tabulate
+        # print(tabulate(self.strike_and_delta_dataframe, headers="keys", tablefmt="psql", showindex=False))
+
+
 
     def filter_strikes(self, delta_range_low, delta_range_high):
         """
@@ -83,12 +88,7 @@ class ScannerAlgo:
     def generate_combinations(
         self, remaining_no_of_legs, range_low, range_high
     ):  
-        """
-        #   2 
-        #   0.5 to 0.7,  
-        #   -0.1 to 0.2
-        """
-        # print("generate_combinations", remaining_no_of_legs, range_low, range_high)
+        
         list_of_filter_legs = self.filter_strikes(range_low, range_high)
 
         list_of_partial_combination = []
@@ -104,15 +104,12 @@ class ScannerAlgo:
                 leg_object.get_config_leg_tuple_for_gui()
             )
 
-            # print("-----")
-            # print("Leg Object: ", leg_object)
-            # print("-----")
             delta_range_min = float(delta_range_min) 
             delta_range_max = float(delta_range_max)
             
             for strike, strike_delta, con_id in list_of_filter_legs:
 
-                new_range_low = strike_delta - delta_range_min
+                new_range_low = strike_delta + delta_range_min
                 new_range_high = strike_delta + delta_range_max
                 
                 list_of_strike_delta_and_con_id_tuple = self.generate_combinations(

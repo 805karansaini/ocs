@@ -110,6 +110,7 @@ class variables(object):
     sleep_time_ten_seconds = (
         10  # Used in recovery mode, After getting order execution details
     )
+    max_wait_time_for_mkt_data = 14
     sleep_time_wait_bid_ask_legs = 10
 
     # When creating Price Chart, max-time we will wait
@@ -158,7 +159,9 @@ class variables(object):
     options_delta = {}
     options_iv_bid = {}
     options_iv_ask = {}
-
+    options_iv_last = {}
+    call_option_open_interest = {}
+    put_option_open_interest = {}
 
     live_und_price = None
 

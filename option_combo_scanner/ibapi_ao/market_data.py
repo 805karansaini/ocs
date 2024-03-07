@@ -2,7 +2,7 @@ import asyncio
 
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-
+from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
 logger = CustomLogger.logger
 
 
@@ -124,7 +124,7 @@ class RequestMarketData:
 
         try:
             result = []
-            batch_size = 30
+            batch_size = strategy_variables.batch_size
             # Process the requests in batches (The User can modify the batch size from variables)
             for indx in range(0, len(contracts_list), batch_size):
                 # Creating a batch for all requests and sending it to the TWS

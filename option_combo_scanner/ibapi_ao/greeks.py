@@ -3,7 +3,7 @@ import asyncio
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.ibapi_ao import *
 from option_combo_scanner.ibapi_ao.contracts import *
-from option_combo_scanner.ibapi_ao.variables import variables
+from option_combo_scanner.ibapi_ao.variables import Variables as variables
 
 logger = CustomLogger.logger
 

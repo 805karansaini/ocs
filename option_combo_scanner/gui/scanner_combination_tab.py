@@ -1,3 +1,4 @@
+import copy
 import datetime
 import pprint
 import tkinter as tk
@@ -17,14 +18,14 @@ logger = CustomLogger.logger
 
 # Name, Width, Heading
 scanner_combination_table_columns_width = [
-    ("Combo ID", 119, "Combo ID"),
-    ("Instrument ID", 119, "Instrument ID"),
-    ("Description", 700, "Description"),
-    ("#Legs", 119, "#Legs"),
-    ("Combo Net  Delta", 119, "Combo Net Delta"),    
-    ("Max Profit", 119, "Max Profit"),
-    ("Max Loss", 119, "Max Loss"),
-    ("Max Profit/Loss Ratio", 119, "Max Profit/Loss Ratio"),
+    ("Combo ID", 220, "Combo ID"),
+    ("Instrument ID", 220, "Instrument ID"),
+    ("Description",220, "Description"),
+    ("#Legs", 220, "#Legs"),
+    ("Combo Net  Delta", 220, "Combo Net Delta"),    
+    ("Max Profit", 220, "Max Profit"),
+    ("Max Loss", 220, "Max Loss"),
+    # ("Max Profit/Loss Ratio", 200, "Max Profit/Loss Ratio"),
 ]
 
 
@@ -39,49 +40,76 @@ class ScannerCombinationTab:
         # Set the scanner_combination_tab in the class variables
         Scanner.scanner_combination_tab_obj = self
 
+        # Set the scanner_combination_tab in the gui/Utils class variables
+        Utils.scanner_combination_tab_object = self
+
     def create_scanner_combination_tab(self):
 
+        # Create Treeview Frame for active Filter DropDown
+        scanner_filter_frame = ttk.Frame(self.scanner_combination_tab_frame, padding=20)
+        scanner_filter_frame.pack(pady=20)
+
+        # Label for filter used in max profit        
+        filter_label_max_profit = ttk.Label(scanner_filter_frame, text="Filter Max Profit", anchor="center", width=14)
+        filter_label_max_profit.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
+
+        # Filter Dropdown for Max Profit 
+        self.filter_max_profit_var = tk.StringVar()
+        self.filter_dropdown_max_profit = ttk.Combobox(scanner_filter_frame, textvariable=self.filter_max_profit_var, values=["Limited", "Unlimited", "All"],
+                                      state="readonly")
+        self.filter_dropdown_max_profit.current(2)
+        self.filter_dropdown_max_profit.grid(column=0, row=1, padx=5, pady=5)
+
+        # Bind Filter function Based on MAx Profit
+        self.filter_dropdown_max_profit.bind("<<ComboboxSelected>>", self.filter_combo_based_on_max_loss_and_max_profit)
+
+        # Label for filter used in max loss        
+        filter_label_max_loss = ttk.Label(scanner_filter_frame, text="Filter Max Loss", anchor="center", width=13)
+        filter_label_max_loss.grid(column=1, row=0, padx=5, pady=(0, 5), sticky="n")
+
+        # Filter Dropdown for Max Loss 
+        self.filter_max_loss_var = tk.StringVar()
+        self.filter_dropdown_max_loss = ttk.Combobox(scanner_filter_frame, textvariable=self.filter_max_loss_var, values=["Limited", "Unlimited", "All"],
+                                      state="readonly")
+        self.filter_dropdown_max_loss.current(2)
+        self.filter_dropdown_max_loss.grid(column=1, row=1, padx=5, pady=5)
+
+        # Bind Filter function Based on MAx Loss
+        self.filter_dropdown_max_loss.bind("<<ComboboxSelected>>", self.filter_combo_based_on_max_loss_and_max_profit)
+
+        # Place in center for filter frame
+        scanner_filter_frame.place(relx=0.5, anchor=tk.CENTER)
+        scanner_filter_frame.place(y=30)
+
         # Create Treeview Frame for active combo table
         scanner_combination_table_frame = ttk.Frame(self.scanner_combination_tab_frame, padding=20)
         scanner_combination_table_frame.pack(pady=20)
 
-        # # Create the "Clear Table" button
-        # clean_table_button = ttk.Button(
-        #     scanner_combination_table_frame,
-        #     text="Clear Table",
-        #     command=lambda: self.clear_combination_table(),
-        # )
-
-        # clean_table_button.grid(column=1, row=0, padx=5, pady=5)
-
         # Place in center
         scanner_combination_table_frame.place(relx=0.5, anchor=tk.CENTER)
-        scanner_combination_table_frame.place(y=30)
-
-        # Create Treeview Frame for active combo table
-        scanner_combination_table_frame = ttk.Frame(self.scanner_combination_tab_frame, padding=20)
-        scanner_combination_table_frame.pack(pady=20)
-
-        # Place in center
-        scanner_combination_table_frame.place(relx=0.5, anchor=tk.CENTER)
-        scanner_combination_table_frame.place(y=335)
+        scanner_combination_table_frame.place(y=425, width = 1590)
 
         # Treeview Scrollbar
-        tree_scroll = Scrollbar(scanner_combination_table_frame)
-        tree_scroll.pack(side="right", fill="y")
+        tree_scroll_y = Scrollbar(scanner_combination_table_frame)
+        tree_scroll_y.pack(side="right", fill="y")
+
+        tree_scroll_x = Scrollbar(scanner_combination_table_frame, orient="horizontal")
+        tree_scroll_x.pack(side="bottom", fill="x")
 
         # Create Treeview
         self.scanner_combination_table = ttk.Treeview(
             scanner_combination_table_frame,
-            yscrollcommand=tree_scroll.set,
-            height=20,
+            xscrollcommand=tree_scroll_x.set,
+            yscrollcommand=tree_scroll_y.set,
+            height=25,
             selectmode="extended",
         )
         # Pack to the screen
-        self.scanner_combination_table.pack()
+        self.scanner_combination_table.pack(expand=True, fill="both")
 
         # Configure the scrollbar
-        tree_scroll.config(command=self.scanner_combination_table.yview)
+        tree_scroll_y.config(command=self.scanner_combination_table.yview)
+        tree_scroll_x.config(command=self.scanner_combination_table.xview)
 
         # Column in Combination table
         self.scanner_combination_table["columns"] = [
@@ -94,7 +122,7 @@ class ScannerCombinationTab:
         self.scanner_combination_table.heading("#0", text="\n", anchor="w")
 
         for col_name, col_width, col_heading in scanner_combination_table_columns_width:
-            self.scanner_combination_table.column(col_name, anchor="center", width=col_width)
+            self.scanner_combination_table.column(col_name, anchor="center", width=col_width, minwidth=col_width, stretch=False)
             self.scanner_combination_table.heading(col_name, text=col_heading, anchor="center")
 
         # Back ground
@@ -110,6 +138,62 @@ class ScannerCombinationTab:
             self.scanner_combination_table.heading(
                 column, command=lambda c=column: self.sort_scanner_combination_table(c, False)
             )
+
+    def filter_combo_based_on_max_loss_and_max_profit(self, event=None):
+        # Get the selected value from the dropdown
+        max_loss_selected_option = self.filter_max_loss_var.get().upper()
+        
+        # Get the selected value from the dropdown
+        max_profit_selected_option = self.filter_max_profit_var.get().upper()
+
+        local_scanner_combo_table_df = copy.deepcopy(StrategyVariables.scanner_combo_table_df)
+
+        # print(f"\nRaw")
+        # print(local_scanner_combo_table_df.to_string())
+        # Filter dataframe here
+        if max_profit_selected_option == "UNLIMITED":
+            # Filter for cases where max loss is within the specified range
+            local_scanner_combo_table_df = local_scanner_combo_table_df[
+                local_scanner_combo_table_df['Max Profit'] == float('inf')
+            ]
+        elif max_profit_selected_option == "LIMITED":
+            # Filter for cases where max loss is within the specified range
+            local_scanner_combo_table_df = local_scanner_combo_table_df[
+                local_scanner_combo_table_df['Max Profit'] != float('inf')
+            ]
+        else:
+            pass
+        # print(f"\nMax Profit")
+        # print(local_scanner_combo_table_df.to_string())
+
+
+        # Filter dataframe here
+        if max_loss_selected_option == "UNLIMITED":
+            # Filter for cases where max loss is within the specified range
+            local_scanner_combo_table_df = local_scanner_combo_table_df[
+                local_scanner_combo_table_df['Max Loss'] == float('-inf')
+            ]
+        elif max_loss_selected_option == "LIMITED":
+            # Filter for cases where max loss is within the specified range
+            local_scanner_combo_table_df = local_scanner_combo_table_df[
+                local_scanner_combo_table_df['Max Loss'] != float('-inf')
+            ]
+        else:
+            pass
+        
+        # print(f"\nMax Loss")
+        # print(local_scanner_combo_table_df.to_string())
+
+        # Clear table
+        self.scanner_combination_table.delete(*self.scanner_combination_table.get_children())
+
+        list_of_all_filtered_combo_ids =  local_scanner_combo_table_df["Combo ID"].to_list()
+
+        # Sort the dataframe according to the header # TODO
+        for combo_id in list_of_all_filtered_combo_ids:
+            combo_id = int(combo_id)
+            scanner_combination_object = StrategyVariables.map_combo_id_to_scanner_combination_object[combo_id]
+            self.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
 
 
     # def clear_order_book_table(self):
@@ -131,7 +215,7 @@ class ScannerCombinationTab:
 
         """
         combo_id = scanner_combination_object.combo_id
-            
+        
         row_values = (
             combo_id,
             scanner_combination_object.instrument_id,
@@ -140,7 +224,7 @@ class ScannerCombinationTab:
             scanner_combination_object.combo_net_delta,
             scanner_combination_object.max_profit,
             scanner_combination_object.max_loss,
-            scanner_combination_object.max_profit_max_loss_ratio
+            # scanner_combination_object.max_profit_max_loss_ratio
         )
 
         # Get the current number of items in the treeview
@@ -169,6 +253,11 @@ class ScannerCombinationTab:
         combo_ids_in_scanner_combination_table = self.scanner_combination_table.get_children()
 
         for combo_id in list_of_combo_ids:
+            # Remove the scanned combination from system 
+            if int(combo_id) in StrategyVariables.map_combo_id_to_scanner_combination_object:
+                StrategyVariables.map_combo_id_to_scanner_combination_object[int(combo_id)].remove_scanned_combo_from_system()
+
+            combo_id = str(combo_id)
             if combo_id in combo_ids_in_scanner_combination_table:
                 self.scanner_combination_table.delete(combo_id)
     

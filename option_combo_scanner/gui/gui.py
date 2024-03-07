@@ -5,11 +5,12 @@ import tkinter as tk
 from tkinter import Scrollbar, ttk
 
 from option_combo_scanner.custom_logger.logger import CustomLogger
-from option_combo_scanner.gui.option_indicator_data_tab import OptionIndicator
+from option_combo_scanner.gui.option_indicator_tab import OptionIndicator
 from option_combo_scanner.gui.scanner_combination_tab import ScannerCombinationTab
 from option_combo_scanner.gui.order_book_tab import OrderBookTab
 from option_combo_scanner.gui.order_presets_tab import OrderPresetTab
 from option_combo_scanner.gui.scanner_inputs_tab import ScannerInputsTab
+from option_combo_scanner.strategy.zzz_deprc_aryan_scanner import Scanner
 
 logger = CustomLogger.logger
 
@@ -30,7 +31,6 @@ class ScreenGUI(threading.Thread):
         # Create the notebook widget with three tabs
         self.notebook = ttk.Notebook(self.window)
         self.notebook.pack(expand=True, fill="both")
-
         # Create the Scanner Inputs Tab
         self.scanner_inputs_tab_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.scanner_inputs_tab_frame, text=" Scanner Inputs ")

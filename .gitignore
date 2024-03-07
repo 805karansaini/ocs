@@ -1,6 +1,8 @@
 # Ignore virtual environment
 .venv/
 .vscode/
+Temp/
+
 
 # Ignore build, dist, main.spec and logs
 build/

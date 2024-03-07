@@ -6,7 +6,7 @@ from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.contracts import get_contract
 from option_combo_scanner.strategy.indicator import Indicator
 from option_combo_scanner.strategy.scanner_config import Config
-from option_combo_scanner.strategy.scanner_configLeg import ConfigLeg
+from option_combo_scanner.strategy.scanner_config_leg import ConfigLeg
 from option_combo_scanner.strategy.instrument import Instrument
 from option_combo_scanner.strategy.order_preset import OrderPreset
 from option_combo_scanner.strategy.scanner_combination import ScannerCombination
@@ -97,6 +97,8 @@ class HouseKeepingGUI:
     def insert_order_status_in_order_book_tab(self):
         pass
     
+
+
     @staticmethod
     def dump_all_scanner_combinations_in_scanner_combination_tab(
         scanner_combination_tab_obj,
@@ -149,7 +151,7 @@ class HouseKeepingGUI:
 
     @staticmethod
     def dump_all_indicator_values_in_indicator_tab(
-        option_indicator_tab_obj,
+        scanner_indicator_tab_obj,
     ):
         # Get the Indicators from Indicator table
         all_indicator = SqlQueries.select_from_db_table(table_name="indicator_table", columns="*")
@@ -158,4 +160,4 @@ class HouseKeepingGUI:
             indicator_obj = Indicator(values_dict)  # Mapping
 
             ### Add in the Indicator table
-            option_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
+            scanner_indicator_tab_obj.insert_into_indicator_table(indicator_obj)

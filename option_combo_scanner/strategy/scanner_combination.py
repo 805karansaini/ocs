@@ -1,23 +1,45 @@
 from pprint import pprint
 
+import pandas as pd
+
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.strategy.manage_mkt_data_sub import ManageMktDataSubscription
 from option_combo_scanner.strategy.monitor_order_preset import MonitorOrderPreset
-from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import (
+    StrategyVariables as strategy_variables,
+)
 
 logger = CustomLogger.logger
 
 
 class ScannerCombination:
-    def __init__(self, values_dict,):
+    def __init__(
+        self,
+        values_dict,
+    ):
         [setattr(self, key, value) for key, value in values_dict.items()]
 
         # Cast to integers
         self.combo_id = int(self.combo_id)
         self.instrument_id = int(self.instrument_id)
+
+        # Case to inf
+        try:
+            self.max_loss = float("-inf") if "inf" in self.max_loss else int(float(self.max_loss))
+        except Exception as e:
+            pass
+            # print(f"Error for COmbo ID: ", self.combo_id, "max_loss", self.max_loss)
         
+        try:
+            self.max_profit = float("inf") if "inf" in self.max_profit else int(float(self.max_profit))
+        except Exception as e:
+            pass
+
+            # print(f"Error for COmbo ID: ", self.combo_id, "max_profit", self.max_profit)
+
+    
         # Set the combination description
         self.description = self.get_combo_description()
 
@@ -25,14 +47,54 @@ class ScannerCombination:
         self.map_combo_id_to_scanner_combination_object()
 
     def map_combo_id_to_scanner_combination_object(self):
+
+        strategy_variables.map_combo_id_to_scanner_combination_object[self.combo_id] = (
+            self
+        )
+
+        # Create a new row data based on the retrieved values
+        row = pd.DataFrame(
+            {
+                "Combo ID": self.combo_id,
+                "Instrument ID": self.instrument_id,
+                "Description": self.description,
+                "#Legs": self.number_of_legs,
+                "Combo Net Delta": self.combo_net_delta,
+                "Max Profit": self.max_profit,
+                "Max Loss": self.max_loss,
+                # "Max Profit/Loss Ratio": self.max_profit_max_loss_ratio,
+            },
+            index=[0],
+        )
+
+        # Add Row to dataframe (concat)
+        strategy_variables.scanner_combo_table_df = pd.concat(
+            [strategy_variables.scanner_combo_table_df, row],
+            ignore_index=True,
+        )
+
+    def remove_scanned_combo_from_system(self):
         
-        strategy_variables.map_combo_id_to_scanner_combination_object[self.combo_id] = self
+        # Remove row from dataframe
+        # TODO Check
+        strategy_variables.scanner_combo_table_df = (
+            strategy_variables.scanner_combo_table_df.drop(
+                strategy_variables.scanner_combo_table_df[
+                    strategy_variables.scanner_combo_table_df["Combo ID"]
+                    == self.combo_id
+                ].index
+            )
+        )
+
+        del strategy_variables.map_combo_id_to_scanner_combination_object[self.combo_id]
 
     def __str__(self) -> str:
-        
+
         return f"Scanner Combination Object: {pprint(vars(self))}"
-    
-    def get_combo_description(self, ):
+
+    def get_combo_description(
+        self,
+    ):
 
         # Ticker 1 (Sec Type 1: Expiry 1 C/P Strike 1) +/- Qty 1,
         # Tickers Informative string
@@ -45,10 +107,8 @@ class ScannerCombination:
             combo_desc_string += f"{self.symbol} ({self.sec_type}"
 
             # Expiry Date, Right, Strike
-            combo_desc_string += (
-                f" {self.expiry} {self.right} {leg_obj.strike}"
-            )
-        
+            combo_desc_string += f" {self.expiry} {self.right} {leg_obj.strike}"
+
             # Buy/Sell +1 or -1
             if leg_obj.action.upper() == "BUY":
                 # check if it is last leg
@@ -65,8 +125,10 @@ class ScannerCombination:
 
         return combo_desc_string
 
-
-    def get_scanner_combination_tuple_for_gui(self, ):
+    def get_scanner_combination_tuple_for_gui(
+        self,
+    ):
+        """ """
         # Create a tuple with object attributes in the specified order
         combination_tuple = (
             self.combo_id,
@@ -84,28 +146,27 @@ class ScannerCombination:
             self.max_profit,
             self.max_loss,
             self.max_profit_max_loss_ratio,
-            self.list_of_all_leg_objects
+            self.list_of_all_leg_objects,
         )
 
         return combination_tuple
 
-    
+
 # It is used to show user the combination details in combination tab of screen GUI
 def get_scanner_combination_details_column_and_data_from_combo_object(
     combo_id: int,
 ):
     try:
         # Scanner Combo Object
-        combo_obj = strategy_variables.map_combo_id_to_scanner_combination_object[combo_id]
+        combo_obj = strategy_variables.map_combo_id_to_scanner_combination_object[
+            combo_id
+        ]
 
     except Exception as e:
         # Show error pop up
         error_title = f"Error Scanned Combo ID: {combo_id}"
         error_string = f"Unable to find the Scanned Combination."
-        Utils.display_message_popup(
-                error_title,
-                error_string
-            )
+        Utils.display_message_popup(error_title, error_string)
         return None
 
     # Column names, to show inside Combination details screen GUI

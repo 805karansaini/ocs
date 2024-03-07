@@ -3,24 +3,27 @@ import os
 import threading
 import time
 import tkinter as tk
-from tkinter import messagebox
 import traceback
+from tkinter import messagebox
 
+# from option_combo_scanner.ibapi_ao.app import IBapi
+from com.ibapi_callbacks import IBapi
 from com.variables import variables as com_variables
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.database.set_up_db import SetupDatabase
 from option_combo_scanner.gui.gui import IsScreenRunning, ScreenGUI
+from option_combo_scanner.gui.scanner_inputs_tab import ScannerInputsTab
 from option_combo_scanner.gui.utils import Utils
-
-from option_combo_scanner.ibapi_ao.app import IBapi
-from com.ibapi_callbacks import IBapi
-
 from option_combo_scanner.ibapi_ao.recovery_mode import RecoveryMode
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.monitor_order_preset import MonitorOrderPreset
+from option_combo_scanner.indicators_calculator.indicator_calculation import \
+    IndicatorCalculation
+from option_combo_scanner.strategy.monitor_order_preset import \
+    MonitorOrderPreset
+from option_combo_scanner.strategy.scanner import (Scanner,
+                                                   run_option_combo_scanner)
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 from option_combo_scanner.strategy.utilities import StrategyUtils
-from option_combo_scanner.strategy.scanner import Scanner
 
 logger = CustomLogger.logger
 
@@ -53,7 +56,7 @@ def ask_for_user_confirmation():
         logger.debug("Recovery mode canceled.")
         print("Recovery mode canceled.")
 
-    # Destroy the root window
+    # Destroy the scroot window
     root.destroy()
 
     return result
@@ -63,7 +66,8 @@ if __name__ == "__main__":
     def run_screen():
         global screen
 
-        # Create Screen GUI
+        # Create Screen GUIat
+
         screen = ScreenGUI()
 
         # Run the screen main loop, when close set 'variables.screen' as False
@@ -110,7 +114,8 @@ if __name__ == "__main__":
 
     # Expose app to all methods
     com_variables.app = app
-
+    # TODO - have multi apps later on
+    com_variables.cas_app = app
 
     flag_start_in_recovery_mode = False
 
@@ -135,9 +140,9 @@ if __name__ == "__main__":
     while not IsScreenRunning.flag_is_screen_running:
         logger.debug("Intializing GUI Screen")
         print("Intializing GUI Screen")
-        time.sleep(0.2)
+        time.sleep(0.3)
     else:
-        time.sleep(1)
+        time.sleep(0.5)
 
     # StrategyUtils.update_the_values_for_order_preset_table()
 
@@ -149,29 +154,33 @@ if __name__ == "__main__":
 
     logger.debug("GUI Screen Initialized")
     print("GUI Screen Initialized")
+    
+    # TODO - Restart later on
+    # # Creating a separate thread
+    # scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
+    # scanner_thread.start()
 
     # Creating the Scanner Object
-    scanner_object = Scanner()
-    
+    # scanner_input = ScannerInputsTab(scanner_object)
     # While Screen is open
     while IsScreenRunning.flag_is_screen_running:
 
+        time.sleep(3)
         try:
+            pass
             
-            try:
-                scanner_object.start_scanner()
-            except Exception as e:
-                # Print the traceback
-                traceback.print_exc()
-            time.sleep(5)
-            
+            IndicatorCalculation.compute_indicators()
+            # H. V. I. V. --->
+            # time.sleep(2)
+            # print("\nDONE" * 5)
+            # time.sleep(5)
             # try:
             #     # Update Order Book from the database
             #     screen.order_book_tab_object.update_order_book_table()
             # except Exception as exp:
             #     logger.error(
             #         f"Exception in main-update_order_book_table exp: {exp}"
-            #     )
+            #     ) 
             #
             # try:
             #     # Accumulate the latest Prices
@@ -202,6 +211,8 @@ if __name__ == "__main__":
         except Exception as e:
             logger.error(f"Exception in main screen loop: {e}")
             print(f"Exception in main screen loop: {e}")
+            traceback.print_exc()
+            # tidi tracevacl
 
         c += 1
     else:

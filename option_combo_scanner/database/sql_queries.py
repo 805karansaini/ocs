@@ -51,11 +51,8 @@ class SqlQueries:
         # Execute the query
         return SqlQueries.execute_delete_query(query)
 
+
     
-
-
-
-
 
     
     # Create Insert Query
@@ -76,7 +73,7 @@ class SqlQueries:
         query = query[:-1] + ")"
 
         return query
-
+    
     # Create Update Query
     @staticmethod
     def create_update_query(table_name, values_dict, where_clause=False):
@@ -265,7 +262,7 @@ class SqlQueries:
         connection = DB_CONN.get_connection_to_database()
 
         if connection is None:
-            return False
+            return False, False
 
         try:
             cursor = connection.cursor(dictionary=True)
@@ -289,7 +286,7 @@ class SqlQueries:
             # If all queries are executed successfully, commit the transaction
             connection.commit()
 
-            return True
+            return True, config_id
 
         except Exception as e:
             # Log the error and rollback the transaction in case of any exception
@@ -297,7 +294,7 @@ class SqlQueries:
                 f"Transaction failed. Exception occurred: {e}"
             )
             connection.rollback()
-            return False
+            return False, False
 
         finally:
             if cursor:

@@ -325,6 +325,10 @@ class IBapi(
         elif tickType == 11:
 
             variables.options_iv_ask[reqId] = impliedVol
+        
+        elif tickType == 12:
+            
+            variables.options_iv_last[reqId] = impliedVol
 
     # Callback for reqMktData
     def tickSnapshotEnd(self, reqId: int):
@@ -438,7 +442,8 @@ class IBapi(
         super().tickSize(reqId, tickType, size)
 
         size = float(size)
-
+        
+        # print(f"ReqID: {reqId} tickType {tickType}: {size}")
         # Updating ask price, if price is not -1
         if (tickType == TickTypeEnum.BID_SIZE) and (size != -1):
 
@@ -453,6 +458,17 @@ class IBapi(
         if (tickType == TickTypeEnum.VOLUME) and (size != -1):
 
             variables.volume[reqId] = size
+        
+        if (tickType == TickTypeEnum.OPTION_CALL_OPEN_INTEREST):
+            # print(f"ReqID: {reqId} Call OI: {size}")
+            variables.call_option_open_interest[reqId] = size
+
+        if (tickType == TickTypeEnum.OPTION_PUT_OPEN_INTEREST):
+            
+            # print(f"ReqID: {reqId} Put OI: {size}")
+            variables.put_option_open_interest[reqId] = size
+        
+
 
     # Callback for reqMktData (BID, ASK)
     def tickPrice(

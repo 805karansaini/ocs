@@ -33,7 +33,7 @@ class Config:
     def get_config_tuple_for_gui(self, ):
         # Create a tuple with object attributes in the specified order
         config_tuple = (
-            # self.config_id,
+            self.config_id,
             self.no_of_leg,
             self.right,
             self.list_of_dte,
