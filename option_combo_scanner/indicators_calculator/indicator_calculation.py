@@ -23,7 +23,7 @@ class IndicatorCalculation:
         # Historical Volatility
 
         HistoricalVolatility.compute()
-        ImpliedVolatility.compute()
-        PutCallVol.compute()
-        ChangeUnderlyingOptionsPrice.compute()
-        Max_Min_Pain.compute()
+        # ImpliedVolatility.compute()
+        # PutCallVol.compute()
+        # ChangeUnderlyingOptionsPrice.compute()
+        # Max_Min_Pain.compute()

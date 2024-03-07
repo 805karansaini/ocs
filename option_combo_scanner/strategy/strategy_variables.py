@@ -46,9 +46,14 @@ class StrategyVariables:
     batch_size = 80
 
     # For HV # Take candle size from the
-    bar_size_historical_volatility = "2 hours"
-    duration_size_historical_volatility = "28 D"
-    lookback_days_historical_volatility = "14 D"
+    user_input_bar_size_historical_volatility = 2 # Hours
+    user_input_lookback_days_historical_volatility = 14 # Days
+    user_input_average_historical_volatility_days = 14  # Days
+
+    bar_size_historical_volatility = f"{user_input_bar_size_historical_volatility} hours"
+    lookback_days_historical_volatility = f"{user_input_lookback_days_historical_volatility} D" 
+    duration_size_historical_volatility = f"{user_input_average_historical_volatility_days  + user_input_lookback_days_historical_volatility} D"
+
 
     # If the flag is False it will calcluate for all put-call strike otherwise for speicfic deltas
     flag_indication_values_based_on_selected_deltas = False

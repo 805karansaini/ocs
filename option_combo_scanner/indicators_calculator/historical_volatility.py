@@ -31,6 +31,9 @@ class HistoricalVolatility:
     def get_all_underlying_for_which_data_is_required(
         local_map_indicator_id_to_indicator_object,
     ):
+        """
+        Returns map_underlying_conid_to_list_of_indicators_id as we need HV for underlying
+        """
 
         map_conid_to_list_of_indicators_id = {}
 
@@ -50,145 +53,6 @@ class HistoricalVolatility:
 
         return map_conid_to_list_of_indicators_id
 
-    @staticmethod
-    def compute():
-        """
-        Basically does everything required to computes the indicator
-        and returns the values
-        """
-        # look_back = "28 D"
-        # what_to_show = "BID"
-        # candle_size = "2 H"
-
-        # Local local_map_indicator_id_to_indicator_object
-        local_map_indicator_id_to_indicator_object = copy.deepcopy(
-            StrategyVariables.map_indicator_id_to_indicator_object
-        )
-
-        # (Set, Minimize the request for historical data)AAPL Single: 5 Rows
-        map_conid_to_list_of_indicators_id = (
-            HistoricalVolatility.get_all_underlying_for_which_data_is_required(
-                local_map_indicator_id_to_indicator_object
-            )
-        )
-
-        # Fetch Historical data
-        map_conid_to_req_id = HistoricalVolatility.fetch_historical_data(
-            map_conid_to_list_of_indicators_id,
-            StrategyVariables.bar_size_historical_volatility,
-            StrategyVariables.duration_size_historical_volatility,
-        )
-
-        # get the dataframe for the req ID
-        for con_id, req_id in map_conid_to_req_id.items():
-            df = variables.map_req_id_to_historical_data_dataframe[req_id]
-
-            if df is not None:
-                print(f"Saving the df for conind: {con_id}")
-                df.to_csv(rf"Temp\{con_id}.csv")
-            else:
-                print(f"DataFrame is empty")
-
-            df["Time"] = pd.to_datetime(df["Time"])
-
-            hv_values = []
-            for day in range(1, 15):
-                start_date = pd.Timestamp.now(tz="Israel").normalize() - pd.Timedelta(
-                    days=day + 14
-                )
-                end_date = pd.Timestamp.now(tz="Israel").normalize() - pd.Timedelta(
-                    days=day
-                )
-                # print(f"{day} Day(s) old HV: Lookback/Period 14 Days: Data: {start_date.date()} - {end_date.date()}")
-
-                filtered_df = df[(df["Time"] >= start_date) & (df["Time"] <= end_date)]
-
-                try:
-                    # Calculate the HV for the current day
-                    if not filtered_df.empty:
-                        hv_value = (
-                            HistoricalVolatility.get_hv_calculation_for_each_conid(
-                                con_id, filtered_df
-                            )
-                        )
-                        if hv_value not in ["N/A"]:
-                            hv_values.append(hv_value)
-
-                    # print(f"Day {day} HV: {hv_value}")
-                except Exception as e:
-                    print(e)
-
-            try:
-                hv_value = HistoricalVolatility.get_hv_calculation_for_each_conid(
-                    con_id, df
-                )
-                # print(f"Indicator Conid: {con_id} H. V.: {hv_value}")
-            except Exception as e:
-                print(e)
-            # print("avghv", hv_values)
-
-            # HV(14D)-Avg(14D)
-            hv_14d_avg_14d = sum(hv_values) / len(hv_values)
-            # print("HV_Value Avg14D", hv_14d_avg_14d)
-
-            # HV(14D)-AvgIV
-
-            HistoricalVolatility.update_hv_calculation(
-                con_id, hv_value, hv_14d_avg_14d, map_conid_to_list_of_indicators_id
-            )
-
-    @staticmethod
-    def update_hv_calculation(
-        conid, hv_value, hv_14d_avg_14d, map_conid_to_list_of_indicators_id
-    ):
-        list_of_indicator_id = map_conid_to_list_of_indicators_id[conid]
-
-        values_dict = {
-            "hv": hv_value,
-            "hv_14d_avg_14d": hv_14d_avg_14d,
-        }
-        where_condition = f" WHERE `underlying_conid` = {conid};"
-
-        select_query = SqlQueries.create_update_query(
-            table_name="indicator_table",
-            values_dict=values_dict,
-            where_clause=where_condition,
-        )
-        # Get all the old rows from indicator table
-        res = SqlQueries.execute_update_query(select_query)
-
-        if not res:
-            print(f"HV values not updated in DB", {conid})
-            # return
-
-        for indicator_id in list_of_indicator_id:
-
-            if indicator_id in StrategyVariables.map_indicator_id_to_indicator_object:
-                StrategyVariables.map_indicator_id_to_indicator_object[
-                    indicator_id
-                ].hv = hv_value
-                StrategyVariables.map_indicator_id_to_indicator_object[
-                    indicator_id
-                ].hv_14d_avg_14d = hv_14d_avg_14d
-
-                StrategyVariables.scanner_indicator_table_df.loc[
-                    StrategyVariables.scanner_indicator_table_df["Indicator ID"]
-                    == indicator_id,
-                    "hv",
-                ] = hv_value
-                StrategyVariables.scanner_indicator_table_df.loc[
-                    StrategyVariables.scanner_indicator_table_df["Indicator ID"]
-                    == indicator_id,
-                    "hv_14d_avg_14d",
-                ] = hv_14d_avg_14d
-
-            else:
-                print(f"Indicator object not found for conid: {conid}")
-
-            # print(StrategyVariables.scanner_indicator_table_df.to_string())
-            HistoricalVolatility.scanner_hv_indicator_tab_obj.update_into_indicator_table(
-                StrategyVariables.scanner_indicator_table_df
-            )
 
     @staticmethod
     def get_hv_calculation_for_each_conid(conid, merged_df):
@@ -328,7 +192,7 @@ class HistoricalVolatility:
     # Method to Fetch Historical Data
     @staticmethod
     def fetch_historical_data(
-        map_conid_to_list_of_indicators_id, bar_size, duration_size
+        map_conid_to_list_of_indicators_id, bar_size, duration_size, what_to_show
     ):
 
         # Map of [conid][action] = req_id
@@ -341,8 +205,7 @@ class HistoricalVolatility:
 
             contract = StrategyVariables.map_con_id_to_contract[conid]
 
-            # TODO
-            what_to_show = "BID"
+            what_to_show = what_to_show
 
             # Getting req_id
             reqId = variables.cas_app.nextorderId
@@ -380,3 +243,148 @@ class HistoricalVolatility:
             counter += 1
 
         return map_conid_to_req_id
+
+    @staticmethod
+    def compute():
+        """
+        Basically does everything required to computes the indicator
+        and returns the values
+        """
+        what_to_show = "BID"
+
+        # Local local_map_indicator_id_to_indicator_object
+        local_map_indicator_id_to_indicator_object = copy.deepcopy(
+            StrategyVariables.map_indicator_id_to_indicator_object
+        )
+
+        # (Set, Minimize the request for historical data)AAPL Single: 5 Rows
+        map_conid_to_list_of_indicators_id = (
+            HistoricalVolatility.get_all_underlying_for_which_data_is_required(
+                local_map_indicator_id_to_indicator_object
+            )
+        )
+
+        # Fetch Historical data
+        map_conid_to_req_id = HistoricalVolatility.fetch_historical_data(
+            map_conid_to_list_of_indicators_id,
+            StrategyVariables.bar_size_historical_volatility,
+            StrategyVariables.duration_size_historical_volatility,
+            what_to_show=what_to_show
+        )
+
+        # get the dataframe for the req ID
+        for con_id, req_id in map_conid_to_req_id.items():
+            df = variables.map_req_id_to_historical_data_dataframe[req_id]
+
+            if not df.empty:
+                pass
+                # print(f"Saving the df for conind: {con_id}")
+                # df.to_csv(rf"Temp\{con_id}.csv")
+            else:
+                # print(f"DataFrame is empty")
+                # if the dataframe is empty we can not compute the HV so continue
+                continue
+
+            # Convert the "Time" column to datetime format if it's not already in datetime format
+            df["Time"] = pd.to_datetime(df["Time"])
+
+            # Extract the date in YYYYMMDD format
+            df['Date'] = df['Time'].dt.strftime('%Y%m%d')
+
+            # Get the sorted list of unique dates in YYYYMMDD format
+            unique_dates = sorted(list(set(df['Date'])))
+
+            hv_values = []
+
+            for ind4
+            x in range(StrategyVariables.user_input_lookback_days_historical_volatility):
+                start_date = unique_dates[indx]
+                end_date_indx = min(len(unique_dates)-1, indx + StrategyVariables.user_input_lookback_days_historical_volatility)
+                end_date = unique_dates[end_date_indx]
+
+                # print(f"{day} Day(s) old HV: Lookback/Period 14 Days: Data: {start_date.date()} - {end_date.date()}")
+                filtered_df = df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
+
+                # TODO - Remove
+                # print("HV. ",  start_date, end_date, unique_dates)
+                # print(filtered_df.to_string())
+
+                time.sleep(2)
+                try:
+                    # Calculate the HV for the current day
+                    if not filtered_df.empty:
+                        hv_value = (
+                            HistoricalVolatility.get_hv_calculation_for_each_conid(
+                                con_id, filtered_df
+                            )
+                        )
+                        if hv_value not in ["N/A"]:
+                            hv_values.append(hv_value)
+
+                    # print(f"Day {day} HV: {hv_value}")
+                except Exception as e:
+                    print(e)
+
+            # HV(14D)-Avg(14D)
+            current_hv_value = hv_values[-1]
+
+            hv_14d_avg_14d = sum(hv_values) / len(hv_values)
+            # print("HV_Value Avg14D", hv_14d_avg_14d)
+            # HV(14D)-AvgIV
+
+            HistoricalVolatility.update_hv_calculation(
+                con_id, current_hv_value, hv_14d_avg_14d, map_conid_to_list_of_indicators_id
+            )
+
+    @staticmethod
+    def update_hv_calculation(
+        conid, hv_value, hv_14d_avg_14d, map_conid_to_list_of_indicators_id
+    ):
+        list_of_indicator_id = map_conid_to_list_of_indicators_id[conid]
+
+        values_dict = {
+            "hv": hv_value,
+            "hv_14d_avg_14d": hv_14d_avg_14d,
+        }
+        where_condition = f" WHERE `underlying_conid` = {conid};"
+
+        select_query = SqlQueries.create_update_query(
+            table_name="indicator_table",
+            values_dict=values_dict,
+            where_clause=where_condition,
+        )
+        # Get all the old rows from indicator table
+        res = SqlQueries.execute_update_query(select_query)
+
+        if not res:
+            print(f"HV values not updated in DB", {conid})
+            # return
+
+        for indicator_id in list_of_indicator_id:
+
+            if indicator_id in StrategyVariables.map_indicator_id_to_indicator_object:
+                StrategyVariables.map_indicator_id_to_indicator_object[
+                    indicator_id
+                ].hv = hv_value
+                StrategyVariables.map_indicator_id_to_indicator_object[
+                    indicator_id
+                ].hv_14d_avg_14d = hv_14d_avg_14d
+
+                StrategyVariables.scanner_indicator_table_df.loc[
+                    StrategyVariables.scanner_indicator_table_df["Indicator ID"]
+                    == indicator_id,
+                    "hv",
+                ] = hv_value
+                StrategyVariables.scanner_indicator_table_df.loc[
+                    StrategyVariables.scanner_indicator_table_df["Indicator ID"]
+                    == indicator_id,
+                    "hv_14d_avg_14d",
+                ] = hv_14d_avg_14d
+
+            else:
+                print(f"Indicator object not found for conid: {conid}")
+
+            # print(StrategyVariables.scanner_indicator_table_df.to_string())
+            HistoricalVolatility.scanner_hv_indicator_tab_obj.update_into_indicator_table(
+                StrategyVariables.scanner_indicator_table_df
+            )
