@@ -46,7 +46,7 @@ def get_contract(
     if right is not None:
         contract.right = right
     if multiplier is not None:
-        contract.multiplier = multiplier
+        contract.multiplier = int(multiplier)
     if con_id is not None:
         contract.conId = con_id
     if trading_class is not None:
@@ -77,9 +77,7 @@ def get_contract_details(contract, req_id=None):
 
     # Print to console
     if variables.flag_debug_mode:
-        print(
-            f"Fetching contract details from TWS for contract = {contract}, reqId = {reqId}"
-        )
+        print(f"Fetching contract details from TWS for contract = {contract}, reqId = {reqId}")
 
     # Request contract details
     variables.app.reqContractDetails(reqId, contract)
@@ -148,9 +146,7 @@ async def get_contract_details_async(contract, req_id=None):
 
     # Print to console
     if variables.flag_debug_mode:
-        print(
-            f"Fetching contract details from TWS for contract = {contract}, reqId = {reqId}"
-        )
+        print(f"Fetching contract details from TWS for contract = {contract}, reqId = {reqId}")
 
     # Request contract details
     variables.app.reqContractDetails(reqId, contract)
@@ -197,9 +193,7 @@ async def get_contract_details_async(contract, req_id=None):
 
 
 # Create Combination contract
-def create_combo_contract(
-    symbol, legs_exchange_list, combo_exchange, currency, conid_list, qty_list
-):
+def create_combo_contract(symbol, legs_exchange_list, combo_exchange, currency, conid_list, qty_list):
 
     # Add underlying details
     contract = Contract()
@@ -213,15 +207,11 @@ def create_combo_contract(
     combo_leg_dictionary = {}
 
     # For each leg
-    for number, (conid_num, leg_exchange, qty_num) in enumerate(
-        zip(conid_list, legs_exchange_list, qty_list)
-    ):
+    for number, (conid_num, leg_exchange, qty_num) in enumerate(zip(conid_list, legs_exchange_list, qty_list)):
         combo_leg_dictionary[f"leg{number}"] = ComboLeg()
         combo_leg_dictionary[f"leg{number}"].conId = int(conid_num)
         combo_leg_dictionary[f"leg{number}"].ratio = abs(int(qty_num))
-        combo_leg_dictionary[f"leg{number}"].action = (
-            "SELL" if int(qty_num) < 0 else "BUY"
-        )
+        combo_leg_dictionary[f"leg{number}"].action = "SELL" if int(qty_num) < 0 else "BUY"
         combo_leg_dictionary[f"leg{number}"].exchange = leg_exchange
 
         # Add leg
@@ -229,6 +219,7 @@ def create_combo_contract(
 
     # Return the combo contract
     return contract
+
 
 # Method tog et beta contract
 def get_beta_contract():

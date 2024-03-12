@@ -7,10 +7,7 @@ from tkinter import Scrollbar, ttk
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.option_indicator_tab import OptionIndicator
 from option_combo_scanner.gui.scanner_combination_tab import ScannerCombinationTab
-from option_combo_scanner.gui.order_book_tab import OrderBookTab
-from option_combo_scanner.gui.order_presets_tab import OrderPresetTab
 from option_combo_scanner.gui.scanner_inputs_tab import ScannerInputsTab
-from option_combo_scanner.strategy.zzz_deprc_aryan_scanner import Scanner
 
 logger = CustomLogger.logger
 

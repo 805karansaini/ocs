@@ -1,4 +1,5 @@
 import pandas as pd
+import tabulate
 
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
@@ -32,11 +33,11 @@ class BinarySearchDeltaIV:
         return [ tuple(Strike, Delta, IV)]
         list_of_target_deltas should sorted
         """
+        if right == "Put":
+            list_of_target_deltas = [-1 * _ for _ in list_of_target_deltas]
+
         list_of_all_strikes = list(dataframe_with_current_mkt_data["Strike"])
-        temp = (
-            dataframe_with_current_mkt_data["BID"]
-            + dataframe_with_current_mkt_data["ASK"]
-        ) / 2
+        temp = (dataframe_with_current_mkt_data["Bid"] + dataframe_with_current_mkt_data["Ask"]) / 2
         list_of_all_strike_premium = list(temp)
 
         N = len(list_of_all_strikes)
@@ -57,18 +58,23 @@ class BinarySearchDeltaIV:
                 list_of_calculated_iv,
                 target_delta,
             )
+
+            '''
+            Karan Supressed prints
             print(f"Target Delta: {target_delta}")
-            print(f"Cal Delta: {list_of_calculated_delta}")
-            print(f"Cal IV: {list_of_calculated_iv}")
+            # Create a pandas DataFrame
+            df_temp = pd.DataFrame(
+                {f"Strikes: ": list_of_all_strikes, f"{right} Delta": list_of_calculated_delta, f"{right} IV": list_of_calculated_iv}
+            )
+
+            # Print the DataFrame using tabulate
+            print(tabulate.tabulate(df_temp, headers="keys", tablefmt="psql"))
+            '''
 
         # Cal Delta, Indx computed delta, iv
-        list_of_strike_delta_iv_tuple = [
-            (None, None, None) for _ in list_of_target_deltas
-        ]
+        list_of_strike_delta_iv_tuple = [(None, None, None) for _ in list_of_target_deltas]
 
-        for indx, (strike, delta, iv) in enumerate(
-            zip(list_of_all_strikes, list_of_calculated_delta, list_of_calculated_iv)
-        ):
+        for indx, (strike, delta, iv) in enumerate(zip(list_of_all_strikes, list_of_calculated_delta, list_of_calculated_iv)):
             if delta is not None and iv is not None:
                 for i, target_delta in enumerate(list_of_target_deltas):
                     if list_of_strike_delta_iv_tuple[i] == (None, None, None):
@@ -76,7 +82,7 @@ class BinarySearchDeltaIV:
                     else:
                         old_strike, old_delta, old_iv = list_of_strike_delta_iv_tuple[i]
 
-                        if abs(target_delta - old_delta) <= abs(target_delta - delta):
+                        if abs(target_delta - old_delta) > abs(target_delta - delta):
                             list_of_strike_delta_iv_tuple[i] = (strike, delta, iv)
 
         return list_of_strike_delta_iv_tuple
@@ -92,6 +98,10 @@ class BinarySearchDeltaIV:
         list_of_calculated_iv,
         target_delta,
     ):
+        """
+        Delta is always decreasing
+        """
+
         left = 0
         right = len(list_of_all_strikes) - 1
 
@@ -101,20 +111,17 @@ class BinarySearchDeltaIV:
             strike = list_of_all_strikes[mid]
             market_premium = list_of_all_strike_premium[mid]
             # if value of delta already exists for the given strike, do binary search
-            if (
-                list_of_calculated_delta[mid] is not None
-                and list_of_calculated_delta[mid] == target_delta
-            ):
+            if list_of_calculated_delta[mid] is not None and list_of_calculated_delta[mid] == target_delta:
                 return mid
-            elif (
-                list_of_calculated_delta[mid] is not None
-                and list_of_calculated_delta[mid] < target_delta
-            ):
+            # Move current delta is greater than target delta, we need to decrease the delta
+            # Delta is always decreasing, move to right handside
+            elif list_of_calculated_delta[mid] is not None and list_of_calculated_delta[mid] > target_delta:
                 left = mid + 1
-            elif (
-                list_of_calculated_delta[mid] is not None
-                and list_of_calculated_delta[mid] > target_delta
-            ):
+            # Move current delta is lower than target delta, we need to increase the delta
+            # Delta is always decreasing, move to left handside
+            elif list_of_calculated_delta[mid] is not None and list_of_calculated_delta[mid] < target_delta:
+                right = mid - 1
+            elif list_of_calculated_delta[mid] == float("NaN"):
                 right = mid - 1
             else:
                 # Mid Delta, IV is not computed so compte it

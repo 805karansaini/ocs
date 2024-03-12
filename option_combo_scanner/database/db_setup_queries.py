@@ -79,7 +79,6 @@ query6 = """CREATE TABLE IF NOT EXISTS `legs_table` (
 query7 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
         `indicator_id` INT AUTO_INCREMENT PRIMARY KEY,
         `instrument_id` INT,
-        `conid` VARCHAR(20),
         `underlying_conid` VARCHAR(20),
         `symbol` VARCHAR(15),
         `sec_type` VARCHAR(15), 
@@ -87,6 +86,7 @@ query7 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
         `multiplier` INT,
         `exchange` VARCHAR(20),
         `trading_class` VARCHAR(20),
+
         `hv` VARCHAR(15),
         `iv_d1` VARCHAR(15),
         `iv_d2` VARCHAR(15),
@@ -124,6 +124,63 @@ query7 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
         FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE
     );"""
 
-# TODO ARYAN:  DELTEE all indicators row when instrument is deete
 
+
+
+# TODO exchange
+query7 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
+
+        `indicator_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `instrument_id` INT,
+        `underlying_conid` VARCHAR(20),
+        `symbol` VARCHAR(15),
+        `sec_type` VARCHAR(15), 
+        `expiry` VARCHAR(15), 
+        `multiplier` INT,
+        `exchange` VARCHAR(20),
+        `trading_class` VARCHAR(20),
+
+        `current_underlying_hv_value` VARCHAR(80),
+        `average_underlying_hv_over_n_days` VARCHAR(80),
+        `absoulte_change_in_underlying_over_one_day` VARCHAR(80),
+        `absoulte_change_in_underlying_over_n_days` VARCHAR(80),
+        `percentage_change_in_underlying_over_n_days` VARCHAR(80),
+        
+        `current_iv_d1` VARCHAR(80),
+        `current_iv_d2` VARCHAR(80),
+        `current_avg_iv` VARCHAR(80),
+        `absolute_change_in_avg_iv_since_yesterday` VARCHAR(80),
+        `percentage_change_in_avg_iv_since_yesterday` VARCHAR(80),
+        `avg_iv_over_n_days` VARCHAR(80), 
+
+        `current_rr_d1` VARCHAR(80), 
+        `current_rr_d2` VARCHAR(80), 
+        `percentage_change_in_rr_since_yesterday_d1` VARCHAR(80), 
+        `percentage_change_in_rr_since_yesterday_d2` VARCHAR(80), 
+        `percentage_change_in_rr_since_14_day_d1` VARCHAR(80), 
+        `percentage_change_in_rr_since_14_day_d2` VARCHAR(80), 
+        
+        `max_pain_strike` VARCHAR(80),
+        `min_pain_strike` VARCHAR(80),
+        `oi_support_strike` VARCHAR(80),
+        `oi_resistance_strike` VARCHAR(80),
+
+        `chg_in_call_opt_price_since_yesterday_d1` VARCHAR(80), 
+        `chg_in_call_opt_price_since_yesterday_d2` VARCHAR(80), 
+        `chg_in_put_opt_price_since_yesterday_d1` VARCHAR(80), 
+        `chg_in_put_opt_price_since_yesterday_d2` VARCHAR(80), 
+        
+        `chg_in_call_opt_price_since_nth_day_d1` VARCHAR(80), 
+        `chg_in_call_opt_price_since_nth_day_d2` VARCHAR(80), 
+        `chg_in_put_opt_price_since_nth_day_d1` VARCHAR(80), 
+        `chg_in_put_opt_price_since_nth_day_d2` VARCHAR(80), 
+        
+        `put_call_volume_ratio_current_day` VARCHAR(80),
+        `put_call_volume_ratio_average_over_n_days` VARCHAR(80),
+        `absolute_pc_change_since_yesterday` VARCHAR(80),
+
+        FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE
+    );"""
+
+# TODO ARYAN:  DELTEE all indicators row when instrument is deete
 all_queries = [query2, query3, query4, query5, query6, query7]

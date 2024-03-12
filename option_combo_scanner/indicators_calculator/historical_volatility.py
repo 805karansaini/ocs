@@ -8,11 +8,11 @@ import pandas as pd
 
 from com.variables import variables
 from option_combo_scanner.database.sql_queries import SqlQueries
+from option_combo_scanner.indicators_calculator.helper_indicator import IndicatorHelper
 from option_combo_scanner.indicators_calculator.historical_data_fetcher import HistoricalDataFetcher
 from option_combo_scanner.indicators_calculator.indicator_hv_calculation import calculate_hv
-from option_combo_scanner.strategy.indicator import Indicator
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
-from option_combo_scanner.strategy.zzz_deprc_aryan_scanner import Scanner
+from option_combo_scanner.strategy.utilities import StrategyUtils
 
 
 class HistoricalVolatility:
@@ -70,7 +70,7 @@ class HistoricalVolatility:
                 print(f"Could not compute the H. V. Related value. Exception {e}")
 
         # check if flag for calculating hv for daily candles is true
-        if variables.flag_hv_daily:
+        if StrategyVariables.flag_hv_daily:
 
             # Get dataframe with 1 D candles
             combination_price_dataframe_for_hv = HistoricalVolatility.group_dataframe_by_time_and_create_1d_candle_first_open_last_close(
@@ -89,15 +89,15 @@ class HistoricalVolatility:
             combination_price_dataframe_for_hv,
             avg_price_combo,
         )
+        print(f"HV STD: {historical_volatility_value}")
 
         # Annualized Historical Volatility  (this will be showed in the GUI)
         if True or variables.flag_enable_hv_annualized:
 
             if historical_volatility_value not in ["N/A", None]:
 
-                annualized_historical_volatility_value = historical_volatility_value * math.sqrt(
-                    variables.minutes_in_year / variables.hv_mins_in_candle
-                )
+                # annualized_historical_volatility_value = historical_volatility_value * math.sqrt(variables.minutes_in_year / variables.hv_mins_in_candle)
+                annualized_historical_volatility_value = historical_volatility_value * math.sqrt(255)
 
             else:
 
@@ -162,7 +162,7 @@ class HistoricalVolatility:
         for conid in map_conid_to_list_of_indicators_id:
 
             contract = StrategyVariables.map_con_id_to_contract[conid]
-
+            # print(f"HV Contract: {contract}")
             what_to_show = what_to_show
 
             # Getting req_id
@@ -194,47 +194,22 @@ class HistoricalVolatility:
         return map_conid_to_req_id
 
     @staticmethod
-    def update_hv_calculation(conid, hv_value, hv_14d_avg_14d, map_conid_to_list_of_indicators_id):
+    def update_hv_calculation(conid, map_conid_to_list_of_indicators_id, values_dict):
+        """
+        "current_underlying_hv_value": current_underlying_hv_value,
+        "average_underlying_hv_over_n_days": average_underlying_hv_over_n_days,
+        "absoulte_change_in_underlying_over_n_days": absoulte_change_in_underlying_over_n_days,
+        "percentage_change_in_underlying_over_n_days": percentage_change_in_underlying_over_n_days,
+        """
+        # List of Indicator IDs
         list_of_indicator_id = map_conid_to_list_of_indicators_id[conid]
 
-        values_dict = {
-            "hv": hv_value,
-            "hv_14d_avg_14d": hv_14d_avg_14d,
-        }
-        where_condition = f" WHERE `underlying_conid` = {conid};"
-
-        select_query = SqlQueries.create_update_query(
-            table_name="indicator_table",
-            values_dict=values_dict,
-            where_clause=where_condition,
-        )
-        # Get all the old rows from indicator table
-        res = SqlQueries.execute_update_query(select_query)
-
-        if not res:
-            print(f"HV values not updated in DB", {conid})
-            # return
-
+        # Update the H.V. Value for indicator
         for indicator_id in list_of_indicator_id:
+            # Update value in DB, Object & GUI
+            IndicatorHelper.update_indicator_values_for_indcator_id(indicator_id=indicator_id, values_dict=values_dict)
 
-            if indicator_id in StrategyVariables.map_indicator_id_to_indicator_object:
-                StrategyVariables.map_indicator_id_to_indicator_object[indicator_id].hv = hv_value
-                StrategyVariables.map_indicator_id_to_indicator_object[indicator_id].hv_14d_avg_14d = hv_14d_avg_14d
-
-                StrategyVariables.scanner_indicator_table_df.loc[
-                    StrategyVariables.scanner_indicator_table_df["Indicator ID"] == indicator_id,
-                    "hv",
-                ] = hv_value
-                StrategyVariables.scanner_indicator_table_df.loc[
-                    StrategyVariables.scanner_indicator_table_df["Indicator ID"] == indicator_id,
-                    "hv_14d_avg_14d",
-                ] = hv_14d_avg_14d
-
-            else:
-                print(f"Indicator object not found for conid: {conid}")
-
-            # print(StrategyVariables.scanner_indicator_table_df.to_string())
-            HistoricalVolatility.scanner_hv_indicator_tab_obj.update_into_indicator_table(StrategyVariables.scanner_indicator_table_df)
+        # print(f"Conid: {conid} Updated HV Values")
 
     @staticmethod
     def compute():
@@ -266,7 +241,14 @@ class HistoricalVolatility:
 
             # If Df is empty can not compute the values
             if df.empty:
+                print(f"Unable to get the historical data for HV Calculation: {con_id}")
                 continue
+
+            # if flag is True Save CSV file
+            if StrategyVariables.flag_store_csv_files:
+                folder_name = "HistoricalVol"
+                file_name = rf"{con_id}_complete"
+                StrategyUtils.save_option_combo_scanner_csv_file(df, folder_name, file_name)
 
             # Convert the "Time" column to datetime format if it's not already in datetime format
             df["Time"] = pd.to_datetime(df["Time"])
@@ -278,13 +260,14 @@ class HistoricalVolatility:
             unique_dates = sorted(list(set(df["Date"])))
 
             list_of_hv_values_for_n_days = []
+            current_close_price = df.iloc[-1]["Close"]
 
             # Iterating and computing the HV for each day
             for indx in range(StrategyVariables.user_input_average_historical_volatility_days):
 
                 # Start and End Date
                 start_date = unique_dates[indx]
-                end_date_indx = min(len(unique_dates) - 1, indx + StrategyVariables.user_input_average_historical_volatility_days)
+                end_date_indx = min(len(unique_dates) - 1, indx + StrategyVariables.user_input_average_historical_volatility_days - 1)
                 end_date = unique_dates[end_date_indx]
 
                 # Filter the dataframe
@@ -295,19 +278,89 @@ class HistoricalVolatility:
                     if filtered_df.empty:
                         continue
                     else:
+                        # if flag is True Save CSV file
+                        if StrategyVariables.flag_store_csv_files:
+                            folder_name = rf"HistoricalVol\{con_id}"
+                            file_name = (
+                                rf"{StrategyVariables.user_input_average_historical_volatility_days - indx}_{start_date}_to_{end_date}"
+                            )
+                            StrategyUtils.save_option_combo_scanner_csv_file(df, folder_name, file_name)
+
                         hv_value = HistoricalVolatility.get_hv_calculation_for_each_conid(con_id, filtered_df)
                         if hv_value not in ["N/A", None]:
                             list_of_hv_values_for_n_days.append(hv_value)
                         else:
                             continue
-                    # print(f"Day {day} HV: {hv_value}")
+                    print(f"Day {indx} {start_date} to {end_date} HV: {hv_value}, having con_id: {con_id}")
                 except Exception as e:
                     pass
 
             # Current HV
-            current_hv_value = list_of_hv_values_for_n_days[-1] if len(list_of_hv_values_for_n_days) > 0 else None
+            current_underlying_hv_value = list_of_hv_values_for_n_days[-1] if len(list_of_hv_values_for_n_days) > 0 else None
+            print(f"Current HV value for conid: {con_id},", current_underlying_hv_value)
+
             # Average HV over N-Days
-            average_hv_over_n_days = sum(list_of_hv_values_for_n_days) / len(list_of_hv_values_for_n_days)
+            average_underlying_hv_over_n_days = sum(list_of_hv_values_for_n_days) / len(list_of_hv_values_for_n_days)
+            print(f"Average HV value ove n days for conid: {con_id},", average_underlying_hv_over_n_days)
+            
+            # Calculate Change in underlying
+            n_day_ago_date = 14
+            one_day_ago_date = 1 
+            one_day_ago_date = unique_dates[-one_day_ago_date]
+            n_day_ago_date = unique_dates[-n_day_ago_date]
+
+            # 1_days_ago_close_price = COMPUTE from DF
+            # Filter the DataFrame to get rows where Date matches date_var
+            # If there are multiple rows for the same date, you can choose the first one
+            filtered_df = df[df["Date"] == one_day_ago_date]
+            one_day_ago_close_price = filtered_df["Close"].iloc[0]
+
+            # n_days_ago_close_price = COMPUTE from DF
+            # Filter the DataFrame to get rows where Date matches date_var
+            # If there are multiple rows for the same date, you can choose the first one
+            filtered_df = df[df["Date"] == n_day_ago_date]
+            n_day_ago_close_price = filtered_df["Close"].iloc[0]
+
+            try:
+                absoulte_change_in_underlying_over_one_day = current_close_price - one_day_ago_close_price
+                print(f"Absolte chg in underlying over one day for conid: {con_id},", absoulte_change_in_underlying_over_one_day)
+            except Exception as e:
+                print(f"Exception Absolte chg in underlying over one day for conid {con_id} e: {e}")
+                absoulte_change_in_underlying_over_one_day = None
+
+            try:
+                absoulte_change_in_underlying_over_n_days = current_close_price - n_day_ago_close_price
+                print(f"Absolte chg in underlying ove n days for conid: {con_id},", absoulte_change_in_underlying_over_n_days)
+                percentage_change_in_underlying_over_n_days = ((current_close_price - n_day_ago_close_price) / n_day_ago_close_price) * 100
+            except Exception as e:
+                print(f"Exception Absolte chg in underlying ove n days for conid {con_id} e: {e}")
+                absoulte_change_in_underlying_over_n_days = None
+                percentage_change_in_underlying_over_n_days = None
+
+            values_dict = {
+                "absoulte_change_in_underlying_over_one_day": (
+                    round(absoulte_change_in_underlying_over_one_day, 2)
+                    if absoulte_change_in_underlying_over_one_day
+                    else absoulte_change_in_underlying_over_one_day
+                ),
+                
+                "absoulte_change_in_underlying_over_n_days": (
+                    round(absoulte_change_in_underlying_over_n_days, 2)
+                    if absoulte_change_in_underlying_over_n_days
+                    else absoulte_change_in_underlying_over_n_days
+                ),
+                "percentage_change_in_underlying_over_n_days": (
+                    round(percentage_change_in_underlying_over_n_days, 2)
+                    if percentage_change_in_underlying_over_n_days
+                    else percentage_change_in_underlying_over_n_days
+                ),
+                "current_underlying_hv_value": (
+                    round(current_underlying_hv_value, 2) if current_underlying_hv_value else current_underlying_hv_value
+                ),
+                "average_underlying_hv_over_n_days": (
+                    round(average_underlying_hv_over_n_days, 2) if average_underlying_hv_over_n_days else average_underlying_hv_over_n_days
+                ),
+            }
 
             # Updating the HV and Avg HV ove N-Days for all the indicator having the same underlying
-            HistoricalVolatility.update_hv_calculation(con_id, current_hv_value, average_hv_over_n_days, map_conid_to_list_of_indicators_id)
+            HistoricalVolatility.update_hv_calculation(con_id, map_conid_to_list_of_indicators_id, values_dict)

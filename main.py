@@ -27,9 +27,11 @@ from option_combo_scanner.strategy.utilities import StrategyUtils
 
 logger = CustomLogger.logger
 
+
 # Method to run app
 def run_loop(app):
     app.run()
+
 
 def ask_for_user_confirmation():
     """
@@ -61,6 +63,7 @@ def ask_for_user_confirmation():
 
     return result
 
+
 if __name__ == "__main__":
 
     def run_screen():
@@ -79,7 +82,7 @@ if __name__ == "__main__":
     print("Please Confirm the start mode")
 
     # # Check if the user wants to delete the database
-    flag_start_in_recovery_mode = ask_for_user_confirmation()
+    flag_start_in_recovery_mode =  True # ask_for_user_confirmation()
 
     # Recovery Mode is False, start fresh
     if not flag_start_in_recovery_mode:
@@ -117,20 +120,20 @@ if __name__ == "__main__":
     # TODO - have multi apps later on
     com_variables.cas_app = app
 
-    flag_start_in_recovery_mode = False
+    # flag_start_in_recovery_mode = False
 
-    # Subscribe the account updates
-    app.reqAccountUpdates(True, variables.account_id)
+    # # Subscribe the account updates
+    # app.reqAccountUpdates(True, variables.account_id)
 
-    # Start the app in recovery mode
-    if flag_start_in_recovery_mode:
-        logger.info("Starting the Recovery Mode")
+    # # Start the app in recovery mode
+    # if flag_start_in_recovery_mode:
+    #     logger.info("Starting the Recovery Mode")
 
-        # Run Recovery Mode
-        RecoveryMode.run(module_start_time)
+    #     # Run Recovery Mode
+    #     RecoveryMode.run(module_start_time)
 
-        # Recovery Mode is done, now start the app
-        logger.debug("Completed recovery, starting app")
+    #     # Recovery Mode is done, now start the app
+    #     logger.debug("Completed recovery, starting app")
 
     # Start Screen Now
     screen_thread = threading.Thread(target=run_screen)
@@ -140,7 +143,7 @@ if __name__ == "__main__":
     while not IsScreenRunning.flag_is_screen_running:
         logger.debug("Intializing GUI Screen")
         print("Intializing GUI Screen")
-        time.sleep(0.3)
+        time.sleep(0.5)
     else:
         time.sleep(0.5)
 
@@ -154,59 +157,20 @@ if __name__ == "__main__":
 
     logger.debug("GUI Screen Initialized")
     print("GUI Screen Initialized")
-    
+
     # TODO - Restart later on
-    # # Creating a separate thread
-    # scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
-    # scanner_thread.start()
+    # Creating a separate thread
+    scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
+    scanner_thread.start()
 
     # Creating the Scanner Object
-    # scanner_input = ScannerInputsTab(scanner_object)
+    # scanner_input = ScannerInputsTab(scanners_object)
     # While Screen is open
     while IsScreenRunning.flag_is_screen_running:
-
-        time.sleep(3)
+        time.sleep(5)
         try:
-            pass
-            
             IndicatorCalculation.compute_indicators()
-            # H. V. I. V. --->
-            # time.sleep(2)
-            # print("\nDONE" * 5)
-            # time.sleep(5)
-            # try:
-            #     # Update Order Book from the database
-            #     screen.order_book_tab_object.update_order_book_table()
-            # except Exception as exp:
-            #     logger.error(
-            #         f"Exception in main-update_order_book_table exp: {exp}"
-            #     ) 
-            #
-            # try:
-            #     # Accumulate the latest Prices
-            #     price = Utils.get_prices_for_order_presets()
-            # except Exception as exp:
-            #     logger.error(
-            #         f"Exception in main-get_prices_for_order_presets exp: {exp}"
-            #     )
-            #
-            # try:
-            #     # Get the latest values dataframe for order preset table
-            #     order_preset_table_values_df = (
-            #         Utils.create_latest_order_preset_values_dataframe(price)
-            #     )
-            # except Exception as exp:
-            #     logger.error(
-            #         f"Exception in main-create_latest_order_preset_values_dataframe exp: {exp}"
-            #     )
-            #
-            # try:
-            #     # Update prices in GUI
-            #     screen.order_preset_tab_object.update_order_preset_table(
-            #         order_preset_table_values_df
-            #     )
-            # except Exception as exp:
-            #     logger.error(f"Exception in main-update_order_preset_table exp: {exp}")
+            time.sleep(1800)
 
         except Exception as e:
             logger.error(f"Exception in main screen loop: {e}")
@@ -214,6 +178,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             # tidi tracevacl
 
+        time.sleep(10)
         c += 1
     else:
         screen.flag_stopped_all_task = True
@@ -240,3 +205,19 @@ while count < rep:
     time.sleep(1)
 else:
     os._exit(0)
+
+
+
+
+
+"""
+Ctrl + K + Ctrl + 0: fold all levels (namespace, class, method, and block)
+Ctrl + K + Ctrl + 1: namespace / @Component(For Angular)
+Ctrl + K + Ctrl + 2: class / methods
+Ctrl + K + Ctrl + 3: methods / blocks
+Ctrl + K + Ctrl + 4: blocks / inner blocks
+Ctrl + K + Ctrl + [ or Ctrl + k + ]: current cursor block
+Ctrl + K + Ctrl + j: UnFold
+
+Ctrl + K + Ctrl + ]: UnFold
+"""

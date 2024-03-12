@@ -5,11 +5,12 @@ from option_combo_scanner.gui.order_presets_tab_helper import OrderPresetHelper
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.contracts import get_contract
 from option_combo_scanner.strategy.indicator import Indicator
-from option_combo_scanner.strategy.scanner_config import Config
-from option_combo_scanner.strategy.scanner_config_leg import ConfigLeg
 from option_combo_scanner.strategy.instrument import Instrument
 from option_combo_scanner.strategy.order_preset import OrderPreset
-from option_combo_scanner.strategy.scanner_combination import ScannerCombination
+from option_combo_scanner.strategy.scanner_combination import \
+    ScannerCombination
+from option_combo_scanner.strategy.scanner_config import Config
+from option_combo_scanner.strategy.scanner_config_leg import ConfigLeg
 from option_combo_scanner.strategy.scanner_leg import ScannerLeg
 
 
@@ -168,6 +169,7 @@ class HouseKeepingGUI:
         )
 
         for values_dict in all_indicator:
+
             indicator_obj = Indicator(values_dict)  # Mapping
 
             ### Add in the Indicator table

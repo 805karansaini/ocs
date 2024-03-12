@@ -5,9 +5,7 @@ from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.strategy.manage_mkt_data_sub import ManageMktDataSubscription
 from option_combo_scanner.strategy.monitor_order_preset import MonitorOrderPreset
-from option_combo_scanner.strategy.strategy_variables import (
-    StrategyVariables as strategy_variables,
-)
+from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
 
 logger = CustomLogger.logger
 
@@ -24,23 +22,24 @@ class Instrument:
 
     def map_instrument_id_to_instrument_object(self):
         # Map instrument_id to Instrument Object
-        strategy_variables.map_instrument_id_to_instrument_object[
-            self.instrument_id
-        ] = self
+        strategy_variables.map_instrument_id_to_instrument_object[self.instrument_id] = self
 
     def __str__(self) -> str:
-        return f"Instrument:\n{pprint(vars(self))}"
+        attributes_str = ", ".join([f"{key}={value}" for key, value in vars(self).items()])
+        return f"Instrument: {attributes_str}"
 
-    def change_value(self, key, value):
+    def update_attr_value(self, values_dict):
         """
         Change value of an attribute of this class
         """
-        if hasattr(self, key):
-            setattr(self, key, value)
-        else:
-            logger.error(
-                f"Inside OrdePreset Object change_value UID: {self.unique_id} '{key}' is not an attribute of this class. new value: {value}"
-            )
+        for key, value in values_dict.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+            else:
+                # TODO - ARYAN
+                logger.error(
+                    f"Inside OrdePreset Object change_value UID: {self.unique_id} '{key}' is not an attribute of this class. new value: {value}"
+                )
 
     def get_instrument_tuple_for_gui(
         self,
@@ -63,6 +62,4 @@ class Instrument:
     def remove_from_system(
         self,
     ):
-        del strategy_variables.map_instrument_id_to_instrument_object[
-            self.instrument_id
-        ]
+        del strategy_variables.map_instrument_id_to_instrument_object[self.instrument_id]

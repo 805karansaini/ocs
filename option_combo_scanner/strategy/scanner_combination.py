@@ -1,15 +1,20 @@
+import asyncio
 from pprint import pprint
 
 import pandas as pd
 
+from com.contracts import get_contract
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.manage_mkt_data_sub import ManageMktDataSubscription
-from option_combo_scanner.strategy.monitor_order_preset import MonitorOrderPreset
-from option_combo_scanner.strategy.strategy_variables import (
-    StrategyVariables as strategy_variables,
-)
+from option_combo_scanner.indicators_calculator.market_data_fetcher import \
+    MarketDataFetcher
+from option_combo_scanner.strategy.manage_mkt_data_sub import \
+    ManageMktDataSubscription
+from option_combo_scanner.strategy.monitor_order_preset import \
+    MonitorOrderPreset
+from option_combo_scanner.strategy.strategy_variables import \
+    StrategyVariables as strategy_variables
 
 logger = CustomLogger.logger
 
@@ -27,19 +32,13 @@ class ScannerCombination:
 
         # Case to inf
         try:
-            self.max_loss = (
-                float("-inf") if "inf" in self.max_loss else int(float(self.max_loss))
-            )
+            self.max_loss = float("-inf") if "inf" in self.max_loss else int(float(self.max_loss))
         except Exception as e:
             pass
             # print(f"Error for COmbo ID: ", self.combo_id, "max_loss", self.max_loss)
 
         try:
-            self.max_profit = (
-                float("inf")
-                if "inf" in self.max_profit
-                else int(float(self.max_profit))
-            )
+            self.max_profit = float("inf") if "inf" in self.max_profit else int(float(self.max_profit))
         except Exception as e:
             pass
 
@@ -53,9 +52,7 @@ class ScannerCombination:
 
     def map_combo_id_to_scanner_combination_object(self):
 
-        strategy_variables.map_combo_id_to_scanner_combination_object[
-            self.combo_id
-        ] = self
+        strategy_variables.map_combo_id_to_scanner_combination_object[self.combo_id] = self
 
         # Create a new row data based on the retrieved values
         row = pd.DataFrame(
@@ -82,13 +79,8 @@ class ScannerCombination:
 
         # Remove row from dataframe
         # TODO Check
-        strategy_variables.scanner_combo_table_df = (
-            strategy_variables.scanner_combo_table_df.drop(
-                strategy_variables.scanner_combo_table_df[
-                    strategy_variables.scanner_combo_table_df["Combo ID"]
-                    == self.combo_id
-                ].index
-            )
+        strategy_variables.scanner_combo_table_df = strategy_variables.scanner_combo_table_df.drop(
+            strategy_variables.scanner_combo_table_df[strategy_variables.scanner_combo_table_df["Combo ID"] == self.combo_id].index
         )
 
         del strategy_variables.map_combo_id_to_scanner_combination_object[self.combo_id]
@@ -156,6 +148,212 @@ class ScannerCombination:
 
         return combination_tuple
 
+    def dispaly_combination_impact(
+        self,
+    ):
+
+        combo_id = self.combo_id
+        instrument_id = self.instrument_id
+        try:
+            indicator_id = strategy_variables.map_instrument_to_indicator_id[instrument_id]
+            indicator_obj = strategy_variables.map_indicator_id_to_indicator_object[indicator_id]
+            underlying_conid = indicator_obj.underlying_conid
+        except Exception as e:
+            print(f"Error for Combo ID: {combo_id}, Instrument ID: {instrument_id} Exception: {e}")
+            return None
+
+        # Combo Details
+        symbol = self.symbol
+        sec_type = self.sec_type
+        exchange = self.exchange
+        currency = self.currency
+        opt_expiry_date = self.expiry
+        right = self.right
+        multiplier = self.multiplier
+        trading_class = self.trading_class if self.trading_class not in ["", None] else None
+
+        # Underlying Details
+        if sec_type == "OPT":
+            underlying_sec_type = "STK"
+            underlying_multiplier = 1
+        else:
+            underlying_sec_type = "FUT"
+            underlying_multiplier = int(multiplier)
+
+        # Leg Details
+        list_of_leg_objects = self.list_of_all_leg_objects
+        list_of_leg_strike_action_qty_tuple = [(leg_obj.strike, leg_obj.action, leg_obj.qty) for leg_obj in list_of_leg_objects]
+
+        list_of_option_contracts = []
+
+        # Underlying Contract
+        underlying_contract = get_contract(
+            symbol=symbol,
+            sec_type=underlying_sec_type,
+            exchange=exchange,
+            currency=currency,
+            multiplier=underlying_multiplier,
+            # trading_class=trading_class,
+            con_id=underlying_conid,
+        )
+
+        for strike, action, quantity in list_of_leg_strike_action_qty_tuple:
+            option_contract = get_contract(
+                symbol,
+                sec_type,
+                exchange,
+                currency,
+                opt_expiry_date,
+                strike,
+                right,
+                multiplier,
+                trading_class=trading_class,
+            )
+            list_of_option_contracts.append(option_contract)
+
+        print(underlying_contract)
+        print(list_of_option_contracts)
+
+        list_of_underlying_and_option_contracts = [underlying_contract] + list_of_option_contracts
+        generic_tick_list = ""
+        snapshot = True
+        max_wait_time = 9
+
+        # Fetch Data for all the Contracts
+        list_of_bid_ask_price_tuple = asyncio.run(
+            MarketDataFetcher.get_current_price_for_list_of_contracts_async(list_of_underlying_and_option_contracts, snapshot)
+        )
+
+        list_of_ba_mid = []
+
+        for contract, (
+            bid_price,
+            ask_price,
+        ) in zip(
+            list_of_underlying_and_option_contracts,
+            list_of_bid_ask_price_tuple,
+        ):
+            if bid_price is None or ask_price is None:
+                print(f"bid_price or ask_price is None for contract: {contract}")
+                return
+
+            ba_mid = (bid_price + ask_price) / 2
+            list_of_ba_mid.append(ba_mid)
+
+        # Title for the Scanned Combintation Details
+        title = f"Impact of Combo, Combo ID : {combo_id}"
+
+        underlying_price = list_of_ba_mid[0]
+        list_of_leg_premiums = list_of_ba_mid[1:]
+        list_of_impact_percent = strategy_variables.list_of_percent_for_impact_calcluation
+        impact_values = [
+            opt_expiry_date,
+        ]
+
+        for impact_per in list_of_impact_percent:
+            underlying_price_per_impact = (underlying_price * (100 + impact_per)) / 100
+            combination_payoff = self.get_combination_payoff(
+                list_of_leg_premiums,
+                list_of_leg_strike_action_qty_tuple,
+                underlying_price_per_impact,
+                right,
+                multiplier,
+            )
+            impact_values.append(round(combination_payoff, 2))
+
+        # ALSO we need complete TODOs, not today but on monday - Aryanok
+        # DISPLAY DETAILS of combo
+        impact_columns = ["Date"] + ["{}% Impact".format(int(impact)) for impact in list_of_impact_percent]
+
+        Utils.display_treeview_popup(title, impact_columns, [impact_values])
+
+        return True
+
+    def get_combination_payoff(
+        self,
+        list_of_leg_premiums,
+        list_of_leg_strike_action_qty_tuple,
+        underlying_price,
+        right,
+        multiplier,
+    ):
+        combination_payoff = 0
+        for leg_premium, (leg_strike, leg_action, leg_qty) in zip(list_of_leg_premiums, list_of_leg_strike_action_qty_tuple):
+            leg_payoff = self.option_payoff(
+                leg_strike,
+                right,
+                leg_action,
+                1,
+                underlying_price,
+                int(multiplier),
+                leg_premium,
+            )
+
+            combination_payoff += leg_payoff
+        return combination_payoff
+
+    # Function to calculate the leg wise option payoff
+    def option_payoff(
+        self,
+        option_strike,
+        option_type,
+        buy_or_sell,
+        quantity,
+        underlying_price_expiry,
+        combination_multiplier,
+        leg_premium,
+    ):
+        """
+        option_strike: Strike of the Leg
+        option_type: CALL/PUT
+        buy_or_sell: BUY/SELL
+        quantity: Qty of Leg
+        underlying_price_expiry: Price of option at expiry
+        """
+        payoff = 0
+
+        if option_type == "CALL":
+            if buy_or_sell == "BUY":
+
+                # CALL BUY
+                if underlying_price_expiry >= option_strike:
+                    payoff += quantity * (underlying_price_expiry - option_strike) * combination_multiplier
+                else:
+                    payoff += 0
+
+            else:
+
+                # CALL SELL
+                if underlying_price_expiry >= option_strike:
+                    payoff -= quantity * (underlying_price_expiry - option_strike) * combination_multiplier
+                else:
+                    payoff += 0
+
+        else:
+            if buy_or_sell == "BUY":
+
+                # BUY PUT
+                if underlying_price_expiry >= option_strike:
+                    payoff += 0
+                else:
+                    payoff += quantity * (option_strike - underlying_price_expiry) * combination_multiplier
+
+            else:
+
+                # SELL PUT
+                if underlying_price_expiry >= option_strike:
+                    payoff += 0
+                else:
+                    payoff -= quantity * (option_strike - underlying_price_expiry) * combination_multiplier
+
+        # Consider the Option Premium as well
+        if buy_or_sell == "BUY":
+            payoff -= leg_premium * combination_multiplier
+        else:
+            payoff += leg_premium * combination_multiplier
+
+        return payoff
+
 
 # It is used to show user the combination details in combination tab of screen GUI
 def get_scanner_combination_details_column_and_data_from_combo_object(
@@ -163,9 +361,7 @@ def get_scanner_combination_details_column_and_data_from_combo_object(
 ):
     try:
         # Scanner Combo Object
-        combo_obj = strategy_variables.map_combo_id_to_scanner_combination_object[
-            combo_id
-        ]
+        combo_obj = strategy_variables.map_combo_id_to_scanner_combination_object[combo_id]
 
     except Exception as e:
         # Show error pop up

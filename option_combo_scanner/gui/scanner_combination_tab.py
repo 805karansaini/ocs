@@ -1,8 +1,11 @@
+import asyncio
 import copy
 import datetime
 import pprint
+import threading
 import tkinter as tk
 from tkinter import Scrollbar, messagebox, ttk
+import traceback
 
 import pandas as pd
 
@@ -10,10 +13,11 @@ from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
 from option_combo_scanner.gui.utils import Utils
+from option_combo_scanner.indicators_calculator.market_data_fetcher import \
+    MarketDataFetcher
 from option_combo_scanner.strategy.scanner import Scanner
-from option_combo_scanner.strategy.scanner_combination import (
-    get_scanner_combination_details_column_and_data_from_combo_object,
-)
+from option_combo_scanner.strategy.scanner_combination import \
+    get_scanner_combination_details_column_and_data_from_combo_object
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
 logger = CustomLogger.logger
@@ -321,9 +325,36 @@ class ScannerCombinationTab:
                 label="View Details",
                 command=lambda: self.display_scanner_combination_details(),
             )
-
+            menu.add_command(
+                label="View Impact",
+                command=lambda: threading.Thread(
+                                target=self.create_and_display_impact_popup(),
+                            ).start(),
+            )
             # display the context menu at the location of the mouse cursor
             menu.post(event.x_root, event.y_root)
+
+    def create_and_display_impact_popup(self):
+        # Get the combo_id from table
+        combo_id = self.scanner_combination_table.selection()[0]
+        combo_id = int(combo_id)
+
+        try:
+            # Get the scanner_combination_object
+            res = StrategyVariables.map_combo_id_to_scanner_combination_object[combo_id].dispaly_combination_impact()
+            if res: 
+                return
+        except Exception as e:
+            
+            print(f"Inside GUI:create_and_display_impact_popup Could not get the combo_id value: {combo_id} {e} \n {traceback.print_exc()}")
+            
+        # Error Popup
+        Utils.display_message_popup(
+            "Error",
+            f"Could not able to display the combination impact combo_id: {combo_id}",
+        )
+            
+        
 
     # Method to display scanner combination details
     def display_scanner_combination_details(
@@ -331,7 +362,6 @@ class ScannerCombinationTab:
     ):
 
         try:
-
             # Get the combo_id from table
             combo_id = self.scanner_combination_table.selection()[0]
             combo_id = int(combo_id)
@@ -349,6 +379,9 @@ class ScannerCombinationTab:
 
         if row_data_list is None or columns is None:
             return
+        print(f"ComboImpact Data")
+        print(f"ComboImpact Data", columns)
+        print(f"ComboImpact Data", row_data_list)
 
         # DISPLAY DETAILS of combo
         Utils.display_treeview_popup(title, columns, row_data_list)

@@ -4,6 +4,8 @@ import bisect
 from collections import Counter
 import os
 from com.variables import *
+from option_combo_scanner.strategy.strategy_variables import StrategyVariables
+from option_combo_scanner.strategy.utilities import StrategyUtils
 
 
 # Global function to calculate Historic volatility using all 4 methods
@@ -48,7 +50,7 @@ def calculate_hv(
 
         else:
             print(f"Wrong HV Method was given... Exiting")
-            sys.exit()
+            
     except Exception as e:
 
         if variables.flag_debug_mode:
@@ -70,26 +72,21 @@ def calculate_standard_deviation(
 
     # Calculating standard Deviation
     standard_dev_result = round(
-        np.std(combination_price_dataframe["Candle Return"]) * 100, 2
+        np.std(combination_price_dataframe["Candle Return"]) * 100, 8
     )
+    
+    # TODO - REMOVE IT
+    # Print the DataFrame using tabulate
+    # print(combination_price_dataframe.to_string())
+    # print(tabulate.tabulate(combination_price_dataframe, headers="keys", tablefmt="psql"))
 
     # Save DF to CSV File (HV) Export data-frame to csv file
-    if variables.flag_store_cas_tab_csv_files:
+    # if flag is True Save CSV file
+    if StrategyVariables.flag_store_csv_files:
+        folder_name = "OCS_HV"
+        file_name = rf"Standard deviation_HV_Unique_id_{conid}"
 
-        # if we are calculating the intraday values we want to store CSV File in a sub-folder
-        # Save in HV folder
-        file_path = rf"{variables.cas_tab_csv_file_path}\OCS_HV"
-
-        # Checking if path exists
-        if not os.path.exists(file_path):
-            os.makedirs(file_path)
-
-        # Saving CSV
-        # Saving the CSV file for the combination HV Calculation
-        combination_price_dataframe.to_csv(
-            rf"{file_path}\Standard deviation_HV_Unique_id_{conid}.csv",
-            index=False,
-        )
+        StrategyUtils.save_option_combo_scanner_csv_file(combination_price_dataframe, folder_name, file_name)
 
     # Using standard deviation for relative change among prices
     return standard_dev_result
@@ -190,24 +187,13 @@ def calculate_parkinson_range_without_gaps(
     combination_price_dataframe[
         pv_term_sq_values_column_name
     ] = parkinson_volatility_term_square
+    
+    # If Flag Save OCS Files 
+    if StrategyVariables.flag_store_csv_files:
+        folder_name = "OCS_HV"
+        file_name = rf"parkinson_volatility_HV_Unique_id_{conid}"
 
-    # Save DF to CSV File (HV) Export data-frame to csv file
-    if variables.flag_store_cas_tab_csv_files:
-
-        # if we are calculating the intraday values we want to store CSV File in a sub-folder
-        # Save in HV folder
-        file_path = rf"{variables.cas_tab_csv_file_path}\OCS_HV"
-
-        # Checking if path exists
-        if not os.path.exists(file_path):
-            os.makedirs(file_path)
-
-        # Saving CSV
-        # Saving the CSV file for the combination HV Calculation
-        combination_price_dataframe.to_csv(
-            rf"{file_path}\parkinson_volatility_HV_Unique_id_{conid}.csv",
-            index=False,
-        )
+        StrategyUtils.save_option_combo_scanner_csv_file(combination_price_dataframe, folder_name, file_name)
 
     return parkinson_range_result
 
@@ -302,26 +288,13 @@ def calculate_parkinson_range_with_gaps(
         pv_term_sq_values_column_name,
         parkinson_volatility_term_square,
     )
+    
+    # If Flag Save OCS Files 
+    if StrategyVariables.flag_store_csv_files:
+        folder_name = "OCS_HV"
+        file_name = rf"parkinson_volatility_with_gaps_HV_Unique_id_{conid}"
 
-    # Save DF to CSV File (HV) Export data-frame to csv file
-    if variables.flag_store_cas_tab_csv_files:
-
-        # if we are calculating the intraday values we want to store CSV File in a sub-folder
-        # TODO ARYAN COMMMENT
-        # Save in HV folder
-        file_path = rf"{variables.cas_tab_csv_file_path}\OCS_HV"
-
-        # Checking if path exists
-        if not os.path.exists(file_path):
-            os.makedirs(file_path)
-
-        # Saving CSV
-        # TODO ARYAN COMMMENT
-        # Saving the CSV file for the combination HV Calculation
-        combination_price_dataframe.to_csv(
-            rf"{file_path}\parkinson_volatility_with_gaps_HV_Unique_id_{conid}.csv",
-            index=False,
-        )
+        StrategyUtils.save_option_combo_scanner_csv_file(combination_price_dataframe, folder_name, file_name)
 
     return parkinson_range_result
 
@@ -378,24 +351,13 @@ def calculate_combo_atr(
                 + combo_daily_open_close_df.loc[i, "TR"]
             ) / k
 
-    # Save DF to CSV File (HV)
-    if (variables.flag_store_cas_tab_csv_files) and (
-        atr_type == "Historical Volatility"
-    ):
+    # If Flag Save OCS Files 
+    if StrategyVariables.flag_store_csv_files and atr_type == "Historical Volatility":
+        folder_name = "OCS_HV"
+        file_name = rf"ATR_HV_Unique_id_{conid}"
 
-        # if we are calculating the intraday values we want to store CSV File in a sub-folder
-        # Save in HV folder
-        file_path = rf"{variables.cas_tab_csv_file_path}\OCS_HV"
+        StrategyUtils.save_option_combo_scanner_csv_file(combo_daily_open_close_df, folder_name, file_name)
 
-        # Checking if file path exists
-        if not os.path.exists(file_path):
-            os.makedirs(file_path)
-
-        # Saving CSV
-        # Saving the CSV file for the combination HV Calculation
-        combo_daily_open_close_df.to_csv(
-            rf"{file_path}\OCS_ATR_HV_Unique_id_{conid}.csv", index=False
-        )
 
     # ATR
     try:
@@ -460,25 +422,6 @@ def calculate_combo_atr_for_positive_negative_candles(combo_daily_open_close_df)
                 combo_daily_open_close_df.loc[i - 1, "ATR"] * (k - 1)
                 + combo_daily_open_close_df.loc[i, "TR"]
             ) / k
-
-    # Save DF to CSV File (HV)
-    """if (variables.flag_store_cas_tab_csv_files):
-
-        # Save in HV folder
-        file_path = fr"{variables.cas_tab_csv_file_path}\HV"
-
-        # Checking if file path exists
-        if not os.path.exists(file_path):
-            os.makedirs(file_path)
-
-        # Saving CSV
-        if leg_number == None:
-            # Saving the CSV file for the combination HV Calculation
-            combo_daily_open_close_df.to_csv(fr"{file_path}\ATR_HV_Unique_id_{conid}.csv", index=False)
-        else:
-            # Saving the CSV file for the 'Leg' HV Calculation
-            combo_daily_open_close_df.to_csv(fr"{file_path}\ATR_HV_Unique_id_{conid}_Leg_No_{leg_number}.csv",
-                                             index=False)"""
 
     # ATR
     try:
