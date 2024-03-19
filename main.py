@@ -40,37 +40,6 @@ def run_indicator_thread():
 def run_loop(app):
     app.run()
 
-def ask_for_user_confirmation():
-    """
-    Do the user want to start app in recovery mode?
-    or delete the database and start fresh?
-    """
-    # Create a tkinter root window
-    root = tk.Tk()
-    root.withdraw()
-
-    # Show a messagebox with the confirmation message
-    result = messagebox.askyesno(
-        "Start in Recovery Mode?",
-        "Do you want to start application in 'Recovery Mode'?\n\nClick 'Yes' to start in Recovery Mode, 'No' to clear the database and start fresh.",
-    )
-
-    # Check the user's response
-    if result:
-        # User clicked 'Yes'
-        logger.debug("Recovery mode confirmed.")
-        print("Recovery mode confirmed.")
-    else:
-        # User clicked 'No'
-        logger.debug("Recovery mode canceled.")
-        print("Recovery mode canceled.")
-
-    # Destroy the scroot window
-    root.destroy()
-
-    return result
-
-
 if __name__ == "__main__":
 
     def run_screen():
@@ -84,12 +53,10 @@ if __name__ == "__main__":
         screen.window.mainloop()
 
         logger.debug("main.py run_sceen: Screen Closed")
-
-    logger.debug("Please Confirm the start mode")
-    print("Please Confirm the start mode")
+    
 
     # # Check if the user wants to delete the database
-    flag_start_in_recovery_mode =   ask_for_user_confirmation()
+    flag_start_in_recovery_mode =   StrategyVariables.flag_recovery_mode
 
     # Recovery Mode is False, start fresh
     if not flag_start_in_recovery_mode:

@@ -31,7 +31,6 @@ class StrategyVariables:
     map_instrument_to_indicator_id = {}
     config_object = None
     nextorderId = None
-    hv_look_back_days = 14
 
     ibkr_tws_host = parser.get('USER INPUTS','ibkr_tws_host') 
     ibkr_tws_port = parser.getint('USER INPUTS','ibkr_tws_port')
@@ -41,15 +40,13 @@ class StrategyVariables:
     delta_d1_indicator_input = parser.getfloat('USER INPUTS','delta_d1_indicator_input')
     delta_d2_indicator_input = parser.getfloat('USER INPUTS','delta_d2_indicator_input')
     riskfree_rate1 = parser.getfloat('USER INPUTS','riskfree_rate1')
-    
-    
 
     # For HV # Take candle size from the
-    user_input_bar_size_historical_volatility = 1
     user_input_lookback_days_historical_volatility = parser.getint('USER INPUTS','user_input_lookback_days_historical_volatility')
     user_input_average_historical_volatility_days = parser.getint('USER INPUTS','user_input_average_historical_volatility_days')
     
 
+    user_input_bar_size_historical_volatility = 1
     bar_size_historical_volatility = f"{user_input_bar_size_historical_volatility} hour"
     lookback_days_historical_volatility = f"{user_input_lookback_days_historical_volatility} D"
     duration_size_historical_volatility = (
@@ -57,15 +54,7 @@ class StrategyVariables:
     )
 
     avg_iv_lookback_days = parser.getint('USER INPUTS','avg_iv_lookback_days')
-
-    lookback_input_for_change_in_avg_iv_since_yesterday = 1
-    lookback_input_for_rr_change_since_yesterday = 1
-    lookback_input_for_rr_change_over_n_days = 14
     
-    # For Option Change
-    # bar_size_for_option_change_calculation = parser.getint('USER INPUTS','bar_size_for_option_change_calculation')
-    # bar_size_for_option_change_cal = f"{bar_size_for_option_change_calculation} hour"
-
     # If the flag is False it will calcluate for all put-call strike otherwise for speicfic deltas
     flag_put_call_indicator_based_on_selected_deltas_only = parser.get('USER INPUTS','flag_put_call_indicator_based_on_selected_deltas_only')
 
@@ -79,13 +68,9 @@ class StrategyVariables:
     historical_price_data_bar_size_int = parser.getint('USER INPUTS','historical_price_data_bar_size') 
     historical_price_data_bar_size = f"{historical_price_data_bar_size_int} hours"
 
-    #Max min Pain Flag 
-    flag_drop_empty_oi_rows = True
-    flag_test_print = False
 
     list_of_percent_for_impact_calcluation_str = parser['USER INPUTS']['list_of_percent_for_impact_calcluation'] #sorted(set([2, -2, 5, -5, 10, -10, 20, -20]))
-
-    list_of_percent_for_impact_calcluation = [int(x.strip()) for x in list_of_percent_for_impact_calcluation_str.split(',')]
+    list_of_percent_for_impact_calcluation = [float(x.strip()) for x in list_of_percent_for_impact_calcluation_str.split(',')]
     list_of_percent_for_impact_calcluation = sorted(set(list_of_percent_for_impact_calcluation))
 
     ###########################
@@ -93,7 +78,7 @@ class StrategyVariables:
     ###########################
     flag_force_restart_scanner = False
     rescan_time_in_seconds = parser.getfloat('USER INPUTS','rescan_time_in_seconds')
-    
+    flag_recovery_mode = parser.getboolean('USER INPUTS','flag_recovery_mode')
 
     # Indicator Cache time in seconds for the scanner
     indicator_cache_time_in_seconds = parser.getfloat('USER INPUTS','indicator_cache_time_in_seconds')
@@ -103,8 +88,8 @@ class StrategyVariables:
     min_delta_threshold = 0.009
     max_delta_threshold = 0.990
 
-    flag_store_csv_files = False
-    o_c_s_folder_path = rf"..\OCSFiles"
+    flag_store_csv_files = parser.getboolean('USER INPUTS','flag_store_csv_files')
+    o_c_s_folder_path = rf"{parser.get('USER INPUTS','o_c_s_folder_path')}"
     batch_size = 100
     batch_size_historical_data = 10
 
@@ -209,4 +194,12 @@ class StrategyVariables:
         "underlying_chg_by_put_opt_price_since_nth_day_d1",
         "underlying_chg_by_put_opt_price_since_nth_day_d2",
     ]
+    
+    lookback_input_for_change_in_avg_iv_since_yesterday = 1
+    lookback_input_for_rr_change_since_yesterday = 1
+    lookback_input_for_rr_change_over_n_days = 14
+    hv_look_back_days = 14
 
+    #Max min Pain Flag 
+    flag_drop_empty_oi_rows = True
+    flag_test_print = False

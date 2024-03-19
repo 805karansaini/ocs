@@ -379,9 +379,9 @@ class ScannerCombinationTab:
 
         if row_data_list is None or columns is None:
             return
-        print(f"ComboImpact Data")
-        print(f"ComboImpact Data", columns)
-        print(f"ComboImpact Data", row_data_list)
+        # print(f"ComboImpact Data")
+        # print(f"ComboImpact Data", columns)
+        # print(f"ComboImpact Data", row_data_list)
 
         # DISPLAY DETAILS of combo
         Utils.display_treeview_popup(title, columns, row_data_list)

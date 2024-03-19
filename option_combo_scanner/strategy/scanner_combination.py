@@ -1,5 +1,6 @@
 import asyncio
 from pprint import pprint
+import warnings
 
 import pandas as pd
 
@@ -66,6 +67,7 @@ class ScannerCombination:
         )
 
         # Add Row to dataframe (concat)
+        warnings.filterwarnings("ignore", message="The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*")
         strategy_variables.scanner_combo_table_df = pd.concat(
             [strategy_variables.scanner_combo_table_df, row],
             ignore_index=True,

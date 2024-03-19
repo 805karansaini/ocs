@@ -75,7 +75,7 @@ query6 = """CREATE TABLE IF NOT EXISTS `legs_table` (
         FOREIGN KEY (`combo_id`) REFERENCES `combination_table`(`combo_id`) ON DELETE CASCADE
     );"""
 
-# TODO exchange
+
 query7 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
         `indicator_id` INT AUTO_INCREMENT PRIMARY KEY,
         `instrument_id` INT,

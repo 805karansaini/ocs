@@ -39,16 +39,16 @@ class IndicatorHelper:
 
         """
 
-        print(
-            "IV: trying to get all_exp",
-            symbol,
-            dte,
-            underlying_sec_type,
-            exchange,
-            currency,
-            multiplier,
-            trading_class,
-        )
+        # print(
+        #     "IV: trying to get all_exp",
+        #     symbol,
+        #     dte,
+        #     underlying_sec_type,
+        #     exchange,
+        #     currency,
+        #     multiplier,
+        #     trading_class,
+        # )
 
         # only call once (not for N-DTEs)
         all_fut_expiries = find_nearest_expiry_for_future_given_fut_dte(

@@ -57,16 +57,16 @@ class Scanner:
 
         """
 
-        print(
-            "Scanner: ",
-            symbol,
-            dte,
-            underlying_sec_type,
-            exchange,
-            currency,
-            multiplier,
-            trading_class,
-        )
+        # print(
+        #     "Scanner: ",
+        #     symbol,
+        #     dte,
+        #     underlying_sec_type,
+        #     exchange,
+        #     currency,
+        #     multiplier,
+        #     trading_class,
+        # )
 
         # only call once (not for N-DTEs)
         all_fut_expiries = find_nearest_expiry_for_future_given_fut_dte(
@@ -322,7 +322,7 @@ class Scanner:
                 list_of_indicator_ids_for_deletion.append(indicator_id)
 
         # self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
-        # TODO - ARAYN Delete from DB, GUI, SYSTEM mappign and everthing etc
+        
         if list_of_indicator_ids_for_deletion:
             self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
 

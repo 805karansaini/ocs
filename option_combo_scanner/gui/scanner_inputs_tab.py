@@ -41,6 +41,7 @@ leg_config_table_columns_width = [
     ("Action", 382, "Action"),
     ("MinDelta", 383, "MinDelta"),
     ("MaxDelta", 383, "MaxDelta"),
+
 ]
 
 
@@ -882,7 +883,7 @@ class ScannerInputsTab:
         # Create the leg_
         self.create_leg_config_editable_table()
 
-        # Add Save button outside the table, in the bottom-right corner
+        
 
     def save_config_button_click(self):
 

@@ -4,95 +4,120 @@ Created on 14-Mar-2023
 @author: Karan
 """
 
-from com.enum_input_class import *
 import configparser
+
+from com.enum_input_class import *
+
 
 # Method to map candle size to candle size string
 def get_candle_size(size_string):
 
-    if 'ONE_MIN' in size_string:
+    if "ONE_MIN" in size_string:
 
         return CandleSize.ONE_MIN
-    elif 'TWO_MIN' in size_string:
+    elif "TWO_MIN" in size_string:
 
-        return  CandleSize.TWO_MIN
-    elif 'THREE_MIN' in size_string:
+        return CandleSize.TWO_MIN
+    elif "THREE_MIN" in size_string:
 
         return CandleSize.THREE_MIN
-    elif 'FIVE_MIN' in size_string:
+    elif "FIVE_MIN" in size_string:
 
         return CandleSize.FIVE_MIN
-    elif 'TEN_MIN' in size_string:
+    elif "TEN_MIN" in size_string:
 
         return CandleSize.TEN_MIN
-    elif 'FIFTEEN_MIN' in size_string:
+    elif "FIFTEEN_MIN" in size_string:
 
         return CandleSize.FIFTEEN_MIN
-    elif 'TWENTY_MIN' in size_string:
+    elif "TWENTY_MIN" in size_string:
 
         return CandleSize.TWENTY_MIN
-    elif 'THIRTY_MIN' in size_string:
+    elif "THIRTY_MIN" in size_string:
 
         return CandleSize.THIRTY_MIN
-    elif 'ONE_HOUR' in size_string:
+    elif "ONE_HOUR" in size_string:
 
         return CandleSize.ONE_HOUR
-    elif 'TWO_HOUR' in size_string:
+    elif "TWO_HOUR" in size_string:
 
         return CandleSize.TWO_HOUR
-    elif 'THREE_HOUR' in size_string:
+    elif "THREE_HOUR" in size_string:
 
         return CandleSize.THREE_HOUR
 
     else:
-        return  CandleSize.FOUR_HOUR
+        return CandleSize.FOUR_HOUR
+
 
 # Map HV method to HV method string
 def get_hv_method(method_str):
 
-    if method_str == 'STANDARD_DEVIATION':
+    if method_str == "STANDARD_DEVIATION":
 
         return HVMethod.STANDARD_DEVIATION
 
-    elif method_str == 'PARKINSON_WITH_GAP':
+    elif method_str == "PARKINSON_WITH_GAP":
 
         return HVMethod.PARKINSON_WITH_GAP
 
-    elif method_str == 'PARKINSON_WITHOUT_GAP':
+    elif method_str == "PARKINSON_WITHOUT_GAP":
 
-        return  HVMethod.PARKINSON_WITHOUT_GAP
+        return HVMethod.PARKINSON_WITHOUT_GAP
 
     else:
 
         return HVMethod.NATR
 
+
 class UserInputs(object):
 
-
     parser = configparser.ConfigParser()
-    parser.read('user_inputs.ini')
+    parser.read("option_scanner_user_inputs.ini")
 
-
+    flag_debug_mode = parser.getboolean("USER INPUTS", "flag_debug_mode")
+    target_timezone = parser.get("TimeZone", "target_timezone")
 
     # IBKR TWS params
-    ibkr_tws_host = None #parser.get('USER INPUTS','ibkr_tws_host')  # Karan-Office PC "25.15.182.17"
-    ibkr_tws_port = None #parser.getint('USER INPUTS','ibkr_tws_port')  # Value: Live A/C -> 7496, Paper A/C -> 7497
-    ibkr_tws_connection_id = 12123
-    ibkr_tws_connection_id_for_cas = 123531
-    ibkr_account_number = "DU6484447"
-    flag_recovery_mode = False
+    ibkr_tws_host = parser.get("USER INPUTS", "ibkr_tws_host")  # Karan-Office PC "25.15.182.17"
+    ibkr_tws_port = parser.getint("USER INPUTS", "ibkr_tws_port")  # Value: Live A/C -> 7496, Paper A/C -> 7497
+    ibkr_tws_connection_id = parser.getint("USER INPUTS", "ibkr_tws_connection_id")
+    ibkr_tws_connection_id_for_cas = parser.getint("USER INPUTS", "ibkr_tws_connection_id_for_cas")
+    ibkr_account_number = parser.get("USER INPUTS", "ibkr_account_number")
+
+    # Historical Volatility Method
+    # Methods available to calculate historic volatility(HV) is given as below
+    hv_method = get_hv_method(parser.get("USER INPUTS", "hv_method"))
+    # STANDARD_DEVIATION, PARKINSON_WITH_GAP, PARKINSON_WITHOUT_GAP, NATR
+
+    stk_currency = parser.get("USER INPUTS", "stk_currency")
+    opt_currency = parser.get("USER INPUTS", "opt_currency")
+    fut_currency = parser.get("USER INPUTS", "fut_currency")
+    fop_currency = parser.get("USER INPUTS", "stk_currency")
+    stk_exchange = parser.get("USER INPUTS", "stk_currency")
+    opt_exchange = parser.get("USER INPUTS", "opt_exchange")
+    fut_exchange = parser.get("USER INPUTS", "fut_exchange")
+    fop_exchange = parser.get("USER INPUTS", "fop_exchange")
+
+    opt_lot_size = parser.getint("USER INPUTS", "opt_lot_size")
+    fut_lot_size = parser.getint("USER INPUTS", "fut_lot_size")
+    fop_lot_size = parser.getint("USER INPUTS", "fop_lot_size")
+
+    ######################
+    # Bottom Variables as not used in option combo scanner
+    # DO NOT CHANGE ANY THING Below it
+    ######################
+    flag_recovery_mode = True
     flag_enable_hv_annualized = True
     flag_identification_print = False
     flag_simulate_prices = False
-    flag_debug_mode = False
     flag_store_cas_tab_csv_files = True
     flag_cache_data = True
-    flag_hv_daily = False
+    flag_hv_daily = True
     flag_since_start_of_day_candles_for_relative_fields = True
     flag_enable_rm_account_rules = True
     flag_enable_trade_level_rm = True
     flag_use_execution_engine = False
-    target_timezone = "Israel"
     account_parameter_for_order_quantity = "SMA"
     flag_series_condition = "AND"
     limit_price_selection_for_execution_engine = "Limit_Bid"
@@ -103,23 +128,19 @@ class UserInputs(object):
     ib_algo_priority = "Patient"
     max_wait_time_for_order_fill = 120
 
-
     # Number of days for which the values in CAS(Conditional Add or Switch) are computed # TODO - rename this
     cas_number_of_days = 20
     atr_number_of_days = 14
     relative_atr_in_range_number_of_buckets = 2
     flag_relative_atr_in_range = "Close In Range"
 
-
-    # Historical Volatility Method
-    hv_method = (
-        get_hv_method("STANDARD_DEVIATION")
-    )  # Methods available to calculate historic volatility(HV) is given as below
-    # STANDARD_DEVIATION, PARKINSON_WITH_GAP, PARKINSON_WITHOUT_GAP, NATR
-
+    ######################
+    # Bottom Variables as not used in option combo scanner
+    # DO NOT CHANGE ANY THING Below it
+    ######################
     # Duration size and Bar size values for Historical Volatility related data
     hv_look_back_days = 12
-    hv_candle_size = get_candle_size('ONE_HOUR')
+    hv_candle_size = get_candle_size("ONE_HOUR")
     #  ONE_MIN, TWO_MIN, THREE_MIN, FIVE_MIN, TEN_MIN , FIFTEEN_MIN, TWENTY_MIN, THIRTY_MIN
     #  ONE_HOUR, TWO_HOUR, THREE_HOUR, FOUR_HOUR,
 
@@ -135,6 +156,10 @@ class UserInputs(object):
     # lookback mins for relative atr derivative
     relative_atr_derivation_lookback_mins = 15
 
+    ######################
+    # Bottom Variables as not used in option combo scanner
+    # DO NOT CHANGE ANY THING Below it
+    ######################
     # candle size for volume magnet
     volume_magnet_candle_size = get_candle_size("TWO_HOUR")
 
@@ -155,6 +180,10 @@ class UserInputs(object):
     #  ONE_MIN, TWO_MIN, THREE_MIN, FIVE_MIN, TEN_MIN , FIFTEEN_MIN, TWENTY_MIN, THIRTY_MIN
     #  ONE_HOUR, TWO_HOUR, THREE_HOUR, FOUR_HOUR,
 
+    ######################
+    # Bottom Variables as not used in option combo scanner
+    # DO NOT CHANGE ANY THING Below it
+    ######################
     # Lookback days for last n minutes fields
     last_n_minutes_fields_lookback_days = 10
 
@@ -166,6 +195,10 @@ class UserInputs(object):
     #  ONE_MIN, TWO_MIN, THREE_MIN, FIVE_MIN, TEN_MIN , FIFTEEN_MIN, TWENTY_MIN, THIRTY_MIN
     #  ONE_HOUR, TWO_HOUR, THREE_HOUR, FOUR_HOUR,
 
+    ######################
+    # Bottom Variables as not used in option combo scanner
+    # DO NOT CHANGE ANY THING Below it
+    ######################
     # range to calualte support adn resistance
     support_resistance_range_percent = 0.05
     cas_long_term_fields_update_interval = 600
@@ -185,6 +218,10 @@ class UserInputs(object):
     bid_ask_spread_threshold_trade_rm_check = 0.01
     bid_ask_qty_threshold_trade_rm_check = 1
 
+    ######################
+    # Bottom Variables as not used in option combo scanner
+    # DO NOT CHANGE ANY THING Below it
+    ######################
     # candle size for order parameter candle
     order_parameter_candle_candle_size = get_candle_size("TWO_HOUR")
     #  ONE_MIN, TWO_MIN, THREE_MIN, FIVE_MIN, TEN_MIN , FIFTEEN_MIN, TWENTY_MIN, THIRTY_MIN
@@ -202,25 +239,22 @@ class UserInputs(object):
     # flag for trailing stop loss premium order
     flag_trailing_stop_loss_premium = "Both"
 
+    ######################
+    # Bottom Variables as not used in option combo scanner
+    # DO NOT CHANGE ANY THING Below it
+    ######################
     # File path where CAS Table Values will be stored in CSV Format, so user can verify the accuracy of the values in CAS Table
     cas_tab_csv_file_path = "..\\ExecutionData"
     custom_columns_json_csv_file_path = "..\\CustomColumnJSON"
     buy_sell_csv = "..\\buy_sell_csv.csv"
-    stk_currency = "USD"
-    opt_currency = "USD"
-    fut_currency = "USD"
-    fop_currency = "USD"
-    stk_exchange = "SMART"
-    opt_exchange = "SMART"
-    fut_exchange = "CME"
-    fop_exchange = "CME"
-    opt_lot_size = 100
-    fut_lot_size = 50
-    fop_lot_size = 50
-        #########################################
+
+    #########################################
     # The following params will not change
     #########################################
-
+    ######################
+    # Bottom Variables as not used in option combo scanner
+    # DO NOT CHANGE ANY THING Below it
+    ######################
     # SQL params
     sql_host = "localhost"
     sql_user = "root"
@@ -228,16 +262,15 @@ class UserInputs(object):
 
     # Active database
     active_sql_db_name = "option_combo_scanner_db"
-    active_sql_connection_string = (
-        "mysql+pymysql://" + sql_user + "@" + sql_host + "/" + active_sql_db_name
-    )
+    active_sql_connection_string = "mysql+pymysql://" + sql_user + "@" + sql_host + "/" + active_sql_db_name
 
     # Archive databse
     archive_sql_db_name = "archive_multileg_strat"
-    archive_sql_connection_string = (
-        "mysql+pymysql://" + sql_user + "@" + sql_host + "/" + archive_sql_db_name
-    )
-
+    archive_sql_connection_string = "mysql+pymysql://" + sql_user + "@" + sql_host + "/" + archive_sql_db_name
+    ######################
+    # Bottom Variables as not used in option combo scanner
+    # DO NOT CHANGE ANY THING Below it
+    ######################
     # Tables name - Common for both database
     sql_table_combination = "combination"
     sql_table_combination_status = "combination_status"
