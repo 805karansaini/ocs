@@ -52,24 +52,13 @@ class IndicatorCalculation:
 
         # All the indicator rows are unique data needs to be fethced for all, can not reduce the requests call
         local_map_indicator_id_to_indicator_object = copy.deepcopy(StrategyVariables.map_indicator_id_to_indicator_object)
-        # priority_queue = [(-1, indicator_id) for indicator_id in local_map_indicator_id_to_indicator_object.keys()]
-        # heapq.heapify(priority_queue)
-        # while priority_queue:
-        #     _, indicator_id = heapq.heappop(priority_queue)
-        #     indicator_object = StrategyVariables.map_indicator_id_to_indicator_object.get(indicator_id)
             
         
-
         # Compute the value for each indicator id
         for (
             indicator_id,
             indicator_object,
         ) in local_map_indicator_id_to_indicator_object.items():
-
-
-            # print("")
-            # print("")
-            # print(f"Indicator ID: {indicator_id}")
 
             # if the indictor was removed
             if indicator_id not in StrategyVariables.map_indicator_id_to_indicator_object:
@@ -117,7 +106,7 @@ class IndicatorCalculation:
 
             try:
                 if flag_realtime_indicators:
-                    # TODO- Remame
+                
                     list_of_call_strike, list_of_put_strikes = ImpliedVolatility.compute(
                         indicator_object,
                         symbol,
@@ -142,7 +131,7 @@ class IndicatorCalculation:
                             print(f"List Of List of Call {list_of_call_strike} and Put {list_of_put_strikes}")
 
                     if StrategyVariables.flag_put_call_indicator_based_on_selected_deltas_only == True:
-                        # TODO- Remame
+                        
                         PutCallVol.compute(
                             indicator_object,
                             symbol,
@@ -199,7 +188,7 @@ class IndicatorCalculation:
         flag_realtime_indicators = True
         IndicatorCalculation.calculate_realtime_market_data_based_indicators(flag_realtime_indicators=flag_realtime_indicators)
 
-        # # # ASDSALKNDLKASNDLKASNLKASNDKNASD
+        
         if not StrategyVariables.flag_put_call_indicator_based_on_selected_deltas_only:
             flag_realtime_indicators = False
             IndicatorCalculation.calculate_realtime_market_data_based_indicators(flag_realtime_indicators=flag_realtime_indicators)
