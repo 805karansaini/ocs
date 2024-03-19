@@ -5,18 +5,18 @@ import pytz
 
 # Read the config file
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("option_scanner_user_inputs.ini")
 
 dbconfig = config["Database"]
-tws_config = config["TWS"]
+# tws_config = config["TWS"]
 timezone_config = config["TimeZone"]
 
 
 class Variables(object):
     app = None
 
-    account_id = tws_config["account"]
-    user_trading_account = account_id
+    # account_id = tws_config["account"]
+    # user_trading_account = account_id
 
     map_order_id_to_order_status = {}
     map_wheel_id_to_wheel_obj = {}
@@ -33,10 +33,10 @@ class Variables(object):
     max_wait_time_for_executions = 60
 
     # TWS Settings
-    tws_host = tws_config["host"]
-    tws_port = int(tws_config["port"])
-    tws_client_id = int(tws_config["client_id"])
-    user_trading_account = tws_config["account"]
+    # tws_host = tws_config["host"]
+    # tws_port = int(tws_config["port"])
+    # tws_client_id = int(tws_config["client_id"])
+    # user_trading_account = tws_config["account"]
 
     # Time Zone
     target_timezone = timezone_config["target_timezone"]

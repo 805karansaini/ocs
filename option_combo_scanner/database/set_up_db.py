@@ -13,7 +13,7 @@ from option_combo_scanner.database.db_setup_queries import all_queries, query0, 
 logger = CustomLogger.logger
 # Read the config file
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("option_scanner_user_inputs.ini")
 
 dbconfig = config["Database"]
 timezone_config = config["TimeZone"]

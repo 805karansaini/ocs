@@ -18,8 +18,6 @@ from option_combo_scanner.ibapi_ao.recovery_mode import RecoveryMode
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.indicators_calculator.indicator_calculation import \
     IndicatorCalculation
-from option_combo_scanner.strategy.monitor_order_preset import \
-    MonitorOrderPreset
 from option_combo_scanner.strategy.scanner import (Scanner,
                                                    run_option_combo_scanner)
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
@@ -27,11 +25,20 @@ from option_combo_scanner.strategy.utilities import StrategyUtils
 
 logger = CustomLogger.logger
 
+def run_indicator_thread():
+    # While Screen is open
+    while True:
+        time.sleep(20)
+        try:
+            IndicatorCalculation.compute_indicators(), 
+        except Exception as e:
+            logger.error(f"Exception in indicator thread loop: {e}")
+            print(f"Exception in indicator thread loop: {e}")
+            traceback.print_exc()
 
 # Method to run app
 def run_loop(app):
     app.run()
-
 
 def ask_for_user_confirmation():
     """
@@ -82,7 +89,7 @@ if __name__ == "__main__":
     print("Please Confirm the start mode")
 
     # # Check if the user wants to delete the database
-    flag_start_in_recovery_mode =  True # ask_for_user_confirmation()
+    flag_start_in_recovery_mode =   ask_for_user_confirmation()
 
     # Recovery Mode is False, start fresh
     if not flag_start_in_recovery_mode:
@@ -94,9 +101,9 @@ if __name__ == "__main__":
     # Main App TWS Object
     app = IBapi()
     app.connect(
-        com_variables.ibkr_tws_host,
-        com_variables.ibkr_tws_port,
-        com_variables.ibkr_tws_connection_id,
+        StrategyVariables.ibkr_tws_host,
+        StrategyVariables.ibkr_tws_port,
+        StrategyVariables.ibkr_tws_connection_id,
     )
 
     # Setting it to None for Main APP
@@ -149,7 +156,7 @@ if __name__ == "__main__":
 
     # StrategyUtils.update_the_values_for_order_preset_table()
 
-    monitor_order_preset_obj = MonitorOrderPreset()
+    # monitor_order_preset_obj = MonitorOrderPreset()
 
     StrategyVariables.screen = screen
 
@@ -163,22 +170,23 @@ if __name__ == "__main__":
     scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
     scanner_thread.start()
 
+    indicator_thread = threading.Thread(target=run_indicator_thread, daemon=True)
+    indicator_thread.start()
+        
     # Creating the Scanner Object
     # scanner_input = ScannerInputsTab(scanners_object)
     # While Screen is open
     while IsScreenRunning.flag_is_screen_running:
-        time.sleep(5)
+        time.sleep(1)
         try:
-            IndicatorCalculation.compute_indicators()
-            time.sleep(1800)
-
+            # IndicatorCalculation.compute_indicators(), 
+            pass
         except Exception as e:
             logger.error(f"Exception in main screen loop: {e}")
             print(f"Exception in main screen loop: {e}")
             traceback.print_exc()
             # tidi tracevacl
 
-        time.sleep(10)
         c += 1
     else:
         screen.flag_stopped_all_task = True

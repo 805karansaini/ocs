@@ -2,7 +2,7 @@ import configparser
 
 # Read the config file
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("option_scanner_user_inputs.ini")
 
 dbconfig = config["Database"]
 

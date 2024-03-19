@@ -5,7 +5,7 @@ import os
 
 # Read the config file
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("option_scanner_user_inputs.ini")
 
 # Settings from config file
 logging_level = config["Logging"]["logging_level"]

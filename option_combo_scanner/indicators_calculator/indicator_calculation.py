@@ -1,4 +1,5 @@
 import copy
+import heapq
 import traceback
 
 from option_combo_scanner.indicators_calculator.helper_indicator import \
@@ -46,10 +47,17 @@ class IndicatorCalculation:
             push in some other heap which is in variable
             heapq.heappush(Orignal_heap, (-1, indicator_id))
             # Compute Indicator for indicator_id
+
         '''
 
         # All the indicator rows are unique data needs to be fethced for all, can not reduce the requests call
         local_map_indicator_id_to_indicator_object = copy.deepcopy(StrategyVariables.map_indicator_id_to_indicator_object)
+        # priority_queue = [(-1, indicator_id) for indicator_id in local_map_indicator_id_to_indicator_object.keys()]
+        # heapq.heapify(priority_queue)
+        # while priority_queue:
+        #     _, indicator_id = heapq.heappop(priority_queue)
+        #     indicator_object = StrategyVariables.map_indicator_id_to_indicator_object.get(indicator_id)
+            
         
 
         # Compute the value for each indicator id
@@ -59,14 +67,14 @@ class IndicatorCalculation:
         ) in local_map_indicator_id_to_indicator_object.items():
 
 
-            print("")
-            print("")
-            print(f"Indicator ID: {indicator_id}")
+            # print("")
+            # print("")
+            # print(f"Indicator ID: {indicator_id}")
 
             # if the indictor was removed
             if indicator_id not in StrategyVariables.map_indicator_id_to_indicator_object:
                 print(
-                    f"Inside calculate_realtime_market_data_based_indicators could not find indicator id: {indicator_id} with {indicator_object} "
+                    f"Inside calculate_realtime_market_data_based_indicators could not find indicator id: {indicator_id}"
                 )
                 continue
 
@@ -130,7 +138,8 @@ class IndicatorCalculation:
                         continue
                     else:
                         print(f"Inside calculate_realtime_market_data_based_indicators")
-                        print(f"List Of List of Call {list_of_call_strike} and Put {list_of_put_strikes}")
+                        if StrategyVariables.flag_test_print:
+                            print(f"List Of List of Call {list_of_call_strike} and Put {list_of_put_strikes}")
 
                     if StrategyVariables.flag_put_call_indicator_based_on_selected_deltas_only == True:
                         # TODO- Remame
@@ -191,6 +200,6 @@ class IndicatorCalculation:
         IndicatorCalculation.calculate_realtime_market_data_based_indicators(flag_realtime_indicators=flag_realtime_indicators)
 
         # # # ASDSALKNDLKASNDLKASNLKASNDKNASD
-        # if not StrategyVariables.flag_put_call_indicator_based_on_selected_deltas_only:
-        #     flag_realtime_indicators = False
-        #     IndicatorCalculation.calculate_realtime_market_data_based_indicators(flag_realtime_indicators=flag_realtime_indicators)
+        if not StrategyVariables.flag_put_call_indicator_based_on_selected_deltas_only:
+            flag_realtime_indicators = False
+            IndicatorCalculation.calculate_realtime_market_data_based_indicators(flag_realtime_indicators=flag_realtime_indicators)

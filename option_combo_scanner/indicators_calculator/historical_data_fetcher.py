@@ -92,7 +92,7 @@ class HistoricalDataFetcher:
 
         for indx, (contract_batch, duration_batch) in enumerate(zip(contract_batches, duration_batches)):
             # TODO - REMOVE
-            print(f"Fetching Historical data for batch: {indx + 1}/{len(contract_batches)}")
+            # print(f"Fetching Historical data for batch: {indx + 1}/{len(contract_batches)}")
 
             for indx, (contract, duration_size) in enumerate(zip(contract_batch, duration_batch)):
 

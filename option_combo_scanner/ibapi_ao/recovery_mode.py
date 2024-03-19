@@ -11,7 +11,7 @@ from option_combo_scanner.ibapi_ao.variables import Variables as variables
 
 # Read the config file
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("option_scanner_user_inputs.ini")
 
 timezone_config = config["TimeZone"]
 target_timezone = timezone_config["target_timezone"]

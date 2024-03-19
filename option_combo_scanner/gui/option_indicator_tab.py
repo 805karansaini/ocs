@@ -8,7 +8,6 @@ from tkinter import Scrollbar, messagebox, ttk
 from option_combo_scanner.database.set_up_db import SetupDatabase
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
-from option_combo_scanner.gui.order_presets_tab_helper import OrderPresetHelper
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.contracts import (
     get_contract, get_contract_details_async)
@@ -18,17 +17,17 @@ from option_combo_scanner.indicators_calculator.implied_volatility import \
     ImpliedVolatility
 from option_combo_scanner.indicators_calculator.put_call_vol import PutCallVol
 from option_combo_scanner.strategy.indicator import Indicator
-from option_combo_scanner.strategy.order_preset import OrderPreset
+
 from option_combo_scanner.strategy.scanner import Scanner
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 from option_combo_scanner.strategy.utilities import StrategyUtils
 
 # Read the config file
-config = configparser.ConfigParser()
-config.read("config.ini")
+# config = configparser.ConfigParser()
+# config.read("config.ini")
 
-tws_config = config["TWS"]
-ACCOUNT_ID = tws_config["account"]
+# tws_config = config["TWS"]
+# ACCOUNT_ID = tws_config["account"]
 
 # Name, Width, Heading
 
@@ -39,44 +38,44 @@ option_indicator_table_columns_width = [
     ("sec_type", 165, "Sec Type"),
     ("expiry", 165, "Expiry"),
 
-    ("current_underlying_hv_value", 165, "HV"),
-    ("average_underlying_hv_over_n_days", 165, "HV(14D)-Avg(14D)"),
-    ("absoulte_change_in_underlying_over_n_days", 165, "Abs Chg Under-(N)"),
-    ("percentage_change_in_underlying_over_n_days", 165, "%Chg Under-(N)"),
-    ("current_hv_minus_iv", 165, "HV - IV"),
-    ("current_iv_d1", 165, "IV(D1)"),
-    ("current_iv_d2", 165, "IV(D2)"),
-    ("current_avg_iv", 165, "Avg(IV)"),
-    ("absolute_change_in_avg_iv_since_yesterday", 165, "Abs Chg Avg(IV)(1D)"),
-    ("percentage_change_in_avg_iv_since_yesterday", 165, "%Chg Avg(IV)(1D)"),
+    ("current_underlying_hv_value", 165, f"HV({StrategyVariables.user_input_lookback_days_historical_volatility})"),
+    ("average_underlying_hv_over_n_days", 165, f"Avg(HV({StrategyVariables.user_input_lookback_days_historical_volatility}),{StrategyVariables.user_input_average_historical_volatility_days})"),
+    ("absoulte_change_in_underlying_over_n_days", 165, f"Chg(Und,{StrategyVariables.user_input_average_historical_volatility_days})"),
+    ("percentage_change_in_underlying_over_n_days", 165, f"%Chg(Und,{StrategyVariables.user_input_average_historical_volatility_days})"),
+    ("current_hv_minus_iv", 165, f"HV({StrategyVariables.user_input_lookback_days_historical_volatility}) - IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input})"),
+    ("current_iv_d1", 165, f"IV({StrategyVariables.delta_d1_indicator_input})"),
+    ("current_iv_d2", 165, f"IV({StrategyVariables.delta_d2_indicator_input})"),
+    ("current_avg_iv", 165, f"IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input})"),
+    ("absolute_change_in_avg_iv_since_yesterday", 165, f"Chg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_change_in_avg_iv_since_yesterday})"),
+    ("percentage_change_in_avg_iv_since_yesterday", 165, f"%Chg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_change_in_avg_iv_since_yesterday})"),
     
-    ("avg_iv_over_n_days", 165, "Avg IV-Avg(14D)"),
-    ("current_rr_d1", 165, "RR(D1)"),
-    ("current_rr_d2", 165, "RR(D2)"),
-    ("percentage_change_in_rr_since_yesterday_d1", 165, "RR(D1)-Chg(1D)"),
-    ("percentage_change_in_rr_since_yesterday_d2", 165, "RR(D2)-Chg(1D)"),
-    ("percentage_change_in_rr_since_14_day_d1", 165, "RR(D1)-Chg(14D)"),
-    ("percentage_change_in_rr_since_14_day_d2", 165, "RR(D2)-Chg(14D)"),
+    ("avg_iv_over_n_days", 165, f"Avg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.avg_iv_lookback_days})"),
+    ("current_rr_d1", 165, f"RR({StrategyVariables.delta_d1_indicator_input})"),
+    ("current_rr_d2", 165, f"RR({StrategyVariables.delta_d2_indicator_input})"),
+    ("percentage_change_in_rr_since_yesterday_d1", 165, f"Chg(RR({StrategyVariables.delta_d1_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_since_yesterday})"),
+    ("percentage_change_in_rr_since_yesterday_d2", 165, f"Chg(RR({StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_since_yesterday})"),
+    ("percentage_change_in_rr_since_14_day_d1", 165, f"Chg(RR({StrategyVariables.delta_d1_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_over_n_days})"),
+    ("percentage_change_in_rr_since_14_day_d2", 165, f"Chg(RR({StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_over_n_days})"),
     ("max_pain_strike", 165, "Max Pain"),
     ("min_pain_strike", 165, "Min Pain"),
     ("oi_support_strike", 165, "OI Support"),
     ("oi_resistance_strike", 165, "OI Resistance"),
     
-    ("put_call_volume_ratio_current_day", 165, "PC Ratio Current"),
-    ("put_call_volume_ratio_average_over_n_days", 165, "PC Ratio-Avg-(14D)"),
-    ("absolute_pc_change_since_yesterday", 165, "Abs PC Change(1D)"),
+    ("put_call_volume_ratio_current_day", 165, "PCR"),
+    ("put_call_volume_ratio_average_over_n_days", 165, f"Avg(PCR,{StrategyVariables.user_input_lookback_days_for_pcr})"),
+    ("absolute_pc_change_since_yesterday", 165, "Chg(PCR,1)"),
     
-    ("pc_change_iv_change", 165, "PC Change/I.V.Change"),
+    ("pc_change_iv_change", 165, f"Chg(PCR,1) / Chg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),1)"),
 
-    ("chg_in_underl_call_opt_price_since_yesterday_d1", 165, "C-D1 Chg Und/OPT Price-(1D)"),
-    ("chg_in_underl_call_opt_price_since_yesterday_d2", 165, "C-D2 Chg Und/OPT Price-(1D)"),
-    ("chg_in_underl_put_opt_price_since_yesterday_d1", 165, "P-D1 Chg Und/OPT Price-(1D)"),
-    ("chg_in_underl_put_opt_price_since_yesterday_d2", 165, "P-D2 Chg Und/OPT Price-(1D)"),
+    ("chg_in_underl_call_opt_price_since_yesterday_d1", 165, f"Chg(Und,1) / Chg(OPT(C,{StrategyVariables.delta_d1_indicator_input}),1)"),
+    ("chg_in_underl_call_opt_price_since_yesterday_d2", 165, f"Chg(Und,1) / Chg(OPT(C,{StrategyVariables.delta_d2_indicator_input}),1)"),
+    ("chg_in_underl_put_opt_price_since_yesterday_d1", 165, f"Chg(Und,1) / Chg(OPT(P,{StrategyVariables.delta_d1_indicator_input}),1)"),
+    ("chg_in_underl_put_opt_price_since_yesterday_d2", 165, f"Chg(Und,1) / Chg(OPT(P,{StrategyVariables.delta_d2_indicator_input}),1)"),
 
-    ("chg_in_underl_call_opt_price_since_nth_day_d1", 165, "C-D1 Chg Und/OPT Price-(N)"),
-    ("chg_in_underl_call_opt_price_since_nth_day_d2", 165, "C-D2 Chg Und/OPT Price-(N)"),
-    ("chg_in_underl_put_opt_price_since_nth_day_d1", 165, "P-D1 Chg Und/OPT Price-(N)"),
-    ("chg_in_underl_put_opt_price_since_nth_day_d2", 165, "P-D2 Chg Und/OPT Price-(N)"),
+    ("chg_in_underl_call_opt_price_since_nth_day_d1", 165, f"Chg(Und,14) / Chg(OPT(C,{StrategyVariables.delta_d1_indicator_input}),14)"),
+    ("chg_in_underl_call_opt_price_since_nth_day_d2", 165, f"Chg(Und,14) / Chg(OPT(C,{StrategyVariables.delta_d2_indicator_input}),14)"),
+    ("chg_in_underl_put_opt_price_since_nth_day_d1", 165, f"Chg(Und,14) / Chg(OPT(P,{StrategyVariables.delta_d1_indicator_input}),14)"),
+    ("chg_in_underl_put_opt_price_since_nth_day_d2", 165, f"Chg(Und,14) / Chg(OPT(P,{StrategyVariables.delta_d2_indicator_input}),14)"),
     
 ]
 
@@ -164,29 +163,20 @@ class OptionIndicator:
         tree_scroll_x.config(command=self.option_indicator_table.xview)
 
         # Define Columns
-        self.option_indicator_table["columns"] = [
-            _[0] for _ in option_indicator_table_columns_width
-        ]
-
-        # Format Column
+        self.option_indicator_table["columns"] = [_[0] for _ in option_indicator_table_columns_width]
         self.option_indicator_table.column("#0", width=0, stretch="no")
 
-        # Create Heading
-        self.option_indicator_table.heading("#0", text="\n", anchor="w")
-
-        # Formate Columns and Create Heading for Columns
         for col_name, col_width, col_heading in option_indicator_table_columns_width:
+            # Adjust column width based on the length of the longest word in the column header
+            max_word_length = max(len(word) for word in col_heading.split())
             self.option_indicator_table.column(
                 col_name,
                 anchor="center",
-                width=col_width,
+                width=max(col_width, max_word_length * 12),
                 minwidth=col_width,
                 stretch=False,
             )
-            self.option_indicator_table.heading(
-                col_name, text=col_heading, anchor="center"
-            )
-
+            self.option_indicator_table.heading(col_name, text=col_heading, anchor="center")
         self.option_indicator_table.tag_configure("oddrow", background="white")
         self.option_indicator_table.tag_configure("evenrow", background="lightblue")
 

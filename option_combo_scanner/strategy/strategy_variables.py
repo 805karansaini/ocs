@@ -5,12 +5,12 @@ from typing import List, Tuple
 
 import pandas as pd
 
-# Read the config file
+# # Read the config file
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("option_scanner_user_inputs.ini")
 
 # Settings from config file
-execution_engine_config = config["ExecutionEngine"]
+
 time_zone_config = config["TimeZone"]
 
 
@@ -20,6 +20,8 @@ class StrategyVariables:
     will be used to store variables that are used across different modules
     mainly the GUI and the monitoring and the execution modules
     """
+    parser = configparser.ConfigParser()
+    parser.read('option_scanner_user_inputs.ini')
 
     map_instrument_id_to_instrument_object = {}
     # not using it anywhere, aryan created this but since there will be a single config in system, hence we are usign 'config_object'
@@ -30,64 +32,84 @@ class StrategyVariables:
     config_object = None
     nextorderId = None
     hv_look_back_days = 14
+
+    ibkr_tws_host = parser.get('USER INPUTS','ibkr_tws_host') 
+    ibkr_tws_port = parser.getint('USER INPUTS','ibkr_tws_port')
+    ibkr_tws_connection_id = parser.getint('USER INPUTS','ibkr_tws_connection_id')
+    
     # Input for delta
-    delta_d1_indicator_input = 0.25
-    delta_d2_indicator_input = 0.50
-    riskfree_rate1 = 0.04
-    avg_iv_lookback_days = 14  # Days  Average(AvgIV_0Day... AvgIV_NDay)
+    delta_d1_indicator_input = parser.getfloat('USER INPUTS','delta_d1_indicator_input')
+    delta_d2_indicator_input = parser.getfloat('USER INPUTS','delta_d2_indicator_input')
+    riskfree_rate1 = parser.getfloat('USER INPUTS','riskfree_rate1')
+    
+    
 
     # For HV # Take candle size from the
-    user_input_bar_size_historical_volatility = 1  # Hours
-    user_input_lookback_days_historical_volatility = 14  # Days
-    user_input_average_historical_volatility_days = 14  # Days
-
-    user_input_lookback_days_implied_volatility = 14  # Days
+    user_input_bar_size_historical_volatility = 1
+    user_input_lookback_days_historical_volatility = parser.getint('USER INPUTS','user_input_lookback_days_historical_volatility')
+    user_input_average_historical_volatility_days = parser.getint('USER INPUTS','user_input_average_historical_volatility_days')
+    
 
     bar_size_historical_volatility = f"{user_input_bar_size_historical_volatility} hour"
     lookback_days_historical_volatility = f"{user_input_lookback_days_historical_volatility} D"
     duration_size_historical_volatility = (
         f"{user_input_average_historical_volatility_days  + user_input_lookback_days_historical_volatility - 1} D"
     )
-    flag_hv_daily = True  # TODO Remove it
 
+    avg_iv_lookback_days = parser.getint('USER INPUTS','avg_iv_lookback_days')
+
+    lookback_input_for_change_in_avg_iv_since_yesterday = 1
+    lookback_input_for_rr_change_since_yesterday = 1
+    lookback_input_for_rr_change_over_n_days = 14
+    
     # For Option Change
-    bar_size_for_option_change_cal = "1 hour"
+    # bar_size_for_option_change_calculation = parser.getint('USER INPUTS','bar_size_for_option_change_calculation')
+    # bar_size_for_option_change_cal = f"{bar_size_for_option_change_calculation} hour"
 
     # If the flag is False it will calcluate for all put-call strike otherwise for speicfic deltas
-    flag_put_call_indicator_based_on_selected_deltas_only = False
+    flag_put_call_indicator_based_on_selected_deltas_only = parser.get('USER INPUTS','flag_put_call_indicator_based_on_selected_deltas_only')
 
     # Put Call Volume Variable
-    put_call_volume_lookback_days = "14 D"
-    put_call_volume_bar_size = "4 hours"
+    user_input_lookback_days_for_pcr = parser.getint('USER INPUTS','user_input_lookback_days_for_pcr')  # Days
+    put_call_volume_lookback_days = f"{user_input_lookback_days_for_pcr} D"
+    put_call_volume_bar_size_int = 4
+    put_call_volume_bar_size = f"{put_call_volume_bar_size_int} hours"
 
-    # Flag if we want to calculate the put call volume for all contracts or only for the selected deltas
-    flag_put_call_volume_for_all_contracts = False
+    # get historical price data variables
+    historical_price_data_bar_size_int = parser.getint('USER INPUTS','historical_price_data_bar_size') 
+    historical_price_data_bar_size = f"{historical_price_data_bar_size_int} hours"
 
-    list_of_percent_for_impact_calcluation = sorted(set([2, -2, 5, -5, 10, -10, 20, -20]))
+    #Max min Pain Flag 
+    flag_drop_empty_oi_rows = True
+    flag_test_print = False
+
+    list_of_percent_for_impact_calcluation_str = parser['USER INPUTS']['list_of_percent_for_impact_calcluation'] #sorted(set([2, -2, 5, -5, 10, -10, 20, -20]))
+
+    list_of_percent_for_impact_calcluation = [int(x.strip()) for x in list_of_percent_for_impact_calcluation_str.split(',')]
+    list_of_percent_for_impact_calcluation = sorted(set(list_of_percent_for_impact_calcluation))
 
     ###########################
     # Scanner
     ###########################
     flag_force_restart_scanner = False
-    rescan_time_in_seconds = 10 * 60
+    rescan_time_in_seconds = parser.getfloat('USER INPUTS','rescan_time_in_seconds')
     
+
     # Indicator Cache time in seconds for the scanner
-    indicator_cache_time_in_seconds = 60 * 60
+    indicator_cache_time_in_seconds = parser.getfloat('USER INPUTS','indicator_cache_time_in_seconds')
 
     # Variables used in filtering in range 0 to 1 threshold
-    flag_enable_filter_based_delta_threshold = True
+    flag_enable_filter_based_delta_threshold = parser.getboolean('USER INPUTS','flag_enable_filter_based_delta_threshold')
     min_delta_threshold = 0.009
     max_delta_threshold = 0.990
 
-        
-    flag_store_csv_files = True
-    o_c_s_folder_path = fr"..\OCSFiles"
-    batch_size = 120
+    flag_store_csv_files = False
+    o_c_s_folder_path = rf"..\OCSFiles"
+    batch_size = 100
     batch_size_historical_data = 10
-    
+
     # Flag if we want the option indicator in % chng
     flag_chng_in_opt_price_in_percentage = False
-
 
     ###########################
     # Variable to map combo id to combination object
@@ -125,7 +147,6 @@ class StrategyVariables:
     # scanner combo table dataframe
     scanner_combo_table_df = pd.DataFrame(columns=scanner_combination_table_columns)
 
-
     # For View detials of scanner combo
     leg_columns_combo_detail_gui = [
         "Action",
@@ -143,7 +164,6 @@ class StrategyVariables:
         "Trading Class",
     ]
 
-    
     # Define column names based on the attributes of the Indicator class
     indicator_columns = [
         "indicator_id",
@@ -190,76 +210,3 @@ class StrategyVariables:
         "underlying_chg_by_put_opt_price_since_nth_day_d2",
     ]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # Not Creating the DF for the Indicators
-    # scanner_indicator_table_columns = [
-    #     "Indicator ID",
-    #     "Instrument ID",
-    #     "Symbol",
-    #     "SecType",
-    #     "Expiry",
-    #     "current_underlying_hv_value",
-    #     "average_underlying_hv_over_n_days",
-    #     "current_iv_d1",
-    #     "current_iv_d2",
-    #     "current_avg_iv",
-    #     "absolute_change_in_avg_iv_since_yesterday",
-    #     "percentage_change_in_avg_iv_since_yesterday",
-    #     "current_rr_d1",
-    #     "current_rr_d2",
-    #     "percentage_change_in_rr_since_14_day_d1",
-    #     "percentage_change_in_rr_since_14_day_d2",
-    #     "percentage_change_in_rr_since_yesterday_d1",
-    #     "percentage_change_in_rr_since_yesterday_d2",
-    #     "max_pain_strike",
-    #     "min_pain_strike",
-    #     "support_strike",
-    #     "resistance_strike",
-    #     "put_call_volume_ratio_current_day",
-    #     "put_call_volume_ratio_average_over_n_days",
-    #     "pc_change_since_yesterday",
-    #     "absoulte_change_in_underlying_over_n_days",
-    #     "percentage_change_in_underlying_over_n_days",
-    #     # "hv",
-    #     # "iv_d1",
-    #     # "iv_d2",
-    #     # "avg_iv",
-    #     # "rr_d1",
-    #     # "rr_d2",
-    #     # "avg_iv_avg_14d",
-    #     # "change_rr_d1_1D",
-    #     # "change_rr_d2_1D",
-    #     # "change_rr_d1_14D",
-    #     # "change_rr_d2_14D",
-    #     # "hv_14d_avg_14d",
-    #     # "hv_14d_avg_iv",
-    #     # "open_interest_support",
-    #     # "open_interest_resistance",
-    #     # "pc_change",
-    #     # "put_call_ratio_avg",
-    #     # "put_call_ratio_current",
-    #     # "Change_underlying_options_price_today",
-    #     # "chg_uderlying_opt_price_14d",
-    #     # "change_in_iv",
-    #     # "pc_change_iv_change",
-    #     # "min_pain",
-    #     # "max_pain",
-    # ]
-    # # scanner combo table dataframe
-    # # scanner_indicator_table_df = pd.DataFrame(columns=scanner_indicator_table_columns)

@@ -80,8 +80,9 @@ class variables(object):
     # list to store req ids for pnl
     pnl_single_req_ids = []
 
+    
     # Time Zone
-    target_timezone = UserInputs.target_timezone
+    target_timezone = "Israel"
 
     target_timezone_obj = pytz.timezone(target_timezone)
 
@@ -253,9 +254,9 @@ class variables(object):
     archive_sqlalchemy_connection = sqlalchemy.create_engine(
         archive_sql_connection_string
     )
-    archive_pymysql_connection = pymysql.connect(
-        host=sql_host, user=sql_user, password=sql_password, db=archive_sql_db_name
-    )
+    # archive_pymysql_connection = pymysql.connect(
+    #     host=sql_host, user=sql_user, password=sql_password, db=archive_sql_db_name
+    # )
 
     cursor = None
 

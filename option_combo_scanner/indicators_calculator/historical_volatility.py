@@ -70,17 +70,16 @@ class HistoricalVolatility:
                 print(f"Could not compute the H. V. Related value. Exception {e}")
 
         # check if flag for calculating hv for daily candles is true
-        if StrategyVariables.flag_hv_daily:
-
+        if True: # StrategyVariables.flag_hv_daily:
             # Get dataframe with 1 D candles
             combination_price_dataframe_for_hv = HistoricalVolatility.group_dataframe_by_time_and_create_1d_candle_first_open_last_close(
                 combination_price_dataframe.copy()
             )
 
-        # If flag for calculating hv for daily candles is false
-        else:
+        # # If flag for calculating hv for daily candles is false
+        # else:
 
-            combination_price_dataframe_for_hv = combination_price_dataframe.copy()
+        #     combination_price_dataframe_for_hv = combination_price_dataframe.copy()
 
         # Calculate Historical volatility data
         historical_volatility_value = calculate_hv(
@@ -89,7 +88,7 @@ class HistoricalVolatility:
             combination_price_dataframe_for_hv,
             avg_price_combo,
         )
-        print(f"HV STD: {historical_volatility_value}")
+        # print(f"HV STD: {historical_volatility_value}")
 
         # Annualized Historical Volatility  (this will be showed in the GUI)
         if True or variables.flag_enable_hv_annualized:
@@ -269,13 +268,14 @@ class HistoricalVolatility:
                 start_date = unique_dates[indx]
                 end_date_indx = min(len(unique_dates) - 1, indx + StrategyVariables.user_input_average_historical_volatility_days - 1)
                 end_date = unique_dates[end_date_indx]
-
+                # print(f"Start Date {start_date} and End {end_date}")
                 # Filter the dataframe
                 filtered_df = df[(df["Date"] >= start_date) & (df["Date"] <= end_date)]
 
                 try:
                     # Calculate the HV for the current day
                     if filtered_df.empty:
+                        print(f"Filtered DataFrame Empty for HV")
                         continue
                     else:
                         # if flag is True Save CSV file
@@ -284,24 +284,32 @@ class HistoricalVolatility:
                             file_name = (
                                 rf"{StrategyVariables.user_input_average_historical_volatility_days - indx}_{start_date}_to_{end_date}"
                             )
-                            StrategyUtils.save_option_combo_scanner_csv_file(df, folder_name, file_name)
+                            StrategyUtils.save_option_combo_scanner_csv_file(filtered_df, folder_name, file_name)
 
                         hv_value = HistoricalVolatility.get_hv_calculation_for_each_conid(con_id, filtered_df)
                         if hv_value not in ["N/A", None]:
                             list_of_hv_values_for_n_days.append(hv_value)
                         else:
                             continue
-                    print(f"Day {indx} {start_date} to {end_date} HV: {hv_value}, having con_id: {con_id}")
+                    if StrategyVariables.flag_test_print:
+                        print(f"Day {indx} {start_date} to {end_date} HV: {hv_value}, having con_id: {con_id}")
                 except Exception as e:
                     pass
 
             # Current HV
             current_underlying_hv_value = list_of_hv_values_for_n_days[-1] if len(list_of_hv_values_for_n_days) > 0 else None
-            print(f"Current HV value for conid: {con_id},", current_underlying_hv_value)
+            if StrategyVariables.flag_test_print:
+                print(f"Current HV value for conid: {con_id},", current_underlying_hv_value)
+            
 
             # Average HV over N-Days
-            average_underlying_hv_over_n_days = sum(list_of_hv_values_for_n_days) / len(list_of_hv_values_for_n_days)
-            print(f"Average HV value ove n days for conid: {con_id},", average_underlying_hv_over_n_days)
+            if len(list_of_hv_values_for_n_days) != 0:
+                average_underlying_hv_over_n_days = sum(list_of_hv_values_for_n_days) / len(list_of_hv_values_for_n_days)
+            else:
+                # Handle the case where list_of_hv_values_for_n_days is empty
+                average_underlying_hv_over_n_days = None
+            # average_underlying_hv_over_n_days = sum(list_of_hv_values_for_n_days) / len(list_of_hv_values_for_n_days)
+            # print(f"Average HV value ove n days for conid: {con_id},", average_underlying_hv_over_n_days)
             
             # Calculate Change in underlying
             n_day_ago_date = 14
@@ -323,14 +331,14 @@ class HistoricalVolatility:
 
             try:
                 absoulte_change_in_underlying_over_one_day = current_close_price - one_day_ago_close_price
-                print(f"Absolte chg in underlying over one day for conid: {con_id},", absoulte_change_in_underlying_over_one_day)
+                # print(f"Absolte chg in underlying over one day for conid: {con_id},", absoulte_change_in_underlying_over_one_day)
             except Exception as e:
                 print(f"Exception Absolte chg in underlying over one day for conid {con_id} e: {e}")
                 absoulte_change_in_underlying_over_one_day = None
 
             try:
                 absoulte_change_in_underlying_over_n_days = current_close_price - n_day_ago_close_price
-                print(f"Absolte chg in underlying ove n days for conid: {con_id},", absoulte_change_in_underlying_over_n_days)
+                # print(f"Absolte chg in underlying ove n days for conid: {con_id},", absoulte_change_in_underlying_over_n_days)
                 percentage_change_in_underlying_over_n_days = ((current_close_price - n_day_ago_close_price) / n_day_ago_close_price) * 100
             except Exception as e:
                 print(f"Exception Absolte chg in underlying ove n days for conid {con_id} e: {e}")

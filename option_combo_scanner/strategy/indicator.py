@@ -7,10 +7,6 @@ from com.contracts import get_contract
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.manage_mkt_data_sub import \
-    ManageMktDataSubscription
-from option_combo_scanner.strategy.monitor_order_preset import \
-    MonitorOrderPreset
 from option_combo_scanner.strategy.strategy_variables import \
     StrategyVariables as strategy_variables
 
@@ -88,7 +84,7 @@ class Indicator:
             else:
                 # TODO - ARYAN
                 logger.error(
-                    f"Inside OrdePreset Object change_value UID: {self.unique_id} '{key}' is not an attribute of this class. new value: {value}"
+                    f"Inside Indicator Object : {self.indicator_id} '{key}' is not an attribute of this class. new value: {value}"
                 )
 
     def remove_indicator_from_system(self):
@@ -123,6 +119,8 @@ class Indicator:
         # )
 
         # TODO - Comment
+
+        # Check if the underlying contract ID is not already present in the map
         if self.underlying_conid not in strategy_variables.map_con_id_to_contract:
             # Underlying SecType
             underlying_sec_type = "FUT" if self.sec_type == "FOP" else "STK"
@@ -136,6 +134,8 @@ class Indicator:
                 multiplier=self.multiplier,
                 con_id=self.underlying_conid,
             )
+            
+            #  Add the underlying contract to the map with its contract ID as the key
 
             strategy_variables.map_con_id_to_contract[self.underlying_conid] = underlying_contract
 
@@ -199,8 +199,8 @@ class Indicator:
                 res.append(round(absoulte_change_in_underlying_over_n_days / val_, 2))
             else:
                 res.append(None)
-
-        print(f"Indicator ID: {self.indicator_id}, Chg Underlying/Chg Opt Price: {res}")
+        if strategy_variables.flag_test_print:
+            print(f"Indicator ID: {self.indicator_id}, Chg Underlying/Chg Opt Price: {res}")
 
         tup = [
             self.indicator_id,

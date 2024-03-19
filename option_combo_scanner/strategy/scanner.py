@@ -13,16 +13,16 @@ from com.greeks import async_get_deltas
 from com.option_comobo_scanner_idetif import (
     find_closest_expiry_for_fop_given_fut_expiries_and_trading_class,
     find_nearest_expiry_and_all_strikes_for_stk_given_dte,
-    find_nearest_expiry_for_future_given_fut_dte,
-)
+    find_nearest_expiry_for_future_given_fut_dte)
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.utils import Utils
-from option_combo_scanner.indicators_calculator.market_data_fetcher import MarketDataFetcher
+from option_combo_scanner.indicators_calculator.market_data_fetcher import \
+    MarketDataFetcher
 from option_combo_scanner.strategy.indicator import Indicator
 from option_combo_scanner.strategy.scanner_algo import ScannerAlgo
-
 # from option_combo_scanner.strategy import strategy_variables
-from option_combo_scanner.strategy.scanner_combination import ScannerCombination
+from option_combo_scanner.strategy.scanner_combination import \
+    ScannerCombination
 from option_combo_scanner.strategy.scanner_leg import ScannerLeg
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
@@ -335,8 +335,13 @@ class Scanner:
                 continue
 
             # TODO Need underlying conid  TODO Comment
+            
+            # Extract expiry date from the expiry and trading class string
             expiry = exp_trad_cls[:8]
+            # Retrieve the underlying contract ID associated with the closest expiry
             underlying_conid = map_closest_expiry_to_underlying_conid[int(expiry)]
+
+            #  Create a dictionary containing information about the new instrument
             new_dict = {
                 "instrument_id": instrument_object.instrument_id,
                 "symbol": instrument_object.symbol,
@@ -348,6 +353,7 @@ class Scanner:
                 "exchange": exchange,
             }
 
+             # Insert the new indicator row in the database (GUI and system)
             self.insert_new_indicator_row_in_db_gui_and_system(new_dict)
 
     # Insertion of new indicator row in DB/GUI
@@ -734,7 +740,7 @@ class Scanner:
 
         for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_deltas):
 
-            print(f"\n Symbol: {instrument_object.symbol} Combination: {combination}")
+            # print(f"\n Symbol: {instrument_object.symbol} Combination: {combination}")
 
             # TODO max loss/profit
             max_loss, max_profit = self.get_combination_max_loss_and_max_profit(
@@ -759,7 +765,7 @@ class Scanner:
             values_dict["max_loss"] = "-inf" if max_loss == float("-inf") else max_loss
             res, combo_id = SqlQueries.insert_into_db_table(table_name="combination_table", values_dict=values_dict)
             if not res:
-                print(f"Unable to insert Combination in the table: {combination}")
+                # print(f"Unable to insert Combination in the table: {combination}")
                 continue
 
             # list of leg object

@@ -352,7 +352,7 @@ def calculate_combo_atr(
             ) / k
 
     # If Flag Save OCS Files 
-    if StrategyVariables.flag_store_csv_files and atr_type == "Historical Volatility":
+    if StrategyVariables.flag_store_csv_files:
         folder_name = "OCS_HV"
         file_name = rf"ATR_HV_Unique_id_{conid}"
 

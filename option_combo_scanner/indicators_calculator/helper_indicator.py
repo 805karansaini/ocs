@@ -265,6 +265,8 @@ class IndicatorHelper:
         call_list__ = ["Call", list_of_all_call_option_contracts]
         put_list__ = ["Put", list_of_all_put_option_contracts]
 
+        flag_market_open = variables.flag_market_open
+
         # Loop for Call and put, reqMktData and return dataframes
         for indx in range(2):
 
@@ -275,7 +277,7 @@ class IndicatorHelper:
             list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple = asyncio.run(
                 MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
                     list_of_all_option_contracts,
-                    True,
+                    flag_market_open,
                     generic_tick_list=generic_tick_list,
                     snapshot=snapshot,
                 )

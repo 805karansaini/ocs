@@ -157,6 +157,13 @@ class ScannerInputsTab:
             if str(instrument_id) in all_instrument_ids:
                 self.instrument_table.delete(instrument_id)
 
+        for index, row_id in enumerate(self.instrument_table.get_children()):
+            if index % 2 == 0:
+                self.instrument_table.item(row_id, tags=("evenrow",))
+            else:
+                self.instrument_table.item(row_id, tags=("oddrow",))
+                    
+
     def delete_selected_instrument(
         self,
     ):

@@ -277,8 +277,8 @@ class PutCallVol:
                 put_call_volum_ratio = total_put_vol_for_date / total_call_vol_for_date
             else:
                 put_call_volum_ratio = None  # Handle division by zero case
-
-            print(f"Date: {date}  PutVolume: {total_put_vol_for_date} CallVolume: {total_call_vol_for_date} PCRatio: {put_call_volum_ratio}")
+            if StrategyVariables.flag_test_print:
+                print(f"Date: {date}  PutVolume: {total_put_vol_for_date} CallVolume: {total_call_vol_for_date} PCRatio: {put_call_volum_ratio}")
             
             # Store the put-call volume ratio for the date
             map_date_to_put_call_volume_ratio[date] = put_call_volum_ratio
@@ -295,9 +295,9 @@ class PutCallVol:
                 pc_ratio_count += 1
 
         put_call_volume_ratio_average_over_n_days = total_pc_ratio_value / pc_ratio_count if pc_ratio_count not in [None, 0] else None
-
-        print(f"Current P/C Ratio Current: ", put_call_volume_ratio_current_day)
-        print(f"P/C Ratio Average Over N-Days: ", put_call_volume_ratio_average_over_n_days)
+        if StrategyVariables.flag_test_print:
+            print(f"Current P/C Ratio Current: ", put_call_volume_ratio_current_day)
+            print(f"P/C Ratio Average Over N-Days: ", put_call_volume_ratio_average_over_n_days)
 
         # Calcluating PC Change from Yesterday
         if len(sorted_dates_set) > 1:
@@ -310,8 +310,8 @@ class PutCallVol:
                 absolute_pc_change_since_yesterday = None
         else:
             absolute_pc_change_since_yesterday = None
-
-        print(f"Absolute PC Change since yesterday", absolute_pc_change_since_yesterday)
+        if StrategyVariables.flag_test_print:
+            print(f"Absolute PC Change since yesterday", absolute_pc_change_since_yesterday)
 
         values_dict = {
             "put_call_volume_ratio_current_day": (

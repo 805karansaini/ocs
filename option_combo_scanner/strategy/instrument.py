@@ -3,8 +3,6 @@ from pprint import pprint
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.manage_mkt_data_sub import ManageMktDataSubscription
-from option_combo_scanner.strategy.monitor_order_preset import MonitorOrderPreset
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
 
 logger = CustomLogger.logger

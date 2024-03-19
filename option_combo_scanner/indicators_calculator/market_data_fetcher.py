@@ -30,7 +30,7 @@ class MarketDataFetcher:
         variables.ask_price[reqId] = None
         variables.bid_price[reqId] = None
         variables.call_option_open_interest[reqId] = None
-        # TODO
+        
         variables.put_option_open_interest[reqId] = None
 
         # Set request type depending on whether the market is live or not
@@ -80,7 +80,7 @@ class MarketDataFetcher:
                     and variables.options_iv_last[reqId] is not None
                     and variables.bid_price[reqId] is not None
                     and variables.ask_price[reqId] is not None
-                    # TODO - KARAN REMOVE as we are not using OI RN
+                    
                     and variables.call_option_open_interest[reqId] is not None
                     and variables.put_option_open_interest[reqId] is not None
                 )

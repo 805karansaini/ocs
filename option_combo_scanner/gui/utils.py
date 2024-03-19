@@ -382,6 +382,12 @@ class Utils:
             # Remove rows from indicator table
             Utils.scanner_indicator_tab_object.remove_row_from_indicator_table(list_of_indicator_ids)
 
+        for index, row_id in enumerate(Utils.scanner_indicator_tab_object.option_indicator_table.get_children()):
+            if index % 2 == 0:
+                Utils.scanner_indicator_tab_object.option_indicator_table.item(row_id, tags=("evenrow",))
+            else:
+                Utils.scanner_indicator_tab_object.option_indicator_table.item(row_id, tags=("oddrow",))
+
     @staticmethod
     def update_indicator_row_in_gui(indicator_id: int):
         indicator_id = int(indicator_id)
