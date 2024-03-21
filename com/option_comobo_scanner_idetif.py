@@ -13,7 +13,7 @@ from com.greeks import *
 
 # Compares the 'target date(expiry)' with all expiries and returns the closest available expiry from them.
 def get_closest_exp_from_expiries_given_target_date(
-    symbol, target_date_str, expiry_dates_ticker, today_str
+    symbol, target_date_str, expiry_dates_ticker, today_str, low_range_date_str, high_range_date_str,
 ):
 
     # Print to console
@@ -33,14 +33,28 @@ def get_closest_exp_from_expiries_given_target_date(
     target_date_obj = variables.target_timezone_obj.localize(
         datetime.datetime.strptime(target_date_str, "%Y%m%d")
     )
+
+    low_range_date_obj = variables.target_timezone_obj.localize(
+        datetime.datetime.strptime(low_range_date_str, "%Y%m%d")
+    )
+
+    high_range_date_obj = variables.target_timezone_obj.localize(
+        datetime.datetime.strptime(high_range_date_str, "%Y%m%d")
+    )
     min_diff = None
     closest_expiry = None
     selected_row = None
+    expiries_in_range = []
 
     # For each date in expiry_dates_ticker' checking the difference and updating the closest_expiry(date)
+    
     for row, d in enumerate(expiry_dates_ticker):
-
+        expiry_date_obj = variables.target_timezone_obj.localize(datetime.datetime.strptime(d, "%Y%m%d"))
+        
+        # print(low_range_date_obj, high_range_date_obj, expiry_date_obj)
         # Difference between the dates
+        if low_range_date_obj <= expiry_date_obj <= high_range_date_obj:
+            expiries_in_range.append(d)
         diff = abs(
             (
                 variables.target_timezone_obj.localize(
@@ -107,7 +121,7 @@ def get_closest_exp_from_expiries_given_target_date(
     if variables.flag_debug_mode:
         print(f"Got Closest Expiry = {closest_expiry},  {symbol=} {target_date_str=}")
 
-    return closest_expiry
+    return closest_expiry, expiries_in_range
 
 
 # We want all the strikes for given user expriy_date and Trading class for FOP,
@@ -314,6 +328,10 @@ def find_nearest_expiry_for_future_given_fut_dte(
 
         return all_expiry_dates_ticker
 
+    # if flag_return_all_filter_epxpiries:
+    #     get_all_filter_expires()
+    # else:
+    #     pass
     # Get Closest Expiry to 'target_date_str'
     closest_expiry_date = str(
         get_closest_exp_from_expiries_given_target_date(
@@ -510,6 +528,8 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
     currency,
     multiplier,
     fop_trading_class,
+    low_range_date_str,
+    high_range_date_str,
 ):
 
     # Print to console
@@ -552,7 +572,7 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
 
     # Contract details not found
     if contract_details is None:
-        return None, None, None, None 
+        return None, None, None, None, None
 
     # The exchange on which the returned options are trading. Can be set to the empty string "" for all exchanges
     # (for STK we are using "" and the callback of reqsecdef is handles such we get the 'SMART' values or The futFopExchange values).
@@ -567,7 +587,7 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
 
     # Handling no Values
     if (all_expiry_dates_ticker is None) or len(all_expiry_dates_ticker) == 0:
-        return None, None, None, None
+        return None, None, None, None, None
 
     # Sorting Expiries
     all_expiry_dates_ticker = sorted(all_expiry_dates_ticker)
@@ -577,9 +597,10 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
         print(f"Expiry Dates: {all_expiry_dates_ticker}")
 
     # Finding Closest Expiry to 'target_date_str'
-    closest_expiry_date = str(
+    # Return multiexpiries from here # TODO Point 2
+    closest_expiry_date, expiry_date_in_range = (
         get_closest_exp_from_expiries_given_target_date(
-            ticker, target_date_str, all_expiry_dates_ticker, today_str
+            ticker, target_date_str, all_expiry_dates_ticker, today_str, low_range_date_str, high_range_date_str,
         )
     )
 
@@ -588,7 +609,7 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
         print(f"Expiry Dates: {all_expiry_dates_ticker}")
         print(f"Available Strike Prices: {strike_prices_ticker}")
 
-    return all_expiry_dates_ticker, strike_prices_ticker, closest_expiry_date, underlying_conid
+    return all_expiry_dates_ticker, strike_prices_ticker, closest_expiry_date, underlying_conid, expiry_date_in_range
 
 
 # Find closest expiry for FOP, with user provided DTE, trading class
@@ -601,6 +622,8 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
     multiplier,
     trading_class,
     all_fut_expiries,
+    low_range_date_str,
+    high_range_date_str,
 ):
 
     # Print to console
@@ -691,11 +714,13 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
         return None, None, None
 
     # Getting Closest Expiry for FOP if length 'all_expiries_with_user_provided_trading_class' > 0
-    closest_expiry_date = get_closest_exp_from_expiries_given_target_date(
+    closest_expiry_date, expiry_date_in_range = get_closest_exp_from_expiries_given_target_date(
         symbol,
         target_date_str,
         all_expiries_with_user_provided_trading_class,
         today_str,
+        low_range_date_str,
+        high_range_date_str,
     )
     
     
@@ -720,7 +745,7 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
             f"All The strikes for FOP {symbol=} given {dte=} {trading_class=} {all_strike_prices=}"
         )
 
-    return all_strike_prices, closest_expiry_date, underlying_conid
+    return all_strike_prices, closest_expiry_date, underlying_conid, expiry_date_in_range
 
 # Method to find nearest strike prices
 async def find_nearest_strike_delta_diff_min_async(

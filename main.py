@@ -137,8 +137,8 @@ if __name__ == "__main__":
     scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
     scanner_thread.start()
 
-    indicator_thread = threading.Thread(target=run_indicator_thread, daemon=True)
-    indicator_thread.start()
+    # indicator_thread = threading.Thread(target=run_indicator_thread, daemon=True)
+    # indicator_thread.start()
         
     # Creating the Scanner Object
     # scanner_input = ScannerInputsTab(scanners_object)

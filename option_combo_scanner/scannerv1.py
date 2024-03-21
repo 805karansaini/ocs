@@ -1,6 +1,5 @@
 import asyncio
 import copy
-import datetime
 import math
 import pprint
 import time
@@ -15,7 +14,6 @@ from com.option_comobo_scanner_idetif import (
     find_closest_expiry_for_fop_given_fut_expiries_and_trading_class,
     find_nearest_expiry_and_all_strikes_for_stk_given_dte,
     find_nearest_expiry_for_future_given_fut_dte)
-from com.variables import variables
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.indicators_calculator.market_data_fetcher import \
@@ -204,33 +202,31 @@ class Scanner:
     def start_scanner(
         self,
     ):
-        # Single Config
-        # No. of Config Leg
-        # for (leg_object) in self.config_obj.list_of_config_leg_object:
-        #     print(leg_object)
-        #     print(leg_object.instrument_id)
 
-
+        for (
+            instrument_id,
+            instrument_object,
+        ) in self.local_map_instrument_id_to_instrument_object.items():
 
             # Early Termination of Scanner
+            local_config_object = self.get_config_from_variables()
+            print(local_config_object)
             if self.check_do_we_need_to_restart_scan():
                 print(f"Early Termination: {self.config_obj}")
                 return
 
             # Skip this instrument if not exist anymore in system
-            # if not leg_object.instrument_id in StrategyVariables.map_instrument_id_to_instrument_object:
-            #     continue
+            if not instrument_id in StrategyVariables.map_instrument_id_to_instrument_object:
+                continue
 
-            list_of_all_generated_combination = self.generate_combinations()
-
-            # symbol = instrument_object.symbol
-            # sec_type = instrument_object.sec_type
-            # multiplier = instrument_object.multiplier
-            # exchange = instrument_object.exchange
-            # trading_class = instrument_object.trading_class
-            # currency = instrument_object.currency
-            # conid = instrument_object.conid
-            # primary_exchange = instrument_object.primary_exchange
+            symbol = instrument_object.symbol
+            sec_type = instrument_object.sec_type
+            multiplier = instrument_object.multiplier
+            exchange = instrument_object.exchange
+            trading_class = instrument_object.trading_class
+            currency = instrument_object.currency
+            conid = instrument_object.conid
+            primary_exchange = instrument_object.primary_exchange
 
             right = None
             list_of_dte = []
@@ -245,21 +241,21 @@ class Scanner:
                 print(f"Add Configuration Values")
 
             # Based on sec_type wil run the scan for instrument
-            # if sec_type == "OPT":
-            #     self.run_scan_for_opt(
-            #         instrument_object=instrument_object,
-            #         list_of_dte=list_of_dte,
-            #         right=right,
-            #     )
-            # elif sec_type == "FOP":
-            #     self.run_scan_for_fop(
-            #         instrument_object=instrument_object,
-            #         list_of_dte=list_of_dte,
-            #         right=right,
-            #     )
-            # else:
-            #     print(f"Security Type {sec_type} is invalid for {instrument_object}")
-            #     continue
+            if sec_type == "OPT":
+                self.run_scan_for_opt(
+                    instrument_object=instrument_object,
+                    list_of_dte=list_of_dte,
+                    right=right,
+                )
+            elif sec_type == "FOP":
+                self.run_scan_for_fop(
+                    instrument_object=instrument_object,
+                    list_of_dte=list_of_dte,
+                    right=right,
+                )
+            else:
+                print(f"Security Type {sec_type} is invalid for {instrument_object}")
+                continue
 
     # Deletion of Indicator data  from DB/GUI
     def delete_indicator_row_from_db_gui_and_system(self, list_of_indicator_ids_deletion):
@@ -655,34 +651,33 @@ class Scanner:
                 df,
             )
 
-    def generate_combinations(self, ):
+    def generate_combinations(self, strike_and_delta_dataframe):
 
         # Drop extra columns
-        # columns_to_drop = ["Bid", "Ask"]
-        # columns_to_drop_existing = [col for col in columns_to_drop if col in strike_and_delta_dataframe.columns]
+        columns_to_drop = ["Bid", "Ask"]
+        columns_to_drop_existing = [col for col in columns_to_drop if col in strike_and_delta_dataframe.columns]
 
-        # df_copy = strike_and_delta_dataframe.copy()
-        # if columns_to_drop_existing:
-        #     strike_and_delta_dataframe = df_copy.drop(columns_to_drop_existing, axis=1)
+        df_copy = strike_and_delta_dataframe.copy()
+        if columns_to_drop_existing:
+            strike_and_delta_dataframe = df_copy.drop(columns_to_drop_existing, axis=1)
 
         # Get the configurations
         remaining_no_of_legs = self.config_obj.no_of_leg - 1
         range_low = self.config_obj.list_of_config_leg_object[0].delta_range_min
         range_high = self.config_obj.list_of_config_leg_object[0].delta_range_max
-        leg_object = self.config_obj.list_of_config_leg_object[0]
-        print(leg_object)
+
         # print("\nGenerate Combintaions: ")
         # print(tabulate(strike_and_delta_dataframe, headers="keys", tablefmt="psql", showindex=False))
-        current_date = datetime.datetime.now(variables.target_timezone_obj)
+        current_date = None
         # List
         res = ScannerAlgo(
             config_obj=self.config_obj,
+            strike_and_delta_dataframe=strike_and_delta_dataframe,
         ).run_scanner(
             remaining_no_of_legs,
             range_low,
             range_high,
             current_date,
-            leg_object
         )
 
         return res

@@ -36,8 +36,8 @@ class Config:
         config_tuple = (
             self.config_id,
             self.no_of_leg,
-            self.right,
-            self.list_of_dte,
+            # self.right,
+            # self.list_of_dte,
             self.list_of_config_leg_object,
         )
 

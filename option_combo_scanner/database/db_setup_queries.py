@@ -31,11 +31,16 @@ query3 = """CREATE TABLE IF NOT EXISTS `config_table` (
 
 query4 = """CREATE TABLE IF NOT EXISTS `config_legs_table` (
         `config_leg_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `instrument_id` INT,
         `config_id`  INT, 
         `leg_number` INT,
+        `right` VARCHAR(50),
         `action` VARCHAR(50),
         `delta_range_min` DECIMAL(10, 8),
         `delta_range_max` DECIMAL(10, 8),
+        `dte_range_min` DECIMAL(10, 8),
+        `dte_range_max` DECIMAL(10, 8),
+        FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE,
         FOREIGN KEY (`config_id`) REFERENCES `config_table`(`config_id`) ON DELETE CASCADE
     );"""
 
@@ -63,15 +68,20 @@ query5 = """CREATE TABLE IF NOT EXISTS `combination_table` (
 
 query6 = """CREATE TABLE IF NOT EXISTS `legs_table` (
         `leg_id` INT AUTO_INCREMENT PRIMARY KEY,
+        `instrument_id` INT,
         `combo_id` INT,
         `leg_number` INT,
         `con_id` VARCHAR(15),
         `strike` VARCHAR(15),
         `qty` VARCHAR(15),
         `delta_found` DECIMAL(10, 8),
+        `right` VARCHAR(50),
         `action` VARCHAR(15),
         `delta_range_min` DECIMAL(10, 8),
         `delta_range_max` DECIMAL(10, 8),
+        `dte_range_min` DECIMAL(10, 8),
+        `dte_range_max` DECIMAL(10, 8),
+        FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE,
         FOREIGN KEY (`combo_id`) REFERENCES `combination_table`(`combo_id`) ON DELETE CASCADE
     );"""
 

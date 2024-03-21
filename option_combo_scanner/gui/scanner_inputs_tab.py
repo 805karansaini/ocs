@@ -37,10 +37,14 @@ instruments_table_columns_width = [
 ]
 
 leg_config_table_columns_width = [
-    ("LegNo", 382, "Leg No"),
-    ("Action", 382, "Action"),
-    ("MinDelta", 383, "MinDelta"),
-    ("MaxDelta", 383, "MaxDelta"),
+    ("LegNo", 190, "Leg No"),
+    ("InstrumentID", 191, "Instrument ID"),
+    ("Action", 190, "Action"),
+    ("Right", 190, "Right"),
+    ("MinDelta", 190, "MinDelta"),
+    ("MaxDelta", 190, "MaxDelta"),
+    ("MinDTE", 190, "MinDTE"),
+    ("MaxDTE", 190, "MaxDTE"),
 
 ]
 
@@ -71,6 +75,7 @@ class ScannerInputsTab:
             text="Add Instrument",
             command=lambda: self.create_instrument_popup(),
         )
+
 
         add_instrument_button.grid(column=1, row=0, padx=5, pady=5)
 
@@ -783,11 +788,15 @@ class ScannerInputsTab:
 
             # Entry and Combo box Inputs
             desc = current_row_number + i + 1
+            instrument_id = "0"
             action_value = "BUY"
+            right_value = "CALL"
             delta_min_value = "0.0"
             delta_max_value = "0.0"
-
-            row_values = (desc, action_value, delta_min_value, delta_max_value)
+            dte_min_value = "0.0"
+            dte_max_value = "0.0"
+            right_value = "CALL"
+            row_values = (desc, instrument_id, action_value, right_value, delta_min_value, delta_max_value, dte_min_value, dte_max_value)
             if i % 2 == 1:
                 self.leg_config_table.insert(
                     "",
@@ -831,15 +840,15 @@ class ScannerInputsTab:
         input_fields_frame.place(relx=0.5, anchor=tk.CENTER, rely=0.2, y=250)
 
         # Labels
-        right_label = ttk.Label(
-            input_fields_frame, text="Right", anchor="center", width=12
-        )
-        right_label.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
+        # right_label = ttk.Label(
+        #     input_fields_frame, text="Right", anchor="center", width=12
+        # )
+        # right_label.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
 
-        dte_leg_label = ttk.Label(
-            input_fields_frame, text="List of DTE", anchor="center", width=12
-        )
-        dte_leg_label.grid(column=1, row=0, padx=5, pady=(0, 5), sticky="n")
+        # dte_leg_label = ttk.Label(
+        #     input_fields_frame, text="List of DTE", anchor="center", width=12
+        # )
+        # dte_leg_label.grid(column=1, row=0, padx=5, pady=(0, 5), sticky="n")
 
         leg_label = ttk.Label(
             input_fields_frame, text="#Legs", anchor="center", width=12
@@ -847,18 +856,18 @@ class ScannerInputsTab:
         leg_label.grid(column=2, row=0, padx=5, pady=(0, 5), sticky="n")
 
         # Entry and Combo box Inputs
-        self.right_var = tk.StringVar()
-        self.right_dropdown = ttk.Combobox(
-            input_fields_frame,
-            textvariable=self.right_var,
-            values=["CALL", "PUT"],
-            state="readonly",
-        )
-        self.right_dropdown.grid(column=0, row=1, padx=5, pady=5)
+        # self.right_var = tk.StringVar()
+        # self.right_dropdown = ttk.Combobox(
+        #     input_fields_frame,
+        #     textvariable=self.right_var,
+        #     values=["CALL", "PUT"],
+        #     state="readonly",
+        # )
+        # self.right_dropdown.grid(column=0, row=1, padx=5, pady=5)
 
         # Add Entry for "dte leg" with label above
-        self.list_of_dte_entry = ttk.Entry(input_fields_frame)
-        self.list_of_dte_entry.grid(column=1, row=1, padx=5, pady=5)
+        # self.list_of_dte_entry = ttk.Entry(input_fields_frame)
+        # self.list_of_dte_entry.grid(column=1, row=1, padx=5, pady=5)
 
         self.no_of_legs_entry = ttk.Entry(input_fields_frame)
         self.no_of_legs_entry.grid(column=2, row=1, padx=5, pady=5)
@@ -889,8 +898,8 @@ class ScannerInputsTab:
 
         values_dict = {
             "no_of_leg": int(self.no_of_legs_entry.get()),
-            "right": self.right_var.get().upper(),
-            "list_of_dte": self.list_of_dte_entry.get(),
+            # "right": self.right_var.get().upper(),
+            # "list_of_dte": self.list_of_dte_entry.get(),
         }
         # Validation on no of legs if it is greater than zero
         if not Utils.is_positive_greater_than_equal_one_integer(
@@ -908,22 +917,23 @@ class ScannerInputsTab:
                 f"Number of legs should be equal to number of row in config table",
             )
             return
+        
 
-        list_of_dte = values_dict["list_of_dte"].strip().split(",")
-        if not len(list_of_dte):
-            Utils.display_message_popup(
-                "Error",
-                f"List of DTE must not be empty",
-            )
-            return
+        # list_of_dte = values_dict["list_of_dte"].strip().split(",")
+        # if not len(list_of_dte):
+        #     Utils.display_message_popup(
+        #         "Error",
+        #         f"List of DTE must not be empty",
+        #     )
+        #     return
 
-        for dte in list_of_dte:
-            if not Utils.is_non_negative_integer(dte):
-                Utils.display_message_popup(
-                    "Error",
-                    f"List of DTE must be non negative integer e.g. 1,2",
-                )
-                return
+        # for dte in list_of_dte:
+        #     if not Utils.is_non_negative_integer(dte):
+        #         Utils.display_message_popup(
+        #             "Error",
+        #             f"List of DTE must be non negative integer e.g. 1,2",
+        #         )
+        #         return
 
         leg_data_list = []
 
@@ -934,12 +944,25 @@ class ScannerInputsTab:
 
             leg_data = {
                 "leg_number": i + 1,
-                "action": item_values[1].upper(),
-                "delta_range_min": item_values[2],
-                "delta_range_max": item_values[3],
+                "instrument_id": item_values[1],
+                "action": item_values[2].upper(),
+                "right": item_values[3].upper(),
+                "delta_range_min": item_values[4],
+                "delta_range_max": item_values[5],
+                "dte_range_min": item_values[6],
+                "dte_range_max": item_values[7],
                 # Add other leg-wise data as needed
             }
+            # print(leg_data)
             # For First leg only range between 0 to 1
+            local_map_instrument_id_instrument_obj = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object)
+            list_of_instrument_ids = local_map_instrument_id_instrument_obj.keys()
+            if int(leg_data["instrument_id"]) not in list_of_instrument_ids:
+                Utils.display_message_popup(
+                    "Error",
+                    f"Instrument ID doesn't exist in Instrument Table",
+                )
+                return
             if i == 0:
                 if not Utils.is_between_zero_to_one(leg_data["delta_range_max"]):
                     Utils.display_message_popup(
@@ -960,6 +983,7 @@ class ScannerInputsTab:
                         f"MinDelta value cannot be greater than MaxDelta value",
                     )
                     return
+                
             else:
                 # For legs 1 onwards validation for -1 to 1 value
                 # Validation
@@ -982,6 +1006,7 @@ class ScannerInputsTab:
                         f"MinDelta value cannot be greater than MaxDelta value",
                     )
                     return
+            
 
             leg_data_list.append(leg_data)
 
@@ -1037,22 +1062,22 @@ class ScannerInputsTab:
         # Default return True if same
         flag_same = True
 
-        current_list_of_dte = [
-            int(dte.strip()) for dte in current_config_object.list_of_dte.split(",")
-        ]
-        new_list_of_dte = [
-            int(dte.strip()) for dte in new_common_config_dict["list_of_dte"].split(",")
-        ]
+        # current_list_of_dte = [
+        #     int(dte.strip()) for dte in current_config_object.list_of_dte.split(",")
+        # ]
+        # new_list_of_dte = [
+        #     int(dte.strip()) for dte in new_common_config_dict["list_of_dte"].split(",")
+        # ]
 
         # Right
-        if current_config_object.right != new_common_config_dict["right"]:
-            return not flag_same
-        # No of Legs
+        # if current_config_object.right != new_common_config_dict["right"]:
+        #     return not flag_same
+        # # No of Legs
         if current_config_object.no_of_leg != int(new_common_config_dict["no_of_leg"]):
             return not flag_same
         # List of DTE
-        if set(new_list_of_dte) != set(current_list_of_dte):
-            return not flag_same
+        # if set(new_list_of_dte) != set(current_list_of_dte):
+        #     return not flag_same
 
         # current_list_of_config_leg_objects
         current_list_of_config_leg_objects = (
@@ -1086,21 +1111,19 @@ class ScannerInputsTab:
         (
             _,
             leg_number,
-            right,
-            list_of_dte,
             list_of_config_leg_object,
         ) = list_of_config_leg_objects
         for leg_obj in list_of_config_leg_object:
             self.insert_into_config_leg_table_helper(leg_obj)
 
     def insert_into_common_config_table_helper(self, config_obj):
-        _, no_of_legs, right, list_of_dte, _ = config_obj.get_config_tuple_for_gui()
+        _, no_of_legs, _ = config_obj.get_config_tuple_for_gui()
 
         self.no_of_legs_entry.insert(0, no_of_legs)
-        self.right_dropdown.config(state="normal")
-        self.right_dropdown.insert(0, right)
-        self.list_of_dte_entry.insert(0, list_of_dte)
-        self.right_dropdown.config(state="readonly")
+        # self.right_dropdown.config(state="normal")
+        # self.right_dropdown.insert(0, right)
+        # self.list_of_dte_entry.insert(0, list_of_dte)
+        # self.right_dropdown.config(state="readonly")
 
     def insert_into_config_leg_table_helper(self, leg_obj):
         row_values = leg_obj.get_config_leg_tuple_for_gui()
@@ -1128,9 +1151,6 @@ class ScannerInputsTab:
             )
 
     def create_leg_config_editable_table(self):
-        # Table,
-        # Editable
-        # Header: ["LegNo", "Action", "MinDelta",, "MaxDelta"]
 
         leg_config_table_frame = ttk.Frame(self.scanner_inputs_tab, padding=20)
         leg_config_table_frame.pack(pady=20)
@@ -1173,16 +1193,24 @@ class ScannerInputsTab:
         # Back ground
         self.leg_config_table.tag_configure("oddrow", background="white")
         self.leg_config_table.tag_configure("evenrow", background="lightblue")
+        
+        # self.leg_config_table.window_create("", window=right_combobox)
 
         # Create an Entry widget
         self.entry = tk.Entry(leg_config_table_frame)
         # Create combo box
-        self.combo_box = ttk.Combobox(
+        self.combo_box_action = ttk.Combobox(
             leg_config_table_frame,
             state="readonly",
             style="Custom.TCombobox",
         )
-
+        self.combo_box_right = ttk.Combobox(
+            leg_config_table_frame,
+            state="readonly",
+            style="Custom.TCombobox",
+        )
+        
+        
         # Bind the <Configure> event of the scrollbar to on_scroll function
         self.leg_config_table.bind("<Configure>", self.forget_entry_end_combo)
 
@@ -1206,17 +1234,6 @@ class ScannerInputsTab:
             pass
 
     def on_double_click(self, event):
-
-        # if self.flag_legs_config_table_in_readonly_state:
-        #     Utils.display_message_popup(
-        #             "Error",
-        #             f"To edit leg-wise config, click on the Update Legs Config button",
-        #         )
-        #     return
-
-        # Your action upon scrolling goes here
-        # self.entry.place_forget()
-        # self.combo_box.place_forget()
         self.forget_entry_end_combo(event)
 
         # Get the item and column clicked
@@ -1233,74 +1250,59 @@ class ScannerInputsTab:
                 x, y, width, height = self.leg_config_table.bbox(item, column)
 
                 # Determine the current value in the cell
-                current_value = list(self.leg_config_table.item(item, "values"))
+                current_value = self.leg_config_table.item(item, "values")[column_index - 1]
+
+                # Destroy any existing Combobox or Entry widget
+                if hasattr(self, "combo_box"):
+                    self.combo_box.destroy()
+                if hasattr(self, "entry"):
+                    self.entry.destroy()
+
+                # Create Combobox for Action column
                 if column_index == 1:
                     return
-                if column_index == 2:  # Assuming column 2 is the Combobox column
-                    # Create a Combobox widget and place it over the cell
-                    self.combo_box = ttk.Combobox(
-                        self.leg_config_table, state="readonly"
-                    )
-                    self.combo_box.place(x=x, y=y, width=width, height=height)
+                if column_index == 3:  
+                    self.combo_box_action = ttk.Combobox(self.leg_config_table, values=["Buy", "Sell"], state="readonly")
+                    self.combo_box_action.set(current_value)
+                    self.combo_box_action.place(x=x, y=y, width=width, height=height)
+                    self.combo_box_action.bind("<Return>", lambda event: self.save_combobox_changes(item, column_index))
+                    self.combo_box_action.bind("<FocusOut>", lambda event: self.combo_box_action.destroy())
 
-                    # Set the options for the Combobox
-                    self.combo_box["values"] = ["Buy", "Sell"]
+                # Create Combobox for Right column
+                elif column_index == 4:
+                    self.combo_box_right = ttk.Combobox(self.leg_config_table, values=["Call", "Put"], state="readonly")
+                    self.combo_box_right.set(current_value)
+                    self.combo_box_right.place(x=x, y=y, width=width, height=height)
+                    self.combo_box_right.bind("<Return>", lambda event: self.save_combobox_changes(item, column_index))
+                    self.combo_box_right.bind("<FocusOut>", lambda event: self.combo_box_right.destroy())
 
-                    # Set the Combobox selection to the current value
-                    self.combo_box.set(current_value[column_index - 1])
-
-                    # Function to handle saving changes made in the Combobox widget
-                    def save_changes(event):
-                        # Get the new value selected by the user
-                        new_value = self.combo_box.get()
-
-                        # Update the value in the current_value list
-                        current_value[column_index - 1] = new_value
-
-                        # Convert the list back to a tuple
-                        updated_value = tuple(current_value)
-
-                        # Update the table with the new value
-                        self.leg_config_table.item(item, values=updated_value)
-
-                        # Remove the Combobox widget from the table
-                        self.combo_box.destroy()
-
-                    # Bind the <Return> key to save changes when user presses Enter
-                    self.combo_box.bind("<Return>", save_changes)
-
-                    # Focus on the Combobox widget
-                    self.combo_box.focus()
+                # Create Entry for other columns
                 else:
-                    # Create an Entry widget and place it over the cell
                     self.entry = ttk.Entry(self.leg_config_table)
+                    self.entry.insert(0, current_value)
                     self.entry.place(x=x, y=y, width=width, height=height)
+                    self.entry.bind("<Return>", lambda event: self.save_entry_changes(item, column_index))
+                    self.entry.bind("<FocusOut>", lambda event: self.entry.destroy())
 
-                    # Set the Entry widget's text to the current value in the cell
-                    self.entry.insert(0, current_value[column_index - 1])
+    def save_combobox_changes(self, item, column_index):
+        if column_index == 3:
+            new_value = self.combo_box_action.get()
+            self.leg_config_table.set(item, "#3", new_value)  # Use "#3" instead of column_index
+            self.combo_box_action.destroy()
+            self.leg_config_table.focus_set()
+        elif column_index == 4:
+            new_value = self.combo_box_right.get()
+            self.leg_config_table.set(item, "#4", new_value)  # Use "#4" instead of column_index
+            self.combo_box_right.destroy()
+            self.leg_config_table.focus_set()
 
-                    # Function to handle saving changes made in the Entry widget
-                    def save_changes(event):
-                        # Get the new value entered by the user
-                        new_value = self.entry.get()
+    def save_entry_changes(self, item, column_index):
+        new_value = self.entry.get()
+        self.leg_config_table.set(item, "#{}".format(column_index), new_value)  # Use "#{}".format(column_index) instead of column_index
+        self.entry.destroy()
 
-                        # Update the value in the current_value list
-                        current_value[column_index - 1] = new_value
 
-                        # Convert the list back to a tuple
-                        updated_value = tuple(current_value)
-
-                        # Update the table with the new value
-                        self.leg_config_table.item(item, values=updated_value)
-
-                        # Remove the Entry widget from the table
-                        self.entry.destroy()
-
-                    # Bind the <Return> key to save changes when user presses Enter
-                    self.entry.bind("<Return>", save_changes)
-
-                    # Focus on the Entry widget
-                    self.entry.focus()
+        
 
     def on_entry_validate(
         self,
