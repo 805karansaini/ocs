@@ -5,8 +5,14 @@ from functools import cache
 import pandas as pd
 
 from com.contracts import get_contract
-from com.option_comobo_scanner_idetif import find_closest_expiry_for_fop_given_fut_expiries_and_trading_class, find_nearest_expiry_and_all_strikes_for_stk_given_dte, find_nearest_expiry_for_future_given_fut_dte
+from com.option_comobo_scanner_idetif import (
+    find_closest_expiry_for_fop_given_fut_expiries_and_trading_class,
+    find_nearest_expiry_and_all_strikes_for_stk_given_dte,
+    find_nearest_expiry_for_future_given_fut_dte,
+)
+from option_combo_scanner.cache.data_store import DataStore
 from option_combo_scanner.database.sql_queries import SqlQueries
+from option_combo_scanner.indicators_calculator.helper_indicator import IndicatorHelper
 from option_combo_scanner.indicators_calculator.market_data_fetcher import MarketDataFetcher
 from option_combo_scanner.strategy.indicator import Indicator
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
@@ -135,7 +141,7 @@ class ScannerAlgo:
     #             list_of_indicator_ids_for_deletion.append(indicator_id)
 
     #     # self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
-        
+
     #     if list_of_indicator_ids_for_deletion:
     #         self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
 
@@ -148,7 +154,7 @@ class ScannerAlgo:
     #             continue
 
     #         # TODO Need underlying conid  TODO Comment
-            
+
     #         # Extract expiry date from the expiry and trading class string
     #         expiry = exp_trad_cls[:8]
     #         # Retrieve the underlying contract ID associated with the closest expiry
@@ -180,7 +186,6 @@ class ScannerAlgo:
     #     # Insertion of indicator data in GUI
     #     Scanner.scanner_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
 
-    
     def get_strike_and_closet_expiry_for_opt(
         self,
         symbol,
@@ -215,7 +220,6 @@ class ScannerAlgo:
             fop_trading_class="",
             low_range_date_str=low_range_date_str,
             high_range_date_str=high_range_date_str,
-
         )
         return string_of_strike_price, closest_expiry_date, underlying_conid, expiry_date_in_range
 
@@ -236,40 +240,34 @@ class ScannerAlgo:
         self.strike_and_delta_dataframe = self.strike_and_delta_dataframe.dropna()
 
         # Replace 'None' with NaN
-        self.strike_and_delta_dataframe = self.strike_and_delta_dataframe.replace(
-            "None", float("nan")
-        )
+        self.strike_and_delta_dataframe = self.strike_and_delta_dataframe.replace("None", float("nan"))
 
         # Convert values to float
-        self.strike_and_delta_dataframe = self.strike_and_delta_dataframe.apply(
-            pd.to_numeric, errors="coerce"
-        )
+        self.strike_and_delta_dataframe = self.strike_and_delta_dataframe.apply(pd.to_numeric, errors="coerce")
 
         # Converting Delta values to absolute
-        self.strike_and_delta_dataframe["Delta"] = self.strike_and_delta_dataframe[
-            "Delta"
-        ].abs()
+        self.strike_and_delta_dataframe["Delta"] = self.strike_and_delta_dataframe["Delta"].abs()
 
         # Remove all the row that have delta less than min_delta_threshold
         if StrategyVariables.flag_enable_filter_based_delta_threshold:
             self.strike_and_delta_dataframe = self.strike_and_delta_dataframe[
-                (
-                    self.strike_and_delta_dataframe["Delta"]
-                    > StrategyVariables.min_delta_threshold
-                )
+                (self.strike_and_delta_dataframe["Delta"] > StrategyVariables.min_delta_threshold)
             ]
 
             # Remove all the row that have delta higher than max_delta_threshold
             self.strike_and_delta_dataframe = self.strike_and_delta_dataframe[
-                (
-                    self.strike_and_delta_dataframe["Delta"]
-                    < StrategyVariables.max_delta_threshold
-                )
+                (self.strike_and_delta_dataframe["Delta"] < StrategyVariables.max_delta_threshold)
             ]
 
         # print("\nFiltered DF")
         # from tabulate import tabulate
         # print(tabulate(self.strike_and_delta_dataframe, headers="keys", tablefmt="psql", showindex=False))
+
+    @staticmethod
+    def get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange):
+        # right = contract.right.lower()
+        key_string = f"ocs_mkt_{symbol}_{expiry}_{sec_type}_{right}_{multiplier}_{trading_class}_{exchange}".lower()
+        return key_string
 
     def filter_strikes(self, delta_range_low, delta_range_high, current_expiry, remaining_no_of_legs, leg_object):
         """
@@ -285,44 +283,52 @@ class ScannerAlgo:
         """
         print(delta_range_low, delta_range_high, current_expiry)
 
-        # If we can get all the valid strikes over all the valid expiries for the leg, then we are good. 
+        # If we can get all the valid strikes over all the valid expiries for the leg, then we are good.
         # list_of_filter_legs = self.filter_strikes(range_low, range_high,) # ConfigLeg, Expiry of the perivous leg N-1 Leg,
+
+        # Get the all the details for contract creation
         instrument_id = leg_object.instrument_id
-        minDTE = leg_object.dte_range_min
-        maxDTE = leg_object.dte_range_max
+        min_dte = leg_object.dte_range_min
+        max_dte = leg_object.dte_range_max
         right = leg_object.right
         instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
-        symbol = instrument_object.symbol
 
+        symbol = instrument_object.symbol
         sec_type = instrument_object.sec_type
         multiplier = instrument_object.multiplier
         exchange = instrument_object.exchange
         trading_class = instrument_object.trading_class
-        currency = instrument_object.currency    
+        currency = instrument_object.currency
+
         set_of_all_closest_expiry = set()
         all_strikes = None
-        res_list_of_filtered_df = []
+        list_of_filtered_legs_tuple = []
         map_closest_expiry_to_underlying_conid = {}
-        low_range_date_str = (current_expiry - datetime.timedelta(days=minDTE)).strftime("%Y%m%d") 
-        high_range_date_str = (current_expiry + datetime.timedelta(days=maxDTE)).strftime("%Y%m%d")
-        
-        if sec_type == 'FOP':
-            
+        # Get the low range date and high range date to get list of expiry
+        low_range_date_str = (current_expiry + datetime.timedelta(days=min_dte)).strftime("%Y%m%d")
+        high_range_date_str = (current_expiry + datetime.timedelta(days=max_dte)).strftime("%Y%m%d")
+
+        if sec_type == "FOP":
+            # get all the strikes and list of expiry
             (all_strikes, closest_expiry, underlying_conid, expiry_date_in_range) = self.get_strike_and_closet_expiry_for_fop(
-                                                        symbol=symbol,
-                                                        dte=1,
-                                                        underlying_sec_type="FUT",
-                                                        exchange=exchange,
-                                                        currency=currency,
-                                                        multiplier=multiplier,
-                                                        trading_class=trading_class,
-                                                        low_range_date_str=low_range_date_str,
-                                                        high_range_date_str=high_range_date_str,
-                                                        
-                                                    )
+                symbol=symbol,
+                dte=1,
+                underlying_sec_type="FUT",
+                exchange=exchange,
+                currency=currency,
+                multiplier=multiplier,
+                trading_class=trading_class,
+                low_range_date_str=low_range_date_str,
+                high_range_date_str=high_range_date_str,
+            )
+
+            print(
+                f"InstrumentID: {instrument_id} low_date: {low_range_date_str} high_date: {high_range_date_str} All Epxiry: {expiry_date_in_range}"
+            )
+
             # if all_strikes is None or closest_expiry == None:
             #     continue
-        elif sec_type == 'OPT':
+        elif sec_type == "OPT":
             (
                 all_strikes_string,
                 closest_expiry,
@@ -339,119 +345,100 @@ class ScannerAlgo:
                 low_range_date_str=low_range_date_str,
                 high_range_date_str=high_range_date_str,
             )
+            print(
+                f"InstrumentID: {instrument_id} low_date: {low_range_date_str} high_date: {high_range_date_str} All Epxiry: {expiry_date_in_range}"
+            )
             all_strikes = [float(_) for _ in all_strikes_string[1:-1].split(",")]
 
             all_strikes = sorted(all_strikes)
+
             # map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
         #     self.update_indicator_table_for_instrument(
         #     instrument_object,
         #     expiry_date_in_range,
         #     map_closest_expiry_to_underlying_conid,
         # )
-        print(expiry_date_in_range)
+
         for expiry in expiry_date_in_range:
-        # print("All Strike: ", all_strikes)
+            # key: ocs_mkt_ symbol, expiry, sectype, right, trading_class, multiplier  exchange
 
-            list_of_all_option_contracts = []
-            for strike in all_strikes:
-                list_of_all_option_contracts.append(
-                    get_contract(
-                        symbol=symbol,
-                        sec_type=sec_type,
-                        multiplier=multiplier,
-                        exchange=exchange,
-                        currency=currency,
-                        right=right,
-                        strike_price=strike,
-                        expiry_date=expiry,
-                        trading_class=trading_class,
-                    )
+            # get the key for caching the raw dataframe
+            key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
+            data_frame = DataStore.get_data(key)
+            if data_frame is not None:
+                df = data_frame.copy()
+            else:
+                # get the list of call and put option contract
+                list_of_call_option_contracts, list_of_put_option_contracts = IndicatorHelper.get_list_of_call_and_put_option_contracts(
+                    symbol,
+                    sec_type,
+                    expiry,
+                    None,
+                    None,
+                    exchange,
+                    currency,
+                    multiplier,
+                    trading_class,
+                    all_strikes,
                 )
-        
-    # Fetch Data for all the  Contracts
-        list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple = asyncio.run(
-            MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
-                list_of_all_option_contracts,
-                flag_market_open=False,
-                generic_tick_list="",
-            )
-        )
 
-        # pprint.pprint(list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple)
+                print(f"InstrumentID: {instrument_id} Expiry: {expiry}")
+                
+                # get the market data dataframe for call/put
+                df_call, df_put = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
+                    list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
+                )
+                # print(df_call.to_string())
+                # print(df_put.to_string())
+                if right.upper() == "CALL":
+                    DataStore.store_data(key, df_call)
+                    df = df_call.copy()
+                else:
+                    DataStore.store_data(key, df_put)
+                    df = df_put.copy()
 
-        columns = [
-            "Strike",
-            "Delta",
-            "ConId",
-            "Bid",
-            "Ask",
-            "Expiry",
-        ]
-        data_frame_dict = {col: [] for col in columns}
+            df.dropna(subset=["Delta"], inplace=True)
+            
+            if right.upper() == "PUT":
+                df["Delta"] = df["Delta"].abs()
+            # Make a copy of the dataframe to avoid modifying the original dataframe
+            # print(df.to_string())
+            filtered_dataframe = df.copy()
 
-        for contract, (
-            delta,
-            iv_ask,
-            iv_bid,
-            iv_last,
-            bid_price,
-            ask_price,
-            call_oi,
-            put_oi,
-        ) in zip(
-            list_of_all_option_contracts,
-            list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple,
-        ):
-            data_frame_dict["Strike"].append(contract.strike)
-            data_frame_dict["Delta"].append((delta))
-            data_frame_dict["ConId"].append(contract.conId)
-
-            data_frame_dict["Bid"].append(bid_price)
-            data_frame_dict["Ask"].append(ask_price)
-            data_frame_dict["Expiry"].append(contract.lastTradeDateOrContractMonth)
-
-        df = pd.DataFrame(data_frame_dict)
-
-        df.dropna(inplace=True)
-
-    # 1. Get all the expries for the instrument
-    # Current Date: MinDTE, MaxDTE: 7:  7  14  -> 14, expiry 21
-    # Leg1: <7,14> March 15 Leg2: MinDTE=-2, MaxDte=2<13,17>
-    # Filter all the valid strikes. 
-    # Get MktData for all the Expiry  
-
-    # Make a copy of the dataframe to avoid modifying the original dataframe
-        filtered_dataframe = df.copy()
-
-    # Filter strikes based on delta_range_low and delta_range_high
-        filtered_dataframe = filtered_dataframe[
-                (filtered_dataframe["Delta"] >= delta_range_low)
-                & (filtered_dataframe["Delta"] <= delta_range_high)
+            # Filter strikes based on delta_range_low and delta_range_high
+            filtered_dataframe = filtered_dataframe[
+                (filtered_dataframe["Delta"] >= delta_range_low) & (filtered_dataframe["Delta"] <= delta_range_high)
             ]
-
-
-    
-        res_list_of_filtered_df.extend(list(
-                # "Strike", "Expiry", "Delta", "ConId", 
-                filtered_dataframe[["Strike", "Delta", "ConId", "Expiry"]].itertuples(
-                    index=False, name=None
+            list_of_filtered_legs_tuple.extend(
+                list(
+                    # "Strike", "Expiry", "Delta", "ConId",
+                    filtered_dataframe[["Strike", "Delta", "ConId", "Expiry"]].itertuples(index=False, name=None)
                 )
-            ))
-        return res_list_of_filtered_df
+            )
 
+        return list_of_filtered_legs_tuple
 
     @cache
     def generate_combinations(self, remaining_no_of_legs, range_low, range_high, current_expiry, leg_object):
+
         # If we can get all the valid strikes over all the valid expiries for the leg, then we are good. Leg0: Leg1 Leg2
-        list_of_filter_legs = self.filter_strikes(range_low, range_high, current_expiry, remaining_no_of_legs, leg_object) # current_expiry, ConfigLeg, Expiry of the perivous leg N-1 Leg: Current Date
-        # ("Strike", "Expiry", "Delta", "ConId"), 
-        print(f"list of filter leg: {list_of_filter_legs}")
+
+        # get the list of filter legs between the given range for the expiry
+        list_of_filter_legs = self.filter_strikes(
+            range_low, range_high, current_expiry, remaining_no_of_legs, leg_object
+        )  # current_expiry, ConfigLeg, Expiry of the perivous leg N-1 Leg: Current Date
+        # ("Strike", "Expiry", "Delta", "ConId"),
+
+        print(f"Leg Object: {leg_object}")
+        print(f"List of filter leg: {list_of_filter_legs}")
+
         list_of_partial_combination = []
 
         if remaining_no_of_legs == 0:
             for strike, strike_delta, con_id, expiry in list_of_filter_legs:
                 list_of_partial_combination.append([(strike, strike_delta, con_id, expiry)])
         else:
+            # get the next leg object to scan
             list_of_config_leg_object = self.config_obj.list_of_config_leg_object
             leg_object = list_of_config_leg_object[-remaining_no_of_legs]
 
@@ -473,20 +460,17 @@ class ScannerAlgo:
 
                 new_range_low = strike_delta + delta_range_min
                 new_range_high = strike_delta + delta_range_max
+                # print(new_range_low, new_range_high)
                 expiry_date_obj = datetime.datetime.strptime(expiry, "%Y%m%d")
-                print("leg object recursion", leg_object)
+
                 list_of_strike_delta_and_con_id_tuple = self.generate_combinations(
-                    remaining_no_of_legs - 1,
-                    new_range_low,
-                    new_range_high,
-                    expiry_date_obj,
-                    leg_object
-                    
+                    remaining_no_of_legs - 1, new_range_low, new_range_high, expiry_date_obj, leg_object
                 )
+
                 current_leg_strike_and_strike_delta = [(strike, strike_delta, con_id, expiry)]
-                for (
-                    next_legs_strike_delta_and_con_id
-                ) in list_of_strike_delta_and_con_id_tuple:
+
+                for next_legs_strike_delta_and_con_id in list_of_strike_delta_and_con_id_tuple:
+
                     temp = current_leg_strike_and_strike_delta[:]
                     temp.extend(next_legs_strike_delta_and_con_id)
                     list_of_partial_combination.append(temp)
@@ -551,21 +535,14 @@ class ScannerAlgo:
 
         return unique_filter_combination
 
-    def run_scanner(
-        self,
-        remaining_no_of_legs,
-        range_low,
-        range_high,
-        current_date,
-        leg_object
-    ):
+    def run_scanner(self, remaining_no_of_legs, range_low, range_high, current_date, leg_object):
 
         list_of_combination = self.generate_combinations(
             remaining_no_of_legs,
             range_low,
             range_high,
             current_expiry=current_date,
-            leg_object = leg_object,
+            leg_object=leg_object,
         )
         print("combination", list_of_combination)
         # print("list_of_combination", list_of_combination)
