@@ -351,7 +351,7 @@ class Utils:
             for combo_id in list_of_all_combo_ids_in_table:
                 row_value = Utils.scanner_combination_tab_object.scanner_combination_table.item(combo_id, "values")
 
-                row_instrume_id = row_value[1]
+                row_instrume_id = row_value[0]
                 if int(row_instrume_id) == int(instrument_id):
                     list_of_combo_ids.append(str(combo_id))
 

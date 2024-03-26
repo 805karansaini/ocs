@@ -895,7 +895,6 @@ class ScannerInputsTab:
         
 
     def save_config_button_click(self):
-
         values_dict = {
             "no_of_leg": int(self.no_of_legs_entry.get()),
             # "right": self.right_var.get().upper(),
