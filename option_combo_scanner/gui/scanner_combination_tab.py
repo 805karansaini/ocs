@@ -24,13 +24,13 @@ logger = CustomLogger.logger
 
 # Name, Width, Heading
 scanner_combination_table_columns_width = [
-    ("Combo ID", 220, "Combo ID"),
-    ("Instrument ID", 220, "Instrument ID"),
-    ("Description", 220, "Description"),
-    ("#Legs", 220, "#Legs"),
-    ("Combo Net  Delta", 220, "Combo Net Delta"),
-    ("Max Profit", 220, "Max Profit"),
-    ("Max Loss", 220, "Max Loss"),
+    ("Combo ID", 255, "Combo ID"),
+    # ("Instrument ID", 255, "Instrument ID"),
+    ("Description", 255, "Description"),
+    ("#Legs", 255, "#Legs"),
+    ("Combo Net  Delta", 255, "Combo Net Delta"),
+    ("Max Profit", 255, "Max Profit"),
+    ("Max Loss", 255, "Max Loss"),
     # ("Max Profit/Loss Ratio", 200, "Max Profit/Loss Ratio"),
 ]
 
@@ -261,7 +261,7 @@ class ScannerCombinationTab:
 
         row_values = (
             combo_id,
-            scanner_combination_object.instrument_id,
+            # scanner_combination_object.instrument_id,
             scanner_combination_object.description,
             scanner_combination_object.number_of_legs,
             scanner_combination_object.combo_net_delta,
