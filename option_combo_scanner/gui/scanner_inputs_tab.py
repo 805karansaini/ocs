@@ -1092,12 +1092,28 @@ class ScannerInputsTab:
         ):
             if prev_leg_object.action != new_leg_data_dict["action"]:
                 return not flag_same
+            
+            if prev_leg_object.right != new_leg_data_dict["right"]:
+                return not flag_same
+            
             if prev_leg_object.delta_range_max != float(
                 new_leg_data_dict["delta_range_max"]
             ):
                 return not flag_same
+            # New right addition in different and same condition
+            
             if prev_leg_object.delta_range_min != float(
                 new_leg_data_dict["delta_range_min"]
+            ):
+                return not flag_same
+            if prev_leg_object.dte_range_max != float(
+                new_leg_data_dict["dte_range_max"]
+            ):
+                return not flag_same
+            # New DTE addition in different and same condition
+            
+            if prev_leg_object.dte_range_min != float(
+                new_leg_data_dict["dte_range_min"]
             ):
                 return not flag_same
 
@@ -1261,7 +1277,7 @@ class ScannerInputsTab:
                 if column_index == 1:
                     return
                 if column_index == 3:  
-                    self.combo_box_action = ttk.Combobox(self.leg_config_table, values=["Buy", "Sell"], state="readonly")
+                    self.combo_box_action = ttk.Combobox(self.leg_config_table, values=["BUY", "SELL"], state="readonly")
                     self.combo_box_action.set(current_value)
                     self.combo_box_action.place(x=x, y=y, width=width, height=height)
                     self.combo_box_action.bind("<Return>", lambda event: self.save_combobox_changes(item, column_index))
@@ -1269,7 +1285,7 @@ class ScannerInputsTab:
 
                 # Create Combobox for Right column
                 elif column_index == 4:
-                    self.combo_box_right = ttk.Combobox(self.leg_config_table, values=["Call", "Put"], state="readonly")
+                    self.combo_box_right = ttk.Combobox(self.leg_config_table, values=["CALL", "PUT"], state="readonly")
                     self.combo_box_right.set(current_value)
                     self.combo_box_right.place(x=x, y=y, width=width, height=height)
                     self.combo_box_right.bind("<Return>", lambda event: self.save_combobox_changes(item, column_index))
