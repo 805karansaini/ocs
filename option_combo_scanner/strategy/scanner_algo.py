@@ -12,13 +12,16 @@ from com.option_comobo_scanner_idetif import (
 )
 from option_combo_scanner.cache.data_store import DataStore
 from option_combo_scanner.database.sql_queries import SqlQueries
+from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.indicators_calculator.helper_indicator import IndicatorHelper
 from option_combo_scanner.indicators_calculator.market_data_fetcher import MarketDataFetcher
 from option_combo_scanner.strategy.indicator import Indicator
+# from option_combo_scanner.strategy.scanner import Scanner
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
 
 class ScannerAlgo:
+    scanner_indicator_tab_obj=None
 
     # def __init__(self):
     def __init__(self, config_obj):
@@ -95,97 +98,106 @@ class ScannerAlgo:
 
         return all_strikes, closest_expiry_date, underlying_conid, expiry_date_in_range
 
-    # def update_indicator_table_for_instrument(
-    #     self,
-    #     instrument_object,
-    #     set_of_all_closest_expiry,
-    #     map_closest_expiry_to_underlying_conid,
-    # ):
-    #     """Updates the indicator table for a given instrument."""
+    def update_indicator_table_for_instrument(
+        self,
+        instrument_object,
+        set_of_all_closest_expiry,
+        map_closest_expiry_to_underlying_conid,
+    ):
+        """Updates the indicator table for a given instrument."""
 
-    #     exchange = instrument_object.exchange
-    #     where_condition = f" WHERE `instrument_id` = {instrument_object.instrument_id};"
-    #     select_query = SqlQueries.create_select_query(
-    #         table_name="indicator_table",
-    #         columns="`indicator_id`, `trading_class`, `expiry`",
-    #         where_clause=where_condition,
-    #     )
+        exchange = instrument_object.exchange
+        where_condition = f" WHERE `instrument_id` = {instrument_object.instrument_id};"
+        select_query = SqlQueries.create_select_query(
+            table_name="indicator_table",
+            columns="`indicator_id`, `trading_class`, `expiry`",
+            where_clause=where_condition,
+        )
 
-    #     # Get all the old rows from indicator table
-    #     all_the_existing_rows_form_db_table = SqlQueries.execute_select_query(select_query)
+        # Get all the old rows from indicator table
+        all_the_existing_rows_form_db_table = SqlQueries.execute_select_query(select_query)
 
-    #     map_indicator_id_to_expiry_and_trading_class_str = {}
-    #     map_expiry_and_trading_class_str_to_indicator_id = {}
+        map_indicator_id_to_expiry_and_trading_class_str = {}
+        map_expiry_and_trading_class_str_to_indicator_id = {}
 
-    #     for old_indicator_dict in all_the_existing_rows_form_db_table:
-    #         indicator_id = int(old_indicator_dict["indicator_id"])
-    #         expiry_and_trading_class_str = f"{old_indicator_dict['expiry']}{old_indicator_dict['trading_class']}"
+        for old_indicator_dict in all_the_existing_rows_form_db_table:
+            indicator_id = int(old_indicator_dict["indicator_id"])
+            expiry_and_trading_class_str = f"{old_indicator_dict['expiry']}{old_indicator_dict['trading_class']}"
 
-    #         map_indicator_id_to_expiry_and_trading_class_str[indicator_id] = expiry_and_trading_class_str
-    #         map_expiry_and_trading_class_str_to_indicator_id[expiry_and_trading_class_str] = indicator_id
+            map_indicator_id_to_expiry_and_trading_class_str[indicator_id] = expiry_and_trading_class_str
+            map_expiry_and_trading_class_str_to_indicator_id[expiry_and_trading_class_str] = indicator_id
 
-    #     # getting the new indicator_rows
-    #     list_of_new_expiry_and_trading_class_str = []
-    #     for expiry in set_of_all_closest_expiry:
-    #         _temp = f"{expiry}{instrument_object.trading_class}"
-    #         list_of_new_expiry_and_trading_class_str.append(_temp)
+        # getting the new indicator_rows
+        list_of_new_expiry_and_trading_class_str = []
+        for expiry in set_of_all_closest_expiry:
+            _temp = f"{expiry}{instrument_object.trading_class}"
+            list_of_new_expiry_and_trading_class_str.append(_temp)
 
-    #     list_of_indicator_ids_for_deletion = []
+        list_of_indicator_ids_for_deletion = []
 
-    #     # Lopping on old one
-    #     for (
-    #         exp_trad_cls,
-    #         indicator_id,
-    #     ) in map_expiry_and_trading_class_str_to_indicator_id.items():
-    #         if not exp_trad_cls in list_of_new_expiry_and_trading_class_str:
-    #             list_of_indicator_ids_for_deletion.append(indicator_id)
+        # Lopping on old one
+        for (
+            exp_trad_cls,
+            indicator_id,
+        ) in map_expiry_and_trading_class_str_to_indicator_id.items():
+            if not exp_trad_cls in list_of_new_expiry_and_trading_class_str:
+                list_of_indicator_ids_for_deletion.append(indicator_id)
 
-    #     # self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
+        # self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
 
-    #     if list_of_indicator_ids_for_deletion:
-    #         self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
+        if list_of_indicator_ids_for_deletion:
+            self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
 
-    #     # Insert all new indicator row
-    #     # old nahi hai, but new mai hai
-    #     # LOOOPING ON NEW ONE
-    #     for exp_trad_cls in list_of_new_expiry_and_trading_class_str:
+        # Insert all new indicator row
+        # old nahi hai, but new mai hai
+        # LOOOPING ON NEW ONE
+        for exp_trad_cls in list_of_new_expiry_and_trading_class_str:
 
-    #         if exp_trad_cls in map_expiry_and_trading_class_str_to_indicator_id:
-    #             continue
+            if exp_trad_cls in map_expiry_and_trading_class_str_to_indicator_id:
+                continue
 
-    #         # TODO Need underlying conid  TODO Comment
+            # TODO Need underlying conid  TODO Comment
 
-    #         # Extract expiry date from the expiry and trading class string
-    #         expiry = exp_trad_cls[:8]
-    #         # Retrieve the underlying contract ID associated with the closest expiry
-    #         underlying_conid = map_closest_expiry_to_underlying_conid[int(expiry)]
+            # Extract expiry date from the expiry and trading class string
+            expiry = exp_trad_cls[:8]
+            # Retrieve the underlying contract ID associated with the closest expiry
+            underlying_conid = map_closest_expiry_to_underlying_conid[int(expiry)]
 
-    #         #  Create a dictionary containing information about the new instrument
-    #         new_dict = {
-    #             "instrument_id": instrument_object.instrument_id,
-    #             "symbol": instrument_object.symbol,
-    #             "sec_type": instrument_object.sec_type,
-    #             "multiplier": instrument_object.multiplier,
-    #             "trading_class": instrument_object.trading_class,
-    #             "expiry": expiry,
-    #             "underlying_conid": underlying_conid,
-    #             "exchange": exchange,
-    #         }
+            #  Create a dictionary containing information about the new instrument
+            new_dict = {
+                "instrument_id": instrument_object.instrument_id,
+                "symbol": instrument_object.symbol,
+                "sec_type": instrument_object.sec_type,
+                "multiplier": instrument_object.multiplier,
+                "trading_class": instrument_object.trading_class,
+                "expiry": expiry,
+                "underlying_conid": underlying_conid,
+                "exchange": exchange,
+            }
 
-    #          # Insert the new indicator row in the database (GUI and system)
-    #         self.insert_new_indicator_row_in_db_gui_and_system(new_dict)
+             # Insert the new indicator row in the database (GUI and system)
+            self.insert_new_indicator_row_in_db_gui_and_system(new_dict)
 
-    # def insert_new_indicator_row_in_db_gui_and_system(self, values_dict):
+    def insert_new_indicator_row_in_db_gui_and_system(self, values_dict):
 
-    #     res, indicator_id = SqlQueries.insert_into_db_table(table_name="indicator_table", values_dict=values_dict)
-    #     if not res:
-    #         return
-    #     values_dict["indicator_id"] = indicator_id
-    #     indicator_obj = Indicator(values_dict)
+        res, indicator_id = SqlQueries.insert_into_db_table(table_name="indicator_table", values_dict=values_dict)
+        if not res:
+            return
+        values_dict["indicator_id"] = indicator_id
+        indicator_obj = Indicator(values_dict)
+        
+        # Insertion of indicator data in GUI
+        ScannerAlgo.scanner_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
+        
+    def delete_indicator_row_from_db_gui_and_system(self, list_of_indicator_ids_deletion):
+        for indicator_id in list_of_indicator_ids_deletion:
+            where_condition = f"WHERE `indicator_id` = {indicator_id}"
+            delete_query = SqlQueries.create_delete_query(table_name="indicator_table", where_clause=where_condition)
+            res = SqlQueries.execute_delete_query(delete_query)
 
-    #     # Insertion of indicator data in GUI
-    #     Scanner.scanner_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
-
+        # Remove from system
+        if list_of_indicator_ids_deletion:
+            Utils.remove_row_from_indicator_table(list_of_indicator_ids=list_of_indicator_ids_deletion)
     def get_strike_and_closet_expiry_for_opt(
         self,
         symbol,
@@ -291,6 +303,7 @@ class ScannerAlgo:
         min_dte = leg_object.dte_range_min
         max_dte = leg_object.dte_range_max
         right = leg_object.right
+    
         instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
 
         symbol = instrument_object.symbol
@@ -326,6 +339,14 @@ class ScannerAlgo:
                 f"InstrumentID: {instrument_id} low_date: {low_range_date_str} high_date: {high_range_date_str} All Epxiry: {expiry_date_in_range}"
             )
 
+            for closest_expiry in expiry_date_in_range:
+                map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
+                
+            self.update_indicator_table_for_instrument(
+            instrument_object,
+            expiry_date_in_range,
+            map_closest_expiry_to_underlying_conid,
+        )
             # if all_strikes is None or closest_expiry == None:
             #     continue
         elif sec_type == "OPT":
@@ -351,13 +372,15 @@ class ScannerAlgo:
             all_strikes = [float(_) for _ in all_strikes_string[1:-1].split(",")]
 
             all_strikes = sorted(all_strikes)
-
-            # map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
-        #     self.update_indicator_table_for_instrument(
-        #     instrument_object,
-        #     expiry_date_in_range,
-        #     map_closest_expiry_to_underlying_conid,
-        # )
+            for closest_expiry in expiry_date_in_range:
+                map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
+            
+            # Update the indicator table for the given list of expiry
+            self.update_indicator_table_for_instrument(
+            instrument_object,
+            expiry_date_in_range,
+            map_closest_expiry_to_underlying_conid,
+        )
 
         for expiry in expiry_date_in_range:
             # key: ocs_mkt_ symbol, expiry, sectype, right, trading_class, multiplier  exchange
@@ -388,8 +411,6 @@ class ScannerAlgo:
                 df_call, df_put = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
                     list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
                 )
-                # print(df_call.to_string())
-                # print(df_put.to_string())
                 if right.upper() == "CALL":
                     DataStore.store_data(key, df_call)
                     df = df_call.copy()
@@ -412,7 +433,7 @@ class ScannerAlgo:
             list_of_filtered_legs_tuple.extend(
                 list(
                     # "Strike", "Expiry", "Delta", "ConId",
-                    filtered_dataframe[["Strike", "Delta", "ConId", "Expiry"]].itertuples(index=False, name=None)
+                    filtered_dataframe[["Strike", "Delta", "ConId", "Expiry", "Bid", "Ask"]].itertuples(index=False, name=None)
                 )
             )
 
@@ -420,8 +441,6 @@ class ScannerAlgo:
 
     @cache
     def generate_combinations(self, remaining_no_of_legs, range_low, range_high, current_expiry, leg_object):
-
-        # If we can get all the valid strikes over all the valid expiries for the leg, then we are good. Leg0: Leg1 Leg2
 
         # get the list of filter legs between the given range for the expiry
         list_of_filter_legs = self.filter_strikes(
@@ -435,8 +454,8 @@ class ScannerAlgo:
         list_of_partial_combination = []
 
         if remaining_no_of_legs == 0:
-            for strike, strike_delta, con_id, expiry in list_of_filter_legs:
-                list_of_partial_combination.append([(strike, strike_delta, con_id, expiry)])
+            for strike, strike_delta, con_id, expiry, bid, ask in list_of_filter_legs:
+                list_of_partial_combination.append([(strike, strike_delta, con_id, expiry, bid, ask)])
         else:
             # get the next leg object to scan
             list_of_config_leg_object = self.config_obj.list_of_config_leg_object
@@ -456,18 +475,17 @@ class ScannerAlgo:
             delta_range_min = float(delta_range_min)
             delta_range_max = float(delta_range_max)
 
-            for strike, strike_delta, con_id, expiry in list_of_filter_legs:
+            for strike, strike_delta, con_id, expiry, bid, ask in list_of_filter_legs:
 
                 new_range_low = strike_delta + delta_range_min
                 new_range_high = strike_delta + delta_range_max
-                # print(new_range_low, new_range_high)
                 expiry_date_obj = datetime.datetime.strptime(expiry, "%Y%m%d")
 
                 list_of_strike_delta_and_con_id_tuple = self.generate_combinations(
                     remaining_no_of_legs - 1, new_range_low, new_range_high, expiry_date_obj, leg_object
                 )
 
-                current_leg_strike_and_strike_delta = [(strike, strike_delta, con_id, expiry)]
+                current_leg_strike_and_strike_delta = [(strike, strike_delta, con_id, expiry, bid, ask)]
 
                 for next_legs_strike_delta_and_con_id in list_of_strike_delta_and_con_id_tuple:
 

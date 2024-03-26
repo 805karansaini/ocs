@@ -18,7 +18,8 @@ from option_combo_scanner.indicators_calculator.implied_volatility import \
 from option_combo_scanner.indicators_calculator.put_call_vol import PutCallVol
 from option_combo_scanner.strategy.indicator import Indicator
 
-from option_combo_scanner.strategy.scanner import Scanner
+# from option_combo_scanner.strategy.scanner import Scanner
+from option_combo_scanner.strategy.scanner_algo import ScannerAlgo
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 from option_combo_scanner.strategy.utilities import StrategyUtils
 
@@ -86,7 +87,7 @@ class OptionIndicator:
         self.create_option_indicator_tab()
         HouseKeepingGUI.dump_all_indicator_values_in_indicator_tab(self)
 
-        Scanner.scanner_indicator_tab_obj = self
+        ScannerAlgo.scanner_indicator_tab_obj = self
         PutCallVol.scanner_indicator_tab_pc_obj = self
         HistoricalVolatility.scanner_hv_indicator_tab_obj = self
 
