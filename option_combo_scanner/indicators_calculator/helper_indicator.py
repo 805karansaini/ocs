@@ -257,6 +257,7 @@ class IndicatorHelper:
             "AskIV",
             "BidIV",
             "LastIV",
+            "Expiry",
         ]
 
         call_option_mkt_data_df = pd.DataFrame()
@@ -300,7 +301,7 @@ class IndicatorHelper:
                 data_frame_dict["Strike"].append(contract.strike)
                 data_frame_dict["Delta"].append(delta)
                 # data_frame_dict["ConId"].append(contract.conId)
-                data_frame_dict["ConId"].append(None)
+                data_frame_dict["ConId"].append(contract.conId)
                 data_frame_dict["Bid"].append(bid_price)
                 data_frame_dict["Ask"].append(ask_price)
                 data_frame_dict["CallOI"].append(call_oi)
@@ -308,6 +309,7 @@ class IndicatorHelper:
                 data_frame_dict["AskIV"].append(iv_ask)
                 data_frame_dict["BidIV"].append(iv_bid)
                 data_frame_dict["LastIV"].append(iv_last)
+                data_frame_dict["Expiry"].append(contract.lastTradeDateOrContractMonth)
 
             if indx == 0:
                 call_option_mkt_data_df = pd.DataFrame(data_frame_dict)
