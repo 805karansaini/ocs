@@ -110,16 +110,14 @@ class HouseKeepingGUI:
 
             combo_id = int(combination["combo_id"])
             legs = int(combination["number_of_legs"])
-
             # list of leg object
             list_of_all_leg_objects = []
 
             # Creating the Leg Objects
             for leg_number in range(1, legs + 1):
+                    leg_values_dict = legs_look_up_dict[combo_id][leg_number]
 
-                leg_values_dict = legs_look_up_dict[combo_id][leg_number]
-
-                list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
+                    list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
 
             # Added the list of leg object
             combination["list_of_all_leg_objects"] = list_of_all_leg_objects

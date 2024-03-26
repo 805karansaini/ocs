@@ -16,6 +16,7 @@ from com.option_comobo_scanner_idetif import (
     find_nearest_expiry_and_all_strikes_for_stk_given_dte,
     find_nearest_expiry_for_future_given_fut_dte)
 from com.variables import variables
+from option_combo_scanner.cache.data_store import DataStore
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.indicators_calculator.market_data_fetcher import \
@@ -221,16 +222,10 @@ class Scanner:
             # if not leg_object.instrument_id in StrategyVariables.map_instrument_id_to_instrument_object:
             #     continue
 
+            #  We need to loop over the configs now - IMPT V2 KARAN ARYAN 
             list_of_all_generated_combination = self.generate_combinations()
-
-            # symbol = instrument_object.symbol
-            # sec_type = instrument_object.sec_type
-            # multiplier = instrument_object.multiplier
-            # exchange = instrument_object.exchange
-            # trading_class = instrument_object.trading_class
-            # currency = instrument_object.currency
-            # conid = instrument_object.conid
-            # primary_exchange = instrument_object.primary_exchange
+            list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
+            self.insert_combinations_into_db(list_of_all_generated_combination, list_of_combo_net_deltas)
 
             right = None
             list_of_dte = []
@@ -260,6 +255,108 @@ class Scanner:
             # else:
             #     print(f"Security Type {sec_type} is invalid for {instrument_object}")
             #     continue
+
+    def insert_combinations_into_db(self, list_of_all_generated_combination, list_of_combo_net_delta):
+        config_obj = self.config_obj
+
+        list_of_config_leg_object = config_obj.list_of_config_leg_object
+        
+        # Get all the combo_id for this very instrument and expiry pair(config_id)
+        where_condition = (
+            f" WHERE `config_id` = {config_obj.config_id};"
+        )
+        select_query = SqlQueries.create_select_query(
+            table_name="combination_table",
+            columns="`combo_id`",
+            where_clause=where_condition,
+        )
+
+        all_combo_ids_for_instrument_and_expiry_from_db = SqlQueries.execute_select_query(select_query)
+        _list_of_combo_ids = [_["combo_id"] for _ in all_combo_ids_for_instrument_and_expiry_from_db]
+
+        # Delete Query
+        delete_query = SqlQueries.create_delete_query(table_name="combination_table", where_clause=where_condition)
+        res = SqlQueries.execute_delete_query(delete_query)
+
+        # Remove from the system.
+        Utils.remove_row_from_scanner_combination_table(list_of_combo_ids=_list_of_combo_ids)
+
+        values_dict = {          
+            "config_id": config_obj.config_id,
+            "number_of_legs": config_obj.no_of_leg,
+        }
+        
+        for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_delta):
+            
+            expiry_dates = [combo[-1] for combo in combination]
+            
+            # TODO max loss/profit
+            
+            max_loss, max_profit = self.get_combination_max_loss_and_max_profit(
+                list_of_legs_tuple=combination,
+                list_of_config_leg_objects=list_of_config_leg_object,
+                right=None,
+                multiplier=None,
+                df_with_strike_delta_bid_ask=None,
+            )
+
+
+            # Remove the key, val if exists form prev iter
+            if "combo_id" in values_dict:
+                del values_dict["combo_id"]
+
+            # Remove the key, val if exists form prev iter
+            if "list_of_all_leg_objects" in values_dict:
+                del values_dict["list_of_all_leg_objects"]
+
+            
+            # values_dict['expiry'] = ','.join(expiry for expiry in expiry_dates)
+            values_dict["combo_net_delta"] = combo_net_delta
+            # values_dict["max_loss"] = max
+            # values_dict["max_profit"] = None
+
+            values_dict["max_profit"] = "inf" if max_profit == float("inf") else round(max_profit, 2)
+            values_dict["max_loss"] = "-inf" if max_loss == float("-inf") else round(max_loss, 2)
+
+            res, combo_id = SqlQueries.insert_into_db_table(table_name="combination_table", values_dict=values_dict)
+            if not res:
+                # print(f"Unable to insert Combination in the table: {combination}")
+                continue
+            list_of_all_leg_objects = []
+            for index, ((strike, delta, con_id, expiry, bid, ask), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
+
+                instrument_id = config_leg_object.instrument_id
+                instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
+                leg_values_dict = {
+                    "combo_id": combo_id,
+                    "leg_number": index + 1,
+                    "con_id": con_id,
+                    "strike": strike,
+                    "qty": 1,
+                    "delta_found": delta,
+                    "expiry": expiry,
+                    "action": config_leg_object.action,
+                    "right": config_leg_object.right,
+                    "symbol": instrument_object.symbol,
+                    "sec_type": instrument_object.sec_type,
+                    "trading_class": instrument_object.trading_class,
+                    "multiplier": instrument_object.multiplier,
+                    "exchange": instrument_object.exchange,
+                    "currency": instrument_object.currency,
+                    
+                }
+                
+                res, leg_id = SqlQueries.insert_into_db_table(table_name="legs_table", values_dict=leg_values_dict)
+                if not res:
+                    print(f"Unable to insert leg in the table: {leg_values_dict}")
+                list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
+
+            values_dict["combo_id"] = combo_id
+            values_dict["list_of_all_leg_objects"] = list_of_all_leg_objects
+
+            #  Scanner Combination Object
+            scanner_combination_object = ScannerCombination(values_dict)
+            Scanner.scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
 
     # Deletion of Indicator data  from DB/GUI
     def delete_indicator_row_from_db_gui_and_system(self, list_of_indicator_ids_deletion):
@@ -350,11 +447,11 @@ class Scanner:
             }
 
              # Insert the new indicator row in the database (GUI and system)
-            self.insert_new_indicator_row_in_db_gui_and_system(new_dict)
+            self.insert_new_indicator_row_in_db_gui_and_system(new_dict, instrument_object)
 
     # Insertion of new indicator row in DB/GUI
-    def insert_new_indicator_row_in_db_gui_and_system(self, values_dict):
-
+    def insert_new_indicator_row_in_db_gui_and_system(self, values_dict, instrument_object):
+        # if instrument_id, expiry exist in indcator table continue else insertion
         res, indicator_id = SqlQueries.insert_into_db_table(table_name="indicator_table", values_dict=values_dict)
         if not res:
             return
@@ -364,296 +461,296 @@ class Scanner:
         # Insertion of indicator data in GUI
         Scanner.scanner_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
 
-    def run_scan_for_opt(self, instrument_object, list_of_dte, right):
-        symbol = instrument_object.symbol
-        sec_type = instrument_object.sec_type
-        multiplier = instrument_object.multiplier
-        exchange = instrument_object.exchange
-        trading_class = instrument_object.trading_class
-        currency = instrument_object.currency
-        conid = instrument_object.conid
-        primary_exchange = instrument_object.primary_exchange
+    # def run_scan_for_opt(self, instrument_object, list_of_dte, right):
+    #     symbol = instrument_object.symbol
+    #     sec_type = instrument_object.sec_type
+    #     multiplier = instrument_object.multiplier
+    #     exchange = instrument_object.exchange
+    #     trading_class = instrument_object.trading_class
+    #     currency = instrument_object.currency
+    #     conid = instrument_object.conid
+    #     primary_exchange = instrument_object.primary_exchange
 
-        set_of_all_closest_expiry = set()
-        all_strikes = None
-        map_closest_expiry_to_underlying_conid = {}
-        for dte in list_of_dte:
+    #     set_of_all_closest_expiry = set()
+    #     all_strikes = None
+    #     map_closest_expiry_to_underlying_conid = {}
+    #     for dte in list_of_dte:
 
-            # OPT/FOP
-            # Get all the expiry from the list of DTE
-            (
-                all_strikes_string,
-                closest_expiry,
-                underlying_conid,
-            ) = self.get_strike_and_closet_expiry_for_opt(
-                symbol=symbol,
-                dte=dte,
-                underlying_sec_type="STK",
-                exchange=exchange,
-                currency=currency,
-                multiplier=multiplier,
-                trading_class="",
-            )
-            if all_strikes_string == None or closest_expiry == None:
-                continue
+    #         # OPT/FOP
+    #         # Get all the expiry from the list of DTE
+    #         (
+    #             all_strikes_string,
+    #             closest_expiry,
+    #             underlying_conid,
+    #         ) = self.get_strike_and_closet_expiry_for_opt(
+    #             symbol=symbol,
+    #             dte=dte,
+    #             underlying_sec_type="STK",
+    #             exchange=exchange,
+    #             currency=currency,
+    #             multiplier=multiplier,
+    #             trading_class="",
+    #         )
+    #         if all_strikes_string == None or closest_expiry == None:
+    #             continue
 
-            set_of_all_closest_expiry.add(closest_expiry)
-            map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
+    #         set_of_all_closest_expiry.add(closest_expiry)
+    #         map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
 
-            # Removing  {  }
-            all_strikes = [float(_) for _ in all_strikes_string[1:-1].split(",")]
+    #         # Removing  {  }
+    #         all_strikes = [float(_) for _ in all_strikes_string[1:-1].split(",")]
 
-            all_strikes = sorted(all_strikes)
+    #         all_strikes = sorted(all_strikes)
 
-        # TODO - Comment
+    #     # TODO - Comment
 
-        # Updates the indicator table for a given instrument
-        self.update_indicator_table_for_instrument(
-            instrument_object,
-            set_of_all_closest_expiry,
-            map_closest_expiry_to_underlying_conid,
-        )
+    #     # Updates the indicator table for a given instrument
+    #     self.update_indicator_table_for_instrument(
+    #         instrument_object,
+    #         set_of_all_closest_expiry,
+    #         map_closest_expiry_to_underlying_conid,
+    #     )
 
-        # Early Termination of Scanner
-        if self.check_do_we_need_to_restart_scan():
-            print(f"Early Termination: {self.config_obj}")
-            return
+    #     # Early Termination of Scanner
+    #     if self.check_do_we_need_to_restart_scan():
+    #         print(f"Early Termination: {self.config_obj}")
+    #         return
 
-        for expiry in set_of_all_closest_expiry:
-            # print("All Strike: ", all_strikes)
+    #     for expiry in set_of_all_closest_expiry:
+    #         # print("All Strike: ", all_strikes)
 
-            list_of_all_option_contracts = []
-            for strike in all_strikes:
-                list_of_all_option_contracts.append(
-                    get_contract(
-                        symbol=symbol,
-                        sec_type=sec_type,
-                        multiplier=multiplier,
-                        exchange=exchange,
-                        currency=currency,
-                        right=right,
-                        strike_price=strike,
-                        expiry_date=expiry,
-                        trading_class=None,
-                    )
-                )
+    #         list_of_all_option_contracts = []
+    #         for strike in all_strikes:
+    #             list_of_all_option_contracts.append(
+    #                 get_contract(
+    #                     symbol=symbol,
+    #                     sec_type=sec_type,
+    #                     multiplier=multiplier,
+    #                     exchange=exchange,
+    #                     currency=currency,
+    #                     right=right,
+    #                     strike_price=strike,
+    #                     expiry_date=expiry,
+    #                     trading_class=None,
+    #                 )
+    #             )
 
-            # Fetch Data for all the  Contracts
-            list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple = asyncio.run(
-                MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
-                    list_of_all_option_contracts,
-                    flag_market_open=False,
-                    generic_tick_list="",
-                )
-            )
+    #         # Fetch Data for all the  Contracts
+    #         list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple = asyncio.run(
+    #             MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
+    #                 list_of_all_option_contracts,
+    #                 flag_market_open=False,
+    #                 generic_tick_list="",
+    #             )
+    #         )
 
-            columns = [
-                "Strike",
-                "Delta",
-                "ConId",
-                "Bid",
-                "Ask",
-            ]
-            data_frame_dict = {col: [] for col in columns}
+    #         columns = [
+    #             "Strike",
+    #             "Delta",
+    #             "ConId",
+    #             "Bid",
+    #             "Ask",
+    #         ]
+    #         data_frame_dict = {col: [] for col in columns}
 
-            for contract, (
-                delta,
-                iv_ask,
-                iv_bid,
-                iv_last,
-                bid_price,
-                ask_price,
-                call_oi,
-                put_oi,
-            ) in zip(
-                list_of_all_option_contracts,
-                list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple,
-            ):
-                data_frame_dict["Strike"].append(contract.strike)
-                data_frame_dict["Delta"].append(str(delta))
-                data_frame_dict["ConId"].append(contract.conId)
+    #         for contract, (
+    #             delta,
+    #             iv_ask,
+    #             iv_bid,
+    #             iv_last,
+    #             bid_price,
+    #             ask_price,
+    #             call_oi,
+    #             put_oi,
+    #         ) in zip(
+    #             list_of_all_option_contracts,
+    #             list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple,
+    #         ):
+    #             data_frame_dict["Strike"].append(contract.strike)
+    #             data_frame_dict["Delta"].append(str(delta))
+    #             data_frame_dict["ConId"].append(contract.conId)
 
-                data_frame_dict["Bid"].append(bid_price)
-                data_frame_dict["Ask"].append(ask_price)
+    #             data_frame_dict["Bid"].append(bid_price)
+    #             data_frame_dict["Ask"].append(ask_price)
 
-            df = pd.DataFrame(data_frame_dict)
-            # print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
+    #         df = pd.DataFrame(data_frame_dict)
+    #         # print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
 
-            # Early Termination of Scanner
-            if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
-                return
+    #         # Early Termination of Scanner
+    #         if self.check_do_we_need_to_restart_scan():
+    #             print(f"Early Termination: {self.config_obj}")
+    #             return
 
-            list_of_all_generated_combination = self.generate_combinations(
-                strike_and_delta_dataframe=df,
-            )
+    #         list_of_all_generated_combination = self.generate_combinations(
+    #             strike_and_delta_dataframe=df,
+    #         )
 
-            # pprint.pprint(f"list_of_all_generated_combination :{list_of_all_generated_combination}")
+    #         # pprint.pprint(f"list_of_all_generated_combination :{list_of_all_generated_combination}")
 
-            # Early Termination of Scanner
-            if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
-                return
+    #         # Early Termination of Scanner
+    #         if self.check_do_we_need_to_restart_scan():
+    #             print(f"Early Termination: {self.config_obj}")
+    #             return
 
-            list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
+    #         list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
 
-            # Early Termination of Scanner
-            if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
-                return
+    #         # Early Termination of Scanner
+    #         if self.check_do_we_need_to_restart_scan():
+    #             print(f"Early Termination: {self.config_obj}")
+    #             return
 
-            self.insert_combinations_into_db(
-                list_of_all_generated_combination,
-                instrument_object,
-                expiry,
-                list_of_combo_net_deltas,
-                df,
-            )
+    #         self.insert_combinations_into_db(
+    #             list_of_all_generated_combination,
+    #             instrument_object,
+    #             expiry,
+    #             list_of_combo_net_deltas,
+    #             df,
+    #         )
 
-    def run_scan_for_fop(self, instrument_object, list_of_dte, right):
-        symbol = instrument_object.symbol
-        sec_type = instrument_object.sec_type
-        multiplier = instrument_object.multiplier
-        exchange = instrument_object.exchange
-        trading_class = instrument_object.trading_class
-        currency = instrument_object.currency
-        conid = instrument_object.conid
-        primary_exchange = instrument_object.primary_exchange
+    # def run_scan_for_fop(self, instrument_object, list_of_dte, right):
+    #     symbol = instrument_object.symbol
+    #     sec_type = instrument_object.sec_type
+    #     multiplier = instrument_object.multiplier
+    #     exchange = instrument_object.exchange
+    #     trading_class = instrument_object.trading_class
+    #     currency = instrument_object.currency
+    #     conid = instrument_object.conid
+    #     primary_exchange = instrument_object.primary_exchange
 
-        set_of_all_closest_expiry = set()
-        all_strikes = None
-        map_closest_expiry_to_underlying_conid = {}
+    #     set_of_all_closest_expiry = set()
+    #     all_strikes = None
+    #     map_closest_expiry_to_underlying_conid = {}
 
-        for dte in list_of_dte:
+    #     for dte in list_of_dte:
 
-            # OPT/FOP
-            # Get all the expiry from the list of DTE
-            (
-                all_strikes,
-                closest_expiry,
-                underlying_conid,
-            ) = self.get_strike_and_closet_expiry_for_fop(
-                symbol=symbol,
-                dte=dte,
-                underlying_sec_type="FUT",
-                exchange=exchange,
-                currency=currency,
-                multiplier=multiplier,
-                trading_class=trading_class,
-            )
+    #         # OPT/FOP
+    #         # Get all the expiry from the list of DTE
+    #         (
+    #             all_strikes,
+    #             closest_expiry,
+    #             underlying_conid,
+    #         ) = self.get_strike_and_closet_expiry_for_fop(
+    #             symbol=symbol,
+    #             dte=dte,
+    #             underlying_sec_type="FUT",
+    #             exchange=exchange,
+    #             currency=currency,
+    #             multiplier=multiplier,
+    #             trading_class=trading_class,
+    #         )
 
-            # print("Scanner: FOP underlying_coind:", underlying_conid)
-            if all_strikes is None or closest_expiry == None:
-                continue
+    #         # print("Scanner: FOP underlying_coind:", underlying_conid)
+    #         if all_strikes is None or closest_expiry == None:
+    #             continue
 
-            map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
-            set_of_all_closest_expiry.add(closest_expiry)
+    #         map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
+    #         set_of_all_closest_expiry.add(closest_expiry)
 
-        # Update Indicator table with Unique Rows
-        self.update_indicator_table_for_instrument(
-            instrument_object,
-            set_of_all_closest_expiry,
-            map_closest_expiry_to_underlying_conid,
-        )
+    #     # Update Indicator table with Unique Rows
+    #     self.update_indicator_table_for_instrument(
+    #         instrument_object,
+    #         set_of_all_closest_expiry,
+    #         map_closest_expiry_to_underlying_conid,
+    #     )
 
-        # Early Termination of Scanner
-        if self.check_do_we_need_to_restart_scan():
-            print(f"Early Termination: {self.config_obj}")
-            return
+    #     # Early Termination of Scanner
+    #     if self.check_do_we_need_to_restart_scan():
+    #         print(f"Early Termination: {self.config_obj}")
+    #         return
 
-        for expiry in set_of_all_closest_expiry:
-            # print("All Strike: ", all_strikes)
+    #     for expiry in set_of_all_closest_expiry:
+    #         # print("All Strike: ", all_strikes)
 
-            list_of_all_option_contracts = []
-            for strike in all_strikes:
-                list_of_all_option_contracts.append(
-                    get_contract(
-                        symbol=symbol,
-                        sec_type=sec_type,
-                        multiplier=multiplier,
-                        exchange=exchange,
-                        currency=currency,
-                        right=right,
-                        strike_price=strike,
-                        expiry_date=expiry,
-                        trading_class=trading_class,
-                    )
-                )
+    #         list_of_all_option_contracts = []
+    #         for strike in all_strikes:
+    #             list_of_all_option_contracts.append(
+    #                 get_contract(
+    #                     symbol=symbol,
+    #                     sec_type=sec_type,
+    #                     multiplier=multiplier,
+    #                     exchange=exchange,
+    #                     currency=currency,
+    #                     right=right,
+    #                     strike_price=strike,
+    #                     expiry_date=expiry,
+    #                     trading_class=trading_class,
+    #                 )
+    #             )
 
-            # Fetch Data for all the  Contracts
-            list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple = asyncio.run(
-                MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
-                    list_of_all_option_contracts,
-                    flag_market_open=False,
-                    generic_tick_list="",
-                )
-            )
+    #         # Fetch Data for all the  Contracts
+    #         list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple = asyncio.run(
+    #             MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
+    #                 list_of_all_option_contracts,
+    #                 flag_market_open=False,
+    #                 generic_tick_list="",
+    #             )
+    #         )
 
-            # pprint.pprint(list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple)
+    #         # pprint.pprint(list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple)
 
-            columns = [
-                "Strike",
-                "Delta",
-                "ConId",
-                "Bid",
-                "Ask",
-            ]
-            data_frame_dict = {col: [] for col in columns}
+    #         columns = [
+    #             "Strike",
+    #             "Delta",
+    #             "ConId",
+    #             "Bid",
+    #             "Ask",
+    #         ]
+    #         data_frame_dict = {col: [] for col in columns}
 
-            for contract, (
-                delta,
-                iv_ask,
-                iv_bid,
-                iv_last,
-                bid_price,
-                ask_price,
-                call_oi,
-                put_oi,
-            ) in zip(
-                list_of_all_option_contracts,
-                list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple,
-            ):
-                data_frame_dict["Strike"].append(contract.strike)
-                data_frame_dict["Delta"].append(str(delta))
-                data_frame_dict["ConId"].append(contract.conId)
+    #         for contract, (
+    #             delta,
+    #             iv_ask,
+    #             iv_bid,
+    #             iv_last,
+    #             bid_price,
+    #             ask_price,
+    #             call_oi,
+    #             put_oi,
+    #         ) in zip(
+    #             list_of_all_option_contracts,
+    #             list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_tuple,
+    #         ):
+    #             data_frame_dict["Strike"].append(contract.strike)
+    #             data_frame_dict["Delta"].append(str(delta))
+    #             data_frame_dict["ConId"].append(contract.conId)
 
-                data_frame_dict["Bid"].append(bid_price)
-                data_frame_dict["Ask"].append(ask_price)
+    #             data_frame_dict["Bid"].append(bid_price)
+    #             data_frame_dict["Ask"].append(ask_price)
 
-            df = pd.DataFrame(data_frame_dict)
-            # print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
+    #         df = pd.DataFrame(data_frame_dict)
+    #         # print(tabulate(df, headers="keys", tablefmt="psql", showindex=False))
 
-            # Early Termination of Scanner
-            if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
-                return
+    #         # Early Termination of Scanner
+    #         if self.check_do_we_need_to_restart_scan():
+    #             print(f"Early Termination: {self.config_obj}")
+    #             return
 
-            list_of_all_generated_combination = self.generate_combinations(
-                strike_and_delta_dataframe=df,
-            )
+    #         list_of_all_generated_combination = self.generate_combinations(
+    #             strike_and_delta_dataframe=df,
+    #         )
 
-            # pprint.pprint(f"list_of_all_generated_combination :{list_of_all_generated_combination}")
+    #         # pprint.pprint(f"list_of_all_generated_combination :{list_of_all_generated_combination}")
 
-            # Early Termination of Scanner
-            if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
-                return
+    #         # Early Termination of Scanner
+    #         if self.check_do_we_need_to_restart_scan():
+    #             print(f"Early Termination: {self.config_obj}")
+    #             return
 
-            # Get the list of net combo delta for the list of combinations
-            list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
+    #         # Get the list of net combo delta for the list of combinations
+    #         list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
 
-            # Early Termination of Scanner
-            if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
-                return
+    #         # Early Termination of Scanner
+    #         if self.check_do_we_need_to_restart_scan():
+    #             print(f"Early Termination: {self.config_obj}")
+    #             return
 
-            self.insert_combinations_into_db(
-                list_of_all_generated_combination,
-                instrument_object,
-                expiry,
-                list_of_combo_net_deltas,
-                df,
-            )
+    #         self.insert_combinations_into_db(
+    #             list_of_all_generated_combination,
+    #             instrument_object,
+    #             expiry,
+    #             list_of_combo_net_deltas,
+    #             df,
+    #         )
 
     def generate_combinations(self, ):
 
@@ -667,8 +764,8 @@ class Scanner:
 
         # Get the configurations
         remaining_no_of_legs = self.config_obj.no_of_leg - 1
-        range_low = self.config_obj.list_of_config_leg_object[0].delta_range_min
-        range_high = self.config_obj.list_of_config_leg_object[0].delta_range_max
+        delta_range_low = self.config_obj.list_of_config_leg_object[0].delta_range_min
+        delta_range_high = self.config_obj.list_of_config_leg_object[0].delta_range_max
         leg_object = self.config_obj.list_of_config_leg_object[0]
         print(leg_object)
         # print("\nGenerate Combintaions: ")
@@ -679,8 +776,8 @@ class Scanner:
             config_obj=self.config_obj,
         ).run_scanner(
             remaining_no_of_legs,
-            range_low,
-            range_high,
+            delta_range_low,
+            delta_range_high,
             current_date,
             leg_object
         )
@@ -688,114 +785,114 @@ class Scanner:
         return res
 
     # Function to insertion the combination in the database
-    def insert_combinations_into_db(
-        self,
-        list_of_all_generated_combination,
-        instrument_object,
-        expiry,
-        list_of_combo_net_deltas,
-        df_with_strike_delta_bid_ask,
-    ):
+    # def insert_combinations_into_db(
+    #     self,
+    #     list_of_all_generated_combination,
+    #     instrument_object,
+    #     expiry,
+    #     list_of_combo_net_deltas,
+    #     df_with_strike_delta_bid_ask,
+    # ):
 
-        config_obj = self.config_obj
-        list_of_config_leg_object = config_obj.list_of_config_leg_object
+    #     config_obj = self.config_obj
+    #     list_of_config_leg_object = config_obj.list_of_config_leg_object
 
-        # Get all the combo_id for this very instrument and expiry pair(config_id)
-        where_condition = (
-            f" WHERE `config_id` = {config_obj.config_id} AND `instrument_id` = {instrument_object.instrument_id} AND `expiry` = {expiry};"
-        )
-        select_query = SqlQueries.create_select_query(
-            table_name="combination_table",
-            columns="`combo_id`",
-            where_clause=where_condition,
-        )
+    #     # Get all the combo_id for this very instrument and expiry pair(config_id)
+    #     where_condition = (
+    #         f" WHERE `config_id` = {config_obj.config_id} AND `instrument_id` = {instrument_object.instrument_id} AND `expiry` = {expiry};"
+    #     )
+    #     select_query = SqlQueries.create_select_query(
+    #         table_name="combination_table",
+    #         columns="`combo_id`",
+    #         where_clause=where_condition,
+    #     )
 
-        all_combo_ids_for_instrument_and_expiry_from_db = SqlQueries.execute_select_query(select_query)
-        _list_of_combo_ids = [_["combo_id"] for _ in all_combo_ids_for_instrument_and_expiry_from_db]
+    #     all_combo_ids_for_instrument_and_expiry_from_db = SqlQueries.execute_select_query(select_query)
+    #     _list_of_combo_ids = [_["combo_id"] for _ in all_combo_ids_for_instrument_and_expiry_from_db]
 
-        # Delete Query
-        delete_query = SqlQueries.create_delete_query(table_name="combination_table", where_clause=where_condition)
-        res = SqlQueries.execute_delete_query(delete_query)
+    #     # Delete Query
+    #     delete_query = SqlQueries.create_delete_query(table_name="combination_table", where_clause=where_condition)
+    #     res = SqlQueries.execute_delete_query(delete_query)
 
-        # Remove from the system.
-        Utils.remove_row_from_scanner_combination_table(list_of_combo_ids=_list_of_combo_ids)
+    #     # Remove from the system.
+    #     Utils.remove_row_from_scanner_combination_table(list_of_combo_ids=_list_of_combo_ids)
 
-        values_dict = {
-            "instrument_id": instrument_object.instrument_id,
-            "config_id": config_obj.config_id,
-            "number_of_legs": config_obj.no_of_leg,
-            "symbol": instrument_object.symbol,
-            "sec_type": instrument_object.sec_type,
-            "expiry": expiry,
-            "right": config_obj.right,
-            "multiplier": instrument_object.multiplier,
-            "trading_class": instrument_object.trading_class,
-            "currency": instrument_object.currency,
-            "exchange": instrument_object.exchange,
-            # "max_profit_max_loss_ratio": 1.3,
-            "primary_exchange": instrument_object.primary_exchange,
-        }
+    #     values_dict = {
+    #         "instrument_id": instrument_object.instrument_id,
+    #         "config_id": config_obj.config_id,
+    #         "number_of_legs": config_obj.no_of_leg,
+    #         "symbol": instrument_object.symbol,
+    #         "sec_type": instrument_object.sec_type,
+    #         "expiry": expiry,
+    #         "right": config_obj.right,
+    #         "multiplier": instrument_object.multiplier,
+    #         "trading_class": instrument_object.trading_class,
+    #         "currency": instrument_object.currency,
+    #         "exchange": instrument_object.exchange,
+    #         # "max_profit_max_loss_ratio": 1.3,
+    #         "primary_exchange": instrument_object.primary_exchange,
+    #     }
 
-        for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_deltas):
+    #     for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_deltas):
 
-            # print(f"\n Symbol: {instrument_object.symbol} Combination: {combination}")
+    #         # print(f"\n Symbol: {instrument_object.symbol} Combination: {combination}")
 
-            # TODO max loss/profit
-            max_loss, max_profit = self.get_combination_max_loss_and_max_profit(
-                list_of_legs_tuple=combination,
-                list_of_config_leg_objects=list_of_config_leg_object,
-                right=config_obj.right,
-                multiplier=instrument_object.multiplier,
-                df_with_strike_delta_bid_ask=df_with_strike_delta_bid_ask,
-            )
+    #         # TODO max loss/profit
+    #         max_loss, max_profit = self.get_combination_max_loss_and_max_profit(
+    #             list_of_legs_tuple=combination,
+    #             list_of_config_leg_objects=list_of_config_leg_object,
+    #             right=config_obj.right,
+    #             multiplier=instrument_object.multiplier,
+    #             df_with_strike_delta_bid_ask=df_with_strike_delta_bid_ask,
+    #         )
 
-            # Remove the key, val if exists form prev iter
-            if "combo_id" in values_dict:
-                del values_dict["combo_id"]
+    #         # Remove the key, val if exists form prev iter
+    #         if "combo_id" in values_dict:
+    #             del values_dict["combo_id"]
 
-            # Remove the key, val if exists form prev iter
-            if "list_of_all_leg_objects" in values_dict:
-                del values_dict["list_of_all_leg_objects"]
+    #         # Remove the key, val if exists form prev iter
+    #         if "list_of_all_leg_objects" in values_dict:
+    #             del values_dict["list_of_all_leg_objects"]
 
-            # add combo net delta calculation to the value dict
-            values_dict["combo_net_delta"] = combo_net_delta
-            values_dict["max_profit"] = "inf" if max_profit == float("inf") else max_profit
-            values_dict["max_loss"] = "-inf" if max_loss == float("-inf") else max_loss
-            res, combo_id = SqlQueries.insert_into_db_table(table_name="combination_table", values_dict=values_dict)
-            if not res:
-                # print(f"Unable to insert Combination in the table: {combination}")
-                continue
+    #         # add combo net delta calculation to the value dict
+    #         values_dict["combo_net_delta"] = combo_net_delta
+    #         values_dict["max_profit"] = "inf" if max_profit == float("inf") else max_profit
+    #         values_dict["max_loss"] = "-inf" if max_loss == float("-inf") else max_loss
+    #         res, combo_id = SqlQueries.insert_into_db_table(table_name="combination_table", values_dict=values_dict)
+    #         if not res:
+    #             # print(f"Unable to insert Combination in the table: {combination}")
+    #             continue
 
-            # list of leg object
-            list_of_all_leg_objects = []
-            for index, ((strike, delta, con_id), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
-                leg_values_dict = {
-                    "combo_id": combo_id,
-                    "leg_number": index + 1,
-                    "con_id": con_id,
-                    "strike": strike,
-                    "qty": 1,
-                    "delta_found": delta,
-                    "action": config_leg_object.action,
-                    "delta_range_min": config_leg_object.delta_range_min,
-                    "delta_range_max": config_leg_object.delta_range_max,
-                }
-                res, leg_id = SqlQueries.insert_into_db_table(table_name="legs_table", values_dict=leg_values_dict)
-                if not res:
-                    print(f"Unable to insert leg in the table: {leg_values_dict}")
+    #         # list of leg object
+    #         list_of_all_leg_objects = []
+    #         for index, ((strike, delta, con_id), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
+    #             leg_values_dict = {
+    #                 "combo_id": combo_id,
+    #                 "leg_number": index + 1,
+    #                 "con_id": con_id,
+    #                 "strike": strike,
+    #                 "qty": 1,
+    #                 "delta_found": delta,
+    #                 "action": config_leg_object.action,
+    #                 "delta_range_min": config_leg_object.delta_range_min,
+    #                 "delta_range_max": config_leg_object.delta_range_max,
+    #             }
+    #             res, leg_id = SqlQueries.insert_into_db_table(table_name="legs_table", values_dict=leg_values_dict)
+    #             if not res:
+    #                 print(f"Unable to insert leg in the table: {leg_values_dict}")
 
-                list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
+    #             list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
 
-            # Add the combo_id and leg objects
-            values_dict["combo_id"] = combo_id
-            values_dict["list_of_all_leg_objects"] = list_of_all_leg_objects
+    #         # Add the combo_id and leg objects
+    #         values_dict["combo_id"] = combo_id
+    #         values_dict["list_of_all_leg_objects"] = list_of_all_leg_objects
 
-            # Scanner Combination Object
-            scanner_combination_object = ScannerCombination(values_dict)
+    #         # Scanner Combination Object
+    #         scanner_combination_object = ScannerCombination(values_dict)
 
-            # Insert the Scanner combination in GUI
-            Scanner.scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
-        Scanner.scanner_combination_tab_obj.filter_combo_based_on_max_loss_and_max_profit()
+    #         # Insert the Scanner combination in GUI
+    #         Scanner.scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
+    #     Scanner.scanner_combination_tab_obj.filter_combo_based_on_max_loss_and_max_profit()
 
     # Function to calculate the leg wise option payoff
     def option_payoff(
@@ -983,18 +1080,21 @@ class Scanner:
         combination_premium_received = 0
         combination_payoff = 0
         for leg, config_leg_obj in zip(list_of_legs_tuple, list_of_config_leg_object):
-
-            option_strike = leg[0]
+            instrument_id = config_leg_obj.instrument_id
+            instrument_object_for_leg_prem = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
+            option_strike,_, _, _, bid, ask = leg
+            # option_strike = leg[0]
 
             leg_premium = 0
             try:
-                bid_value, ask_value = tuple(
-                    df_with_strike_delta_bid_ask[df_with_strike_delta_bid_ask["Strike"] == float(option_strike)][["Bid", "Ask"]].iloc[0]
-                )
-                if bid_value == float("nan") or pd.isna(bid_value) or ask_value == float("nan") or pd.isna(ask_value):
+
+                # bid_value, ask_value = tuple(
+                #     df_with_strike_delta_bid_ask[df_with_strike_delta_bid_ask["Strike"] == float(option_strike)][["Bid", "Ask"]].iloc[0]
+                # )
+                if bid == float("nan") or ask == float("nan"):
                     leg_premium = 0
                 else:
-                    leg_premium = (bid_value + ask_value) / 2
+                    leg_premium = (bid + ask) / 2
 
             except Exception as e:
                 # TODO REMOVE IT
@@ -1002,11 +1102,11 @@ class Scanner:
 
             leg_payoff, leg_premium_received = self.option_payoff(
                 option_strike,
-                right,
+                config_leg_obj.right,
                 config_leg_obj.action,
                 1,
                 underlying_strike_price,
-                int(multiplier),
+                int(instrument_object_for_leg_prem.multiplier),
                 leg_premium,
             )
 
@@ -1025,7 +1125,7 @@ class Scanner:
             # Loop over leg object to get action for the leg
             for leg_tuple, leg_object in zip(combination, list_of_config_leg_object):
                 action = leg_object.action
-                _, delta, _ = leg_tuple
+                _, delta, _, _, _, _ = leg_tuple
                 # if Buy will add the delta
                 if action.upper() == "Buy".upper():
                     net_combo += delta
