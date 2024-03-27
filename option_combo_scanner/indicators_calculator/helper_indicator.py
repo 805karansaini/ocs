@@ -247,6 +247,7 @@ class IndicatorHelper:
 
         # Option MKT Data DFs, PUT MKT Data DFs
         columns = [
+            "Symbol",
             "Strike",
             "Delta",
             "ConId",
@@ -297,7 +298,7 @@ class IndicatorHelper:
                 list_of_all_option_contracts,
                 list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple,
             ):
-
+                data_frame_dict["Symbol"].append(contract.symbol)
                 data_frame_dict["Strike"].append(contract.strike)
                 data_frame_dict["Delta"].append(delta)
                 # data_frame_dict["ConId"].append(contract.conId)
