@@ -22,6 +22,7 @@ from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.indicators_calculator.market_data_fetcher import \
     MarketDataFetcher
 from option_combo_scanner.strategy.indicator import Indicator
+from option_combo_scanner.strategy.max_loss_profit_calculation import MaxPNLCalculation
 from option_combo_scanner.strategy.scanner_algo import ScannerAlgo
 # from option_combo_scanner.strategy import strategy_variables
 from option_combo_scanner.strategy.scanner_combination import \
@@ -224,6 +225,7 @@ class Scanner:
 
             #  We need to loop over the configs now - IMPT V2 KARAN ARYAN 
             list_of_all_generated_combination = self.generate_combinations()
+        
             list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
             self.insert_combinations_into_db(list_of_all_generated_combination, list_of_combo_net_deltas)
 
@@ -255,7 +257,8 @@ class Scanner:
             # else:
             #     print(f"Security Type {sec_type} is invalid for {instrument_object}")
             #     continue
-
+                
+    # Combination insertion into db
     def insert_combinations_into_db(self, list_of_all_generated_combination, list_of_combo_net_delta):
         config_obj = self.config_obj
 
@@ -285,20 +288,25 @@ class Scanner:
             "config_id": config_obj.config_id,
             "number_of_legs": config_obj.no_of_leg,
         }
-        
+
+        total_combo_profit = total_combo_loss = 0
+
         for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_delta):
             
-            expiry_dates = [combo[-1] for combo in combination]
+            # calulate max profit and loss for the combination
+            max_profit, max_loss = MaxPNLCalculation.calcluate_maxpnl(combination, list_of_config_leg_object)
             
-            # TODO max loss/profit
-            
-            max_loss, max_profit = self.get_combination_max_loss_and_max_profit(
-                list_of_legs_tuple=combination,
-                list_of_config_leg_objects=list_of_config_leg_object,
-                right=None,
-                multiplier=None,
-                df_with_strike_delta_bid_ask=None,
-            )
+            total_combo_profit = (max_profit)
+            total_combo_loss = (max_loss)
+            # print(total_combo_profit, total_combo_loss)
+
+            # max_loss, max_profit = self.get_combination_max_loss_and_max_profit(
+            #     list_of_legs_tuple=combination,
+            #     list_of_config_leg_objects=list_of_config_leg_object,
+            #     right=None,
+            #     multiplier=None,
+            #     df_with_strike_delta_bid_ask=None,
+            # )
 
 
             # Remove the key, val if exists form prev iter
@@ -309,21 +317,19 @@ class Scanner:
             if "list_of_all_leg_objects" in values_dict:
                 del values_dict["list_of_all_leg_objects"]
 
-            
-            # values_dict['expiry'] = ','.join(expiry for expiry in expiry_dates)
+        
             values_dict["combo_net_delta"] = combo_net_delta
-            # values_dict["max_loss"] = max
-            # values_dict["max_profit"] = None
 
-            values_dict["max_profit"] = "inf" if max_profit == float("inf") else round(max_profit, 2)
-            values_dict["max_loss"] = "-inf" if max_loss == float("-inf") else round(max_loss, 2)
+            values_dict["max_profit"] = "inf" if max_profit == float("inf") else total_combo_profit
+            values_dict["max_loss"] = "-inf" if max_loss == float("-inf") else total_combo_loss
 
             res, combo_id = SqlQueries.insert_into_db_table(table_name="combination_table", values_dict=values_dict)
             if not res:
                 # print(f"Unable to insert Combination in the table: {combination}")
                 continue
             list_of_all_leg_objects = []
-            for index, ((strike, delta, con_id, expiry, bid, ask), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
+            # insertion of the values in legs table
+            for index, ((_, strike, delta, con_id, expiry, bid, ask, iv), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
 
                 instrument_id = config_leg_object.instrument_id
                 instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
@@ -343,7 +349,7 @@ class Scanner:
                     "multiplier": instrument_object.multiplier,
                     "exchange": instrument_object.exchange,
                     "currency": instrument_object.currency,
-                    
+                    "primary_exchange": instrument_object.primary_exchange,
                 }
                 
                 res, leg_id = SqlQueries.insert_into_db_table(table_name="legs_table", values_dict=leg_values_dict)
@@ -369,85 +375,85 @@ class Scanner:
         if list_of_indicator_ids_deletion:
             Utils.remove_row_from_indicator_table(list_of_indicator_ids=list_of_indicator_ids_deletion)
 
-    def update_indicator_table_for_instrument(
-        self,
-        instrument_object,
-        set_of_all_closest_expiry,
-        map_closest_expiry_to_underlying_conid,
-    ):
-        """Updates the indicator table for a given instrument."""
+    # def update_indicator_table_for_instrument(
+    #     self,
+    #     instrument_object,
+    #     set_of_all_closest_expiry,
+    #     map_closest_expiry_to_underlying_conid,
+    # ):
+    #     """Updates the indicator table for a given instrument."""
 
-        exchange = instrument_object.exchange
-        where_condition = f" WHERE `instrument_id` = {instrument_object.instrument_id};"
-        select_query = SqlQueries.create_select_query(
-            table_name="indicator_table",
-            columns="`indicator_id`, `trading_class`, `expiry`",
-            where_clause=where_condition,
-        )
+    #     exchange = instrument_object.exchange
+    #     where_condition = f" WHERE `instrument_id` = {instrument_object.instrument_id};"
+    #     select_query = SqlQueries.create_select_query(
+    #         table_name="indicator_table",
+    #         columns="`indicator_id`, `trading_class`, `expiry`",
+    #         where_clause=where_condition,
+    #     )
 
-        # Get all the old rows from indicator table
-        all_the_existing_rows_form_db_table = SqlQueries.execute_select_query(select_query)
+    #     # Get all the old rows from indicator table
+    #     all_the_existing_rows_form_db_table = SqlQueries.execute_select_query(select_query)
 
-        map_indicator_id_to_expiry_and_trading_class_str = {}
-        map_expiry_and_trading_class_str_to_indicator_id = {}
+    #     map_indicator_id_to_expiry_and_trading_class_str = {}
+    #     map_expiry_and_trading_class_str_to_indicator_id = {}
 
-        for old_indicator_dict in all_the_existing_rows_form_db_table:
-            indicator_id = int(old_indicator_dict["indicator_id"])
-            expiry_and_trading_class_str = f"{old_indicator_dict['expiry']}{old_indicator_dict['trading_class']}"
+    #     for old_indicator_dict in all_the_existing_rows_form_db_table:
+    #         indicator_id = int(old_indicator_dict["indicator_id"])
+    #         expiry_and_trading_class_str = f"{old_indicator_dict['expiry']}{old_indicator_dict['trading_class']}"
 
-            map_indicator_id_to_expiry_and_trading_class_str[indicator_id] = expiry_and_trading_class_str
-            map_expiry_and_trading_class_str_to_indicator_id[expiry_and_trading_class_str] = indicator_id
+    #         map_indicator_id_to_expiry_and_trading_class_str[indicator_id] = expiry_and_trading_class_str
+    #         map_expiry_and_trading_class_str_to_indicator_id[expiry_and_trading_class_str] = indicator_id
 
-        # getting the new indicator_rows
-        list_of_new_expiry_and_trading_class_str = []
-        for expiry in set_of_all_closest_expiry:
-            _temp = f"{expiry}{instrument_object.trading_class}"
-            list_of_new_expiry_and_trading_class_str.append(_temp)
+    #     # getting the new indicator_rows
+    #     list_of_new_expiry_and_trading_class_str = []
+    #     for expiry in set_of_all_closest_expiry:
+    #         _temp = f"{expiry}{instrument_object.trading_class}"
+    #         list_of_new_expiry_and_trading_class_str.append(_temp)
 
-        list_of_indicator_ids_for_deletion = []
+    #     list_of_indicator_ids_for_deletion = []
 
-        # Lopping on old one
-        for (
-            exp_trad_cls,
-            indicator_id,
-        ) in map_expiry_and_trading_class_str_to_indicator_id.items():
-            if not exp_trad_cls in list_of_new_expiry_and_trading_class_str:
-                list_of_indicator_ids_for_deletion.append(indicator_id)
+    #     # Lopping on old one
+    #     for (
+    #         exp_trad_cls,
+    #         indicator_id,
+    #     ) in map_expiry_and_trading_class_str_to_indicator_id.items():
+    #         if not exp_trad_cls in list_of_new_expiry_and_trading_class_str:
+    #             list_of_indicator_ids_for_deletion.append(indicator_id)
 
-        # self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
+    #     # self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
         
-        if list_of_indicator_ids_for_deletion:
-            self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
+    #     if list_of_indicator_ids_for_deletion:
+    #         self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
 
-        # Insert all new indicator row
-        # old nahi hai, but new mai hai
-        # LOOOPING ON NEW ONE
-        for exp_trad_cls in list_of_new_expiry_and_trading_class_str:
+    #     # Insert all new indicator row
+    #     # old nahi hai, but new mai hai
+    #     # LOOOPING ON NEW ONE
+    #     for exp_trad_cls in list_of_new_expiry_and_trading_class_str:
 
-            if exp_trad_cls in map_expiry_and_trading_class_str_to_indicator_id:
-                continue
+    #         if exp_trad_cls in map_expiry_and_trading_class_str_to_indicator_id:
+    #             continue
 
-            # TODO Need underlying conid  TODO Comment
+    #         # TODO Need underlying conid  TODO Comment
             
-            # Extract expiry date from the expiry and trading class string
-            expiry = exp_trad_cls[:8]
-            # Retrieve the underlying contract ID associated with the closest expiry
-            underlying_conid = map_closest_expiry_to_underlying_conid[int(expiry)]
+    #         # Extract expiry date from the expiry and trading class string
+    #         expiry = exp_trad_cls[:8]
+    #         # Retrieve the underlying contract ID associated with the closest expiry
+    #         underlying_conid = map_closest_expiry_to_underlying_conid[int(expiry)]
 
-            #  Create a dictionary containing information about the new instrument
-            new_dict = {
-                "instrument_id": instrument_object.instrument_id,
-                "symbol": instrument_object.symbol,
-                "sec_type": instrument_object.sec_type,
-                "multiplier": instrument_object.multiplier,
-                "trading_class": instrument_object.trading_class,
-                "expiry": expiry,
-                "underlying_conid": underlying_conid,
-                "exchange": exchange,
-            }
+    #         #  Create a dictionary containing information about the new instrument
+    #         new_dict = {
+    #             "instrument_id": instrument_object.instrument_id,
+    #             "symbol": instrument_object.symbol,
+    #             "sec_type": instrument_object.sec_type,
+    #             "multiplier": instrument_object.multiplier,
+    #             "trading_class": instrument_object.trading_class,
+    #             "expiry": expiry,
+    #             "underlying_conid": underlying_conid,
+    #             "exchange": exchange,
+    #         }
 
-             # Insert the new indicator row in the database (GUI and system)
-            self.insert_new_indicator_row_in_db_gui_and_system(new_dict, instrument_object)
+    #          # Insert the new indicator row in the database (GUI and system)
+    #         self.insert_new_indicator_row_in_db_gui_and_system(new_dict, instrument_object)
 
     # Insertion of new indicator row in DB/GUI
     def insert_new_indicator_row_in_db_gui_and_system(self, values_dict, instrument_object):
@@ -958,7 +964,7 @@ class Scanner:
 
         return payoff, leg_premium_received
 
-    # Get the maxloss maxprofit for the combination
+    # Get the maxloss maxprofit for the combination (can work as each leg in group)
     def get_combination_max_loss_and_max_profit(
         self,
         list_of_legs_tuple,
@@ -1067,7 +1073,7 @@ class Scanner:
 
         return max_loss, max_profit
 
-    # Calulating Combination Payoff for Strike
+    # Calulating Combination Payoff for Strike (each strike in leg with dte thing and theo price here in this func)
     def get_combination_payoff(
         self,
         list_of_legs_tuple,
@@ -1099,7 +1105,6 @@ class Scanner:
             except Exception as e:
                 # TODO REMOVE IT
                 print(f"Could not get the bid and ask for Strike: {option_strike}")
-
             leg_payoff, leg_premium_received = self.option_payoff(
                 option_strike,
                 config_leg_obj.right,
@@ -1110,7 +1115,7 @@ class Scanner:
                 leg_premium,
             )
 
-            # print(f"        Leg PayOff: {leg_payoff} Strike: {option_strike} Premium: {leg_premium}")
+            # print(f"Leg PayOff: {leg_payoff} Strike: {option_strike} Premium: {leg_premium}")
             combination_payoff += leg_payoff
             combination_premium_received += leg_premium_received
         return combination_payoff, combination_premium_received
@@ -1125,7 +1130,7 @@ class Scanner:
             # Loop over leg object to get action for the leg
             for leg_tuple, leg_object in zip(combination, list_of_config_leg_object):
                 action = leg_object.action
-                _, delta, _, _, _, _ = leg_tuple
+                _,_, delta, _, _, _, _,_ = leg_tuple
                 # if Buy will add the delta
                 if action.upper() == "Buy".upper():
                     net_combo += delta
