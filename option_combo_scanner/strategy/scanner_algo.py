@@ -422,7 +422,7 @@ class ScannerAlgo:
                     DataStore.store_data(key, df_put)
                     df = df_put.copy()
 
-            df.dropna(subset=["Delta"], inplace=True)
+            df.dropna(subset=["Delta", "Bid", "Ask", "LastIV"], inplace=True)
             
             if right.upper() == "PUT":
                 df["Delta"] = df["Delta"].abs()
@@ -437,7 +437,7 @@ class ScannerAlgo:
             list_of_filtered_legs_tuple.extend(
                 list(
                     # "Strike", "Expiry", "Delta", "ConId",
-                    filtered_dataframe[["Strike", "Delta", "ConId", "Expiry", "Bid", "Ask"]].itertuples(index=False, name=None)
+                    filtered_dataframe[["Symbol", "Strike", "Delta", "ConId", "Expiry", "Bid", "Ask", "LastIV"]].itertuples(index=False, name=None)
                 )
             )
 
@@ -458,8 +458,8 @@ class ScannerAlgo:
         list_of_partial_combination = []
 
         if remaining_no_of_legs == 0:
-            for strike, strike_delta, con_id, expiry, bid, ask in list_of_filter_legs:
-                list_of_partial_combination.append([(strike, strike_delta, con_id, expiry, bid, ask)])
+            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv in list_of_filter_legs:
+                list_of_partial_combination.append([(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv)])
         else:
             # get the next leg object to scan
             list_of_config_leg_object = self.config_obj.list_of_config_leg_object
@@ -479,7 +479,7 @@ class ScannerAlgo:
             delta_range_min = float(delta_range_min)
             delta_range_max = float(delta_range_max)
 
-            for strike, strike_delta, con_id, expiry, bid, ask in list_of_filter_legs:
+            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv in list_of_filter_legs:
 
                 new_range_low = strike_delta + delta_range_min
                 new_range_high = strike_delta + delta_range_max
@@ -489,7 +489,7 @@ class ScannerAlgo:
                     remaining_no_of_legs - 1, new_range_low, new_range_high, expiry_date_obj, leg_object
                 )
 
-                current_leg_strike_and_strike_delta = [(strike, strike_delta, con_id, expiry, bid, ask)]
+                current_leg_strike_and_strike_delta = [(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv)]
 
                 for next_legs_strike_delta_and_con_id in list_of_strike_delta_and_con_id_tuple:
 
@@ -566,7 +566,7 @@ class ScannerAlgo:
             current_expiry=current_date,
             leg_object=leg_object,
         )
-        print("combination", list_of_combination)
+        # print("combination", list_of_combination)
         # print("list_of_combination", list_of_combination)
         # list_of_filter_combination = self.filter_list_of_combination(
         #     list_of_combination
