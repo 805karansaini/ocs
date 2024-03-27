@@ -302,8 +302,7 @@ class ScannerAlgo:
         instrument_id = leg_object.instrument_id
         min_dte = leg_object.dte_range_min
         max_dte = leg_object.dte_range_max
-        right = leg_object.right
-    
+        right = leg_object.right   
         instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
 
         symbol = instrument_object.symbol
@@ -341,7 +340,7 @@ class ScannerAlgo:
 
             for closest_expiry in expiry_date_in_range:
                 map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
-                
+
             self.update_indicator_table_for_instrument(
             instrument_object,
             expiry_date_in_range,
@@ -387,7 +386,9 @@ class ScannerAlgo:
 
             # get the key for caching the raw dataframe
             key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
+            # print(key)
             data_frame = DataStore.get_data(key)
+            # print(data_frame)
             if data_frame is not None:
                 df = data_frame.copy()
             else:
@@ -411,10 +412,13 @@ class ScannerAlgo:
                 df_call, df_put = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
                     list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
                 )
+
                 if right.upper() == "CALL":
+                    key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
                     DataStore.store_data(key, df_call)
                     df = df_call.copy()
-                else:
+                elif right.upper() == 'PUT':
+                    key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
                     DataStore.store_data(key, df_put)
                     df = df_put.copy()
 
