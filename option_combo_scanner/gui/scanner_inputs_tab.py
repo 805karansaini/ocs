@@ -1077,11 +1077,11 @@ class ScannerInputsTab:
         # List of DTE
         # if set(new_list_of_dte) != set(current_list_of_dte):
         #     return not flag_same
-
         # current_list_of_config_leg_objects
         current_list_of_config_leg_objects = (
             current_config_object.list_of_config_leg_object
         )
+
 
         # Number of legs must be equal
         if len(current_list_of_config_leg_objects) != len(new_leg_data_list):
@@ -1090,6 +1090,10 @@ class ScannerInputsTab:
         for prev_leg_object, new_leg_data_dict in zip(
             current_list_of_config_leg_objects, new_leg_data_list
         ):
+            if prev_leg_object.instrument_id != new_leg_data_dict["instrument_id"]:
+                return not flag_same
+            
+
             if prev_leg_object.action != new_leg_data_dict["action"]:
                 return not flag_same
             
