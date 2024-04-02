@@ -155,7 +155,7 @@ class MaxPNLCalculation:
 
                 # TODO - comment 
                 # getting the payoff(left) - payoff(left + 1)
-                slope_left_numerator = strike_zero_payoff - strike_one_payoff
+                slope_left_numerator = (strike_zero_payoff - strike_one_payoff)/int(instrument_object_for_multiplier.multiplier)
                 slope_left_deno = 1
 
             # Get the combination payoff for the strike of current leg
@@ -195,7 +195,7 @@ class MaxPNLCalculation:
                 
                 # TODO - comment 
                 # getting the payoff(right) - payoff(right - 1) and divide by the multiplier
-                slope_right_numerator = (max_strike_right_payoff - max_strike_right_one_payoff)/instrument_object_for_multiplier.multiplier
+                slope_right_numerator = (max_strike_right_payoff - max_strike_right_one_payoff)/int(instrument_object_for_multiplier.multiplier)
                 slope_right_deno = 1
 
                 # print(f"LegTuple: {leg_tuple} {combo_pay_off_for_current_strike= } {slope_right_numerator= } {strike_right= }")
@@ -214,24 +214,29 @@ class MaxPNLCalculation:
         print(f"        Payoff(left) - Payoff(left+1) {slope_left_numerator}")
 
         # Update the Max Profit
-        if slope_right_numerator/slope_right_deno > 0.90:
-            max_profit = float("inf")
-            list_of_combination_payoff_at_all_strikes.pop()
-            
-        if slope_left_numerator/slope_left_deno > 0.90:
-            max_profit = float("inf")
-            list_of_combination_payoff_at_all_strikes.pop(0)
-
-        # Update the Max Loss
-        if slope_right_numerator/slope_right_deno < -0.90:
-            max_loss = float("-inf")
-            
-        if slope_left_numerator/slope_left_deno < -0.90:
-            max_loss = float("-inf")
-
+        if abs(slope_right_numerator/slope_right_deno) > 0.90:
+            if slope_right_numerator > 0:
+                max_profit = float("inf")
+                list_of_combination_payoff_at_all_strikes.pop()
+            elif slope_right_numerator < 0:
+                max_loss = float("-inf")
+                list_of_combination_payoff_at_all_strikes.pop()
+                    
+        if abs(slope_left_numerator/slope_left_deno) > 0.90:
+            if slope_left_numerator > 0:
+                max_profit = float("inf")
+                list_of_combination_payoff_at_all_strikes.pop(0)
+            elif slope_left_numerator < 0:
+                max_loss = float("-inf")
+                list_of_combination_payoff_at_all_strikes.pop(0)
+                
         # Updating the max profit and loss
-        max_profit = max(list_of_combination_payoff_at_all_strikes)
-        max_loss = min(list_of_combination_payoff_at_all_strikes)
+        if max_profit != float("inf"):
+            max_profit = max(list_of_combination_payoff_at_all_strikes)
+
+        if max_loss != float("-inf"):
+            max_loss = min(list_of_combination_payoff_at_all_strikes)
+
         return max_loss, max_profit
 
 
