@@ -788,7 +788,7 @@ class ScannerInputsTab:
 
             # Entry and Combo box Inputs
             desc = current_row_number + i + 1
-            instrument_id = "0"
+            instrument_id = ""
             action_value = "BUY"
             right_value = "CALL"
             delta_min_value = "0.0"
@@ -855,7 +855,11 @@ class ScannerInputsTab:
         )
         leg_label.grid(column=2, row=0, padx=5, pady=(0, 5), sticky="n")
 
-        # Entry and Combo box Inputs
+        # right_label = ttk.Label(
+        #     input_fields_frame, text="Right", anchor="center", width=12
+        # )
+        # right_label.grid(column=10, row=0, padx=5, pady=(0, 5), sticky="n")
+        # # Entry and Combo box Inputs
         # self.right_var = tk.StringVar()
         # self.right_dropdown = ttk.Combobox(
         #     input_fields_frame,
@@ -863,7 +867,7 @@ class ScannerInputsTab:
         #     values=["CALL", "PUT"],
         #     state="readonly",
         # )
-        # self.right_dropdown.grid(column=0, row=1, padx=5, pady=5)
+        # self.right_dropdown.place(column=10, row=1, padx=5, pady=5)
 
         # Add Entry for "dte leg" with label above
         # self.list_of_dte_entry = ttk.Entry(input_fields_frame)
@@ -943,7 +947,7 @@ class ScannerInputsTab:
 
             leg_data = {
                 "leg_number": i + 1,
-                "instrument_id": item_values[1],
+                "instrument_id": (item_values[1]),
                 "action": item_values[2].upper(),
                 "right": item_values[3].upper(),
                 "delta_range_min": item_values[4],
@@ -956,6 +960,12 @@ class ScannerInputsTab:
             # For First leg only range between 0 to 1
             local_map_instrument_id_instrument_obj = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object)
             list_of_instrument_ids = local_map_instrument_id_instrument_obj.keys()
+            if not leg_data["instrument_id"].isdigit():
+                Utils.display_message_popup(
+                    "Error",
+                    f"Instrument ID '{leg_data['instrument_id']}' is not a valid integer",
+                )
+                return
             if int(leg_data["instrument_id"]) not in list_of_instrument_ids:
                 Utils.display_message_popup(
                     "Error",
