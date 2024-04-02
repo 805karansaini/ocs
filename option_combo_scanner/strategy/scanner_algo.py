@@ -300,10 +300,13 @@ class ScannerAlgo:
 
         # Get the all the details for contract creation
         instrument_id = leg_object.instrument_id
+        if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
+            print(f"Inside filter_strikes for scanner algo function could not find instrument id: {instrument_id}")
+            return
+        instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
         min_dte = leg_object.dte_range_min
         max_dte = leg_object.dte_range_max
         right = leg_object.right   
-        instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
 
         symbol = instrument_object.symbol
         sec_type = instrument_object.sec_type
@@ -365,9 +368,6 @@ class ScannerAlgo:
                 low_range_date_str=low_range_date_str,
                 high_range_date_str=high_range_date_str,
             )
-            print(
-                f"InstrumentID: {instrument_id} low_date: {low_range_date_str} high_date: {high_range_date_str} All Epxiry: {expiry_date_in_range}"
-            )
             all_strikes = [float(_) for _ in all_strikes_string[1:-1].split(",")]
 
             all_strikes = sorted(all_strikes)
@@ -392,6 +392,12 @@ class ScannerAlgo:
             if data_frame is not None:
                 df = data_frame.copy()
             else:
+                # TODO REMOVE IT ARYAN
+                if symbol == "ES":
+                    all_strikes = [5250, 5255, 5260]
+                else:
+                    all_strikes = [18550, 18555, 18560,18565]
+
                 # get the list of call and put option contract
                 list_of_call_option_contracts, list_of_put_option_contracts = IndicatorHelper.get_list_of_call_and_put_option_contracts(
                     symbol,
@@ -412,6 +418,8 @@ class ScannerAlgo:
                 df_call, df_put = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
                     list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
                 )
+                df_call['underlying_conid'] = underlying_conid
+                df_put['underlying_conid'] = underlying_conid
 
                 if right.upper() == "CALL":
                     key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
@@ -421,23 +429,32 @@ class ScannerAlgo:
                     key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
                     DataStore.store_data(key, df_put)
                     df = df_put.copy()
-
-            df.dropna(subset=["Delta", "Bid", "Ask", "LastIV"], inplace=True)
+            # print(df.to_string())
+            # print(df.to_string())
+            df.dropna(subset=["Delta", "Bid", "Ask", "AskIV"], inplace=True)
             
             if right.upper() == "PUT":
                 df["Delta"] = df["Delta"].abs()
             # Make a copy of the dataframe to avoid modifying the original dataframe
-            # print(df.to_string())
+            
             filtered_dataframe = df.copy()
-
+            if symbol == "ES":
+                filtered_dataframe = filtered_dataframe[
+                    (filtered_dataframe["Strike"] >= 5250) & (filtered_dataframe["Strike"] <= 5260)
+                ]
+            elif symbol == "NQ":
+                filtered_dataframe = filtered_dataframe[
+                    (filtered_dataframe["Strike"] >= 18550) & (filtered_dataframe["Strike"] <= 18565)
+                ]
             # Filter strikes based on delta_range_low and delta_range_high
             filtered_dataframe = filtered_dataframe[
                 (filtered_dataframe["Delta"] >= delta_range_low) & (filtered_dataframe["Delta"] <= delta_range_high)
             ]
+
             list_of_filtered_legs_tuple.extend(
                 list(
                     # "Strike", "Expiry", "Delta", "ConId",
-                    filtered_dataframe[["Symbol", "Strike", "Delta", "ConId", "Expiry", "Bid", "Ask", "LastIV"]].itertuples(index=False, name=None)
+                    filtered_dataframe[["Symbol", "Strike", "Delta", "ConId", "Expiry", "Bid", "Ask", "AskIV", "underlying_conid"]].itertuples(index=False, name=None)
                 )
             )
 
@@ -452,14 +469,14 @@ class ScannerAlgo:
         )  # current_expiry, ConfigLeg, Expiry of the perivous leg N-1 Leg: Current Date
         # ("Strike", "Expiry", "Delta", "ConId"),
 
-        print(f"Leg Object: {leg_object}")
-        print(f"List of filter leg: {list_of_filter_legs}")
+        # print(f"Leg Object: {leg_object}")
+        # print(f"List of filter leg: {list_of_filter_legs}")
 
         list_of_partial_combination = []
 
         if remaining_no_of_legs == 0:
-            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv in list_of_filter_legs:
-                list_of_partial_combination.append([(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv)])
+            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid in list_of_filter_legs:
+                list_of_partial_combination.append([(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid)])
         else:
             # get the next leg object to scan
             list_of_config_leg_object = self.config_obj.list_of_config_leg_object
@@ -479,7 +496,7 @@ class ScannerAlgo:
             delta_range_min = float(delta_range_min)
             delta_range_max = float(delta_range_max)
 
-            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv in list_of_filter_legs:
+            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid in list_of_filter_legs:
 
                 new_range_low = strike_delta + delta_range_min
                 new_range_high = strike_delta + delta_range_max
@@ -489,7 +506,7 @@ class ScannerAlgo:
                     remaining_no_of_legs - 1, new_range_low, new_range_high, expiry_date_obj, leg_object
                 )
 
-                current_leg_strike_and_strike_delta = [(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv)]
+                current_leg_strike_and_strike_delta = [(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid)]
 
                 for next_legs_strike_delta_and_con_id in list_of_strike_delta_and_con_id_tuple:
 
