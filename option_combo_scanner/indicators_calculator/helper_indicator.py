@@ -301,7 +301,6 @@ class IndicatorHelper:
                 data_frame_dict["Symbol"].append(contract.symbol)
                 data_frame_dict["Strike"].append(contract.strike)
                 data_frame_dict["Delta"].append(delta)
-                # data_frame_dict["ConId"].append(contract.conId)
                 data_frame_dict["ConId"].append(contract.conId)
                 data_frame_dict["Bid"].append(bid_price)
                 data_frame_dict["Ask"].append(ask_price)

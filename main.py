@@ -18,8 +18,7 @@ from option_combo_scanner.ibapi_ao.recovery_mode import RecoveryMode
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.indicators_calculator.indicator_calculation import \
     IndicatorCalculation
-from option_combo_scanner.strategy.scanner import (Scanner,
-                                                   run_option_combo_scanner)
+from option_combo_scanner.strategy.scanner import (Scanner, run_option_combo_scanner)
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 from option_combo_scanner.strategy.utilities import StrategyUtils
 
