@@ -17,11 +17,14 @@ class MaxPNLCalculation:
     # Group the combination with same underlying
     @staticmethod
     def create_group_same_und(combination):
+        # Dict for group key as conid and list of values containing the leg_tuples
         grouped_tuples = {}
 
         for symbol, strike, delta, conid, expiry, bid, ask, iv, underlying_conid, config_leg_obj in combination:
+            # Append the leg to group 
             if underlying_conid in grouped_tuples:
                 grouped_tuples[underlying_conid].append((symbol, strike, delta, conid, expiry, bid, ask, iv, underlying_conid, config_leg_obj))
+            # Create the group key: list and append the leg 
             else:
                 grouped_tuples[underlying_conid] = [(symbol, strike, delta, conid, expiry, bid, ask, iv, underlying_conid, config_leg_obj)]
 
@@ -29,244 +32,276 @@ class MaxPNLCalculation:
     
     # find the closest expiry for the group combination
     @staticmethod
-    def find_closest_expiry(group_combinations):
+    def find_closest_expiry_for_groups(group_combinations):
         closest_expiry_list = []
+
+        # Loop over each group and update the closest expiry for it
         for group_combination in group_combinations:
             min_expiry = 99999999
+
+            # Update the closest expiry if a closer expiry date is found
             for symbol, strike, delta, _, expiry, _, _, _,_,_ in group_combination:
                 if int(expiry) < min_expiry:
                     min_expiry = int(expiry)
+
+            # Append the min_expiry to the list 
             closest_expiry_list.append(str(min_expiry))
+        
         return closest_expiry_list
 
     @staticmethod
-    def calcluate_maxpnl(combination, list_of_config_leg_object):
-        total_grp_max_profit = total_grp_max_loss = 0
+    def calcluate_max_pnl(combination, list_of_config_leg_object):
         # Combination
         print(f"Combintaion: {combination}")
 
+        # Vairables for total combination max profit and loss
+        combo_max_profit = 0
+        combo_max_loss = 0
+
         list_of_leg_tuples = combination
-        combination = []
+        list_of_leg_tuples_with_config_leg = []
+        
+        # Adding the config_leg_obj to the leg_tuple
         for leg_tuple, config_leg_obj in zip(list_of_leg_tuples, list_of_config_leg_object):
             temp_ = list(leg_tuple)
             temp_.append(config_leg_obj)
-            combination.append(tuple(temp_))
+            list_of_leg_tuples_with_config_leg.append(tuple(temp_))
             
-        # Group Combination based on same uderlying
-        group_combinations: list = MaxPNLCalculation.create_group_same_und(combination)
+        # Grouping the Combination based on underlying
+        list_of_combination_groups: list = MaxPNLCalculation.create_group_same_und(list_of_leg_tuples_with_config_leg)
         
-        # print(group_combinations)
-        # get the list of closest expiry for the groups
-        list_of_closest_expiry = MaxPNLCalculation.find_closest_expiry(group_combinations)
+        # Get the list of closest expiry for the groups
+        list_of_closest_expiry_for_each_group = MaxPNLCalculation.find_closest_expiry_for_groups(list_of_combination_groups)
 
-        # iterate over the group to get payoff for group combination
-        for group_combination, closest_expiry in zip(group_combinations, list_of_closest_expiry):
-            #   Groups TODO
-            print(f"    Group Combination: {group_combination}")
-            sub_list_of_config_leg_object = [ _[-1] for _ in group_combination]
+        # Iterate over the groups, and calculate the Max Profit and Loss for each groups
+        for combination_group, closest_expiry in zip(list_of_combination_groups, list_of_closest_expiry_for_each_group):
 
-            # print(group_combination, closest_expiry, config_leg)
-            max_loss, max_profit = MaxPNLCalculation.get_combination_max_loss_and_max_profit(
-                    list_of_legs_tuple=group_combination,
-                    list_of_config_leg_objects=sub_list_of_config_leg_object,
-                    closest_expiry = closest_expiry,
+            print(f"    Combination Group: {combination_group}")
+
+            # Creating a list of the config_leg_object for this group, for getting action, right etc info
+            list_of_config_leg_object_for_combination_group = [ _[-1] for _ in combination_group]
+
+            # Calculating the MaxLoss and Max Profit for the Group(acting as a combination)
+            max_loss_combination_group, max_profit_combination_group = MaxPNLCalculation.get_combination_max_loss_and_max_profit(
+                    list_of_legs_tuple=combination_group,
+                    list_of_config_leg_objects=list_of_config_leg_object_for_combination_group,
+                    closest_expiry=closest_expiry,
                 )
-            
 
-            print(f"        Max Loss: {max_loss}, Max Profit: {max_profit}\n")
-            
-            total_grp_max_profit += (max_profit)
-            total_grp_max_loss += (max_loss)
+            print(f"        Max Loss: {max_loss_combination_group}, Max Profit: {max_profit_combination_group}\n")
 
-        print(f"    Total Combo Profit: {total_grp_max_profit}, Total Combo Loss: {total_grp_max_loss}")
-        return total_grp_max_profit, total_grp_max_loss
+            combo_max_profit += (max_profit_combination_group)
+            combo_max_loss += (max_loss_combination_group)
+
+        print(f"    Total Combo Loss: {combo_max_loss}, Total Combo Profit: {combo_max_profit}")
+
+        return combo_max_profit, combo_max_loss
     
     @staticmethod
     def get_combination_max_loss_and_max_profit(list_of_legs_tuple, list_of_config_leg_objects, closest_expiry):
+        # Setting the default Values
         max_profit = float("-inf")
         max_loss = float("inf")
 
-        # Sort list_of_legs_tuple
-        sorted_legs_tuple = sorted(
-            list_of_legs_tuple, key=lambda x: x[1]
-        )  # Assuming tuple elements to be sorted based on the first element
+        # Sort the list_of_legs_tuple based on the STRIKE
+        sorted_legs_tuple = sorted(list_of_legs_tuple, key=lambda x: x[1])  
 
         # Rearrange list_of_config_leg_objects based on the sorting of list_of_legs_tuple
         sorted_indices = [list_of_legs_tuple.index(leg) for leg in sorted_legs_tuple]
-        # print(list_of_config_leg_objects)
-        sorted_config_leg_objects = [list_of_config_leg_objects[i] for i in sorted_indices]
 
-        # print(sorted_config_leg_objects)
+        # Creating a list of leg_object and Renaming the variable
+        list_of_config_leg_objects = [list_of_config_leg_objects[i] for i in sorted_indices]
         list_of_legs_tuple = sorted_legs_tuple
-        list_of_config_leg_objects = sorted_config_leg_objects
+
+        # Calcaulte the combinations premium received
+        combination_premium_received = MaxPNLCalculation.calculate_combination_premium(list_of_legs_tuple, list_of_config_leg_objects,)
+
+        # InstrumentID, and InstrumentObject for multiplier
+        # TODO if deleted, ddo something
+        instrument_id = list_of_config_leg_objects[0].instrument_id
+        if instrument_id not in strategy_variables.map_instrument_id_to_instrument_object:
+            print(f"Inside get_combination_max_loss_and_max_profit function could not find instrument id: {instrument_id}")
+            return
+        instrument_object_for_multiplier = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object[instrument_id])
+
+        list_of_combination_payoff_at_all_strikes = []
+        # Looping over each Leg Tuples containg STRIKE, and computing the combination payoff if at the expiry the underlying price is equal to leg_tuple.strike
         for i, leg_tuple in enumerate(list_of_legs_tuple):
-        
+            
+            # Current Leg Strike
+            current_leg_strike = leg_tuple[1]
+            
+            # Get the Left & Left+1 Payoff
+            if i == 0:
+                left_strike = 0 
+                # Get the payoff for left strike: 0
+                strike_zero_payoff = MaxPNLCalculation.get_combination_payoff(
+                    list_of_legs_tuple,
+                    list_of_config_leg_objects,
+                    underlying_strike_price=left_strike,
+                    closest_expiry=closest_expiry,
+                )
+
+                # Add the Combination payoff at Strike 0
+                list_of_combination_payoff_at_all_strikes.append(round(strike_zero_payoff, 2))
+
+                # Get the payoff for left_strike + 1
+                strike_one_payoff = MaxPNLCalculation.get_combination_payoff(
+                    list_of_legs_tuple,
+                    list_of_config_leg_objects,
+                    underlying_strike_price=left_strike + 1,
+                    closest_expiry=closest_expiry,
+                )
+
+                # TODO - comment 
+                # getting the payoff(left) - payoff(left + 1)
+                slope_left_numerator = strike_zero_payoff - strike_one_payoff
+                slope_left_deno = 1
+
             # Get the combination payoff for the strike of current leg
-            combo_pay_off_for_current_strike, combination_premium_received = MaxPNLCalculation.get_combination_payoff(
+            combo_pay_off_for_current_strike = MaxPNLCalculation.get_combination_payoff(
                 list_of_legs_tuple,
                 list_of_config_leg_objects,
-                leg_tuple[1],
+                current_leg_strike,
                 closest_expiry,
             )
-            combo_pay_off_for_current_strike = round(combo_pay_off_for_current_strike)
-
+            list_of_combination_payoff_at_all_strikes.append(round(combo_pay_off_for_current_strike, 2))
             # print(f"UndPrice At Expiry {leg_tuple[1]}, Combination Payoff: {combo_pay_off_for_current_strike}")
-            # Max Profit is max of (Payoff Strike1, PayoffStrike2...)
-            max_profit = max(max_profit, combo_pay_off_for_current_strike)
-            max_loss = min(max_loss, combo_pay_off_for_current_strike)
 
-            if i == 0:
-                # Get the payoff for left strike: 0
-                strike_zero_payoff, l_combination_premium_received = MaxPNLCalculation.get_combination_payoff(
-                    list_of_legs_tuple,
-                    list_of_config_leg_objects,
-                    0,
-                    closest_expiry,
-                )
-                # Get the payoff for left + 1
-                strike_one_payoff, l_1_combination_premium_received = MaxPNLCalculation.get_combination_payoff(
-                    list_of_legs_tuple,
-                    list_of_config_leg_objects,
-                    1,
-                    closest_expiry,
-                )
-
-                # [payoff(left) - payoff(left+1)]
-                slope_left_numerator = strike_zero_payoff - strike_one_payoff
-                strike_left = 0
-                strike_left_plus_one = 1
-                # [strike(left+1) - strike[(left)]
-                slope_left_deno = strike_left_plus_one - strike_left
-
-
-            # Get the Right Payoff for Max Strike N
+            # Get the Right & Right-1 Payoff
             if i == len(list_of_legs_tuple) - 1:
+
+                # Right Strike is 2*MaxStrike
+                right_strike = current_leg_strike * 2
+
                 # Strike N * 2: Get the next Strike payoff for Strike N * 2
-                max_strike_right_payoff, r_combination_premium_received = MaxPNLCalculation.get_combination_payoff(
+                max_strike_right_payoff = MaxPNLCalculation.get_combination_payoff(
                     list_of_legs_tuple,
                     list_of_config_leg_objects,
-                    list_of_legs_tuple[i][1] * 2,
-                    closest_expiry,
+                    underlying_strike_price=right_strike,
+                    closest_expiry=closest_expiry,
                 )
+
+                # Add the Combination payoff at Strike Strike Right
+                list_of_combination_payoff_at_all_strikes.append(round(max_strike_right_payoff, 2))
+
                 # Get payoff for right - 1
-                max_strike_right_one_payoff, r_1_combination_premium_received = MaxPNLCalculation.get_combination_payoff(
+                max_strike_right_one_payoff = MaxPNLCalculation.get_combination_payoff(
                     list_of_legs_tuple,
                     list_of_config_leg_objects,
-                    (list_of_legs_tuple[i][1] * 2) - 1,
-                    closest_expiry,
+                    underlying_strike_price=right_strike - 1,
+                    closest_expiry=closest_expiry,
                 )
-                # [payoff(right) - payoff(right-1)] 
-                slope_right_numerator = max_strike_right_payoff - max_strike_right_one_payoff
-                strike_right = list_of_legs_tuple[i][1] * 2
-                strike_right_minus_one = (list_of_legs_tuple[i][1] * 2) - 1
-                # [strike(right) - strike[(right -1)]
-                slope_right_deno = strike_right - strike_right_minus_one
+                
+                # TODO - comment 
+                # getting the payoff(right) - payoff(right - 1) and divide by the multiplier
+                slope_right_numerator = (max_strike_right_payoff - max_strike_right_one_payoff)/instrument_object_for_multiplier.multiplier
+                slope_right_deno = 1
 
                 # print(f"LegTuple: {leg_tuple} {combo_pay_off_for_current_strike= } {slope_right_numerator= } {strike_right= }")
-        
-        # Print WIthout Premimum
-        print(f"        Without Premimum, Profit : {max_profit}, Loss: {max_loss}")
+
+        # TODO- print list_of_combination_payoff_at_all_strikes
+        print(f"        List of Combination Payoff W/P Prem. for all Strikes: {list_of_combination_payoff_at_all_strikes}")
         print(f"        Premimum: {combination_premium_received}")
-        # Premium
-        # Premium Added
-        # Final Premium
-        max_profit += round(combination_premium_received, 2)
-        max_loss += round(combination_premium_received, 2)
-        print(f"        With Premimum, Profit : {max_profit}, Loss: {max_loss}")
+        
+        # TODO - list_of_combination_payoff_at_all_strikes + combination premium
+        list_of_combination_payoff_at_all_strikes = [ _ + combination_premium_received for _ in list_of_combination_payoff_at_all_strikes]
+        print(f"        List of Combination Payoff W/ Prem for all Strikes: {list_of_combination_payoff_at_all_strikes}")
+
+        
+
         print(f"        Payoff(right) - Payoff(right-1) {slope_right_numerator}")
-        print(f"        Strike(right) - Strike[(right -1) {slope_right_deno}")
         print(f"        Payoff(left) - Payoff(left+1) {slope_left_numerator}")
-        print(f"        Strike(left+1) - Strike[(left) {slope_left_deno}")
 
-
-        # if [payoff(right) - payoff(right-1)] / [strike(right) - strike[(right -1)] > 0.95 -> profit is infinite
-        # if [payoff(left) - payoff(left+1)] / [strike(left+1) - strike[(left)] > 0.95 -> profit is infinite
-        # if [payoff(right) - payoff(right-1)] / [strike(right) - strike[(right -1)] < -0.95 -> loss is infinite
-        # if [payoff(left) - payoff(left+1)] / [strike(left+1) - strike[(left)] < -0.95 -> loss is infinite
-
-        if slope_right_numerator/slope_right_deno > 0.95:
+        # Update the Max Profit
+        if slope_right_numerator/slope_right_deno > 0.90:
             max_profit = float("inf")
-
-        if slope_left_numerator/slope_left_deno > 0.95:
+            list_of_combination_payoff_at_all_strikes.pop()
+            
+        if slope_left_numerator/slope_left_deno > 0.90:
             max_profit = float("inf")
+            list_of_combination_payoff_at_all_strikes.pop(0)
 
-        if slope_right_numerator/slope_right_deno < -0.95:
+        # Update the Max Loss
+        if slope_right_numerator/slope_right_deno < -0.90:
+            max_loss = float("-inf")
+            
+        if slope_left_numerator/slope_left_deno < -0.90:
             max_loss = float("-inf")
 
-        if slope_left_numerator/slope_left_deno < -0.95:
-            max_loss = float("-inf")
-
-
+        # Updating the max profit and loss
+        max_profit = max(list_of_combination_payoff_at_all_strikes)
+        max_loss = min(list_of_combination_payoff_at_all_strikes)
         return max_loss, max_profit
-
 
 
     # Calulating Combination Payoff for Strike
     @staticmethod
     def get_combination_payoff(list_of_legs_tuple, list_of_config_leg_object, underlying_strike_price, closest_expiry):
-        combination_premium_received = 0
+
+        # Default Values        
         combination_payoff = 0
+        
+        # For each leg in the combinations, caclculate the option-payoff if the underlying expiries at 'underlying_strike_price'
         for leg, config_leg_obj in zip(list_of_legs_tuple, list_of_config_leg_object):
+            
+            # InstrumentID, and InstrumentObject for multiplier
             instrument_id = config_leg_obj.instrument_id
+            if instrument_id not in strategy_variables.map_instrument_id_to_instrument_object:
+                print(f"Inside get_combination_payoff function could not find instrument id: {instrument_id}")
+                continue
             instrument_object_for_leg_prem = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object[instrument_id])
+            # TODO HANDLE IT ARYAN - IMPORTANT
+
+            # Unpacking the combination leg tuple
             symbol, option_strike,_, _, leg_expiry, bid, ask, leg_iv,_, _ = leg
-            leg_premium = 0
+            intial_leg_premium = 0
+            
+            # Getting the intial_leg_premium
             try:
                 if bid == float("nan") or ask == float("nan"):
-                    leg_premium = 0
+                    intial_leg_premium = 0
                 else:
-                    leg_premium = (bid + ask) / 2
-
+                    intial_leg_premium = (bid + ask) / 2
             except Exception as e:
-                # TODO REMOVE IT
-                print(f"Could not get the bid and ask for Strike: {option_strike}")
+                intial_leg_premium = 0
 
-            # Calcluate Payoff for trivial case of same as closest expiry
+            # Calcluate OptionPayoff for the expiry same as closest expiry, holds the TimeValueOfOption=0
             if leg_expiry == closest_expiry:
-                leg_payoff, leg_premium_received = MaxPNLCalculation.option_payoff(
+                leg_payoff, _ = MaxPNLCalculation.option_payoff(
                     option_strike,
                     config_leg_obj.right,
                     config_leg_obj.action,
                     1,
                     float(underlying_strike_price),
                     int(instrument_object_for_leg_prem.multiplier),
-                    leg_premium,
+                    intial_leg_premium,
                 )
+                # Add to combination off the sign is already adjusted in the option_payoff method
+                combination_payoff += leg_payoff
+
+            # Calculate the OptionPayoff for the further expiry than the closest expiry, holds the TimeValueOfOption
             else:
-                # get_theoretical_premium(S, r1, r2, t, X, sigma, opt_type):
+
+                # Getting the TTE from the closest expiry in Years
                 leg_expiry_obj = datetime.datetime.strptime(leg_expiry, "%Y%m%d")
                 closest_expiry_obj = datetime.datetime.strptime(closest_expiry, "%Y%m%d")
                 time_to_expiration = abs(leg_expiry_obj - closest_expiry_obj).days
-                # get time to time_to_expiration
                 time_to_expiration = (time_to_expiration) / 365
 
-                # get theoretical_premimum
-                print(f"        Theortical Premimum Function Inputs: {underlying_strike_price= }, {strategy_variables.riskfree_rate1= }, {time_to_expiration= }, {option_strike= }, {leg_iv= }, {config_leg_obj.right= }")
-                intrintic_plus_time_value = Utils.get_theoretical_premium(underlying_strike_price, strategy_variables.riskfree_rate1, 0, time_to_expiration, option_strike, leg_iv, config_leg_obj.right)                
-                print(f"        Theortical Premimum: {intrintic_plus_time_value= } for {option_strike= } for {leg_expiry= }")
-                # calculate leg payoff for case where leg expiry is later than closest expiry
-                """
-                option_strike: Strike of the Leg
-                option_type: CALL/PUT
-                buy_or_sell: BUY/SELL
-                quantity: Qty of Leg
-                underlying_price_expiry: Price of option at expiry
-                """
-
-                # leg_payoff, leg_premium_received = MaxPNLCalculation.option_payoff(
-                #     option_strike,
-                #     config_leg_obj.right,
-                #     config_leg_obj.action,
-                #     1,
-                #     float(underlying_strike_price),
-                #     int(instrument_object_for_leg_prem.multiplier),
-                #     theoretical_premimum,
-                # )
+                # Theoretical Premium
+                leg_payoff = Utils.get_theoretical_premium(underlying_strike_price, strategy_variables.riskfree_rate1, 0, time_to_expiration, option_strike, leg_iv, config_leg_obj.right)                
+                
+                # Add to combination PayOff
+                leg_payoff = 1*leg_payoff if config_leg_obj.action.upper() == "BUY" else -1*leg_payoff
+                leg_payoff *= int(instrument_object_for_leg_prem.multiplier)
+                
+                combination_payoff += leg_payoff 
+                print(f"        Theortical Premimum Function Inputs: {underlying_strike_price= }, RR1: {strategy_variables.riskfree_rate1}, TTE: {time_to_expiration}, Strike:{option_strike}, IV: {leg_iv}, Right: {config_leg_obj.right}")
+                print(f"        Theortical Premimum: Payoff/Ther.Prem: {leg_payoff} for Strike: {option_strike} for Expiry: {leg_expiry}")
 
             # print(f"Leg PayOff: {leg_payoff} Strike: {option_strike} Premium: {leg_premium}")
-            combination_payoff += leg_payoff
-            combination_premium_received += leg_premium_received
-        return combination_payoff, combination_premium_received
+        return combination_payoff
 
 
     # Function to calculate the leg wise option payoff
@@ -288,7 +323,6 @@ class MaxPNLCalculation:
         underlying_price_expiry: Price of option at expiry
         """
         leg_premium_received = 0
-        # TODO Remove it
         payoff = 0
 
         if option_type == "CALL":
@@ -332,5 +366,69 @@ class MaxPNLCalculation:
             leg_premium_received += leg_premium * combination_multiplier
 
         return payoff, leg_premium_received
+
+    
+    @staticmethod
+    def calculate_leg_premium(
+        buy_or_sell,
+        combination_multiplier,
+        leg_premium,
+    ):
+        """
+        option_strike: Strike of the Leg
+        option_type: CALL/PUT
+        buy_or_sell: BUY/SELL
+        quantity: Qty of Leg
+        underlying_price_expiry: Price of option at expiry
+        """
+        leg_premium_received = 0
+    
+        # Consider the Option Premium as well
+        if buy_or_sell == "BUY":
+            leg_premium_received -= leg_premium * combination_multiplier
+        else:
+            leg_premium_received += leg_premium * combination_multiplier
+
+        return leg_premium_received
+
+    
+    @staticmethod
+    def calculate_combination_premium(list_of_legs_tuple, list_of_config_leg_object,):
+
+        # Default Values        
+        combination_premium_received = 0
+        
+        # For each leg in the combinations, caclculate the option-payoff if the underlying expiries at 'underlying_strike_price'
+        for leg, config_leg_obj in zip(list_of_legs_tuple, list_of_config_leg_object):
+            
+            # InstrumentID, and InstrumentObject for multiplier
+            instrument_id = config_leg_obj.instrument_id
+            instrument_object_for_leg_prem = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object[instrument_id])
+            # TODO HANDLE IT ARYAN - IMPORTANT
+
+            # Unpacking the combination leg tuple
+            symbol, option_strike,_, _, leg_expiry, bid, ask, leg_iv,_, _ = leg
+            intial_leg_premium = 0
+            
+            # Getting the intial_leg_premium
+            try:
+                if bid == float("nan") or ask == float("nan"):
+                    intial_leg_premium = 0
+                else:
+                    intial_leg_premium = (bid + ask) / 2
+            except Exception as e:
+                intial_leg_premium = 0
+
+            leg_premium_received = MaxPNLCalculation.calculate_leg_premium(
+                config_leg_obj.action,
+                int(instrument_object_for_leg_prem.multiplier),
+                intial_leg_premium,
+            )
+
+            # TODO 
+            combination_premium_received += leg_premium_received
+
+        return combination_premium_received
+
 
     
