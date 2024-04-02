@@ -420,7 +420,24 @@ class Utils:
 
     @staticmethod
     def get_implied_volatility(S, r1, r2, t, X, market_premium, opt_type):
-
+        """
+        calucalted_delta, calucalted_iv = Utils.get_delta(
+                    underlying_price,
+                    StrategyVariables.riskfree_rate1,
+                    0,
+                    time_to_expiration,
+                    float(strike),
+                    opt_premium,
+                    option_right,
+                )
+        current_price,
+        StrategyVariables.riskfree_rate1 =0.04,
+        0,
+        time_to_expiration,
+        float(contract.strike),
+        market_premium,  
+        right,
+        """
         max_iters = 50
         max_iv = 8.0
 
@@ -484,7 +501,9 @@ class Utils:
 
     @staticmethod
     def get_theoretical_premium(S, r1, r2, t, X, sigma, opt_type):
-
+        if S == 0:
+            S = 0.0001
+            
         sigma_t = sigma * math.sqrt(t)
         d1 = (math.log(S / X) + ((r1 + math.pow(sigma, 2) / 2) * t)) / sigma_t
         d2 = d1 - sigma_t
@@ -499,6 +518,15 @@ class Utils:
     @staticmethod
     def get_delta(S, r1, r2, t, X, market_premium, opt_type):
         """
+        calucalted_delta, calucalted_iv = Utils.get_delta(
+                    underlying_price,
+                    StrategyVariables.riskfree_rate1,
+                    0,
+                    time_to_expiration,
+                    float(strike),
+                    opt_premium,
+                    option_right,
+                )
         current_price,
         StrategyVariables.riskfree_rate1 =0.04,
         0,

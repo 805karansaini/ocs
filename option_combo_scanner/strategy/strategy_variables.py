@@ -20,8 +20,9 @@ class StrategyVariables:
     will be used to store variables that are used across different modules
     mainly the GUI and the monitoring and the execution modules
     """
+
     parser = configparser.ConfigParser()
-    parser.read('option_scanner_user_inputs.ini')
+    parser.read("option_scanner_user_inputs.ini")
 
     map_instrument_id_to_instrument_object = {}
     # not using it anywhere, aryan created this but since there will be a single config in system, hence we are usign 'config_object'
@@ -32,19 +33,18 @@ class StrategyVariables:
     config_object = None
     nextorderId = None
 
-    ibkr_tws_host = parser.get('USER INPUTS','ibkr_tws_host') 
-    ibkr_tws_port = parser.getint('USER INPUTS','ibkr_tws_port')
-    ibkr_tws_connection_id = parser.getint('USER INPUTS','ibkr_tws_connection_id')
-    
+    ibkr_tws_host = parser.get("USER INPUTS", "ibkr_tws_host")
+    ibkr_tws_port = parser.getint("USER INPUTS", "ibkr_tws_port")
+    ibkr_tws_connection_id = parser.getint("USER INPUTS", "ibkr_tws_connection_id")
+
     # Input for delta
-    delta_d1_indicator_input = parser.getfloat('USER INPUTS','delta_d1_indicator_input')
-    delta_d2_indicator_input = parser.getfloat('USER INPUTS','delta_d2_indicator_input')
-    riskfree_rate1 = parser.getfloat('USER INPUTS','riskfree_rate1')
+    delta_d1_indicator_input = parser.getfloat("USER INPUTS", "delta_d1_indicator_input")
+    delta_d2_indicator_input = parser.getfloat("USER INPUTS", "delta_d2_indicator_input")
+    riskfree_rate1 = parser.getfloat("USER INPUTS", "riskfree_rate1")
 
     # For HV # Take candle size from the
-    user_input_lookback_days_historical_volatility = parser.getint('USER INPUTS','user_input_lookback_days_historical_volatility')
-    user_input_average_historical_volatility_days = parser.getint('USER INPUTS','user_input_average_historical_volatility_days')
-    
+    user_input_lookback_days_historical_volatility = parser.getint("USER INPUTS", "user_input_lookback_days_historical_volatility")
+    user_input_average_historical_volatility_days = parser.getint("USER INPUTS", "user_input_average_historical_volatility_days")
 
     user_input_bar_size_historical_volatility = 1
     bar_size_historical_volatility = f"{user_input_bar_size_historical_volatility} hour"
@@ -53,44 +53,47 @@ class StrategyVariables:
         f"{user_input_average_historical_volatility_days  + user_input_lookback_days_historical_volatility - 1} D"
     )
 
-    avg_iv_lookback_days = parser.getint('USER INPUTS','avg_iv_lookback_days')
-    
+    avg_iv_lookback_days = parser.getint("USER INPUTS", "avg_iv_lookback_days")
+
     # If the flag is False it will calcluate for all put-call strike otherwise for speicfic deltas
-    flag_put_call_indicator_based_on_selected_deltas_only = parser.get('USER INPUTS','flag_put_call_indicator_based_on_selected_deltas_only')
+    flag_put_call_indicator_based_on_selected_deltas_only = parser.get(
+        "USER INPUTS", "flag_put_call_indicator_based_on_selected_deltas_only"
+    )
 
     # Put Call Volume Variable
-    user_input_lookback_days_for_pcr = parser.getint('USER INPUTS','user_input_lookback_days_for_pcr')  # Days
+    user_input_lookback_days_for_pcr = parser.getint("USER INPUTS", "user_input_lookback_days_for_pcr")  # Days
     put_call_volume_lookback_days = f"{user_input_lookback_days_for_pcr} D"
     put_call_volume_bar_size_int = 4
     put_call_volume_bar_size = f"{put_call_volume_bar_size_int} hours"
 
     # get historical price data variables
-    historical_price_data_bar_size_int = parser.getint('USER INPUTS','historical_price_data_bar_size') 
+    historical_price_data_bar_size_int = parser.getint("USER INPUTS", "historical_price_data_bar_size")
     historical_price_data_bar_size = f"{historical_price_data_bar_size_int} hours"
 
-
-    list_of_percent_for_impact_calcluation_str = parser['USER INPUTS']['list_of_percent_for_impact_calcluation'] #sorted(set([2, -2, 5, -5, 10, -10, 20, -20]))
-    list_of_percent_for_impact_calcluation = [float(x.strip()) for x in list_of_percent_for_impact_calcluation_str.split(',')]
+    list_of_percent_for_impact_calcluation_str = parser["USER INPUTS"][
+        "list_of_percent_for_impact_calcluation"
+    ]  # sorted(set([2, -2, 5, -5, 10, -10, 20, -20]))
+    list_of_percent_for_impact_calcluation = [float(x.strip()) for x in list_of_percent_for_impact_calcluation_str.split(",")]
     list_of_percent_for_impact_calcluation = sorted(set(list_of_percent_for_impact_calcluation))
 
     ###########################
     # Scanner
     ###########################
     flag_force_restart_scanner = False
-    rescan_time_in_seconds = parser.getfloat('USER INPUTS','rescan_time_in_seconds')
-    flag_recovery_mode = parser.getboolean('USER INPUTS','flag_recovery_mode')
+    rescan_time_in_seconds = parser.getfloat("USER INPUTS", "rescan_time_in_seconds")
+    flag_recovery_mode = parser.getboolean("USER INPUTS", "flag_recovery_mode")
 
     # Indicator Cache time in seconds for the scanner
-    indicator_cache_time_in_seconds = parser.getfloat('USER INPUTS','indicator_cache_time_in_seconds')
+    indicator_cache_time_in_seconds = parser.getfloat("USER INPUTS", "indicator_cache_time_in_seconds")
 
     # Variables used in filtering in range 0 to 1 threshold
-    flag_enable_filter_based_delta_threshold = parser.getboolean('USER INPUTS','flag_enable_filter_based_delta_threshold')
+    flag_enable_filter_based_delta_threshold = parser.getboolean("USER INPUTS", "flag_enable_filter_based_delta_threshold")
     min_delta_threshold = 0.009
     max_delta_threshold = 0.990
 
-    flag_store_csv_files = parser.getboolean('USER INPUTS','flag_store_csv_files')
+    flag_store_csv_files = parser.getboolean("USER INPUTS", "flag_store_csv_files")
     o_c_s_folder_path = rf"{parser.get('USER INPUTS','o_c_s_folder_path')}"
-    batch_size = 100
+    batch_size = 80
     batch_size_historical_data = 10
 
     # Flag if we want the option indicator in % chng
@@ -194,12 +197,12 @@ class StrategyVariables:
         "underlying_chg_by_put_opt_price_since_nth_day_d1",
         "underlying_chg_by_put_opt_price_since_nth_day_d2",
     ]
-    
+
     lookback_input_for_change_in_avg_iv_since_yesterday = 1
     lookback_input_for_rr_change_since_yesterday = 1
     lookback_input_for_rr_change_over_n_days = 14
     hv_look_back_days = 14
 
-    #Max min Pain Flag 
+    # Max min Pain Flag
     flag_drop_empty_oi_rows = True
     flag_test_print = False

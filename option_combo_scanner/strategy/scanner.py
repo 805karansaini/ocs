@@ -206,6 +206,7 @@ class Scanner:
     def start_scanner(
         self,
     ):
+
         # Single Config
         # No. of Config Leg
         # for (leg_object) in self.config_obj.list_of_config_leg_object:
@@ -224,8 +225,10 @@ class Scanner:
             #     continue
 
             #  We need to loop over the configs now - IMPT V2 KARAN ARYAN 
+            
+            if self.config_obj is None:
+                return
             list_of_all_generated_combination = self.generate_combinations()
-        
             list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
             self.insert_combinations_into_db(list_of_all_generated_combination, list_of_combo_net_deltas)
 
@@ -293,21 +296,11 @@ class Scanner:
 
         for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_delta):
             
-            # calulate max profit and loss for the combination
-            max_profit, max_loss = MaxPNLCalculation.calcluate_maxpnl(combination, list_of_config_leg_object)
+            # Calulate Max Profit/Loss for the combination
+            max_profit, max_loss = MaxPNLCalculation.calcluate_max_pnl(combination, list_of_config_leg_object)
             
-            total_combo_profit = (max_profit)
-            total_combo_loss = (max_loss)
-            # print(total_combo_profit, total_combo_loss)
-
-            # max_loss, max_profit = self.get_combination_max_loss_and_max_profit(
-            #     list_of_legs_tuple=combination,
-            #     list_of_config_leg_objects=list_of_config_leg_object,
-            #     right=None,
-            #     multiplier=None,
-            #     df_with_strike_delta_bid_ask=None,
-            # )
-
+            total_combo_profit = round(max_profit, 2)
+            total_combo_loss = round(max_loss,2)
 
             # Remove the key, val if exists form prev iter
             if "combo_id" in values_dict:
@@ -329,7 +322,7 @@ class Scanner:
                 continue
             list_of_all_leg_objects = []
             # insertion of the values in legs table
-            for index, ((_, strike, delta, con_id, expiry, bid, ask, iv), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
+            for index, ((_, strike, delta, con_id, expiry, bid, ask, iv,_), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
 
                 instrument_id = config_leg_object.instrument_id
                 instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
@@ -760,20 +753,14 @@ class Scanner:
 
     def generate_combinations(self, ):
 
-        # Drop extra columns
-        # columns_to_drop = ["Bid", "Ask"]
-        # columns_to_drop_existing = [col for col in columns_to_drop if col in strike_and_delta_dataframe.columns]
-
-        # df_copy = strike_and_delta_dataframe.copy()
-        # if columns_to_drop_existing:
-        #     strike_and_delta_dataframe = df_copy.drop(columns_to_drop_existing, axis=1)
-
         # Get the configurations
+        
         remaining_no_of_legs = self.config_obj.no_of_leg - 1
         delta_range_low = self.config_obj.list_of_config_leg_object[0].delta_range_min
         delta_range_high = self.config_obj.list_of_config_leg_object[0].delta_range_max
         leg_object = self.config_obj.list_of_config_leg_object[0]
-        print(leg_object)
+       
+        # print(leg_object)
         # print("\nGenerate Combintaions: ")
         # print(tabulate(strike_and_delta_dataframe, headers="keys", tablefmt="psql", showindex=False))
         current_date = datetime.datetime.now(variables.target_timezone_obj)
@@ -1122,6 +1109,7 @@ class Scanner:
 
     # Calulation of Combo Net Delta
     def get_list_combo_net_delta(self, list_of_all_generated_combination):
+
         list_of_config_leg_object = self.config_obj.list_of_config_leg_object
         list_of_combo_net_deltas = []
         # Loop over list of combination
@@ -1130,7 +1118,7 @@ class Scanner:
             # Loop over leg object to get action for the leg
             for leg_tuple, leg_object in zip(combination, list_of_config_leg_object):
                 action = leg_object.action
-                _,_, delta, _, _, _, _,_ = leg_tuple
+                _,_, delta, _, _, _, _,_, _ = leg_tuple
                 # if Buy will add the delta
                 if action.upper() == "Buy".upper():
                     net_combo += delta

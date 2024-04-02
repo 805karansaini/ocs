@@ -89,9 +89,9 @@ class MaxPNLCalculation:
                 )
 
             print(f"        Max Loss: {max_loss_combination_group}, Max Profit: {max_profit_combination_group}\n")
-
-            combo_max_profit += (max_profit_combination_group)
-            combo_max_loss += (max_loss_combination_group)
+            if max_loss_combination_group and max_profit_combination_group:
+                combo_max_profit += (max_profit_combination_group)
+                combo_max_loss += (max_loss_combination_group)
 
         print(f"    Total Combo Loss: {combo_max_loss}, Total Combo Profit: {combo_max_profit}")
 
@@ -121,7 +121,7 @@ class MaxPNLCalculation:
         instrument_id = list_of_config_leg_objects[0].instrument_id
         if instrument_id not in strategy_variables.map_instrument_id_to_instrument_object:
             print(f"Inside get_combination_max_loss_and_max_profit function could not find instrument id: {instrument_id}")
-            return
+            return None, None
         instrument_object_for_multiplier = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object[instrument_id])
 
         list_of_combination_payoff_at_all_strikes = []
@@ -254,7 +254,7 @@ class MaxPNLCalculation:
             instrument_id = config_leg_obj.instrument_id
             if instrument_id not in strategy_variables.map_instrument_id_to_instrument_object:
                 print(f"Inside get_combination_payoff function could not find instrument id: {instrument_id}")
-                continue
+                return 0
             instrument_object_for_leg_prem = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object[instrument_id])
             # TODO HANDLE IT ARYAN - IMPORTANT
 

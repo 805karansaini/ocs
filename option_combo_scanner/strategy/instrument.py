@@ -17,6 +17,8 @@ class Instrument:
 
         # Manage Conid, contract, Subscription
         self.map_instrument_id_to_instrument_object()
+        self.instrument_id = int(self.instrument_id)
+        
 
     def map_instrument_id_to_instrument_object(self):
         # Map instrument_id to Instrument Object
@@ -60,4 +62,5 @@ class Instrument:
     def remove_from_system(
         self,
     ):
+        print(f"Deleteing the instrumen: {self.instrument_id}")
         del strategy_variables.map_instrument_id_to_instrument_object[self.instrument_id]

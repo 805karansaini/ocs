@@ -2,6 +2,7 @@ import asyncio
 import copy
 import datetime
 from functools import cache
+import traceback
 import pandas as pd
 
 from com.contracts import get_contract
@@ -299,10 +300,11 @@ class ScannerAlgo:
         # list_of_filter_legs = self.filter_strikes(range_low, range_high,) # ConfigLeg, Expiry of the perivous leg N-1 Leg,
 
         # Get the all the details for contract creation
-        instrument_id = leg_object.instrument_id
+        instrument_id = int(leg_object.instrument_id)
         if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
             print(f"Inside filter_strikes for scanner algo function could not find instrument id: {instrument_id}")
-            return
+            return []
+        
         instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
         min_dte = leg_object.dte_range_min
         max_dte = leg_object.dte_range_max
@@ -392,11 +394,11 @@ class ScannerAlgo:
             if data_frame is not None:
                 df = data_frame.copy()
             else:
-                # TODO REMOVE IT ARYAN
-                if symbol == "ES":
-                    all_strikes = [5250, 5255, 5260]
-                else:
-                    all_strikes = [18550, 18555, 18560,18565]
+                # # TODO REMOVE IT ARYAN
+                # if symbol == "ES":
+                #     all_strikes = [5250, 5255, 5260]
+                # else:
+                #     all_strikes = [18550, 18555, 18560,18565]
 
                 # get the list of call and put option contract
                 list_of_call_option_contracts, list_of_put_option_contracts = IndicatorHelper.get_list_of_call_and_put_option_contracts(
@@ -438,14 +440,15 @@ class ScannerAlgo:
             # Make a copy of the dataframe to avoid modifying the original dataframe
             
             filtered_dataframe = df.copy()
-            if symbol == "ES":
-                filtered_dataframe = filtered_dataframe[
-                    (filtered_dataframe["Strike"] >= 5250) & (filtered_dataframe["Strike"] <= 5260)
-                ]
-            elif symbol == "NQ":
-                filtered_dataframe = filtered_dataframe[
-                    (filtered_dataframe["Strike"] >= 18550) & (filtered_dataframe["Strike"] <= 18565)
-                ]
+            # if symbol == "ES":
+            #     filtered_dataframe = filtered_dataframe[
+            #         (filtered_dataframe["Strike"] >= 5250) & (filtered_dataframe["Strike"] <= 5260)
+            #     ]
+            # elif symbol == "NQ":
+            #     filtered_dataframe = filtered_dataframe[
+            #         (filtered_dataframe["Strike"] >= 18550) & (filtered_dataframe["Strike"] <= 18565)
+            #     ]
+
             # Filter strikes based on delta_range_low and delta_range_high
             filtered_dataframe = filtered_dataframe[
                 (filtered_dataframe["Delta"] >= delta_range_low) & (filtered_dataframe["Delta"] <= delta_range_high)
@@ -559,7 +562,7 @@ class ScannerAlgo:
                 leg_number = leg_object.leg_number
                 action = leg_object.action
                 # Unpack the Strike Delta & Conid from a Leg:  (5100.0B, 0.6981448441368908, 0)
-                strike, delta, conid = leg_tuple
+                _, strike, delta, conid,_,_,_,_,_ = leg_tuple
 
                 temp_leg_tuple = (strike, action)
                 temp_combination.append(temp_leg_tuple)
@@ -585,11 +588,11 @@ class ScannerAlgo:
         )
         # print("combination", list_of_combination)
         # print("list_of_combination", list_of_combination)
-        # list_of_filter_combination = self.filter_list_of_combination(
-        #     list_of_combination
-        # )
-        # list_of_filter_combination_without_dup = (
-        #     self.remove_duplicate_combo_different_order(list_of_filter_combination)
-        # )
+        list_of_filter_combination = self.filter_list_of_combination(
+            list_of_combination
+        )
+        list_of_filter_combination_without_dup = (
+            self.remove_duplicate_combo_different_order(list_of_filter_combination)
+        )
 
-        return list_of_combination
+        return list_of_filter_combination_without_dup
