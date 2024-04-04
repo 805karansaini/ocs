@@ -1,0 +1,3 @@
+Leg No,Instrument ID,Action,Right,MinDelta,MaxDelta,MinDTE,MaxDTE
+1,,Buy,Put,,,,
+2,,Sell,Put,0.01,1,0,0
