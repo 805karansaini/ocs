@@ -229,20 +229,30 @@ class Scanner:
             if self.config_obj is None:
                 return
             list_of_all_generated_combination = self.generate_combinations()
+            # todo early teminate
+            if self.check_do_we_need_to_restart_scan():
+                print(f"Early Termination: {self.config_obj}")
+                return
+
             list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
+            # todo early teminate
+            if self.check_do_we_need_to_restart_scan():
+                print(f"Early Termination: {self.config_obj}")
+                return
+
             self.insert_combinations_into_db(list_of_all_generated_combination, list_of_combo_net_deltas)
 
-            right = None
-            list_of_dte = []
-            try:
-                right = self.config_obj.right
+            # right = None
+            # list_of_dte = []
+            # try:
+            #     right = self.config_obj.right
 
-                list_of_dte_string_form = self.config_obj.list_of_dte
+            #     list_of_dte_string_form = self.config_obj.list_of_dte
 
-                list_of_dte = [int(num.strip()) for num in list_of_dte_string_form.split(",")]
-            except AttributeError:
-                # Handle the case where local_config_object does not have the expected attributes
-                print(f"Add Configuration Values")
+            #     list_of_dte = [int(num.strip()) for num in list_of_dte_string_form.split(",")]
+            # except AttributeError:
+            #     # Handle the case where local_config_object does not have the expected attributes
+            #     print(f"Add Configuration Values")
 
             # Based on sec_type wil run the scan for instrument
             # if sec_type == "OPT":
@@ -295,6 +305,11 @@ class Scanner:
         total_combo_profit = total_combo_loss = 0
 
         for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_delta):
+            # todo early teminate
+            if self.check_do_we_need_to_restart_scan():
+                print(f"Early Termination: {self.config_obj}")
+                return
+
             
             # Calulate Max Profit/Loss for the combination
             max_profit, max_loss = MaxPNLCalculation.calcluate_max_pnl(combination, list_of_config_leg_object)
@@ -322,7 +337,7 @@ class Scanner:
                 continue
             list_of_all_leg_objects = []
             # insertion of the values in legs table
-            for index, ((_, strike, delta, con_id, expiry, bid, ask, iv,_), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
+            for index, ((_, strike, delta, con_id, expiry, bid, ask, iv,und_conid), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
 
                 instrument_id = config_leg_object.instrument_id
                 instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
@@ -343,6 +358,7 @@ class Scanner:
                     "exchange": instrument_object.exchange,
                     "currency": instrument_object.currency,
                     "primary_exchange": instrument_object.primary_exchange,
+                    "underlying_conid": und_conid,
                 }
                 
                 res, leg_id = SqlQueries.insert_into_db_table(table_name="legs_table", values_dict=leg_values_dict)
@@ -760,7 +776,7 @@ class Scanner:
         delta_range_high = self.config_obj.list_of_config_leg_object[0].delta_range_max
         leg_object = self.config_obj.list_of_config_leg_object[0]
        
-        # print(leg_object)
+        print(leg_object)
         # print("\nGenerate Combintaions: ")
         # print(tabulate(strike_and_delta_dataframe, headers="keys", tablefmt="psql", showindex=False))
         current_date = datetime.datetime.now(variables.target_timezone_obj)

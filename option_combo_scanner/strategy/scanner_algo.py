@@ -295,6 +295,11 @@ class ScannerAlgo:
             pandas.DataFrame: Filtered dataframe containing strikes within the given delta range
         """
         print(delta_range_low, delta_range_high, current_expiry)
+        # todo early teminate
+
+        if self.check_do_we_need_to_restart_scan():
+                print(f"Early Termination: {self.config_obj}")
+                return
 
         # If we can get all the valid strikes over all the valid expiries for the leg, then we are good.
         # list_of_filter_legs = self.filter_strikes(range_low, range_high,) # ConfigLeg, Expiry of the perivous leg N-1 Leg,
@@ -383,8 +388,19 @@ class ScannerAlgo:
             map_closest_expiry_to_underlying_conid,
         )
 
+        # todo early teminate
+        if self.check_do_we_need_to_restart_scan():
+                print(f"Early Termination: {self.config_obj}")
+                return
+
         for expiry in expiry_date_in_range:
             # key: ocs_mkt_ symbol, expiry, sectype, right, trading_class, multiplier  exchange
+
+            # todo early teminate
+            if self.check_do_we_need_to_restart_scan():
+                print(f"Early Termination: {self.config_obj}")
+                return
+
 
             # get the key for caching the raw dataframe
             key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
@@ -422,6 +438,12 @@ class ScannerAlgo:
                 )
                 df_call['underlying_conid'] = underlying_conid
                 df_put['underlying_conid'] = underlying_conid
+
+                # todo early teminate
+                if self.check_do_we_need_to_restart_scan():
+                    print(f"Early Termination: {self.config_obj}")
+                    return
+
 
                 if right.upper() == "CALL":
                     key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
@@ -475,6 +497,12 @@ class ScannerAlgo:
         # print(f"Leg Object: {leg_object}")
         # print(f"List of filter leg: {list_of_filter_legs}")
 
+        # todo early teminate
+        if self.check_do_we_need_to_restart_scan():
+                print(f"Early Termination: {self.config_obj}")
+                return
+
+
         list_of_partial_combination = []
 
         if remaining_no_of_legs == 0:
@@ -500,6 +528,7 @@ class ScannerAlgo:
             delta_range_max = float(delta_range_max)
 
             for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid in list_of_filter_legs:
+                
 
                 new_range_low = strike_delta + delta_range_min
                 new_range_high = strike_delta + delta_range_max
@@ -508,6 +537,7 @@ class ScannerAlgo:
                 list_of_strike_delta_and_con_id_tuple = self.generate_combinations(
                     remaining_no_of_legs - 1, new_range_low, new_range_high, expiry_date_obj, leg_object
                 )
+
 
                 current_leg_strike_and_strike_delta = [(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid)]
 
@@ -596,3 +626,31 @@ class ScannerAlgo:
         )
 
         return list_of_filter_combination_without_dup
+    
+
+
+    def check_do_we_need_to_restart_scan(
+        self,
+    ):
+        """
+        False: Indicates do not need to restart scan
+        True: Indicates do need to restart scan
+        """
+        # If config got changed
+        local_config_object = self.get_config_from_variables()
+        
+        if local_config_object:
+            if not self.config_obj.config_id == local_config_object.config_id:
+                return True
+
+        if StrategyVariables.flag_force_restart_scanner:
+            return True
+
+        return False
+    
+    def get_config_from_variables(
+        self,
+    ):
+        local_config_object = copy.deepcopy(StrategyVariables.config_object)
+
+        return local_config_object
