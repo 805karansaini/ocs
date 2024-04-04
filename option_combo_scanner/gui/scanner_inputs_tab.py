@@ -1,11 +1,15 @@
 import asyncio
 import configparser
 import copy
+import os
 import threading
 import time
 import tkinter as tk
+from tkinter import filedialog
 import uuid
 from tkinter import Scrollbar, messagebox, ttk
+
+import pandas as pd
 from com.identify_trading_class_for_fop import (
     identify_the_trading_class_for_all_the_fop_leg_in_combination_async,
 )
@@ -50,12 +54,39 @@ leg_config_table_columns_width = [
 
 
 class ScannerInputsTab:
+    # List of Templates Mapping to path
+    dropdown_file_mapping = {
+        'Bull Call Spread': 'Bull Call Spread.csv',
+        'Bear Call Spread': 'Bear Call Spread.csv',
+        'Bull Put Spread': 'Bull Put Spread.csv',
+        'Bear Put Spread': 'Bear Put Spread.csv',
+        'Calendar Call Spread': 'Calendar Call Spread.csv',
+        'Calendar Put Spread': 'Calendar Put Spread.csv',
+        'Iron Condor': 'Iron Condor.csv',
+        'Iron Fly': 'Iron Fly.csv',
+        'Straddle': 'Straddle.csv',
+        'Strangle': 'Strangle.csv',
+        # Add more mappings for other dropdown options
+    }
+
     def __init__(self, scanner_inputs_tab):
+
+        # Mapping the directory for Templates
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root_dir = os.path.abspath(os.path.join(script_dir, '..', '..'))
+        self.templates_dir = os.path.join(project_root_dir, 'Templates')
+
+        # Update file paths in the mapping to point to the templates directory
+        for key, filename in self.dropdown_file_mapping.items():
+            full_path = os.path.join(self.templates_dir, filename)
+            self.dropdown_file_mapping[key] = full_path
+
+
         self.flag_legs_config_table_in_readonly_state = True
         self.scanner_inputs_tab = scanner_inputs_tab
 
         self.create_scanner_inputs_tab()
-
+        
     def create_scanner_inputs_tab(self):
         self.create_instrument_table()
         self.create_configuration_inputs_and_table()
@@ -831,7 +862,7 @@ class ScannerInputsTab:
     def create_configuration_inputs_and_table(
         self,
     ):
-
+        
         # Create a frame for input fields
         input_fields_frame = ttk.Frame(self.scanner_inputs_tab, padding=20)
         input_fields_frame.pack()
@@ -839,39 +870,33 @@ class ScannerInputsTab:
         # Place the input fields frame just below the instrument table
         input_fields_frame.place(relx=0.5, anchor=tk.CENTER, rely=0.2, y=250)
 
-        # Labels
-        # right_label = ttk.Label(
-        #     input_fields_frame, text="Right", anchor="center", width=12
-        # )
-        # right_label.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
+        # dropdown for templates
+        dropdown_label = ttk.Label(
+            input_fields_frame, text="Template", anchor="center", width=12
+        )
+        dropdown_label.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
+        dropdown_var = tk.StringVar()
+        dropdown = ttk.Combobox(input_fields_frame, textvariable=dropdown_var, state="readonly")
+        # getting the values for templates from map
+        dropdown['values'] = tuple(self.dropdown_file_mapping.keys())
+        dropdown.grid(column=0, row=1, padx=5, pady=5)
 
-        # dte_leg_label = ttk.Label(
-        #     input_fields_frame, text="List of DTE", anchor="center", width=12
-        # )
-        # dte_leg_label.grid(column=1, row=0, padx=5, pady=(0, 5), sticky="n")
+        # Bind the template which is selected
+        # dropdown.bind("<<ComboboxSelected>>", lambda event: self.upload_template_from_mapped_path(dropdown_var.get()))
+        template_button = ttk.Button(input_fields_frame, text='Import Template', 
+                                    command=lambda: self.upload_template_from_mapped_path(dropdown_var.get()))
+        template_button.grid(column=0, row=2, padx=5, pady=5)
+
+        # Create a separator between the dropdown/button and the "#Legs" label
+        separator = ttk.Separator(input_fields_frame, orient='vertical')
+        separator.grid(column=1, row=0, rowspan=2, padx=5, pady=(0, 5), sticky='ns')
 
         leg_label = ttk.Label(
             input_fields_frame, text="#Legs", anchor="center", width=12
         )
         leg_label.grid(column=2, row=0, padx=5, pady=(0, 5), sticky="n")
 
-        # right_label = ttk.Label(
-        #     input_fields_frame, text="Right", anchor="center", width=12
-        # )
-        # right_label.grid(column=10, row=0, padx=5, pady=(0, 5), sticky="n")
-        # # Entry and Combo box Inputs
-        # self.right_var = tk.StringVar()
-        # self.right_dropdown = ttk.Combobox(
-        #     input_fields_frame,
-        #     textvariable=self.right_var,
-        #     values=["CALL", "PUT"],
-        #     state="readonly",
-        # )
-        # self.right_dropdown.place(column=10, row=1, padx=5, pady=5)
-
-        # Add Entry for "dte leg" with label above
-        # self.list_of_dte_entry = ttk.Entry(input_fields_frame)
-        # self.list_of_dte_entry.grid(column=1, row=1, padx=5, pady=5)
+        
 
         self.no_of_legs_entry = ttk.Entry(input_fields_frame)
         self.no_of_legs_entry.grid(column=2, row=1, padx=5, pady=5)
@@ -882,11 +907,7 @@ class ScannerInputsTab:
             text="Update Legs",
             command=lambda: self.update_leg_config_button_clicked(),
         )
-        update_leg_config_button.grid(column=5, row=1, padx=5, pady=5)
-
-        # Add Save button
-        # save_config_button = ttk.Button(input_fields_frame, text="Save Config", command=self.save_config_button_click)
-        # save_config_button.grid(column=6, row=1, padx=5, pady=5)
+        update_leg_config_button.grid(column=2, row=2, padx=5, pady=5)
         save_config_button = ttk.Button(
             self.scanner_inputs_tab,
             text="Save Config",
@@ -896,13 +917,110 @@ class ScannerInputsTab:
         # Create the leg_
         self.create_leg_config_editable_table()
 
-        
+    # Funtion for Upload Template for mapped path
+    def upload_template_from_mapped_path(self, selected_option):
+        # extract the file path form mapp
+        file_path = self.dropdown_file_mapping.get(selected_option)
+        if file_path:
+            # function to upload the csv in app
+            self.upload_template_from_csv_to_app(file_path)
 
+    # function for Template upload
+    def upload_template_from_csv(self, template_button):
+
+        # Disabled upload orders button
+        template_button.config(state="disabled")
+
+        # Get window to choose file from storage
+        file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
+
+        if file_path:
+
+            # Place template values in CSV
+            upload_thread = threading.Thread(
+                target=self.upload_template_from_csv_to_app,
+                args=(
+                    file_path,
+                    template_button,
+                ),
+            )
+            upload_thread.start()
+
+            # Enabled template button
+        template_button.config(state="enabled")
+
+    # function for Template upload to app
+    def upload_template_from_csv_to_app(self, orders_dataframe_path):
+
+        try:
+            # get csv file from file path
+            print(orders_dataframe_path)
+            template_dataframe = pd.read_csv(orders_dataframe_path)
+
+            # Replace null values by None string
+            template_dataframe = template_dataframe.fillna("")
+            print(template_dataframe.to_string())
+
+        except Exception as e:
+            # Error Message pop-up
+            Utils.display_message_popup(
+                "Error",
+                f"Unable to read the CSV file",
+            )
+            # Enabled template button
+            # template_button.config(state="enabled")
+
+            return
+        
+        if template_dataframe.empty:
+            # Error Message pop-up
+            Utils.display_message_popup(
+                "Error",
+                f"CSV file was empty",
+            )
+
+            # Enabled upload template button
+            # template_button.config(state="enabled")
+
+            return
+
+        is_valid = self.check_validness_for_template_df(template_dataframe)
+        if not is_valid:
+            return
+        self.insert_into_config_leg_table_through_template(template_dataframe)
+        
+    def check_validness_for_template_df(self, template_dataframe_to_be_checked):
+        # Getting list of valid columns
+        columns_for_template_csv = copy.deepcopy(strategy_variables.columns_for_templates_to_csv)
+
+        # Getting columns of dataframe to-be-checked
+        template_dataframe_columns = template_dataframe_to_be_checked.columns
+
+        # check if number of columns in csv file is correct
+        if len(columns_for_template_csv) != len(template_dataframe_columns):
+            Utils.display_message_popup(
+                "Error",
+                f"Columns are not matching in file, Number of columns is wrong",
+            )
+            return False
+
+
+        # Check if columns in template dataframe for upload templates are valid
+        for allowed_columns_name, user_input_col_name in zip(
+            columns_for_template_csv, template_dataframe_columns
+        ):
+            if allowed_columns_name != user_input_col_name:
+                Utils.display_message_popup(
+                "Error",
+                f"Columns are not matching in file, Invalid column: '{user_input_col_name}",
+                )
+                return False
+        return True
+            
+        
     def save_config_button_click(self):
         values_dict = {
             "no_of_leg": int(self.no_of_legs_entry.get()),
-            # "right": self.right_var.get().upper(),
-            # "list_of_dte": self.list_of_dte_entry.get(),
         }
         # Validation on no of legs if it is greater than zero
         if not Utils.is_positive_greater_than_equal_one_integer(
@@ -921,23 +1039,6 @@ class ScannerInputsTab:
             )
             return
         
-
-        # list_of_dte = values_dict["list_of_dte"].strip().split(",")
-        # if not len(list_of_dte):
-        #     Utils.display_message_popup(
-        #         "Error",
-        #         f"List of DTE must not be empty",
-        #     )
-        #     return
-
-        # for dte in list_of_dte:
-        #     if not Utils.is_non_negative_integer(dte):
-        #         Utils.display_message_popup(
-        #             "Error",
-        #             f"List of DTE must be non negative integer e.g. 1,2",
-        #         )
-        #         return
-
         leg_data_list = []
 
         for i in range(int(self.no_of_legs_entry.get())):
@@ -972,21 +1073,23 @@ class ScannerInputsTab:
                     f"Instrument ID doesn't exist in Instrument Table",
                 )
                 return
+            
             if i == 0:
-                if not Utils.is_between_zero_to_one(leg_data["delta_range_max"]):
+                if not Utils.is_between_zero_to_one(float(leg_data["delta_range_max"])):
                     Utils.display_message_popup(
                         "Error",
                         f"Delta values for the first leg should be between 0 and 1",
                     )
                     return
 
-                if not Utils.is_between_zero_to_one(leg_data["delta_range_min"]):
+                if not Utils.is_between_zero_to_one(float(leg_data["delta_range_min"])):
                     Utils.display_message_popup(
                         "Error",
                         f"Delta values for the first leg should be between 0 and 1",
                     )
                     return
-                if leg_data["delta_range_min"] > leg_data["delta_range_max"]:
+    
+                if (float(leg_data["delta_range_min"])) > (float(leg_data["delta_range_max"])):
                     Utils.display_message_popup(
                         "Error",
                         f"MinDelta value cannot be greater than MaxDelta value",
@@ -996,20 +1099,22 @@ class ScannerInputsTab:
             else:
                 # For legs 1 onwards validation for -1 to 1 value
                 # Validation
-                if not Utils.is_between_minus_one_to_one(leg_data["delta_range_max"]):
+                
+                if not Utils.is_between_minus_one_to_one(float(leg_data["delta_range_max"])):
                     Utils.display_message_popup(
                         "Error",
                         f"Delta values should be in between -1 to 1",
                     )
                     return
 
-                if not Utils.is_between_minus_one_to_one(leg_data["delta_range_min"]):
+                if not Utils.is_between_minus_one_to_one(float(leg_data["delta_range_min"])):
                     Utils.display_message_popup(
                         "Error",
                         f"Delta values should be in between -1 to 1",
                     )
                     return
-                if leg_data["delta_range_min"] > leg_data["delta_range_max"]:
+
+                if (float(leg_data["delta_range_min"])) > (float(leg_data["delta_range_max"])):
                     Utils.display_message_popup(
                         "Error",
                         f"MinDelta value cannot be greater than MaxDelta value",
@@ -1145,14 +1250,39 @@ class ScannerInputsTab:
         for leg_obj in list_of_config_leg_object:
             self.insert_into_config_leg_table_helper(leg_obj)
 
+    def insert_into_config_leg_table_through_template(self, dataframe):
+        self.leg_config_table.delete(*self.leg_config_table.get_children())
+
+        # Iterate over rows of the DataFrame
+        for index, row in dataframe.iterrows():
+            row_values = tuple(row)
+            # print(row_values)
+            # Get the current number of items in the treeview
+            num_items = len(self.leg_config_table.get_children())
+
+            if num_items % 2 == 1:
+                self.leg_config_table.insert(
+                    "",
+                    "end",
+                    iid=row_values[0],
+                    text=num_items + 1,
+                    values=row_values,
+                    tags=("oddrow",),
+                )
+            else:
+                self.leg_config_table.insert(
+                    "",
+                    "end",
+                    iid=row_values[0],
+                    text=num_items + 1,
+                    values=row_values,
+                    tags=("evenrow",),
+                )
+
     def insert_into_common_config_table_helper(self, config_obj):
         _, no_of_legs, _ = config_obj.get_config_tuple_for_gui()
-
         self.no_of_legs_entry.insert(0, no_of_legs)
-        # self.right_dropdown.config(state="normal")
-        # self.right_dropdown.insert(0, right)
-        # self.list_of_dte_entry.insert(0, list_of_dte)
-        # self.right_dropdown.config(state="readonly")
+        
 
     def insert_into_config_leg_table_helper(self, leg_obj):
         row_values = leg_obj.get_config_leg_tuple_for_gui()
