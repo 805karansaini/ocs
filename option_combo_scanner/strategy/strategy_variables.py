@@ -132,6 +132,18 @@ class StrategyVariables:
         "Max Loss",
         "Max Profit/Loss Ratio",
     ]
+
+    columns_for_templates_to_csv = [
+        "Leg No",
+        "Instrument ID",
+        "Action",
+        "Right",
+        "MinDelta",
+        "MaxDelta",
+        "MinDTE",
+        "MaxDTE",
+
+    ]
     # scanner combo table dataframe
     scanner_combo_table_df = pd.DataFrame(columns=scanner_combination_table_columns)
 
