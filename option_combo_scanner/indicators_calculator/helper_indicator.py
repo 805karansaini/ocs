@@ -71,6 +71,7 @@ class IndicatorHelper:
             all_strikes,
             closest_expiry_date,
             underlying_conid,
+            _,
         ) = find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
             symbol,
             dte,
@@ -105,6 +106,7 @@ class IndicatorHelper:
             all_strikes,
             closest_expiry_date,
             underlying_conid,
+            _,
         ) = find_nearest_expiry_and_all_strikes_for_stk_given_dte(
             ticker=symbol,
             days_to_expiry=dte,
