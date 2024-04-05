@@ -891,12 +891,11 @@ class ScannerInputsTab:
         separator = ttk.Separator(input_fields_frame, orient='vertical')
         separator.grid(column=1, row=0, rowspan=2, padx=5, pady=(0, 5), sticky='ns')
 
+        # No of legs label and entry
         leg_label = ttk.Label(
             input_fields_frame, text="#Legs", anchor="center", width=12
         )
         leg_label.grid(column=2, row=0, padx=5, pady=(0, 5), sticky="n")
-
-        
 
         self.no_of_legs_entry = ttk.Entry(input_fields_frame)
         self.no_of_legs_entry.grid(column=2, row=1, padx=5, pady=5)
@@ -919,47 +918,22 @@ class ScannerInputsTab:
 
     # Funtion for Upload Template for mapped path
     def upload_template_from_mapped_path(self, selected_option):
-        # extract the file path form mapp
+        # extract the file path from mapp
         file_path = self.dropdown_file_mapping.get(selected_option)
         if file_path:
             # function to upload the csv in app
             self.upload_template_from_csv_to_app(file_path)
 
-    # function for Template upload
-    def upload_template_from_csv(self, template_button):
-
-        # Disabled upload orders button
-        template_button.config(state="disabled")
-
-        # Get window to choose file from storage
-        file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
-
-        if file_path:
-
-            # Place template values in CSV
-            upload_thread = threading.Thread(
-                target=self.upload_template_from_csv_to_app,
-                args=(
-                    file_path,
-                    template_button,
-                ),
-            )
-            upload_thread.start()
-
-            # Enabled template button
-        template_button.config(state="enabled")
-
-    # function for Template upload to app
-    def upload_template_from_csv_to_app(self, orders_dataframe_path):
+    # Function for Template upload to app
+    def upload_template_from_csv_to_app(self, template_dataframe_path):
 
         try:
             # get csv file from file path
-            print(orders_dataframe_path)
-            template_dataframe = pd.read_csv(orders_dataframe_path)
+            template_dataframe = pd.read_csv(template_dataframe_path)
 
             # Replace null values by None string
             template_dataframe = template_dataframe.fillna("")
-            print(template_dataframe.to_string())
+            # print(template_dataframe.to_string())
 
         except Exception as e:
             # Error Message pop-up
@@ -983,12 +957,15 @@ class ScannerInputsTab:
             # template_button.config(state="enabled")
 
             return
-
+        
+        # Check validness for the template dataframe
         is_valid = self.check_validness_for_template_df(template_dataframe)
         if not is_valid:
             return
+        # Insert the template into the config leg table 
         self.insert_into_config_leg_table_through_template(template_dataframe)
-        
+
+    # Function to check validness of the template df
     def check_validness_for_template_df(self, template_dataframe_to_be_checked):
         # Getting list of valid columns
         columns_for_template_csv = copy.deepcopy(strategy_variables.columns_for_templates_to_csv)
