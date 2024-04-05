@@ -6,6 +6,7 @@ from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.strategy.strategy_variables import (
+    MaxPNLEnum,
     StrategyVariables as strategy_variables,
 )
 
@@ -16,7 +17,7 @@ class MaxPNLCalculation:
 
     # Group the combination with same underlying
     @staticmethod
-    def create_group_same_und(combination):
+    def create_group_same_und(combination, flag_return_dict=False):
         # Dict for group key as conid and list of values containing the leg_tuples
         grouped_tuples = {}
 
@@ -28,6 +29,10 @@ class MaxPNLCalculation:
             else:
                 grouped_tuples[underlying_conid] = [(symbol, strike, delta, conid, expiry, bid, ask, iv, underlying_conid, config_leg_obj)]
 
+        # If true return the dict
+        if flag_return_dict:
+            return grouped_tuples
+        
         return list(grouped_tuples.values())
     
     # find the closest expiry for the group combination
@@ -54,6 +59,9 @@ class MaxPNLCalculation:
         # Combination
         print(f"Combintaion: {combination}")
 
+        # KARANARYAN Variable from SV:  ONE/GNE
+        flag_overall_nearest_expiry = MaxPNLEnum.ONE
+        
         # Vairables for total combination max profit and loss
         combo_max_profit = 0
         combo_max_loss = 0
@@ -72,7 +80,14 @@ class MaxPNLCalculation:
         
         # Get the list of closest expiry for the groups
         list_of_closest_expiry_for_each_group = MaxPNLCalculation.find_closest_expiry_for_groups(list_of_combination_groups)
+        # if ONE:
+        # if user select for overall nearest expiry(ONE)
+        if flag_overall_nearest_expiry:
+            # get the cloest epxiry for all group 
+            cloest_expiry_ = min(list_of_closest_expiry_for_each_group)
+            list_of_closest_expiry_for_each_group = [cloest_expiry_] * len(list_of_closest_expiry_for_each_group)
 
+        
         # Iterate over the groups, and calculate the Max Profit and Loss for each groups
         for combination_group, closest_expiry in zip(list_of_combination_groups, list_of_closest_expiry_for_each_group):
 
@@ -117,7 +132,6 @@ class MaxPNLCalculation:
         combination_premium_received = MaxPNLCalculation.calculate_combination_premium(list_of_legs_tuple, list_of_config_leg_objects,)
 
         # InstrumentID, and InstrumentObject for multiplier
-        # TODO if deleted, ddo something
         instrument_id = list_of_config_leg_objects[0].instrument_id
         if instrument_id not in strategy_variables.map_instrument_id_to_instrument_object:
             print(f"Inside get_combination_max_loss_and_max_profit function could not find instrument id: {instrument_id}")
@@ -242,7 +256,7 @@ class MaxPNLCalculation:
 
     # Calulating Combination Payoff for Strike
     @staticmethod
-    def get_combination_payoff(list_of_legs_tuple, list_of_config_leg_object, underlying_strike_price, closest_expiry):
+    def get_combination_payoff(list_of_legs_tuple, list_of_config_leg_object, underlying_strike_price, closest_expiry, multiplier=None):
 
         # Default Values        
         combination_payoff = 0
@@ -255,9 +269,12 @@ class MaxPNLCalculation:
             if instrument_id not in strategy_variables.map_instrument_id_to_instrument_object:
                 print(f"Inside get_combination_payoff function could not find instrument id: {instrument_id}")
                 return 0
-            instrument_object_for_leg_prem = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object[instrument_id])
-            # TODO HANDLE IT ARYAN - IMPORTANT
-
+            else:
+                if multiplier == None:
+                    multiplier = int(strategy_variables.map_instrument_id_to_instrument_object[instrument_id].multiplier)
+                else:
+                    multiplier = multiplier
+                    
             # Unpacking the combination leg tuple
             symbol, option_strike,_, _, leg_expiry, bid, ask, leg_iv,_, _ = leg
             intial_leg_premium = 0
@@ -279,7 +296,7 @@ class MaxPNLCalculation:
                     config_leg_obj.action,
                     1,
                     float(underlying_strike_price),
-                    int(instrument_object_for_leg_prem.multiplier),
+                    int(multiplier),
                     intial_leg_premium,
                 )
                 # Add to combination off the sign is already adjusted in the option_payoff method
@@ -299,7 +316,7 @@ class MaxPNLCalculation:
                 
                 # Add to combination PayOff
                 leg_payoff = 1*leg_payoff if config_leg_obj.action.upper() == "BUY" else -1*leg_payoff
-                leg_payoff *= int(instrument_object_for_leg_prem.multiplier)
+                leg_payoff *= int(multiplier)
                 
                 combination_payoff += leg_payoff 
                 print(f"        Theortical Premimum Function Inputs: {underlying_strike_price= }, RR1: {strategy_variables.riskfree_rate1}, TTE: {time_to_expiration}, Strike:{option_strike}, IV: {leg_iv}, Right: {config_leg_obj.right}")
