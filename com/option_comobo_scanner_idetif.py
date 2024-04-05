@@ -13,7 +13,7 @@ from com.greeks import *
 
 # Compares the 'target date(expiry)' with all expiries and returns the closest available expiry from them.
 def get_closest_exp_from_expiries_given_target_date(
-    symbol, target_date_str, expiry_dates_ticker, today_str, low_range_date_str, high_range_date_str,
+    symbol, target_date_str, expiry_dates_ticker, today_str, low_range_date_str=None, high_range_date_str=None,
 ):
 
     # Print to console
@@ -33,7 +33,10 @@ def get_closest_exp_from_expiries_given_target_date(
     target_date_obj = variables.target_timezone_obj.localize(
         datetime.datetime.strptime(target_date_str, "%Y%m%d")
     )
-
+    if low_range_date_str is None:
+        low_range_date_str = '19000101'
+    if high_range_date_str is None:
+        high_range_date_str = '99991230'
     low_range_date_obj = variables.target_timezone_obj.localize(
         datetime.datetime.strptime(low_range_date_str, "%Y%m%d")
     )
@@ -528,8 +531,8 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
     currency,
     multiplier,
     fop_trading_class,
-    low_range_date_str,
-    high_range_date_str,
+    low_range_date_str=None,
+    high_range_date_str=None,
 ):
 
     # Print to console
@@ -622,8 +625,8 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
     multiplier,
     trading_class,
     all_fut_expiries,
-    low_range_date_str,
-    high_range_date_str,
+    low_range_date_str=None,
+    high_range_date_str=None,
 ):
 
     # Print to console

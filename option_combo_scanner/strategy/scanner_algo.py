@@ -299,7 +299,7 @@ class ScannerAlgo:
 
         if self.check_do_we_need_to_restart_scan():
                 print(f"Early Termination: {self.config_obj}")
-                return
+                return []
 
         # If we can get all the valid strikes over all the valid expiries for the leg, then we are good.
         # list_of_filter_legs = self.filter_strikes(range_low, range_high,) # ConfigLeg, Expiry of the perivous leg N-1 Leg,
@@ -391,7 +391,7 @@ class ScannerAlgo:
         # todo early teminate
         if self.check_do_we_need_to_restart_scan():
                 print(f"Early Termination: {self.config_obj}")
-                return
+                return []
 
         for expiry in expiry_date_in_range:
             # key: ocs_mkt_ symbol, expiry, sectype, right, trading_class, multiplier  exchange
@@ -399,7 +399,7 @@ class ScannerAlgo:
             # todo early teminate
             if self.check_do_we_need_to_restart_scan():
                 print(f"Early Termination: {self.config_obj}")
-                return
+                return []
 
 
             # get the key for caching the raw dataframe
@@ -442,7 +442,7 @@ class ScannerAlgo:
                 # todo early teminate
                 if self.check_do_we_need_to_restart_scan():
                     print(f"Early Termination: {self.config_obj}")
-                    return
+                    return []
 
 
                 if right.upper() == "CALL":
@@ -499,8 +499,8 @@ class ScannerAlgo:
 
         # todo early teminate
         if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
-                return
+            print(f"Early Termination: {self.config_obj}")
+            return []
 
 
         list_of_partial_combination = []

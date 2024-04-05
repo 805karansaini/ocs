@@ -25,21 +25,3 @@ class ScannerLeg:
 
     def __str__(self) -> str:
         return f"Scanner Leg Object: {pprint(vars(self))}"
-
-    def get_leg_tuple_for_gui(
-        self,
-    ):
-        # Create a tuple with object attributes in the specified order
-        leg_tuple = (
-            self.combo_id,
-            self.leg_number,
-            self.con_id,
-            self.strike,
-            self.qty,
-            self.delta_found,
-            self.action,
-            self.delta_range_min,
-            self.delta_range_max,
-        )
-
-        return leg_tuple

@@ -86,6 +86,7 @@ query6 = """CREATE TABLE IF NOT EXISTS `legs_table` (
             `trading_class` VARCHAR(20),
             `primary_exchange` VARCHAR(20),
             `con_id` VARCHAR(20),
+            `underlying_conid` VARCHAR(20),
             `delta_found` DECIMAL(10, 8),
             FOREIGN KEY (`combo_id`) REFERENCES `combination_table`(`combo_id`) ON DELETE CASCADE
         );"""
