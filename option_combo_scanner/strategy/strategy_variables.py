@@ -4,6 +4,7 @@ import threading
 from typing import List, Tuple
 
 import pandas as pd
+from enum import Enum
 
 # # Read the config file
 config = configparser.ConfigParser()
@@ -13,6 +14,10 @@ config.read("option_scanner_user_inputs.ini")
 
 time_zone_config = config["TimeZone"]
 
+
+class MaxPNLEnum(Enum):
+    ONE = 1
+    GNE = 2
 
 class StrategyVariables:
     """
@@ -218,3 +223,5 @@ class StrategyVariables:
     # Max min Pain Flag
     flag_drop_empty_oi_rows = True
     flag_test_print = False
+
+    flag_ONE_for_max_pnl = "ONE"
