@@ -349,12 +349,10 @@ class ScannerCombinationTab:
             print(f"Inside GUI:create_and_display_impact_popup Could not get the combo_id value: {combo_id} {e} \n {traceback.print_exc()}")
             
         # Error Popup
-        Utils.display_message_popup(
-            "Error",
-            f"Could not able to display the combination impact combo_id: {combo_id}",
-        )
-            
-        
+        # Utils.display_message_popup(
+        #     "Error",
+        #     f"Could not able to display the combination impact combo_id: {combo_id}",
+        # )
 
     # Method to display scanner combination details
     def display_scanner_combination_details(

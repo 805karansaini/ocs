@@ -152,7 +152,7 @@ class MarketDataFetcher:
             result += await asyncio.gather(
                 *[
                     MarketDataFetcher.get_option_delta_and_implied_volatility(
-                        contract, flag_market_open, generic_tick_list, snapshot, max_wait_time
+                        contract, flag_market_open, generic_tick_list, snapshot, max_wait_time,
                     )
                     for contract in batch
                 ]

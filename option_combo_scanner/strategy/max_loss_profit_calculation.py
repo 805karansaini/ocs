@@ -5,10 +5,9 @@ from pprint import pprint
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.strategy_variables import (
-    MaxPNLEnum,
-    StrategyVariables as strategy_variables,
-)
+from option_combo_scanner.strategy.strategy_variables import MaxPNLEnum
+from option_combo_scanner.strategy.strategy_variables import \
+    StrategyVariables as strategy_variables
 
 logger = CustomLogger.logger
 
@@ -60,7 +59,7 @@ class MaxPNLCalculation:
         print(f"Combintaion: {combination}")
 
         # KARANARYAN Variable from SV:  ONE/GNE
-        flag_overall_nearest_expiry = MaxPNLEnum.ONE
+        flag_overall_nearest_expiry = strategy_variables.calculation_mode_for_combination_max_pnl
         
         # Vairables for total combination max profit and loss
         combo_max_profit = 0
@@ -80,9 +79,9 @@ class MaxPNLCalculation:
         
         # Get the list of closest expiry for the groups
         list_of_closest_expiry_for_each_group = MaxPNLCalculation.find_closest_expiry_for_groups(list_of_combination_groups)
-        # if ONE:
+
         # if user select for overall nearest expiry(ONE)
-        if flag_overall_nearest_expiry:
+        if flag_overall_nearest_expiry == MaxPNLEnum.ONE:
             # get the cloest epxiry for all group 
             cloest_expiry_ = min(list_of_closest_expiry_for_each_group)
             list_of_closest_expiry_for_each_group = [cloest_expiry_] * len(list_of_closest_expiry_for_each_group)
@@ -167,7 +166,7 @@ class MaxPNLCalculation:
                     closest_expiry=closest_expiry,
                 )
 
-                # TODO - comment 
+    
                 # getting the payoff(left) - payoff(left + 1)
                 slope_left_numerator = (strike_zero_payoff - strike_one_payoff)/int(instrument_object_for_multiplier.multiplier)
                 slope_left_deno = 1
