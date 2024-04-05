@@ -11,6 +11,7 @@ from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.indicators_calculator.market_data_fetcher import \
     MarketDataFetcher
+from option_combo_scanner.strategy.max_loss_profit_calculation import MaxPNLCalculation
 from option_combo_scanner.strategy.strategy_variables import \
     StrategyVariables as strategy_variables
 
@@ -146,35 +147,213 @@ class ScannerCombination:
         )
 
         return combination_tuple
-    def dispaly_combination_impact(self):
-        combo_id = self.combo_id
+    
+    def dispaly_combination_impact(self,):
+
+        # Getitng the CombinationObj, ComboID, List of ComboLegObj
+        combo_obj = self
+        combo_id = combo_obj.combo_id
+        list_of_combo_leg_object = combo_obj.list_of_all_leg_objects
+
+        # Config ID, Confg Object, ListOfConfigLegObj
+        config_id = combo_obj.config_id
+        config_obj = copy.deepcopy(strategy_variables.config_object)
+        list_of_config_leg_object = config_obj.list_of_config_leg_object
         
-        try:
-            config_obj = strategy_variables.config_object
-            
-            # List to store underlying_conid for each instrument
-            list_of_underlying_conids = []
-            
-            for config_leg_obj in config_obj.list_of_config_leg_object:
-                instrument_id = config_leg_obj.instrument_id
-                
-                # Retrieve indicator_id and indicator_obj for each instrument
-                indicator_id = strategy_variables.map_instrument_to_indicator_id[instrument_id]
-                indicator_obj = strategy_variables.map_indicator_id_to_indicator_object[indicator_id]
-                underlying_conid = indicator_obj.underlying_conid
-                
-                list_of_underlying_conids.append(underlying_conid)
-        except Exception as e:
-            print(f"Error for Combo ID: {combo_id}. Exception: {e}")
-            return None
+
+        # Creating the list_of_combo_leg_tuples_with_config_leg
+        list_of_combo_leg_tuples_with_config_leg = []
+
+        # Adding the config_leg_obj to the leg_tuple
+        for combo_leg_object, config_leg_obj in zip(list_of_combo_leg_object, list_of_config_leg_object):
+            temp_list = [combo_leg_object.symbol, combo_leg_object.strike, None, None, combo_leg_object.expiry, None, None, None, combo_leg_object.underlying_conid, config_leg_obj]
+            list_of_combo_leg_tuples_with_config_leg.append(tuple(temp_list))
         
+        # Creating the Groups Based on the Underlying
+        map_underlying_conid_to_list_of_combination_group: dict = MaxPNLCalculation.create_group_same_und(list_of_combo_leg_tuples_with_config_leg, flag_return_dict=True)
+        list_of_combination_groups = list(map_underlying_conid_to_list_of_combination_group.values())
+
+        # Get the list of closest expiry for the groups
+        list_of_closest_expiry_for_each_group = MaxPNLCalculation.find_closest_expiry_for_groups(list_of_combination_groups,)
+        cl = min(list_of_closest_expiry_for_each_group)
+        # 1.a We want to get the Current Price of Underlying Contract.
+        # 1.b We want to get the Current Market Data for Option Contracts.
+        # 1.c if required data is not available, throw an error popup.
+        # 2. Manupulate the leg tuples, meaning update the None to fetched values 
+        # 3. Impact
+        
+        # List of underlying contracts
+        list_of_underlying_contract = []
+
+        # Underlying Contracts 
+        for underlying_conid, combination_group in map_underlying_conid_to_list_of_combination_group.items():
+            
+            # Unpacking the first leg
+            symbol, _, _, _, _, _, _, _, underlying_conid, config_leg_obj = combination_group[0]
+
+            # Get the Instrument SecType
+            _instrument_id = config_leg_obj.instrument_id
+
+            if _instrument_id not in strategy_variables.map_instrument_id_to_instrument_object:
+                Utils.display_message_popup(
+                    "Error",
+                f"Can not compute the Impact: Unable to find Instrument ID: {_instrument_id}",
+                )
+                return
+            # Get the instrument object details for contract creation
+            instrument_obj_ = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object[_instrument_id])
+            sec_type_  = instrument_obj_.sec_type
+            exchange_ = instrument_obj_.exchange
+            currency_  = instrument_obj_.currency
+            und_multiplier_  = instrument_obj_.multiplier
+            if sec_type_ == "OPT":
+                underlying_sec_type = "STK"
+                underlying_multiplier = 1
+                underlying_contract = get_contract(
+                    symbol=symbol,
+                    sec_type=underlying_sec_type,
+                    exchange=exchange_,
+                    currency=currency_,
+                    multiplier=und_multiplier_,
+                    con_id=underlying_conid,
+                )
+                list_of_underlying_contract.append(underlying_contract)
+            else:
+                underlying_sec_type = "FUT"
+                underlying_multiplier = int(und_multiplier_)
+                underlying_contract = get_contract(
+                    symbol=symbol,
+                    sec_type=underlying_sec_type,
+                    exchange=exchange_,
+                    currency=currency_,
+                    multiplier=underlying_multiplier,
+                    con_id=underlying_conid,
+                )
+                list_of_underlying_contract.append(underlying_contract)
+        
+
+    
+        # Option Contracts
+        # Creation of Option Contract
+        list_of_leg_objects = self.list_of_all_leg_objects
+        list_of_leg_strike_action_qty_tuple = [(leg_obj.symbol, leg_obj.strike, leg_obj.expiry, leg_obj.right, leg_obj.sec_type, leg_obj.multiplier, leg_obj.trading_class, leg_obj.exchange, leg_obj.currency) for leg_obj in list_of_leg_objects]
+        list_of_option_contracts = []
+
+        # Loop through each leg's strike, action, quantity, expiry, right, and multiplier and create option contracts, then add to the list
+        for symbol,strike, expiry, right_, sec_type, multiplier_, trading_class_, exchange, currency in list_of_leg_strike_action_qty_tuple:
+            option_contract = get_contract(
+                symbol,
+                sec_type,
+                exchange,
+                currency,
+                expiry,
+                strike,
+                right_,
+                multiplier_,
+                trading_class=trading_class_,
+            )
+            list_of_option_contracts.append(option_contract)
+
+        # Merged in list of both underlying and option contract
+        list_underlying_and_option_contract = list_of_underlying_contract + list_of_option_contracts
+        generic_tick_list = "101"
+        snapshot = True
+        flag_market_open=False
+        max_wait_time = 9
+        list_of_bid_ask_iv_tuple = asyncio.run(
+            MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(list_underlying_and_option_contract, flag_market_open, generic_tick_list, snapshot,max_wait_time)
+        )
+
+
+
+        # Get the Mkt Data  [ <Bid, Ask > | <Bid, Ask IV,> ], delta, iv, oi
+        # list_of_: 
+        # Validate if required values values are present or not.
+    
+        list_of_ba_mid = []
+        for contract, (delta,iv_ask,iv_bid,iv_last,bid_price,ask_price,call_oi,put_oi,) in zip(list_underlying_and_option_contract[:2],list_of_bid_ask_iv_tuple[:2],):
+            if bid_price is None or ask_price is None:
+                print(f"bid_price or ask_price is None for contract: {contract}")
+                return
+
+            ba_mid = (bid_price + ask_price) / 2
+            list_of_ba_mid.append(ba_mid)
+        
+        res = []
+        title = f"Impact of Combo, Combo ID : {combo_id}"
+        list_of_impact_percent = strategy_variables.list_of_percent_for_impact_calcluation
+        impact_value_groups = [
+            cl,
+        ]
+        # For each underlying and group calcluate the impact
+        for (underlying_price), und_combination_group in zip(list_of_ba_mid, list_of_combination_groups):
+            group_res = []
+            # Loop over the list of impact percent
+            for impact_per in list_of_impact_percent:
+                underlying_strike_price = (underlying_price * (100 + impact_per)) / 100
+                # Get the combination payoff 
+                combination_payoff = MaxPNLCalculation.get_combination_payoff(
+                    list_of_legs_tuple=und_combination_group,
+                    list_of_config_leg_objects=list_of_combo_leg_tuples_with_config_leg,
+                    underlying_strike_price = underlying_strike_price,
+                    closest_expiry=cl,
+                    multiplier=multiplier,
+                )
+                # Store the groupwise combination payoff
+                group_res.append(round(combination_payoff, 2))
+            # Finally Store all the Group Impact Calcluation
+            res.append(group_res)
+
+        # res = [ [ -20, -10 for a group1], [ -20, -10 for a group2]]
+        # Get the sum of correspoding percentage impact value groupwise
+        impact_sum_value_groups = [sum(group_percentages) for group_percentages in zip(*res)]
+
+        # Final list of impact value along with the closest expiry
+        impact_value_groups.extend(impact_sum_value_groups)
+        impact_columns = ["Date"] + ["{}% Impact".format(int(impact)) for impact in list_of_impact_percent]
+
+        Utils.display_treeview_popup(title, impact_columns, [impact_value_groups])
+
+        # return True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # res [-20 -10, -5, Total]
+
+        for combination_group, closest_expiry in zip(list_of_combination_groups, list_of_closest_expiry_for_each_group):
+            
+            multiplier = None
+            # Creating a list of the config_leg_object for this group, for getting action, right etc info
+            list_of_config_leg_object_for_combination_group = [ _[-1] for _ in combination_group]
+
+            # Calculating the MaxLoss and Max Profit for the Group(acting as a combination)
+            combination_payoff = MaxPNLCalculation.get_combination_payoff(
+                    list_of_legs_tuple=combination_group,
+                    list_of_config_leg_objects=list_of_config_leg_object_for_combination_group,
+                    closest_expiry=closest_expiry,
+                    multiplier=multiplier,
+                )
+            
         # Combo Details
         list_of_underlying_contract = []
         list_of_leg_objects = self.list_of_all_leg_objects
-        list_of_leg_contract_info_tuple = [(leg_obj.symbol, leg_obj.sec_type, leg_obj.exchange, leg_obj.currency, leg_obj.expiry, leg_obj.right, leg_obj.multiplier, leg_obj.trading_class) for leg_obj in list_of_leg_objects]
-        
+        list_of_leg_contract_info_tuple = [(leg_obj.symbol, leg_obj.sec_type, leg_obj.exchange, leg_obj.currency, leg_obj.expiry, leg_obj.right, leg_obj.multiplier, leg_obj.trading_class, leg_obj.underlying_conid) for leg_obj in list_of_leg_objects]
+
+        # Loop through each leg's contract information and create underlying contracts add to the list
         for leg_info, underlying_conid in zip(list_of_leg_contract_info_tuple, list_of_underlying_conids):
-            symbol, sec_type, exchange, currency, expiry_date, right, multiplier, trading_class = leg_info
+            symbol, sec_type, exchange, currency, expiry_date, right, multiplier, trading_class, und_conid = leg_info
             if sec_type == "OPT":
                 underlying_sec_type = "STK"
                 underlying_multiplier = 1
@@ -184,7 +363,7 @@ class ScannerCombination:
                     exchange=exchange,
                     currency=currency,
                     multiplier=underlying_multiplier,
-                    con_id=underlying_conid,
+                    con_id=und_conid,
                 )
                 list_of_underlying_contract.append(underlying_contract)
             else:
@@ -196,15 +375,16 @@ class ScannerCombination:
                     exchange=exchange,
                     currency=currency,
                     multiplier=underlying_multiplier,
-                    con_id=underlying_conid,
+                    con_id=und_conid,
                 )
                 list_of_underlying_contract.append(underlying_contract)
         
-        list_of_leg_strike_action_qty_tuple = [(leg_obj.strike, leg_obj.action, leg_obj.qty, leg_obj.expiry, leg_obj.right, leg_obj.multiplier) for leg_obj in list_of_leg_objects]
+        list_of_leg_strike_action_qty_tuple = [(leg_obj.symbol, leg_obj.strike, leg_obj.con_id, leg_obj.action, leg_obj.qty, leg_obj.expiry, leg_obj.right, leg_obj.multiplier) for leg_obj in list_of_leg_objects]
 
         list_of_option_contracts = []
 
-        for strike, action, quantity, expiry, right_, multiplier_ in list_of_leg_strike_action_qty_tuple:
+        # Loop through each leg's strike, action, quantity, expiry, right, and multiplier and create option contracts, then add to the list
+        for _,strike, _,action, quantity, expiry, right_, multiplier_ in list_of_leg_strike_action_qty_tuple:
             option_contract = get_contract(
                 symbol,
                 sec_type,
@@ -230,13 +410,7 @@ class ScannerCombination:
 
         list_of_ba_mid = []
 
-        for contract, (
-            bid_price,
-            ask_price,
-        ) in zip(
-            list_of_underlying_and_option_contracts,
-            list_of_bid_ask_price_tuple,
-        ):
+        for contract, (bid_price, ask_price,) in zip(list_of_underlying_contract,list_of_bid_ask_price_tuple,):
             if bid_price is None or ask_price is None:
                 print(f"bid_price or ask_price is None for contract: {contract}")
                 return
@@ -244,128 +418,36 @@ class ScannerCombination:
             ba_mid = (bid_price + ask_price) / 2
             list_of_ba_mid.append(ba_mid)
 
-        # Title for the Scanned Combination Details
+        
         print(list_of_ba_mid)
-        list_of_expiry_dates = [contract.lastTradeDateOrContractMonth for contract in list_of_underlying_and_option_contracts if contract.lastTradeDateOrContractMonth]
-
+        list_of_expiry_dates = [contract.lastTradeDateOrContractMonth for contract in list_of_option_contracts if contract.lastTradeDateOrContractMonth]
+        closest_expiry = min(list_of_expiry_dates)
         # List to store all impact values for each expiry date
-        all_impact_values = []
+        # underlying_price = list_of_ba_mid[0]
+        # list_of_leg_premiums = list_of_ba_mid[1:]
+        list_of_impact_percent = strategy_variables.list_of_percent_for_impact_calcluation
+        impact_values = [
+            closest_expiry,
+        ]
 
-    
-        for expiry_date in list_of_expiry_dates:
-            for underlying_price in list_of_ba_mid[:2]:
-                title = f"Impact of Combo, Combo ID: {combo_id}, Expiry Date: {expiry_date}"
-                
-                list_of_leg_premiums = list_of_ba_mid[2:]
-                list_of_impact_percent = strategy_variables.list_of_percent_for_impact_calcluation
-                impact_values = [expiry_date]
+        # ES, NQ, ES, NQ, NQ
+        for underlying_price in list_of_ba_mid:
+            for impact_per in list_of_impact_percent:
+                underlying_price_per_impact = (underlying_price * (100 + impact_per)) / 100
+                combination_payoff = MaxPNLCalculation.get_combination_payoff(
+                    list_of_leg_strike_action_qty_tuple,
+                    underlying_price_per_impact,
+                    closest_expiry,
+                )
 
-                for impact_per in list_of_impact_percent:
-                    underlying_price_per_impact = (underlying_price * (100 + impact_per)) / 100
-                    combination_payoff = self.get_combination_payoff(
-                        list_of_leg_premiums,
-                        list_of_leg_strike_action_qty_tuple,
-                        underlying_price_per_impact,
-                        right,
-                        multiplier,
-                    )
-                    impact_values.append(round(combination_payoff, 2))
-                
-                # Append the impact values for the current expiry date to all_impact_values
-            all_impact_values.append(impact_values)
+            impact_values.append(round(combination_payoff, 2))
 
-        # Display the popup with all impact values
-            impact_columns = ["Date"] + ["{}% Impact".format(int(impact)) for impact in list_of_impact_percent]
-        Utils.display_treeview_popup(title, impact_columns, all_impact_values)
+        # DISPLAY DETAILS of combo
+        impact_columns = ["Date"] + ["{}% Impact".format(int(impact)) for impact in list_of_impact_percent]
+
+        Utils.display_treeview_popup(title, impact_columns, [impact_values])
 
         return True
-
-
-    def get_combination_payoff(
-        self,
-        list_of_leg_premiums,
-        list_of_leg_strike_action_qty_tuple,
-        underlying_price,
-        right,
-        multiplier,
-    ):
-        combination_payoff = 0
-        for leg_premium, (leg_strike, leg_action, leg_qty, expiry, right_, multiplier_) in zip(list_of_leg_premiums, list_of_leg_strike_action_qty_tuple):
-            leg_payoff = self.option_payoff(
-                leg_strike,
-                right_,
-                leg_action,
-                1,
-                underlying_price,
-                int(multiplier_),
-                leg_premium,
-            )
-
-            combination_payoff += leg_payoff
-        return combination_payoff
-
-    # Function to calculate the leg wise option payoff
-    def option_payoff(
-        self,
-        option_strike,
-        option_type,
-        buy_or_sell,
-        quantity,
-        underlying_price_expiry,
-        combination_multiplier,
-        leg_premium,
-    ):
-        """
-        option_strike: Strike of the Leg
-        option_type: CALL/PUT
-        buy_or_sell: BUY/SELL
-        quantity: Qty of Leg
-        underlying_price_expiry: Price of option at expiry
-        """
-        payoff = 0
-
-        if option_type == "CALL":
-            if buy_or_sell == "BUY":
-
-                # CALL BUY
-                if underlying_price_expiry >= option_strike:
-                    payoff += quantity * (underlying_price_expiry - option_strike) * combination_multiplier
-                else:
-                    payoff += 0
-
-            else:
-
-                # CALL SELL
-                if underlying_price_expiry >= option_strike:
-                    payoff -= quantity * (underlying_price_expiry - option_strike) * combination_multiplier
-                else:
-                    payoff += 0
-
-        else:
-            if buy_or_sell == "BUY":
-
-                # BUY PUT
-                if underlying_price_expiry >= option_strike:
-                    payoff += 0
-                else:
-                    payoff += quantity * (option_strike - underlying_price_expiry) * combination_multiplier
-
-            else:
-
-                # SELL PUT
-                if underlying_price_expiry >= option_strike:
-                    payoff += 0
-                else:
-                    payoff -= quantity * (option_strike - underlying_price_expiry) * combination_multiplier
-
-        # Consider the Option Premium as well
-        if buy_or_sell == "BUY":
-            payoff -= leg_premium * combination_multiplier
-        else:
-            payoff += leg_premium * combination_multiplier
-
-        return payoff
-
 
 # It is used to show user the combination details in combination tab of screen GUI
 def get_scanner_combination_details_column_and_data_from_combo_object(
