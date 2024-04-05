@@ -42,6 +42,9 @@ class StrategyVariables:
     ibkr_tws_port = parser.getint("USER INPUTS", "ibkr_tws_port")
     ibkr_tws_connection_id = parser.getint("USER INPUTS", "ibkr_tws_connection_id")
 
+    # User Input for the calc. mode in in the max PnL cacl
+    calculation_mode_for_combination_max_pnl = MaxPNLEnum.GNE
+
     # Input for delta
     delta_d1_indicator_input = parser.getfloat("USER INPUTS", "delta_d1_indicator_input")
     delta_d2_indicator_input = parser.getfloat("USER INPUTS", "delta_d2_indicator_input")
