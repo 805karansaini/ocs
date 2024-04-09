@@ -44,67 +44,67 @@ class Scanner:
         self.local_map_instrument_id_to_instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object)
         self.config_obj = copy.deepcopy(StrategyVariables.config_object)
 
-    def get_strike_and_closet_expiry_for_fop(
-        self,
-        symbol,
-        dte,
-        underlying_sec_type,
-        exchange,
-        currency,
-        multiplier,
-        trading_class,
-    ):
-        """
-        Function used to get the
-        list of all the available strikes
-        and closest expiry for FOP sec_type
+    # def get_strike_and_closet_expiry_for_fop(
+    #     self,
+    #     symbol,
+    #     dte,
+    #     underlying_sec_type,
+    #     exchange,
+    #     currency,
+    #     multiplier,
+    #     trading_class,
+    # ):
+    #     """
+    #     Function used to get the
+    #     list of all the available strikes
+    #     and closest expiry for FOP sec_type
 
-        """
+    #     """
 
-        # print(
-        #     "Scanner: ",
-        #     symbol,
-        #     dte,
-        #     underlying_sec_type,
-        #     exchange,
-        #     currency,
-        #     multiplier,
-        #     trading_class,
-        # )
+    #     # print(
+    #     #     "Scanner: ",
+    #     #     symbol,
+    #     #     dte,
+    #     #     underlying_sec_type,
+    #     #     exchange,
+    #     #     currency,
+    #     #     multiplier,
+    #     #     trading_class,
+    #     # )
 
-        # only call once (not for N-DTEs)
-        all_fut_expiries = find_nearest_expiry_for_future_given_fut_dte(
-            symbol,
-            dte,
-            underlying_sec_type,
-            exchange,
-            currency,
-            multiplier,
-            trading_class="",
-            only_want_all_expiries=True,
-        )
+    #     # only call once (not for N-DTEs)
+    #     all_fut_expiries = find_nearest_expiry_for_future_given_fut_dte(
+    #         symbol,
+    #         dte,
+    #         underlying_sec_type,
+    #         exchange,
+    #         currency,
+    #         multiplier,
+    #         trading_class="",
+    #         only_want_all_expiries=True,
+    #     )
 
-        # Handling None
-        if all_fut_expiries == None:
-            return None, None, None
+    #     # Handling None
+    #     if all_fut_expiries == None:
+    #         return None, None, None
 
-        # get closest FOP Expiry for given Trading class
-        (
-            all_strikes,
-            closest_expiry_date,
-            underlying_conid,
-        ) = find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
-            symbol,
-            dte,
-            underlying_sec_type,
-            exchange,
-            currency,
-            multiplier,
-            trading_class,
-            all_fut_expiries,
-        )
+    #     # get closest FOP Expiry for given Trading class
+    #     (
+    #         all_strikes,
+    #         closest_expiry_date,
+    #         underlying_conid,
+    #     ) = find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
+    #         symbol,
+    #         dte,
+    #         underlying_sec_type,
+    #         exchange,
+    #         currency,
+    #         multiplier,
+    #         trading_class,
+    #         all_fut_expiries,
+    #     )
 
-        return all_strikes, closest_expiry_date, underlying_conid
+    #     return all_strikes, closest_expiry_date, underlying_conid
 
     # def stop_scan(self):
     #     self.scanning = False
@@ -239,7 +239,7 @@ class Scanner:
             if self.check_do_we_need_to_restart_scan():
                 print(f"Early Termination: {self.config_obj}")
                 return
-
+            # list_of_all_generated_combination Leg1: (symbol, strike, delta, conid, expiry, bid ask iv un conid, theta vega gmma, und_price)
             self.insert_combinations_into_db(list_of_all_generated_combination, list_of_combo_net_deltas)
 
             # right = None
@@ -309,8 +309,7 @@ class Scanner:
             if self.check_do_we_need_to_restart_scan():
                 print(f"Early Termination: {self.config_obj}")
                 return
-
-            
+            # extract new 4 and call maxpnl with previous tuple
             # Calulate Max Profit/Loss for the combination
             max_profit, max_loss = MaxPNLCalculation.calcluate_max_pnl(combination, list_of_config_leg_object)
             
@@ -360,7 +359,7 @@ class Scanner:
                     "primary_exchange": instrument_object.primary_exchange,
                     "underlying_conid": und_conid,
                 }
-                
+
                 res, leg_id = SqlQueries.insert_into_db_table(table_name="legs_table", values_dict=leg_values_dict)
                 if not res:
                     print(f"Unable to insert leg in the table: {leg_values_dict}")

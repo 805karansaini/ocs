@@ -527,7 +527,7 @@ class Utils:
                     opt_premium,
                     option_right,
                 )
-        current_price,
+        current_price of underlying,
         StrategyVariables.riskfree_rate1 =0.04,
         0,
         time_to_expiration,

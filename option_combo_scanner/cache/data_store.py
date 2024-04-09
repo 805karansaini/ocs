@@ -23,7 +23,6 @@ class DataStore:
         If the DataFrame is older than 30 minutes, return None.
         """
         if key in DataStore.data_store:
-            print('key', key)
             df, timestamp = DataStore.data_store[key]
             if time.time() - timestamp <= DataStore.MAX_CACHE_TIME_IN_SECONDS:  # 30 minutes in seconds
                 return df

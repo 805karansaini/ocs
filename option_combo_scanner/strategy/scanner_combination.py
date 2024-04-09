@@ -334,8 +334,8 @@ class ScannerCombination:
                 temp_list_of_combination_legs.append(list(leg_tuple))
 
         print(f"temp list of combination leg:{temp_list_of_combination_legs} ")
+
         # Update the legs_tuple for each combination group.
-                
         for i, (leg_info_list, (
             delta,
             iv_ask,
@@ -368,32 +368,48 @@ class ScannerCombination:
         start = 0
         print("list_of_number_of_legs_in_combo", list_of_number_of_legs_in_combo)
         for legs__ in list_of_number_of_legs_in_combo:
+            
+            # Start index for this new group
             end = start + legs__
-            new_gorup = temp_list_of_combination_legs[start:end]
-            new_list_of_combination_groups.append(new_gorup)
+
+            # New Group
+            new_group = temp_list_of_combination_legs[start:end]
+            new_list_of_combination_groups.append(new_group)
+            
+            # Update the start index
             start = end
 
-        # Rename
+        # Rename the variable
         list_of_combo_group = new_list_of_combination_groups
+        
         print(f"list of combo group: {list_of_combo_group}")
+        print(f"list_of_underlying_price_for_combo_group: {list_of_underlying_price_for_combo_group}")
+
         res = []
+        
+        # Title and List of Impacts in the UserInputs
         title = f"Impact of Combo, Combo ID : {combo_id}"
         list_of_impact_percent = strategy_variables.list_of_percent_for_impact_calcluation
-        impact_value_groups = [
-            closest_expiry
-        ]
-        print(f"list_of_underlying_price_for_combo_group: {list_of_underlying_price_for_combo_group}")
-        # For each underlying and group calcluate the impact
+
+        # Closest Expiry for displaying        
+        impact_value_groups = [closest_expiry]
+        
+        # For each group(same underlying) calcluate the impact
         for underlying_price, combination_group, multiplier in zip(list_of_underlying_price_for_combo_group, list_of_combo_group, list_of_multiplier_for_combo_group):
             
+            print(f"Underlying Price: {underlying_price}")
+            print(f"Combination Group: {combination_group}\n")
+
             list_of_config_leg_objects = [_[-1] for _ in combination_group]
+
+
             group_res = []
             # Loop over the list of impact percent
             for impact_per in list_of_impact_percent:
                 underlying_strike_price = (underlying_price * (100 + impact_per)) / 100
 
                 # Get the combination payoff 
-                print(f"underlying price: {underlying_price}, combination grp: {combination_group}, {multiplier=}")
+                print(f"Impact-UnderlyingPrice: {underlying_price}, \nCombination Group: {combination_group}, {multiplier=}")
                 combination_payoff = MaxPNLCalculation.get_combination_payoff(
                     list_of_legs_tuple=combination_group,
                     list_of_config_leg_object=list_of_config_leg_objects,
@@ -402,10 +418,12 @@ class ScannerCombination:
                     multiplier=multiplier,
                 )
                 
+                print(f"Combintaion Payoff : {combination_payoff}")
                 # Store the groupwise combination payoff
                 group_res.append(round(combination_payoff, 2))
             # Finally Store all the Group Impact Calcluation
             res.append(group_res)
+            print(res)
 
         # res = [ [ -20, -10 for a group1], [ -20, -10 for a group2]]
         print("Final List", res)

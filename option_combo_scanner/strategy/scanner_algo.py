@@ -41,8 +41,8 @@ class ScannerAlgo:
         currency,
         multiplier,
         trading_class,
-        low_range_date_str,
-        high_range_date_str,
+        low_range_date_str=None,
+        high_range_date_str=None,
     ):
         """
         Function used to get the
@@ -297,9 +297,9 @@ class ScannerAlgo:
         print(delta_range_low, delta_range_high, current_expiry)
         # todo early teminate
 
-        if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
-                return []
+        # if self.check_do_we_need_to_restart_scan():
+        #         print(f"Early Termination: {self.config_obj}")
+        #         return []
 
         # If we can get all the valid strikes over all the valid expiries for the leg, then we are good.
         # list_of_filter_legs = self.filter_strikes(range_low, range_high,) # ConfigLeg, Expiry of the perivous leg N-1 Leg,
@@ -390,8 +390,8 @@ class ScannerAlgo:
 
         # todo early teminate
         if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
-                return []
+            print(f"Early Termination: {self.config_obj}")
+            return []
 
         for expiry in expiry_date_in_range:
             # key: ocs_mkt_ symbol, expiry, sectype, right, trading_class, multiplier  exchange
@@ -411,10 +411,10 @@ class ScannerAlgo:
                 df = data_frame.copy()
             else:
                 # # TODO REMOVE IT ARYAN
-                # if symbol == "ES":
-                #     all_strikes = [5250, 5255, 5260]
-                # else:
-                #     all_strikes = [18550, 18555, 18560,18565]
+                if symbol == "ES":
+                    all_strikes = [5250, 5255, 5260]
+                else:
+                    all_strikes = [18550, 18555, 18560,18565]
 
                 # get the list of call and put option contract
                 list_of_call_option_contracts, list_of_put_option_contracts = IndicatorHelper.get_list_of_call_and_put_option_contracts(
@@ -462,14 +462,14 @@ class ScannerAlgo:
             # Make a copy of the dataframe to avoid modifying the original dataframe
             
             filtered_dataframe = df.copy()
-            # if symbol == "ES":
-            #     filtered_dataframe = filtered_dataframe[
-            #         (filtered_dataframe["Strike"] >= 5250) & (filtered_dataframe["Strike"] <= 5260)
-            #     ]
-            # elif symbol == "NQ":
-            #     filtered_dataframe = filtered_dataframe[
-            #         (filtered_dataframe["Strike"] >= 18550) & (filtered_dataframe["Strike"] <= 18565)
-            #     ]
+            if symbol == "ES":
+                filtered_dataframe = filtered_dataframe[
+                    (filtered_dataframe["Strike"] >= 5250) & (filtered_dataframe["Strike"] <= 5260)
+                ]
+            elif symbol == "NQ":
+                filtered_dataframe = filtered_dataframe[
+                    (filtered_dataframe["Strike"] >= 18550) & (filtered_dataframe["Strike"] <= 18565)
+                ]
 
             # Filter strikes based on delta_range_low and delta_range_high
             filtered_dataframe = filtered_dataframe[

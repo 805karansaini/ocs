@@ -37,6 +37,7 @@ def get_closest_exp_from_expiries_given_target_date(
         low_range_date_str = '19000101'
     if high_range_date_str is None:
         high_range_date_str = '99991230'
+    # print(low_range_date_str, high_range_date_str)
     low_range_date_obj = variables.target_timezone_obj.localize(
         datetime.datetime.strptime(low_range_date_str, "%Y%m%d")
     )
@@ -714,7 +715,7 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
 
     # If length of 'all_expiries_with_user_provided_trading_class' is Zero. Return None
     if len(all_expiries_with_user_provided_trading_class) < 1:
-        return None, None, None
+        return None, None, None, None
 
     # Getting Closest Expiry for FOP if length 'all_expiries_with_user_provided_trading_class' > 0
     closest_expiry_date, expiry_date_in_range = get_closest_exp_from_expiries_given_target_date(
