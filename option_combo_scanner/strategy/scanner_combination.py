@@ -308,6 +308,9 @@ class ScannerCombination:
             ask_price,
             call_oi,
             put_oi,
+            _,
+            _,
+            _
         ) in underlying_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple:
 
             if bid_price is None or ask_price is None:
@@ -345,6 +348,9 @@ class ScannerCombination:
             ask_price,
             call_oi,
             put_oi,
+            _,
+            _,
+            _,
         )) in enumerate(zip(temp_list_of_combination_legs, options_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple)):
             
 

@@ -21,6 +21,7 @@ from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.indicators_calculator.market_data_fetcher import \
     MarketDataFetcher
+from option_combo_scanner.strategy.greeks_calculation import CalcluateGreeks
 from option_combo_scanner.strategy.indicator import Indicator
 from option_combo_scanner.strategy.max_loss_profit_calculation import MaxPNLCalculation
 from option_combo_scanner.strategy.scanner_algo import ScannerAlgo
@@ -305,13 +306,22 @@ class Scanner:
         total_combo_profit = total_combo_loss = 0
 
         for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_delta):
+            
             # todo early teminate
             if self.check_do_we_need_to_restart_scan():
                 print(f"Early Termination: {self.config_obj}")
                 return
-            # extract new 4 and call maxpnl with previous tuple
+            # Calculate all greeks for the combo
+            net_greek_dict = CalcluateGreeks.compute_all_greeks(combination, list_of_config_leg_object)
+            print(f"list_of_greeks_dicts: {net_greek_dict}")
+
+            for greek_key, greek_value in net_greek_dict.items():
+                values_dict[greek_key] = (greek_value)
+
+            # Extract new 4 values vega theta gamma und price and call maxpnl with previous tuple 
+            modified_combination = [(combo_tuple[:-4]) for combo_tuple in combination]
             # Calulate Max Profit/Loss for the combination
-            max_profit, max_loss = MaxPNLCalculation.calcluate_max_pnl(combination, list_of_config_leg_object)
+            max_profit, max_loss = MaxPNLCalculation.calcluate_max_pnl(modified_combination, list_of_config_leg_object)
             
             total_combo_profit = round(max_profit, 2)
             total_combo_loss = round(max_loss,2)
@@ -336,7 +346,7 @@ class Scanner:
                 continue
             list_of_all_leg_objects = []
             # insertion of the values in legs table
-            for index, ((_, strike, delta, con_id, expiry, bid, ask, iv,und_conid), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
+            for index, ((_, strike, delta, con_id, expiry, bid, ask, iv,und_conid,_,_,_,_), config_leg_object) in enumerate(zip(combination, list_of_config_leg_object)):
 
                 instrument_id = config_leg_object.instrument_id
                 instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
@@ -1133,7 +1143,7 @@ class Scanner:
             # Loop over leg object to get action for the leg
             for leg_tuple, leg_object in zip(combination, list_of_config_leg_object):
                 action = leg_object.action
-                _,_, delta, _, _, _, _,_, _ = leg_tuple
+                _,_, delta, _, _, _, _,_, _,_,_,_,_ = leg_tuple
                 # if Buy will add the delta
                 if action.upper() == "Buy".upper():
                     net_combo += delta

@@ -479,7 +479,7 @@ class ScannerAlgo:
             list_of_filtered_legs_tuple.extend(
                 list(
                     # "Strike", "Expiry", "Delta", "ConId",
-                    filtered_dataframe[["Symbol", "Strike", "Delta", "ConId", "Expiry", "Bid", "Ask", "AskIV", "underlying_conid"]].itertuples(index=False, name=None)
+                    filtered_dataframe[["Symbol", "Strike", "Delta", "ConId", "Expiry", "Bid", "Ask", "AskIV", "underlying_conid", "Vega", "Theta", "Gamma", "UnderlyingPrice"]].itertuples(index=False, name=None)
                 )
             )
 
@@ -506,8 +506,8 @@ class ScannerAlgo:
         list_of_partial_combination = []
 
         if remaining_no_of_legs == 0:
-            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid in list_of_filter_legs:
-                list_of_partial_combination.append([(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid)])
+            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price in list_of_filter_legs:
+                list_of_partial_combination.append([(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price)])
         else:
             # get the next leg object to scan
             list_of_config_leg_object = self.config_obj.list_of_config_leg_object
@@ -527,7 +527,7 @@ class ScannerAlgo:
             delta_range_min = float(delta_range_min)
             delta_range_max = float(delta_range_max)
 
-            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid in list_of_filter_legs:
+            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price in list_of_filter_legs:
                 
 
                 new_range_low = strike_delta + delta_range_min
@@ -539,7 +539,7 @@ class ScannerAlgo:
                 )
 
 
-                current_leg_strike_and_strike_delta = [(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid)]
+                current_leg_strike_and_strike_delta = [(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price)]
 
                 for next_legs_strike_delta_and_con_id in list_of_strike_delta_and_con_id_tuple:
 
@@ -592,7 +592,7 @@ class ScannerAlgo:
                 leg_number = leg_object.leg_number
                 action = leg_object.action
                 # Unpack the Strike Delta & Conid from a Leg:  (5100.0B, 0.6981448441368908, 0)
-                _, strike, delta, conid,_,_,_,_,_ = leg_tuple
+                _, strike, delta, conid,_,_,_,_,_,_,_,_,_ = leg_tuple
 
                 temp_leg_tuple = (strike, action)
                 temp_combination.append(temp_leg_tuple)
@@ -624,7 +624,7 @@ class ScannerAlgo:
         list_of_filter_combination_without_dup = (
             self.remove_duplicate_combo_different_order(list_of_filter_combination)
         )
-
+        
         return list_of_filter_combination_without_dup
     
 

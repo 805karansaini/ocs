@@ -13,7 +13,7 @@ class MarketDataFetcher:
     ):
         # Handle Case where TWS is not available
         if variables.app.nextorderId is None:
-            return (None, None, None, None, None, None, None, None)
+            return (None, None, None, None, None, None, None, None, None, None, None)
 
         # Get reqID
         reqId = variables.app.nextorderId
@@ -30,8 +30,10 @@ class MarketDataFetcher:
         variables.ask_price[reqId] = None
         variables.bid_price[reqId] = None
         variables.call_option_open_interest[reqId] = None
-        
         variables.put_option_open_interest[reqId] = None
+        variables.options_vega[reqId] = None
+        variables.options_theta[reqId] = None
+        variables.options_gamma[reqId] = None
 
         # Set request type depending on whether the market is live or not
         if flag_market_open:
@@ -83,6 +85,9 @@ class MarketDataFetcher:
                     
                     and variables.call_option_open_interest[reqId] is not None
                     and variables.put_option_open_interest[reqId] is not None
+                    and variables.options_vega[reqId] is not None
+                    and variables.options_theta[reqId] is not None
+                    and variables.options_gamma[reqId] is not None
                 )
             ):
 
@@ -103,6 +108,9 @@ class MarketDataFetcher:
                     variables.ask_price[reqId],
                     variables.call_option_open_interest[reqId],
                     variables.put_option_open_interest[reqId],
+                    variables.options_vega[reqId],
+                    variables.options_theta[reqId],
+                    variables.options_gamma[reqId],
                 )
 
             # Response not yet ended
