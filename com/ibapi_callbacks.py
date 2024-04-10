@@ -258,19 +258,6 @@ class IBapi(
             theta,
             undPrice,
         )
-        super().tickOptionComputation(
-            reqId,
-            tickType,
-            tickAttrib,
-            impliedVol,
-            delta,
-            optPrice,
-            pvDividend,
-            gamma,
-            vega,
-            theta,
-            undPrice,
-        )
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -300,9 +287,35 @@ class IBapi(
 
         # Setting delta value for reqId, (tickType = 13 -> Model Delta)
         if (delta is not None) and (tickType == 13):
-
+            # print(
+            #     "TickOptionComputation. TickerId:",
+            #     reqId,
+            #     "TickType:",
+            #     tickType,
+            #     "TickAttrib:",
+            #     str(tickAttrib),
+            #     "ImpliedVolatility:",
+            #     str(impliedVol),
+            #     "Delta:",
+            #     str(delta),
+            #     "OptionPrice:",
+            #     str(optPrice),
+            #     "pvDividend:",
+            #     str(pvDividend),
+            #     "Gamma: ",
+            #     str(gamma),
+            #     "Vega:",
+            #     str(vega),
+            #     "Theta:",
+            #     str(theta),
+            #     "UnderlyingPrice:",
+            #     str(undPrice),
+            # )
             # print(['Delta received', delta])
             variables.options_delta[reqId] = delta
+            variables.options_gamma[reqId] = gamma
+            variables.options_theta[reqId] = theta
+            variables.options_vega[reqId] = vega
 
 
 

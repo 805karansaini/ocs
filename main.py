@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
     indicator_thread = threading.Thread(target=run_indicator_thread, daemon=True)
     indicator_thread.start()
-        
+    
     # Creating the Scanner Object
     # scanner_input = ScannerInputsTab(scanners_object)
     # While Screen is open
@@ -151,7 +151,6 @@ if __name__ == "__main__":
             logger.error(f"Exception in main screen loop: {e}")
             print(f"Exception in main screen loop: {e}")
             traceback.print_exc()
-
         c += 1
     else:
         screen.flag_stopped_all_task = True

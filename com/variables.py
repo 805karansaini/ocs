@@ -163,6 +163,9 @@ class variables(object):
     options_iv_last = {}
     call_option_open_interest = {}
     put_option_open_interest = {}
+    options_vega = {}
+    options_theta = {}
+    options_gamma = {}
 
     live_und_price = None
 
