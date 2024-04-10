@@ -316,7 +316,7 @@ class Scanner:
             print(f"list_of_greeks_dicts: {net_greek_dict}")
 
             for greek_key, greek_value in net_greek_dict.items():
-                values_dict[greek_key] = (greek_value)
+                values_dict[greek_key] = round(greek_value, 5)
 
             # Extract new 4 values vega theta gamma und price and call maxpnl with previous tuple 
             modified_combination = [(combo_tuple[:-4]) for combo_tuple in combination]
