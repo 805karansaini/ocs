@@ -24,14 +24,24 @@ logger = CustomLogger.logger
 
 # Name, Width, Heading
 scanner_combination_table_columns_width = [
-    ("Combo ID", 255, "Combo ID"),
-    # ("Instrument ID", 255, "Instrument ID"),
-    ("Description", 255, "Description"),
-    ("#Legs", 255, "#Legs"),
-    ("Combo Net  Delta", 255, "Combo Net Delta"),
-    ("Max Profit", 255, "Max Profit"),
-    ("Max Loss", 255, "Max Loss"),
-    # ("Max Profit/Loss Ratio", 200, "Max Profit/Loss Ratio"),
+    ("Combo ID", 90, "Combo ID"),
+    ("Description", 90, "Description"),
+    ("#Legs", 90, "#Legs"),
+    ("Combo Net  Delta", 90, "Combo Net Delta"),
+    ("Max Profit", 90, "Max Profit"),
+    ("Max Loss", 90, "Max Loss"),
+    ("Vanna", 90, "Vanna"),
+    ("Zomma", 90, "Zomma"),
+    ("Vomma", 90, "Vomma"),
+    ("Charm", 90, "Charm"),
+    ("Speed", 90, "Speed"),
+    ("Color", 90, "Color"),
+    ("Veta", 90, "Veta"),
+    ("Ultima", 90, "Ultima"),
+    ("Vega", 90, "Vega"),
+    ("Theta", 90, "Theta"),
+    ("Gamma", 90, "Gamma"),
+    
 ]
 
 
@@ -246,6 +256,7 @@ class ScannerCombinationTab:
     def insert_combination_in_scanner_combination_table_gui(
         self, scanner_combination_object
     ):
+        
         """
         # Name, Width, Heading
         scanner_combination_table_columns_width = [
@@ -267,6 +278,19 @@ class ScannerCombinationTab:
             scanner_combination_object.combo_net_delta,
             scanner_combination_object.max_profit,
             scanner_combination_object.max_loss,
+            scanner_combination_object.vanna,
+            scanner_combination_object.zomma,
+            scanner_combination_object.vomma,
+            scanner_combination_object.charm,
+            scanner_combination_object.speed,
+            scanner_combination_object.color,
+            scanner_combination_object.veta,
+            scanner_combination_object.ultima,
+
+            scanner_combination_object.vega,
+            scanner_combination_object.theta,
+            scanner_combination_object.gamma,
+            
             # scanner_combination_object.max_profit_max_loss_ratio
         )
 
