@@ -167,6 +167,7 @@ class variables(object):
     options_vega = {}
     options_theta = {}
     options_gamma = {}
+    und_price = {}
 
     live_und_price = None
 

@@ -13,8 +13,8 @@ class CalcluateGreeks:
         # Loop over the leg tuple of each combination
         for leg_tuple, config_leg_object in zip(combination, list_of_config_leg_object):
             # Unpack the values stored in tuple
-            _,strike,_,_,expiry,_,_,_,_,vega,theta,gamma,underlying_price = leg_tuple
-
+            _,strike,_,_,expiry,bid,ask,_,_,vega,theta,gamma,underlying_price = leg_tuple
+            options_prem = (bid + ask)/2
             # Calcluate the time to expiration for the greeks
             current_date = datetime.datetime.today().strftime("%Y%m%d")
             current_date_obj = datetime.datetime.strptime(current_date, "%Y%m%d")
@@ -23,23 +23,24 @@ class CalcluateGreeks:
             time_to_expiration = (abs(current_date_obj - expiry_date_obj).days)/365
 
             # Get the IV for the greeks calcluation
-            sigma = Utils.get_implied_volatility(underlying_price, StrategyVariables.riskfree_rate1, 0, time_to_expiration, strike, underlying_price, config_leg_object.right)
+            print
+            sigma = Utils.get_implied_volatility(float(underlying_price), StrategyVariables.riskfree_rate1, 0, time_to_expiration, strike, options_prem, config_leg_object.right)
             # Calcluate Vanna greeks for each leg_tuple
-            vanna = CalcluateGreeks.calculate_vanna(underlying_price, strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
+            vanna = CalcluateGreeks.calculate_vanna(float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
             # Calcluate Zomma greeks for each leg_tuple
-            zomma = CalcluateGreeks.calculate_zomma(underlying_price, strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
+            zomma = CalcluateGreeks.calculate_zomma(float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
             # Calcluate Vomma greeks for each leg_tuple
-            vomma = CalcluateGreeks.calculate_vomma(underlying_price, strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
+            vomma = CalcluateGreeks.calculate_vomma(float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
             # Calcluate Charm greeks for each leg_tuple
-            charm = CalcluateGreeks.calculate_charm(underlying_price, strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0, config_leg_object.right)
+            charm = CalcluateGreeks.calculate_charm(float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0, config_leg_object.right)
             # Calcluate speed greeks for each leg_tuple
-            speed = CalcluateGreeks.calculate_speed(underlying_price, strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
+            speed = CalcluateGreeks.calculate_speed(float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
             # Calcluate color greeks for each leg_tuple
-            color = CalcluateGreeks.calculate_color(underlying_price, strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
+            color = CalcluateGreeks.calculate_color(float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
             # Calcluate veta greeks for each leg_tuple
-            veta = CalcluateGreeks.calculate_veta(underlying_price, strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
+            veta = CalcluateGreeks.calculate_veta(float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
             # Calcluate ultima greeks for each leg_tuple
-            ultima = CalcluateGreeks.calculate_ultima(underlying_price, strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
+            ultima = CalcluateGreeks.calculate_ultima(float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
             
             # Store the greeks in dictionary for each leg tuple
             greeks_dict = {

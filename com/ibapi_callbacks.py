@@ -316,6 +316,7 @@ class IBapi(
             variables.options_gamma[reqId] = gamma
             variables.options_theta[reqId] = theta
             variables.options_vega[reqId] = vega
+            variables.und_price[reqId] = undPrice
 
 
 

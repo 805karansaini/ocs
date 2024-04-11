@@ -312,14 +312,12 @@ class IndicatorHelper:
                 vega,
                 theta,
                 gamma,
+                und_price
             ) in zip(
                 list_of_all_option_contracts,
                 list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple,
             ):
-                if bid_price is not None and ask_price is not None:
-                    underlying_price = (bid_price + ask_price)/2
-                else:
-                    underlying_price = None
+                
 
                 data_frame_dict["Symbol"].append(contract.symbol)
                 data_frame_dict["Strike"].append(contract.strike)
@@ -336,7 +334,7 @@ class IndicatorHelper:
                 data_frame_dict["Vega"].append(vega)
                 data_frame_dict["Theta"].append(theta)
                 data_frame_dict["Gamma"].append(gamma)
-                data_frame_dict["UnderlyingPrice"].append(underlying_price)
+                data_frame_dict["UnderlyingPrice"].append(und_price)
 
             if indx == 0:
                 call_option_mkt_data_df = pd.DataFrame(data_frame_dict)

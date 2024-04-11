@@ -313,10 +313,10 @@ class Scanner:
                 return
             # Calculate all greeks for the combo
             net_greek_dict = CalcluateGreeks.compute_all_greeks(combination, list_of_config_leg_object)
-            print(f"list_of_greeks_dicts: {net_greek_dict}")
+            # print(f"list_of_greeks_dicts: {net_greek_dict}")
 
             for greek_key, greek_value in net_greek_dict.items():
-                values_dict[greek_key] = round(greek_value, 5)
+                values_dict[greek_key] = round(greek_value, 3)
                 
             # Extract new 4 values vega theta gamma und price and call maxpnl with previous tuple 
             modified_combination = [(combo_tuple[:-4]) for combo_tuple in combination]
