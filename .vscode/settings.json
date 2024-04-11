@@ -1,3 +1,7 @@
 {
-    
+  "python.analysis.extraPaths": [
+    "./option_combo_scanner",
+    "./option_combo_scanner/custom_",
+    "./option_combo_scanner/custom_logger"
+  ]
 }

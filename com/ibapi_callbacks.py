@@ -361,34 +361,45 @@ class IBapi(
             print("HistoricalData. ReqId:", reqId, "BarData.", bar)
 
         # Get bar data
-        bar_date = bar.date
+        bar_date = bar.date  # Format: YYYYMMDD HHMMSS
         bar_open = bar.open
         bar_high = bar.high
         bar_low = bar.low
         bar_close = bar.close
         bar_volume = bar.volume
 
+        # # Formatting bar_date and converting to users target_timezone
+        # utc_timezone = pytz.utc
+        # # Parse bar date string to datetime object
+        # utc_datetime = datetime.datetime.strptime(bar_date, '%Y%m%d %H%M%S')
+
+        # # Convert UTC time to target time zone
+        # target_datetime = utc_timezone.localize(utc_datetime).astimezone(variables.target_timezone_obj)
+
+        # bar_date = target_datetime.strftime('%Y-%m-%d %H:%M:%S')
+
+
         # Formatting bar_date and converting to users target_timezone
-        try:
-            # Time, and timezone string
-            tws_date_str, tws_tz_str = bar_date.rsplit(" ", 1)
+        # try:
+        #     # Time, and timezone string
+        #     tws_date_str, tws_tz_str = bar_date.rsplit(" ", 1)
 
-            # Parsing time
-            tws_date_obj = datetime.datetime.strptime(tws_date_str, "%Y%m%d %H:%M:%S")
+        #     # Parsing time
+        #     tws_date_obj = datetime.datetime.strptime(tws_date_str, "%Y%m%d %H:%M:%S")
 
-            # Parsing tws_dt with tws_tz
-            tws_tz = pytz.timezone(tws_tz_str)
-            tws_received_date_obj = tws_tz.localize(tws_date_obj)
+        #     # Parsing tws_dt with tws_tz
+        #     tws_tz = pytz.timezone(tws_tz_str)
+        #     tws_received_date_obj = tws_tz.localize(tws_date_obj)
 
-            # convert localized datetime to target timezone
-            bar_date = tws_received_date_obj.astimezone(variables.target_timezone_obj)
+        #     # convert localized datetime to target timezone
+        #     bar_date = tws_received_date_obj.astimezone(variables.target_timezone_obj)
 
-        except Exception as e:
-            # print(f"Exception in bar data : {bar}")
-            # print(f"Exception : {e}")
-            bar_date = datetime.datetime.strptime(bar_date, "%Y%m%d")
-            # tws_date_str = bar_date
-            # 2023-04-04
+        # except Exception as e:
+        #     # print(f"Exception in bar data : {bar}")
+        #     # print(f"Exception : {e}")
+        #     bar_date = datetime.datetime.strptime(bar_date, "%Y%m%d")
+        #     # tws_date_str = bar_date
+        #     # 2023-04-04
 
         # create another row to append
         row = pd.DataFrame(

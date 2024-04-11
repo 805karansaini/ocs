@@ -1,0 +1,259 @@
+# import nest_asyncio
+# nest_asyncio.apply()
+
+import asyncio
+import datetime
+import time
+
+import pandas as pd
+import pytz
+
+from ao_api.client import EClient
+from ao_api.wrapper import EWrapper
+from com.variables import variables
+import warnings
+
+# VENDOR = "-polygon"
+# BASE_FOLDER_PATH = rf"tests\results"
+# EXP_NO = "exp4"
+
+
+class AlgoOneAPI(EClient, EWrapper):
+
+    def __init__(self, data_server_host, data_server_port, data_server_client_id, loop):
+        EClient.__init__(self, self, loop=loop)
+        self.loop = loop
+
+        (
+            self.data_server_host,
+            self.data_server_port,
+            self.data_server_client_id,
+        ) = (data_server_host, data_server_port, data_server_client_id)
+
+        self.req_id = None
+        self.map_req_id_to_error = {}
+        self.map_req_id_to_historical_data = {}
+        self.map_req_id_to_historical_data_ended = {}
+
+    async def setup_api_connection(self):
+        try:
+
+            await self.connect(self.data_server_host, self.data_server_port, self.data_server_client_id)
+
+            print("Connecting to Data Server...")
+
+            # Check if the API is connected via order id
+            while True:
+                if self.is_connected():
+                    print("Connected to Data Server.")
+
+                    # Set the req_id
+                    self.req_id = 1
+
+                    # Start the receiver coroutine
+                    asyncio.create_task(self.conn.receive_response())
+
+                    break
+                else:
+                    print("Waiting for connection with Data Server...")
+                    asyncio.sleep(1)
+
+        except Exception as exp:
+            # TODO we should log it and not show it to the user.
+            print(f"Unable to connect to data server, Exception: {exp}")
+
+    def historical_data(self, request_id: str, historical_bars: dict):
+        # print(f"Historical Data: reqId: {request_id} Bar: {historical_bars}")
+        request_id = int(request_id)
+        
+        # # Formatting bar_date and converting to users target_timezone
+        # try:
+        #     # Time, and timezone string
+        #     tws_date_str, tws_tz_str = bar_date.rsplit(" ", 1)
+        #     # Parsing time
+        #     tws_date_obj = datetime.datetime.strptime(tws_date_str, "%Y%m%d %H:%M:%S")
+        #     # Parsing tws_dt with tws_tz
+        #     tws_tz = pytz.timezone(tws_tz_str)
+        #     tws_received_date_obj = tws_tz.localize(tws_date_obj)
+        #     # convert localized datetime to target timezone
+        #     bar_date = tws_received_date_obj.astimezone(variables.target_timezone_obj)
+
+        # except Exception as e:
+        #     # print(f"Exception in bar data : {bar}")
+        #     # print(f"Exception : {e}")
+        #     bar_date = datetime.datetime.strptime(bar_date, "%Y%m%d")
+
+        # def convert_utc_to_timezone(utc_time, target_timezone):
+        # Define timezone objects
+        # utc_timezone = pytz.utc
+        # target_timezone_obj = pytz.timezone(target_timezone)
+
+        # # Parse UTC time string to datetime object
+        # utc_datetime = datetime.strptime(utc_time, '%Y-%m-%d %H%M%S')
+
+        # # Convert UTC time to target time zone
+        # target_datetime = utc_timezone.localize(utc_datetime).astimezone(target_timezone_obj)
+
+        # return target_datetime.strftime('%Y-%m-%d %H:%M:%S %Z')def convert_utc_to_timezone(utc_time, target_timezone):
+
+        bar_date = historical_bars['datetime']
+        bar_open = historical_bars['open']
+        bar_high = historical_bars['high']
+        bar_low = historical_bars['low']
+        bar_close = historical_bars['close']
+        bar_volume = historical_bars['volume']
+
+        try:
+                
+            # Formatting bar_date and converting to users target_timezone
+            utc_timezone = pytz.utc
+
+            # Parse bar date string to datetime object
+            utc_datetime_dt_obj = datetime.datetime.strptime(bar_date, '%Y%m%d %H%M%S')
+
+            # Convert UTC time to target time zone
+            bar_target_datetime = utc_timezone.localize(utc_datetime_dt_obj).astimezone(variables.target_timezone_obj)
+
+            # bar_target_datetime = bar_target_datetime.strftime('%Y-%m-%d %H:%M:%S')
+        except Exception as e:
+            print(e)
+
+        # Add Row to dataframe (concat)
+        warnings.filterwarnings("ignore", category=FutureWarning,)
+
+
+        # create another row to append
+        row = pd.DataFrame(
+            {
+                "Time": bar_target_datetime,
+                "Open": bar_open,
+                "Close": bar_close,
+                "Volume": bar_volume,
+            },
+            index=[0],
+        )
+
+        # While Using Price Chart Making a dataframe
+        if request_id in variables.map_req_id_to_historical_data_dataframe:
+
+            # Add Row to dataframe (concat)
+            variables.map_req_id_to_historical_data_dataframe[request_id] = pd.concat(
+                [variables.map_req_id_to_historical_data_dataframe[request_id], row],
+                ignore_index=True,
+            )
+        # self.map_req_id_to_historical_data[request_id].append(historical_bars)
+
+    def historical_data_end(self, request_id: str):
+        print(f"Historical data end, Request id: {request_id}")
+        
+        request_id = int(request_id)
+        variables.req_mkt_data_end[request_id] = True
+
+        # self.map_req_id_to_historical_data_ended[request_id] = True
+
+    def error(
+        self,
+        request_id: str,
+        error_code: int,
+        error_msg: str,
+        advance_order_reject_json="",
+    ):
+        print(f"Error: request_id={request_id}, {error_code=} msg={error_msg} {advance_order_reject_json=}")
+        if request_id:
+            self.map_req_id_to_error[request_id] = True
+
+    async def _start_setup(self):
+        """
+        Wrapper to setup conn and keeps running the event loop
+        """
+        # Connect to Data Server via WS
+        await self.setup_api_connection()
+
+        while self.is_connected():
+            await asyncio.sleep(5)
+
+    def start(self):
+        try:
+            print(self.loop)
+            asyncio.run_coroutine_threadsafe(self._start_setup(), self.loop)
+            # asyncio.run(self._start_setup())
+        except Exception as e:
+            print("Inside Start: ", e)
+        # TODO - Handle Reconnection
+
+    # async def get_historical_data(
+    #     self, contract, bar_size, bar_unit, duration, max_wait_time=15
+    # ):
+
+    #     req_id = self.req_id
+    #     self.req_id += 1
+
+    #     self.map_req_id_to_error[req_id] = False
+    #     self.map_req_id_to_historical_data[req_id] = []
+    #     self.map_req_id_to_historical_data_ended[req_id] = False
+
+    #     flag_rth_only = True
+
+    #     start_time = time.perf_counter()
+
+    #     self.get_historical_bars(
+    #         req_id,
+    #         contract=contract,
+    #         duration=duration,
+    #         bar_unit=bar_unit,
+    #         bar_size=bar_size,
+    #         flag_rth_only=flag_rth_only,
+    #     )
+
+    #     sleep_in_iter = 0.1
+
+    #     counter = 0
+    #     # Wait for response from TWS
+    #     while True:
+
+    #         # (Error received for the request) OR (Timeout of 11 secs) OR (Response end indicated by API)
+    #         if (self.map_req_id_to_error[req_id] == True) or (
+    #             self.map_req_id_to_historical_data_ended[req_id] == True
+    #         ):
+
+    #             # Create a df and save it
+    #             df = pd.DataFrame(data=self.map_req_id_to_historical_data[req_id])
+
+    #             file_path = rf"{BASE_FOLDER_PATH}\{EXP_NO}\{req_id}{VENDOR}.csv"
+    #             df.to_csv(file_path, index=False)
+
+    #             # Time
+    #             time_took = time.perf_counter() - start_time
+    #             print(f"Request ID: {req_id} Time Took: {time_took}")
+
+    #             # Call that method
+    #             row = [req_id, contract.ticker, time_took]
+    #             # write_to_csv(row=row)
+    #             return
+    #         elif counter >= int(max_wait_time / sleep_in_iter):
+    #             # TimeoutError
+    #             # Call that method
+    #             row = [req_id, contract.ticker, "INF"]
+    #             # write_to_csv(row=row)
+    #             break
+
+    #         # Response not yet ended
+    #         else:
+    #             # Wait for response
+    #             await asyncio.sleep(sleep_in_iter)
+    #             # time.sleep(sleep_in_iter)
+    #             counter += 1
+
+    # async def get_historical_data_for_list_of_contracts(
+    #     self, list_of_contracts, bar_size, bar_unit, duration, max_wait_time
+    # ):
+
+    #     # Fetching option delta for each contract in the contracts_list
+    #     await asyncio.gather(
+    #         *[
+    #             self.get_historical_data(
+    #                 contract, bar_size, bar_unit, duration, max_wait_time
+    #             )
+    #             for contract in list_of_contracts
+    #         ]
+    #     )
