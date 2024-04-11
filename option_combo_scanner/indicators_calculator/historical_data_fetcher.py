@@ -3,10 +3,11 @@ import time
 
 import pandas as pd
 
+from ao_api.enums import BarUnit
 from com.variables import variables as variables
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
-
+from ao_api.ibkr_ao_adapter import IBkrAlgoOneAdapter
 logger = CustomLogger.logger
 
 
@@ -20,6 +21,7 @@ class HistoricalDataFetcher:
     @staticmethod
     def request_historical_data_for_contract(contract, bar_size, duration_size, what_to_show, req_id=None, cas_app=True):
 
+        print(f"IBKR: {contract}")
         # If req_id was not provided, getting request ID
         if req_id == None:
             # Getting req_id
@@ -37,45 +39,76 @@ class HistoricalDataFetcher:
         # Static for reqHistoricalData
         end_date_time = ""
         duration_string = duration_size
-        bar_size_setting = bar_size
+        bar_size = bar_size
         use_rth = variables.flag_use_rth
         format_date = 1
         keep_up_to_date = False
-
+        
         # Error Received
         variables.req_error[reqId] = False
 
+        contract = IBkrAlgoOneAdapter.contract(contract)
+        duration = IBkrAlgoOneAdapter.duration(duration_string)
+        bar_size, bar_unit = IBkrAlgoOneAdapter.bar_size(bar_size)
+        flag_rth_only = IBkrAlgoOneAdapter.flag_rth_only(use_rth)
+        bar_type = IBkrAlgoOneAdapter.bar_type(what_to_show)
+
+        print(f"AO: {contract}")
+
+        # DS Client Requesting the Data
+        variables.ds_client.get_historical_bars(
+            request_id=reqId,
+            contract=contract, # Contract
+            duration=duration,    
+            bar_unit=bar_unit,
+            bar_size=bar_size,
+            flag_rth_only=flag_rth_only,
+            bar_type=bar_type,
+        )
+
+        """
+        bar_size_setting = "1 hour"
+        ds_client.get_historical_bars(
+            req_id,
+            amzn_call_opt, # Contract
+            duration=10,        # Days    
+            bar_unit=bar_unit,  
+            bar_size=3,         # inte
+            flag_rth_only=True, 
+        )
+        """
+
         # Which TWS API app to use?
-        if cas_app:
+        # if cas_app:
 
-            # Send request via CAS APP
-            variables.cas_app.reqHistoricalData(
-                reqId,
-                contract,
-                end_date_time,
-                duration_string,
-                bar_size_setting,
-                what_to_show,
-                use_rth,
-                format_date,
-                keep_up_to_date,
-                [],
-            )
-        else:
+        #     # Send request via CAS APP
+        #     variables.cas_app.reqHistoricalData(
+        #         reqId,
+        #         contract,
+        #         end_date_time,        ""
+        #         duration_string,      "14 D", 1 D, 15 D
+        #         bar_size_setting,      1 mins, 1 hour, 2 hours. bar size, bar unit
+        #         what_to_show, 
+        #         use_rth,  False
+        #         format_date,
+        #         keep_up_to_d1ate,
+        #         [],
+        #     )
+        # else:
 
-            # Send request Via Main App
-            variables.app.reqHistoricalData(
-                reqId,
-                contract,
-                end_date_time,
-                duration_string,
-                bar_size_setting,
-                what_to_show,
-                use_rth,
-                format_date,
-                keep_up_to_date,
-                [],
-            )
+        #     # Send request Via Main App
+        #     variables.app.reqHistoricalData(
+        #         reqId,
+        #         contract,
+        #         end_date_time,
+        #         duration_string,
+        #         bar_size_setting,
+        #         what_to_show,
+        #         use_rth,
+        #         format_date,
+        #         keep_up_to_date,
+        #         [],
+        #     )
 
     @staticmethod
     def fetch_historical_data_for_list_of_contracts(list_of_all_option_contracts, bar_size, list_of_duration_size, what_to_show):
