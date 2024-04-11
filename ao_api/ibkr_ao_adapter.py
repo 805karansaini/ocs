@@ -6,8 +6,31 @@ class IBkrAlgoOneAdapter:
 
     @staticmethod
     def duration(duration_string):
-        # TODO
+
         duration, duration_unit = duration_string.split(" ")
+        duration = int(duration)
+        if "S" in duration_unit.upper():
+            # TODO
+            pass
+        elif "D" in duration_unit.upper():
+            duration = duration
+        elif "W" in duration_unit.upper():
+            duration = duration * 5
+        elif "M" in duration_unit.upper():
+            duration = duration * 22
+        elif "Y" in duration_unit.upper():
+            duration = duration * 252
+        else:
+            print(f"duration_string: {duration_string}")
+        # if "M" in duration_unit.upper():
+        #     duration = duration * 22
+        # elif "W" in duration_unit.upper():
+        #     duration = duration * 5
+        # elif "Y" in duration_unit.upper():
+        #     duration = duration * 255
+        
+        # if duration_unit != "D":
+        #     print("Error: Duration unit not supported")
         return int(duration)
 
     @staticmethod
@@ -20,6 +43,8 @@ class IBkrAlgoOneAdapter:
             bar_unit = BarUnit.MINUTE
         elif "hour" in bar_unit:
             bar_unit = BarUnit.HOUR
+        elif "day" in bar_unit:
+            bar_unit = BarUnit.DAY
         else:
             print("Bar Unit", bar_unit)
 
