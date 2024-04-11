@@ -190,14 +190,14 @@ class PutCallVol:
 
         # Fetch Historical data
         for right, list_option_contracts in list_right_and_list_contracts_tuple:
-            
+            print(f"PC VOlumne: {right}, {list_option_contracts}")
             # Can be Turned on to test out values
-            # if not flag_put_call_indicator_based_on_selected_deltas_only:
-            #     # TODO REMOVE THIS TEST CODE, get from variabels ARYAN
-            #     middle_index = len(list_option_contracts) // 2
-            #     list_of_contracts = list_option_contracts[middle_index + 40 : middle_index + 60]
-            # else:
-            #     list_of_contracts = list_option_contracts
+            if not flag_put_call_indicator_based_on_selected_deltas_only:
+                # TODO REMOVE THIS TEST CODE, get from variabels ARYAN
+                middle_index = len(list_option_contracts) // 2
+                list_of_contracts = list_option_contracts[middle_index + 40 : middle_index + 60]
+            else:
+                list_of_contracts = list_option_contracts
 
             list_of_contracts = list_option_contracts
 

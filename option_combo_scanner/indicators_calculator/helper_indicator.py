@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from tabulate import tabulate
 
-from com.contracts import get_contract
+from com.contracts import get_contract, get_contract_details
 from com.option_comobo_scanner_idetif import (
     find_closest_expiry_for_fop_given_fut_expiries_and_trading_class,
     find_nearest_expiry_and_all_strikes_for_stk_given_dte,
@@ -163,6 +163,15 @@ class IndicatorHelper:
                     multiplier=multiplier,
                     con_id=underlying_conid,
                 )
+
+                # Complete contract with expiry and everything
+                contract_details = get_contract_details(underlying_contract)
+                underlying_contract.lastTradeDateOrContractMonth = contract_details.contract.lastTradeDateOrContractMonth
+
+
+                # Get contract details.
+                # Update uncontrcat details
+
             elif underlying_sec_type == "STK":
                 (
                     all_strikes,

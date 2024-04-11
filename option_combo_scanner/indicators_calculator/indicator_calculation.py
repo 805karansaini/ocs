@@ -126,8 +126,8 @@ class IndicatorCalculation:
                         )
                         continue
                     else:
-                        print(f"Inside calculate_realtime_market_data_based_indicators")
                         if StrategyVariables.flag_test_print:
+                            print(f"Computing Put Call Volume based on (deltad1, deltad2, strikes) only")
                             print(f"List Of List of Call {list_of_call_strike} and Put {list_of_put_strikes}")
 
                     if StrategyVariables.flag_put_call_indicator_based_on_selected_deltas_only == True:

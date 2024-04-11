@@ -413,7 +413,7 @@ class ScannerAlgo:
                 # # TODO REMOVE IT ARYAN
                 if symbol == "ES":
                     all_strikes = [5250, 5255, 5260]
-                else:
+                elif symbol == "NQ":
                     all_strikes = [18550, 18555, 18560,18565]
 
                 # get the list of call and put option contract

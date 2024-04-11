@@ -244,7 +244,9 @@ class ImpliedVolatility:
         current_date_obj_for_dte = datetime.datetime.strptime(current_date_for_dte, "%Y%m%d")
         expiry_date_obj_for_dte = datetime.datetime.strptime(expiry, "%Y%m%d")
         dte = abs(current_date_obj_for_dte - expiry_date_obj_for_dte).days
+        # underlying_contract.conId = 265598
 
+        print("underlying_contract: ", underlying_contract)
         # Get Underlying Price
         underlying_bid, underlying_ask = asyncio.run(MarketDataFetcher.get_current_price_for_contract(underlying_contract))
 
@@ -844,7 +846,7 @@ class ImpliedVolatility:
             list_of_contracts.append(contract)
 
         list_of_duration_size = [2] * 4 + [n_th_day + 1] * 4
-        what_to_show = "Bid"
+        what_to_show = "BID"
         list_of_duration_size_for_fetcher = [f"{_} D" for _ in list_of_duration_size]
 
         # Put it in the Variable # ARYAN TODO

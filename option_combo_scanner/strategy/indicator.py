@@ -3,7 +3,7 @@ from pprint import pprint
 
 import pandas as pd
 
-from com.contracts import get_contract
+from com.contracts import get_contract, get_contract_details
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
@@ -134,9 +134,12 @@ class Indicator:
                 multiplier=self.multiplier,
                 con_id=self.underlying_conid,
             )
-            
-            #  Add the underlying contract to the map with its contract ID as the key
 
+            # Complete contract with expiry and everything
+            contract_details = get_contract_details(underlying_contract)
+            underlying_contract.lastTradeDateOrContractMonth = contract_details.contract.lastTradeDateOrContractMonth
+
+            #  Add the underlying contract to the map with its contract ID as the key
             strategy_variables.map_con_id_to_contract[self.underlying_conid] = underlying_contract
 
     def get_tuple(self):

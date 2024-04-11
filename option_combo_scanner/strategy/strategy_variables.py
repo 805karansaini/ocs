@@ -64,7 +64,7 @@ class StrategyVariables:
     avg_iv_lookback_days = parser.getint("USER INPUTS", "avg_iv_lookback_days")
 
     # If the flag is False it will calcluate for all put-call strike otherwise for speicfic deltas
-    flag_put_call_indicator_based_on_selected_deltas_only = parser.get(
+    flag_put_call_indicator_based_on_selected_deltas_only = parser.getboolean(
         "USER INPUTS", "flag_put_call_indicator_based_on_selected_deltas_only"
     )
 
@@ -101,7 +101,7 @@ class StrategyVariables:
 
     flag_store_csv_files = parser.getboolean("USER INPUTS", "flag_store_csv_files")
     o_c_s_folder_path = rf"{parser.get('USER INPUTS','o_c_s_folder_path')}"
-    batch_size = 80
+    batch_size = 40
     batch_size_historical_data = 10
 
     # Flag if we want the option indicator in % chng

@@ -5,7 +5,7 @@ from pprint import pprint
 
 import pandas as pd
 
-from com.contracts import get_contract
+from com.contracts import get_contract, get_contract_details
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
@@ -70,7 +70,8 @@ class ScannerCombination:
         )
 
         # Add Row to dataframe (concat)
-        warnings.filterwarnings("ignore", message="The behavior of DataFrame concatenation with empty or all-NA entries is deprecated.*")
+        warnings.filterwarnings("ignore", category=FutureWarning)
+
         strategy_variables.scanner_combo_table_df = pd.concat(
             [strategy_variables.scanner_combo_table_df, row],
             ignore_index=True,
@@ -247,7 +248,11 @@ class ScannerCombination:
                     multiplier=underlying_multiplier,
                     con_id=underlying_conid,
                 )
-
+                # Complete contract with expiry and everything
+                contract_details = get_contract_details(underlying_contract)
+                underlying_contract.lastTradeDateOrContractMonth = contract_details.contract.lastTradeDateOrContractMonth
+                #  '{"contract_type":"FUT","ticker":"ES","right":"","expiry":"20240621","strike":0.0,"currency":"USD","trading_class":"ES","exchange":"CME","multiplier":50}', 'duration': 27, 'bar_size': 1, 'bar_unit': 'hour', 'bar_type': 'BID', 'flag_rth_only': True}}
+            
             # Append the underlying contract to the list
             list_of_underlying_contract.append(underlying_contract)
 

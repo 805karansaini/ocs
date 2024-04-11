@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import os
 import threading
@@ -9,6 +10,7 @@ from tkinter import messagebox
 # from option_combo_scanner.ibapi_ao.app import IBapi
 from com.ibapi_callbacks import IBapi
 from com.variables import variables as com_variables
+from option_combo_scanner.client_app.app import AlgoOneAPI
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.database.set_up_db import SetupDatabase
 from option_combo_scanner.gui.gui import IsScreenRunning, ScreenGUI
@@ -27,13 +29,13 @@ logger = CustomLogger.logger
 def run_indicator_thread():
     # While Screen is open
     while True:
-        time.sleep(20)
         try:
             IndicatorCalculation.compute_indicators(), 
         except Exception as e:
             logger.error(f"Exception in indicator thread loop: {e}")
             print(f"Exception in indicator thread loop: {e}")
             traceback.print_exc()
+        time.sleep(20)
 
 # Method to run app
 def run_loop(app):
@@ -64,6 +66,33 @@ if __name__ == "__main__":
     # Module start time
     module_start_time = datetime.datetime.now(variables.target_timezone_obj)
 
+    ######## Start New Data Server Integration Changes
+    def start_loop(loop):
+        asyncio.set_event_loop(loop)
+        loop.run_forever()
+        print("End in loop")
+    
+    # Create a new event loop and start it in a new thread
+    new_loop = asyncio.new_event_loop()
+    t = threading.Thread(target=start_loop, args=(new_loop,))
+    t.start()
+
+    time.sleep(1)
+    
+    # Creating the Data Server Client
+    ds_client = AlgoOneAPI(
+        data_server_host="25.38.187.70", data_server_port=8765, data_server_client_id=123, loop=new_loop
+    )
+    ds_client.start()
+
+    # Wait for the connection
+    while not ds_client.is_connected():
+        time.sleep(0.2)
+
+    ######## End New Data Server Integration Changes
+
+    com_variables.ds_client = ds_client
+
     # Main App TWS Object
     app = IBapi()
     app.connect(
@@ -93,21 +122,6 @@ if __name__ == "__main__":
     # TODO - have multi apps later on
     com_variables.cas_app = app
 
-    # flag_start_in_recovery_mode = False
-
-    # # Subscribe the account updates
-    # app.reqAccountUpdates(True, variables.account_id)
-
-    # # Start the app in recovery mode
-    # if flag_start_in_recovery_mode:
-    #     logger.info("Starting the Recovery Mode")
-
-    #     # Run Recovery Mode
-    #     RecoveryMode.run(module_start_time)
-
-    #     # Recovery Mode is done, now start the app
-    #     logger.debug("Completed recovery, starting app")
-
     # Start Screen Now
     screen_thread = threading.Thread(target=run_screen)
     screen_thread.start()
@@ -119,10 +133,6 @@ if __name__ == "__main__":
         time.sleep(0.5)
     else:
         time.sleep(0.5)
-
-    # StrategyUtils.update_the_values_for_order_preset_table()
-
-    # monitor_order_preset_obj = MonitorOrderPreset()
 
     StrategyVariables.screen = screen
 
@@ -143,7 +153,8 @@ if __name__ == "__main__":
     # scanner_input = ScannerInputsTab(scanners_object)
     # While Screen is open
     while IsScreenRunning.flag_is_screen_running:
-        time.sleep(1)
+        print(f"Threading active count: {threading.active_count()}")
+        time.sleep(5)
         try:
             # IndicatorCalculation.compute_indicators(), 
             pass

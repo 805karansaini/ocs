@@ -78,7 +78,6 @@ class HistoricalVolatility:
 
         # # If flag for calculating hv for daily candles is false
         # else:
-
         #     combination_price_dataframe_for_hv = combination_price_dataframe.copy()
 
         # Calculate Historical volatility data
