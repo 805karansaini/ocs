@@ -30,7 +30,13 @@ def run_indicator_thread():
     # While Screen is open
     while True:
         try:
+            # S
+            start_time = time.time()
             IndicatorCalculation.compute_indicators(), 
+            # E
+            end_time = time.time()
+            time_taken = end_time - start_time
+            print(f"Time taken to compute indicators: {time_taken} seconds")
         except Exception as e:
             logger.error(f"Exception in indicator thread loop: {e}")
             print(f"Exception in indicator thread loop: {e}")
@@ -88,7 +94,6 @@ if __name__ == "__main__":
     # Wait for the connection
     while not ds_client.is_connected():
         time.sleep(0.2)
-
     ######## End New Data Server Integration Changes
 
     com_variables.ds_client = ds_client
@@ -107,7 +112,8 @@ if __name__ == "__main__":
     # Start the web socket in a thread
     api_thread = threading.Thread(target=run_loop, args=(app,), daemon=True)
     api_thread.start()
-
+    
+    
     # Check if the API is connected via order id
     while True:
         if isinstance(com_variables.nextorderId, int):
@@ -153,7 +159,7 @@ if __name__ == "__main__":
     # scanner_input = ScannerInputsTab(scanners_object)
     # While Screen is open
     while IsScreenRunning.flag_is_screen_running:
-        print(f"Threading active count: {threading.active_count()}")
+        # print(f"Threading active count: {threading.active_count()}")
         time.sleep(5)
         try:
             # IndicatorCalculation.compute_indicators(), 

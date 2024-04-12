@@ -158,9 +158,10 @@ class AlgoOneAPI(EClient, EWrapper):
         error_msg: str,
         advance_order_reject_json="",
     ):
+        request_id = int(request_id)
         print(f"Error: request_id={request_id}, {error_code=} msg={error_msg} {advance_order_reject_json=}")
-        if request_id:
-            self.map_req_id_to_error[request_id] = True
+        
+        variables.req_mkt_data_end[request_id] = True
 
     async def _start_setup(self):
         """

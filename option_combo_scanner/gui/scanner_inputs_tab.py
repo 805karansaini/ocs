@@ -1229,6 +1229,10 @@ class ScannerInputsTab:
 
     def insert_into_config_leg_table_through_template(self, dataframe):
         self.leg_config_table.delete(*self.leg_config_table.get_children())
+        # self.no_of_legs_entry.delete(*self.no_of_legs_entry)
+        self.no_of_legs_entry.delete(0, tk.END)
+        self.no_of_legs_entry.insert(0, len(dataframe))
+
 
         # Iterate over rows of the DataFrame
         for index, row in dataframe.iterrows():
