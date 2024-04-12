@@ -42,6 +42,9 @@ class StrategyVariables:
     ibkr_tws_port = parser.getint("USER INPUTS", "ibkr_tws_port")
     ibkr_tws_connection_id = parser.getint("USER INPUTS", "ibkr_tws_connection_id")
 
+    ocs_bridge_to_main_app_host = parser.get("USER INPUTS", "ocs_bridge_to_main_app_host")
+    ocs_bridge_to_main_app_port = parser.get("USER INPUTS", "ocs_bridge_to_main_app_port")
+
     # User Input for the calc. mode in in the max PnL cacl
     calculation_mode_for_combination_max_pnl = MaxPNLEnum.GNE
 

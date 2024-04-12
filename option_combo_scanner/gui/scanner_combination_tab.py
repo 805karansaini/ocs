@@ -1,14 +1,16 @@
 import asyncio
 import copy
 import datetime
+import io
 import pprint
 import threading
 import tkinter as tk
 from tkinter import Scrollbar, messagebox, ttk
 import traceback
-
+import csv
 import pandas as pd
 
+from brdige_app import BridgeApp
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
@@ -19,6 +21,7 @@ from option_combo_scanner.strategy.scanner import Scanner
 from option_combo_scanner.strategy.scanner_combination import \
     get_scanner_combination_details_column_and_data_from_combo_object
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
+
 
 logger = CustomLogger.logger
 
@@ -355,8 +358,37 @@ class ScannerCombinationTab:
                                 target=self.create_and_display_impact_popup(),
                             ).start(),
             )
+            menu.add_command(
+                label="Export Combo to Main App",
+                command=lambda: threading.Thread(
+                                target= self.export_combo_details(),
+                            ).start(),
+            )
             # display the context menu at the location of the mouse cursor
             menu.post(event.x_root, event.y_root)
+
+    def export_combo_details(self,):
+        # Get the details of the selected combination
+        try:
+            # Get the combo_id from table
+            combo_id = self.scanner_combination_table.selection()[0]
+            combo_id = int(combo_id)
+        except Exception as e:
+            print(f"Could not get the combo_id value: {combo_id} ")
+            return
+
+        # Title for the Scanned Combintation Details
+        title = f"Scanned Combintation Details, Combo ID : {combo_id}"
+
+        (
+            columns,
+            row_data_list,
+        ) = get_scanner_combination_details_column_and_data_from_combo_object(combo_id)
+
+        # selected_item = self.scanner_combination_table.selection()[0]
+        # details = self.scanner_combination_table.item(selected_item)
+        print(columns, row_data_list)
+        self.create_csv_structure_for_main_app(row_data_list, combo_id)
 
     def create_and_display_impact_popup(self):
         # Get the combo_id from table
@@ -456,3 +488,46 @@ class ScannerCombinationTab:
 
         # Change the Reverse Flag in variables Dict
         StrategyVariables.scanner_combination_table_sort_by_column = {column: reverse}
+
+    def create_csv_structure_for_main_app(self, legs_list, combo_id):
+
+        headers = ["Type", "Action", "SecType", "Symbol", "DTE", "Delta", "Right", "#Lots", "Multiplier", "Exchange", 
+                "Trading Class", "Currency", "ConID", "Primary Exchange", "Strike", "Expiry"]
+        
+        columns_for_download_combo_to_csv = [
+        "Type",
+        "Action",
+        "SecType",
+        "Symbol",
+        "DTE",
+        "Delta",
+        "Right",
+        "#Lots",
+        "Multiplier",
+        "Exchange",
+        "Trading Class",
+        "Currency",
+        "ConID",
+        "Primary Exchange",
+        "Strike",
+        "Expiry",
+    ]
+        
+        # Specify the filename for your CSV
+        # filename = f'combo_csv_for_combo_id_{combo_id}.csv'
+
+        # Prepare the data rows for the CSV
+        data_rows = [['#SOC', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']]
+        for leg in legs_list:
+            # Extract details from each leg
+            action, symbol, sectype, exchange, currency, lots, expiry, strike, right, multiplier, conid, primaryexchange, trading_class = leg
+            
+            # Create a row with placeholders for missing values and the '#LEG' indicator in the 'Type' column
+            leg_row = ['#LEG', action, sectype, symbol, 'None', 'None', right, lots, multiplier, exchange, trading_class, currency, conid, primaryexchange, strike, expiry]
+            data_rows.append(leg_row)
+        data_rows.append(['#EOC', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''])
+
+        combo_df = pd.DataFrame(data_rows)
+        combo_df.columns = headers
+    
+        BridgeApp.send_csv(combo_df, combo_id)
