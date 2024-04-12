@@ -81,28 +81,17 @@ class Decoder:
         reqId = response_mssg["request_id"]
         error_dict = response_mssg["result"][0]
 
-        # errorCode = error_dict.get('error_code', None)
-        # errorString = error_dict.get('error_msg', None)
-        # advancedOrderRejectJson = error_dict.get('advance_order_reject_json', None)
-        errorCode = None
-        errorString = error_dict
-        advancedOrderRejectJson = None
+        error_code = error_dict.get('error_code', None)
+        error_msg = error_dict.get('error_msg', None)
+        advance_order_reject_json = error_dict.get('advance_order_reject_json', None)
 
-        self.wrapper.error(reqId, errorCode, errorString, advancedOrderRejectJson)
+        self.wrapper.error(reqId, error_code, error_msg, advance_order_reject_json)
 
     def process_historical_data_msg(self, response_mssg):
         reqId = response_mssg["request_id"]
         itemCount = response_mssg["result"]
 
-        for data_dict in itemCount:
-            bar = {}
-            bar["datetime"] = data_dict["datetime"]
-            bar["open"] = data_dict["open"]
-            bar["high"] = data_dict["high"]
-            bar["low"] = data_dict["low"]
-            bar["close"] = data_dict["close"]
-            bar["volume"] = data_dict["volume"]
-
+        for bar in itemCount:
             self.wrapper.historical_data(reqId, bar)
 
     def process_historical_data_end_msg(self, response_mssg):
