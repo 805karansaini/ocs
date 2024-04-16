@@ -494,24 +494,6 @@ class ScannerCombinationTab:
         headers = ["Type", "Action", "SecType", "Symbol", "DTE", "Delta", "Right", "#Lots", "Multiplier", "Exchange", 
                 "Trading Class", "Currency", "ConID", "Primary Exchange", "Strike", "Expiry"]
         
-        columns_for_download_combo_to_csv = [
-        "Type",
-        "Action",
-        "SecType",
-        "Symbol",
-        "DTE",
-        "Delta",
-        "Right",
-        "#Lots",
-        "Multiplier",
-        "Exchange",
-        "Trading Class",
-        "Currency",
-        "ConID",
-        "Primary Exchange",
-        "Strike",
-        "Expiry",
-    ]
         
         # Specify the filename for your CSV
         # filename = f'combo_csv_for_combo_id_{combo_id}.csv'

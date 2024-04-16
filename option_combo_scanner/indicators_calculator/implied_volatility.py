@@ -467,6 +467,22 @@ class ImpliedVolatility:
         # We want to compute 1D-AvgIV to 13D-AvgIV
         for right in ["Call", "Put"]:
             
+            if right == "Call":
+                list_of_all_option_contracts = list_of_all_call_option_contracts
+            elif right == "Put":
+                list_of_all_option_contracts = list_of_all_put_option_contracts
+
+            sec_type = list_of_all_option_contracts[0].secType
+
+            print(f"SecType: {sec_type}")
+            if not sec_type in StrategyVariables.list_of_sec_type_to_use_binary_search:
+                start_time = time.perf_counter()
+
+                # Get the Data in one go and store in the DataStore
+                BinarySearchDeltaIV.get_historical_data_for_list_of_contracts_and_store_in_data_store(list_of_all_option_contracts)
+
+                print(f"Total Time Took: {time.perf_counter() - start_time}")
+
             for ith_day in range(1, n_th_day):
 
                 if len(all_the_dates_in_underlying_data) > ith_day:
@@ -489,11 +505,7 @@ class ImpliedVolatility:
                 if StrategyVariables.flag_test_print:
                     print(f"Right: {right} Day Ago: {ith_day} UnderPrice: {underlying_close_price_for_ith_day} TTE: {time_to_expiration} Old Date: {ith_days_old_date} Expiry: {expiry_date_obj}")
 
-                if right == "Call":
-                    list_of_all_option_contracts = list_of_all_call_option_contracts
-                elif right == "Put":
-                    list_of_all_option_contracts = list_of_all_put_option_contracts
-
+                    
                 # Get the strike along with delta & iv value, such that the target delta is nearest
                 # For getting these values we can compute the IV_D1 and IV_D2 and AvgIV for ith_day
                 # [Tar.DeltaD1: (Strike, Delta, IV,), Tar.DeltaD2: (Strike, Delta, IV,)]

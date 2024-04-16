@@ -21,7 +21,7 @@ class HistoricalDataFetcher:
     @staticmethod
     def request_historical_data_for_contract(contract, bar_size, duration_size, what_to_show, req_id=None, cas_app=True):
 
-        print(f"IBKR: {contract}")
+        # print(f"IBKR: {contract}")
         # If req_id was not provided, getting request ID
         if req_id == None:
             # Getting req_id
@@ -48,18 +48,20 @@ class HistoricalDataFetcher:
         variables.req_error[reqId] = False
 
         contract = IBkrAlgoOneAdapter.contract(contract)
-        duration = IBkrAlgoOneAdapter.duration(duration_string)
+        duration, start_datetime, end_datetime = IBkrAlgoOneAdapter.duration(duration_string)
         bar_size, bar_unit = IBkrAlgoOneAdapter.bar_size(bar_size)
         flag_rth_only = IBkrAlgoOneAdapter.flag_rth_only(use_rth)
         bar_type = IBkrAlgoOneAdapter.bar_type(what_to_show)
 
-        print(f"AO: {contract}")
+        # print(f"AO: {contract}")
 
         # DS Client Requesting the Data
         variables.ds_client.get_historical_bars(
             request_id=reqId,
             contract=contract, # Contract
-            duration=duration,    
+            duration=duration,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
             bar_unit=bar_unit,
             bar_size=bar_size,
             flag_rth_only=flag_rth_only,
@@ -139,17 +141,17 @@ class HistoricalDataFetcher:
                 # Append the reqId to list
                 list_of_req_id_for_historical_data.append(reqId)
 
-                counter = 0
-                while variables.cas_wait_time_for_historical_data > (counter * variables.sleep_time_between_iters):
+            counter = 0
+            while variables.cas_wait_time_for_historical_data > (counter * variables.sleep_time_between_iters):
 
-                    # Waitting for the request to end or give error
-                    if all([variables.req_mkt_data_end[req_id] or variables.req_error[req_id] for req_id in list_of_req_id_for_historical_data]):
-                        break
+                # Waitting for the request to end or give error
+                if all([variables.req_mkt_data_end[req_id] or variables.req_error[req_id] for req_id in list_of_req_id_for_historical_data]):
+                    break
 
-                    # Sleep for sleep_time_waiting_for_tws_response
-                    time.sleep(variables.sleep_time_between_iters)
+                # Sleep for sleep_time_waiting_for_tws_response
+                time.sleep(variables.sleep_time_between_iters)
 
-                    # Increase Counter
-                    counter += 1
+                # Increase Counter
+                counter += 1
 
         return list_of_req_id_for_historical_data

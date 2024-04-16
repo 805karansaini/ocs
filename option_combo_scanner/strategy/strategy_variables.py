@@ -1,10 +1,10 @@
 import configparser
 import datetime
 import threading
+from enum import Enum
 from typing import List, Tuple
 
 import pandas as pd
-from enum import Enum
 
 # # Read the config file
 config = configparser.ConfigParser()
@@ -18,6 +18,7 @@ time_zone_config = config["TimeZone"]
 class MaxPNLEnum(Enum):
     ONE = 1
     GNE = 2
+
 
 class StrategyVariables:
     """
@@ -104,8 +105,8 @@ class StrategyVariables:
 
     flag_store_csv_files = parser.getboolean("USER INPUTS", "flag_store_csv_files")
     o_c_s_folder_path = rf"{parser.get('USER INPUTS','o_c_s_folder_path')}"
-    batch_size = 40
-    batch_size_historical_data = 10
+    batch_size = 50
+    batch_size_historical_data = 20
 
     # Flag if we want the option indicator in % chng
     flag_chng_in_opt_price_in_percentage = False
@@ -153,7 +154,6 @@ class StrategyVariables:
         "MaxDelta",
         "MinDTE",
         "MaxDTE",
-
     ]
     # scanner combo table dataframe
     scanner_combo_table_df = pd.DataFrame(columns=scanner_combination_table_columns)
@@ -231,3 +231,5 @@ class StrategyVariables:
     flag_test_print = False
 
     flag_ONE_for_max_pnl = "ONE"
+
+    list_of_sec_type_to_use_binary_search = ["OPT", "STK", "FUT", "FOP"]

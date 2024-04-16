@@ -1,4 +1,5 @@
 import copy
+import time
 
 import pandas as pd
 import tabulate
@@ -349,3 +350,30 @@ class BinarySearchDeltaIV:
         key_string = f"{contract.symbol}_{contract.lastTradeDateOrContractMonth}_{contract.strike}_{contract.secType}_{right}_{contract.multiplier}_{contract.tradingClass}".lower()
 
         return key_string
+
+    @staticmethod
+    def get_historical_data_for_list_of_contracts_and_store_in_data_store(list_of_contracts,):
+
+        N = len(list_of_contracts)
+
+        # If the data is not present in the data store, fetch the data from the IBKR
+        what_to_show_price = "BID"
+        bar_size_price = StrategyVariables.historical_price_data_bar_size
+        duration_size_price = f"{StrategyVariables.avg_iv_lookback_days} D"
+        list_of_duration_size = [duration_size_price] * N
+
+        list_of_req_id_for_historical_data = HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
+            list_of_contracts, bar_size_price, list_of_duration_size, what_to_show_price
+        )
+
+        for req_id, contract in zip(list_of_req_id_for_historical_data, list_of_contracts):
+            contract_df = variables.map_req_id_to_historical_data_dataframe[req_id]
+            key = BinarySearchDeltaIV.get_key_from_contract(contract)
+        
+            # If flag is True store CSV Files
+            if StrategyVariables.flag_store_csv_files:
+                folder_name = f"DeltaIV\{contract.symbol}_{contract.right}_{contract.tradingClass}"
+                file_name = rf"{key}"
+                StrategyUtils.save_option_combo_scanner_csv_file(contract_df, folder_name, file_name)
+
+            DataStore.store_data(key, contract_df)

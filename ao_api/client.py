@@ -6,10 +6,10 @@ import socket
 from typing import Optional
 
 from ao_api import decoder, msg_reader
-from ao_api.contract import Contract, contract_to_dict
-from ao_api.enums import BarType, BarUnit
 from ao_api.message import OUT
 from ao_api.ws_client import WebSocketClient
+from ao_api.contract import Contract, contract_to_dict
+from ao_api.enums import BarType, BarUnit
 
 logger = logging.getLogger(__name__)
 

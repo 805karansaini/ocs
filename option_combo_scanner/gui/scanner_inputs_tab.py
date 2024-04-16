@@ -1423,6 +1423,7 @@ class ScannerInputsTab:
                     self.entry.place(x=x, y=y, width=width, height=height)
                     self.entry.bind("<Return>", lambda event: self.save_entry_changes(item, column_index))
                     self.entry.bind("<FocusOut>", lambda event: self.entry.destroy())
+                    self.entry.focus_set()
 
     def save_combobox_changes(self, item, column_index):
         if column_index == 3:

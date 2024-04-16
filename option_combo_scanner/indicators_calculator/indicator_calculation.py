@@ -188,7 +188,6 @@ class IndicatorCalculation:
         flag_realtime_indicators = True
         IndicatorCalculation.calculate_realtime_market_data_based_indicators(flag_realtime_indicators=flag_realtime_indicators)
 
-        
         if not StrategyVariables.flag_put_call_indicator_based_on_selected_deltas_only:
             flag_realtime_indicators = False
             IndicatorCalculation.calculate_realtime_market_data_based_indicators(flag_realtime_indicators=flag_realtime_indicators)

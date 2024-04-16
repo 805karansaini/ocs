@@ -14,13 +14,14 @@ class ContractType(str, Enum):
 class Contract(BaseModel):
     contract_type: ContractType
     ticker: str
-    right: str = None  # C or P
-    expiry: str = None  # Format: YYYYMMDD
-    strike: float|None = None
-    currency: str = None
-    trading_class: str = None
-    exchange: str = None
-    multiplier: int = None
+    right: str | None = None  # C or P
+    expiry: str | None = None  # Format: YYYYMMDD
+    strike: float | None = None
+    currency: str | None = None
+    trading_class: str | None = None
+    exchange: str | None = None
+    multiplier: int | None = None
+
 
 def get_contract_obj(contract: dict) -> Contract:
 

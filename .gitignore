@@ -2,7 +2,7 @@
 .venv/
 .vscode/
 Temp/
-
+zzz_aryan/
 
 # Ignore build, dist, main.spec and logs
 build/

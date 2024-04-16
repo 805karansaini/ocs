@@ -32,7 +32,7 @@ def run_indicator_thread():
         try:
             # S
             start_time = time.time()
-            IndicatorCalculation.compute_indicators(), 
+            IndicatorCalculation.compute_indicators() 
             # E
             end_time = time.time()
             time_taken = end_time - start_time
@@ -41,6 +41,8 @@ def run_indicator_thread():
             logger.error(f"Exception in indicator thread loop: {e}")
             print(f"Exception in indicator thread loop: {e}")
             traceback.print_exc()
+        
+        print("End of indicators Calculation")
         time.sleep(20)
 
 # Method to run app
@@ -149,8 +151,8 @@ if __name__ == "__main__":
 
     # TODO - Restart later on
     # Creating a separate thread
-    scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
-    scanner_thread.start()
+    # scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
+    # scanner_thread.start()
 
     indicator_thread = threading.Thread(target=run_indicator_thread, daemon=True)
     indicator_thread.start()

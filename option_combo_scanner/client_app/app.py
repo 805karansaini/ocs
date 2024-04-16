@@ -56,7 +56,7 @@ class AlgoOneAPI(EClient, EWrapper):
                     break
                 else:
                     print("Waiting for connection with Data Server...")
-                    asyncio.sleep(1)
+                    await asyncio.sleep(1)
 
         except Exception as exp:
             # TODO we should log it and not show it to the user.
@@ -181,80 +181,3 @@ class AlgoOneAPI(EClient, EWrapper):
         except Exception as e:
             print("Inside Start: ", e)
         # TODO - Handle Reconnection
-
-    # async def get_historical_data(
-    #     self, contract, bar_size, bar_unit, duration, max_wait_time=15
-    # ):
-
-    #     req_id = self.req_id
-    #     self.req_id += 1
-
-    #     self.map_req_id_to_error[req_id] = False
-    #     self.map_req_id_to_historical_data[req_id] = []
-    #     self.map_req_id_to_historical_data_ended[req_id] = False
-
-    #     flag_rth_only = True
-
-    #     start_time = time.perf_counter()
-
-    #     self.get_historical_bars(
-    #         req_id,
-    #         contract=contract,
-    #         duration=duration,
-    #         bar_unit=bar_unit,
-    #         bar_size=bar_size,
-    #         flag_rth_only=flag_rth_only,
-    #     )
-
-    #     sleep_in_iter = 0.1
-
-    #     counter = 0
-    #     # Wait for response from TWS
-    #     while True:
-
-    #         # (Error received for the request) OR (Timeout of 11 secs) OR (Response end indicated by API)
-    #         if (self.map_req_id_to_error[req_id] == True) or (
-    #             self.map_req_id_to_historical_data_ended[req_id] == True
-    #         ):
-
-    #             # Create a df and save it
-    #             df = pd.DataFrame(data=self.map_req_id_to_historical_data[req_id])
-
-    #             file_path = rf"{BASE_FOLDER_PATH}\{EXP_NO}\{req_id}{VENDOR}.csv"
-    #             df.to_csv(file_path, index=False)
-
-    #             # Time
-    #             time_took = time.perf_counter() - start_time
-    #             print(f"Request ID: {req_id} Time Took: {time_took}")
-
-    #             # Call that method
-    #             row = [req_id, contract.ticker, time_took]
-    #             # write_to_csv(row=row)
-    #             return
-    #         elif counter >= int(max_wait_time / sleep_in_iter):
-    #             # TimeoutError
-    #             # Call that method
-    #             row = [req_id, contract.ticker, "INF"]
-    #             # write_to_csv(row=row)
-    #             break
-
-    #         # Response not yet ended
-    #         else:
-    #             # Wait for response
-    #             await asyncio.sleep(sleep_in_iter)
-    #             # time.sleep(sleep_in_iter)
-    #             counter += 1
-
-    # async def get_historical_data_for_list_of_contracts(
-    #     self, list_of_contracts, bar_size, bar_unit, duration, max_wait_time
-    # ):
-
-    #     # Fetching option delta for each contract in the contracts_list
-    #     await asyncio.gather(
-    #         *[
-    #             self.get_historical_data(
-    #                 contract, bar_size, bar_unit, duration, max_wait_time
-    #             )
-    #             for contract in list_of_contracts
-    #         ]
-    #     )
