@@ -1,8 +1,9 @@
 import asyncio
 import copy
 import datetime
-from functools import cache
 import traceback
+from functools import cache
+
 import pandas as pd
 
 from com.contracts import get_contract
@@ -17,12 +18,13 @@ from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.indicators_calculator.helper_indicator import IndicatorHelper
 from option_combo_scanner.indicators_calculator.market_data_fetcher import MarketDataFetcher
 from option_combo_scanner.strategy.indicator import Indicator
+
 # from option_combo_scanner.strategy.scanner import Scanner
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
 
 class ScannerAlgo:
-    scanner_indicator_tab_obj=None
+    scanner_indicator_tab_obj = None
 
     # def __init__(self):
     def __init__(self, config_obj):
@@ -50,17 +52,6 @@ class ScannerAlgo:
         and closest expiry for FOP sec_type
 
         """
-
-        # print(
-        #     "Scanner: ",
-        #     symbol,
-        #     dte,
-        #     underlying_sec_type,
-        #     exchange,
-        #     currency,
-        #     multiplier,
-        #     trading_class,
-        # )
 
         # only call once (not for N-DTEs)
         all_fut_expiries = find_nearest_expiry_for_future_given_fut_dte(
@@ -176,7 +167,7 @@ class ScannerAlgo:
                 "exchange": exchange,
             }
 
-             # Insert the new indicator row in the database (GUI and system)
+            # Insert the new indicator row in the database (GUI and system)
             self.insert_new_indicator_row_in_db_gui_and_system(new_dict)
 
     def insert_new_indicator_row_in_db_gui_and_system(self, values_dict):
@@ -186,10 +177,10 @@ class ScannerAlgo:
             return
         values_dict["indicator_id"] = indicator_id
         indicator_obj = Indicator(values_dict)
-        
+
         # Insertion of indicator data in GUI
         ScannerAlgo.scanner_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
-        
+
     def delete_indicator_row_from_db_gui_and_system(self, list_of_indicator_ids_deletion):
         for indicator_id in list_of_indicator_ids_deletion:
             where_condition = f"WHERE `indicator_id` = {indicator_id}"
@@ -199,6 +190,7 @@ class ScannerAlgo:
         # Remove from system
         if list_of_indicator_ids_deletion:
             Utils.remove_row_from_indicator_table(list_of_indicator_ids=list_of_indicator_ids_deletion)
+
     def get_strike_and_closet_expiry_for_opt(
         self,
         symbol,
@@ -309,11 +301,11 @@ class ScannerAlgo:
         if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
             print(f"Inside filter_strikes for scanner algo function could not find instrument id: {instrument_id}")
             return []
-        
+
         instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
         min_dte = leg_object.dte_range_min
         max_dte = leg_object.dte_range_max
-        right = leg_object.right   
+        right = leg_object.right
 
         symbol = instrument_object.symbol
         sec_type = instrument_object.sec_type
@@ -352,10 +344,10 @@ class ScannerAlgo:
                 map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
 
             self.update_indicator_table_for_instrument(
-            instrument_object,
-            expiry_date_in_range,
-            map_closest_expiry_to_underlying_conid,
-        )
+                instrument_object,
+                expiry_date_in_range,
+                map_closest_expiry_to_underlying_conid,
+            )
             # if all_strikes is None or closest_expiry == None:
             #     continue
         elif sec_type == "OPT":
@@ -380,13 +372,13 @@ class ScannerAlgo:
             all_strikes = sorted(all_strikes)
             for closest_expiry in expiry_date_in_range:
                 map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
-            
+
             # Update the indicator table for the given list of expiry
             self.update_indicator_table_for_instrument(
-            instrument_object,
-            expiry_date_in_range,
-            map_closest_expiry_to_underlying_conid,
-        )
+                instrument_object,
+                expiry_date_in_range,
+                map_closest_expiry_to_underlying_conid,
+            )
 
         # todo early teminate
         if self.check_do_we_need_to_restart_scan():
@@ -401,7 +393,6 @@ class ScannerAlgo:
                 print(f"Early Termination: {self.config_obj}")
                 return []
 
-
             # get the key for caching the raw dataframe
             key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
             # print(key)
@@ -414,7 +405,7 @@ class ScannerAlgo:
                 if symbol == "ES":
                     all_strikes = [5250, 5255, 5260]
                 elif symbol == "NQ":
-                    all_strikes = [18550, 18555, 18560,18565]
+                    all_strikes = [18550, 18555, 18560, 18565]
 
                 # get the list of call and put option contract
                 list_of_call_option_contracts, list_of_put_option_contracts = IndicatorHelper.get_list_of_call_and_put_option_contracts(
@@ -431,45 +422,44 @@ class ScannerAlgo:
                 )
 
                 print(f"InstrumentID: {instrument_id} Expiry: {expiry}")
-                
+
                 # get the market data dataframe for call/put
                 df_call, df_put = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
                     list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
                 )
-                df_call['underlying_conid'] = underlying_conid
-                df_put['underlying_conid'] = underlying_conid
+                df_call["underlying_conid"] = underlying_conid
+                df_put["underlying_conid"] = underlying_conid
 
                 # todo early teminate
                 if self.check_do_we_need_to_restart_scan():
                     print(f"Early Termination: {self.config_obj}")
                     return []
 
-
                 if right.upper() == "CALL":
-                    key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
+                    key = ScannerAlgo.get_key_from_contract_for_scanner_algo(
+                        symbol, expiry, sec_type, right, trading_class, multiplier, exchange
+                    )
                     DataStore.store_data(key, df_call)
                     df = df_call.copy()
-                elif right.upper() == 'PUT':
-                    key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
+                elif right.upper() == "PUT":
+                    key = ScannerAlgo.get_key_from_contract_for_scanner_algo(
+                        symbol, expiry, sec_type, right, trading_class, multiplier, exchange
+                    )
                     DataStore.store_data(key, df_put)
                     df = df_put.copy()
             # print(df.to_string())
             # print(df.to_string())
             df.dropna(subset=["Delta", "Bid", "Ask", "AskIV"], inplace=True)
-            
+
             if right.upper() == "PUT":
                 df["Delta"] = df["Delta"].abs()
             # Make a copy of the dataframe to avoid modifying the original dataframe
-            
+
             filtered_dataframe = df.copy()
             if symbol == "ES":
-                filtered_dataframe = filtered_dataframe[
-                    (filtered_dataframe["Strike"] >= 5250) & (filtered_dataframe["Strike"] <= 5260)
-                ]
+                filtered_dataframe = filtered_dataframe[(filtered_dataframe["Strike"] >= 5250) & (filtered_dataframe["Strike"] <= 5260)]
             elif symbol == "NQ":
-                filtered_dataframe = filtered_dataframe[
-                    (filtered_dataframe["Strike"] >= 18550) & (filtered_dataframe["Strike"] <= 18565)
-                ]
+                filtered_dataframe = filtered_dataframe[(filtered_dataframe["Strike"] >= 18550) & (filtered_dataframe["Strike"] <= 18565)]
 
             # Filter strikes based on delta_range_low and delta_range_high
             filtered_dataframe = filtered_dataframe[
@@ -479,7 +469,23 @@ class ScannerAlgo:
             list_of_filtered_legs_tuple.extend(
                 list(
                     # "Strike", "Expiry", "Delta", "ConId",
-                    filtered_dataframe[["Symbol", "Strike", "Delta", "ConId", "Expiry", "Bid", "Ask", "AskIV", "underlying_conid", "Vega", "Theta", "Gamma", "UnderlyingPrice"]].itertuples(index=False, name=None)
+                    filtered_dataframe[
+                        [
+                            "Symbol",
+                            "Strike",
+                            "Delta",
+                            "ConId",
+                            "Expiry",
+                            "Bid",
+                            "Ask",
+                            "AskIV",
+                            "underlying_conid",
+                            "Vega",
+                            "Theta",
+                            "Gamma",
+                            "UnderlyingPrice",
+                        ]
+                    ].itertuples(index=False, name=None)
                 )
             )
 
@@ -489,9 +495,8 @@ class ScannerAlgo:
     def generate_combinations(self, remaining_no_of_legs, range_low, range_high, current_expiry, leg_object):
 
         # get the list of filter legs between the given range for the expiry
-        list_of_filter_legs = self.filter_strikes(
-            range_low, range_high, current_expiry, remaining_no_of_legs, leg_object
-        )  # current_expiry, ConfigLeg, Expiry of the perivous leg N-1 Leg: Current Date
+        list_of_filter_legs = self.filter_strikes(range_low, range_high, current_expiry, remaining_no_of_legs, leg_object)
+        # Current_expiry, ConfigLeg, Expiry of the perivous leg N-1 Leg: Current Date
         # ("Strike", "Expiry", "Delta", "ConId"),
 
         # print(f"Leg Object: {leg_object}")
@@ -502,12 +507,27 @@ class ScannerAlgo:
             print(f"Early Termination: {self.config_obj}")
             return []
 
-
         list_of_partial_combination = []
 
         if remaining_no_of_legs == 0:
-            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price in list_of_filter_legs:
-                list_of_partial_combination.append([(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price)])
+            for (
+                symbol,
+                strike,
+                strike_delta,
+                con_id,
+                expiry,
+                bid,
+                ask,
+                last_iv,
+                underlying_conid,
+                vega,
+                theta,
+                gamma,
+                und_price,
+            ) in list_of_filter_legs:
+                list_of_partial_combination.append(
+                    [(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price)]
+                )
         else:
             # get the next leg object to scan
             list_of_config_leg_object = self.config_obj.list_of_config_leg_object
@@ -527,8 +547,21 @@ class ScannerAlgo:
             delta_range_min = float(delta_range_min)
             delta_range_max = float(delta_range_max)
 
-            for symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price in list_of_filter_legs:
-                
+            for (
+                symbol,
+                strike,
+                strike_delta,
+                con_id,
+                expiry,
+                bid,
+                ask,
+                last_iv,
+                underlying_conid,
+                vega,
+                theta,
+                gamma,
+                und_price,
+            ) in list_of_filter_legs:
 
                 new_range_low = strike_delta + delta_range_min
                 new_range_high = strike_delta + delta_range_max
@@ -538,8 +571,9 @@ class ScannerAlgo:
                     remaining_no_of_legs - 1, new_range_low, new_range_high, expiry_date_obj, leg_object
                 )
 
-
-                current_leg_strike_and_strike_delta = [(symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price)]
+                current_leg_strike_and_strike_delta = [
+                    (symbol, strike, strike_delta, con_id, expiry, bid, ask, last_iv, underlying_conid, vega, theta, gamma, und_price)
+                ]
 
                 for next_legs_strike_delta_and_con_id in list_of_strike_delta_and_con_id_tuple:
 
@@ -592,7 +626,7 @@ class ScannerAlgo:
                 leg_number = leg_object.leg_number
                 action = leg_object.action
                 # Unpack the Strike Delta & Conid from a Leg:  (5100.0B, 0.6981448441368908, 0)
-                _, strike, delta, conid,_,_,_,_,_,_,_,_,_ = leg_tuple
+                _, strike, delta, conid, _, _, _, _, _, _, _, _, _ = leg_tuple
 
                 temp_leg_tuple = (strike, action)
                 temp_combination.append(temp_leg_tuple)
@@ -618,16 +652,10 @@ class ScannerAlgo:
         )
         # print("combination", list_of_combination)
         # print("list_of_combination", list_of_combination)
-        list_of_filter_combination = self.filter_list_of_combination(
-            list_of_combination
-        )
-        list_of_filter_combination_without_dup = (
-            self.remove_duplicate_combo_different_order(list_of_filter_combination)
-        )
-        
-        return list_of_filter_combination_without_dup
-    
+        list_of_filter_combination = self.filter_list_of_combination(list_of_combination)
+        list_of_filter_combination_without_dup = self.remove_duplicate_combo_different_order(list_of_filter_combination)
 
+        return list_of_filter_combination_without_dup
 
     def check_do_we_need_to_restart_scan(
         self,
@@ -638,7 +666,7 @@ class ScannerAlgo:
         """
         # If config got changed
         local_config_object = self.get_config_from_variables()
-        
+
         if local_config_object:
             if not self.config_obj.config_id == local_config_object.config_id:
                 return True
@@ -647,7 +675,7 @@ class ScannerAlgo:
             return True
 
         return False
-    
+
     def get_config_from_variables(
         self,
     ):
