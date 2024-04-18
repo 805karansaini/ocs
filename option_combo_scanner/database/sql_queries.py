@@ -252,11 +252,11 @@ class SqlQueries:
         Returns True if the transaction is successful
         """
         list_of_all_queries = []
-        list_of_all_queries.append(
-            SqlQueries.create_delete_query(
-                table_name="config_table", where_clause=" WHERE `config_id` > 0;"
-            )
-        )
+        # list_of_all_queries.append(
+        #     SqlQueries.create_delete_query(
+        #         table_name="config_table", where_clause=" WHERE `config_id` > 0;"
+        #     )
+        # )
         list_of_all_queries.append(
             SqlQueries.create_insert_query(
                 table_name="config_table", values_dict=common_config_dict
