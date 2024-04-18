@@ -960,33 +960,32 @@ class ScannerInputsTab:
                 return False
         return True
 
+    # Function for Save Config Button Click
     def save_config_button_click(
         self,
         popup=None,
         values_dict=None,
     ):
-        # TODO COMMENT
+        # Get the no of legs from the table
         no_of_leg = int(len(self.leg_config_table.get_children()))
 
-        # TODO COMMENT
-
+        # Validate if No of Legs is Zero
         if no_of_leg == 0:
             Utils.display_message_popup(
                 "Error",
                 f"No of legs is zero",
             )
             return
-            # print("ARYAN TODO")
-        # TODO COMMENT
 
+        # Create value dict from the GUI table to insert in the db
         if values_dict is None:
             values_dict = {
                 "description": self.description_entry.get("1.0", tk.END).strip(),
                 "status": self.status_combobox.get(),
                 "config_name": self.name_entry.get(),
             }
-        # TODO COMMENT
 
+        # Add No of legs to dict for insertion in db
         values_dict["no_of_leg"] = no_of_leg
 
         leg_data_list = []
