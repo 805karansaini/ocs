@@ -22,6 +22,7 @@ class ConfigLeg:
         self.dte_range_max = float(self.dte_range_max)
         self.dte_range_min = float(self.dte_range_min)
         self.instrument_id = int(self.instrument_id)
+        self.quantity = int(self.quantity)
     #     self.map_configleg_id_to_config_object()
 
     # def map_configleg_id_to_config_object(self):
@@ -42,6 +43,7 @@ class ConfigLeg:
             self.instrument_id,
             self.action,
             self.right,
+            self.quantity,
             self.delta_range_min,
             self.delta_range_max,
             self.dte_range_min,
