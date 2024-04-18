@@ -48,10 +48,10 @@ leg_config_table_columns_width = [
 ]
 
 leg_config_manager_table_columns_width = [
-    ("ConfigID", 382, "ConfigID"),
-    ("ConfigName", 382, "ConfigName"),
-    ("Description", 382, "Description"),
-    ("Status", 382, "Status"),
+    ("Config ID", 182, "ConfigID"),
+    ("Name", 182, "ConfigName"),
+    ("Description", 982, "Description"),
+    ("Status", 182, "Status"),
 ]
 
 
