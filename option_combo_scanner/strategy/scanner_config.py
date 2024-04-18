@@ -18,12 +18,13 @@ class Config:
         [setattr(self, key, value) for key, value in values_dict.items()]
 
         # Manage Conid, contract, Subscription # TODO
+        self.config_id = int(float(self.config_id))
         self.map_config_id_to_config_object()
 
     def map_config_id_to_config_object(self):
 
         # Assigning the current object to the 'config_object' variable within the 'strategy_variables'
-        strategy_variables.config_object = self
+        strategy_variables.map_config_id_to_config_object[self.config_id] = self
 
     def __str__(self) -> str:
 
@@ -42,3 +43,9 @@ class Config:
         )
 
         return config_tuple
+
+    def remove_from_system(
+        self,
+    ):
+        print(f"Deleteing the config: {self.config_id}")
+        del strategy_variables.map_config_id_to_config_object[self.config_id]
