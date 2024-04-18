@@ -150,6 +150,7 @@ class StrategyVariables:
         "Instrument ID",
         "Action",
         "Right",
+        "Quantity",
         "MinDelta",
         "MaxDelta",
         "MinDTE",
