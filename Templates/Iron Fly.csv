@@ -1,5 +1,5 @@
-Leg No,Instrument ID,Action,Right,MinDelta,MaxDelta,MinDTE,MaxDTE
-1,,Buy,Call,0.45,0.55,,
-2,,Buy,Put,-0.05,0.05,0,0
-3,,Sell,Call,-1,-0.01,0,0
-4,,Sell,Put,-0.05,0.05,0,0
+Leg No,Instrument ID,Action,Right,Quantity,MinDelta,MaxDelta,MinDTE,MaxDTE
+1,,Buy,Call,1,0.45,0.55,,
+2,,Buy,Put,1,-0.05,0.05,0,0
+3,,Sell,Call,1,-1,-0.01,0,0
+4,,Sell,Put,1,-0.05,0.05,0,0
