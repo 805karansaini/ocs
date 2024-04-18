@@ -3,9 +3,7 @@ from pprint import pprint
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.strategy_variables import (
-    StrategyVariables as strategy_variables,
-)
+from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
 
 logger = CustomLogger.logger
 
@@ -25,6 +23,9 @@ class Config:
 
         # Assigning the current object to the 'config_object' variable within the 'strategy_variables'
         strategy_variables.map_config_id_to_config_object[self.config_id] = self
+
+        # Add to min heap
+        strategy_variables.primary_min_heap_config.push((-1, self.config_id))
 
     def __str__(self) -> str:
 
@@ -49,3 +50,4 @@ class Config:
     ):
         print(f"Deleteing the config: {self.config_id}")
         del strategy_variables.map_config_id_to_config_object[self.config_id]
+        strategy_variables.primary_min_heap_config.delete_item(self.config_id)
