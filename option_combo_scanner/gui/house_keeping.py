@@ -5,9 +5,7 @@ from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.contracts import get_contract
 from option_combo_scanner.strategy.indicator import Indicator
 from option_combo_scanner.strategy.instrument import Instrument
-
-from option_combo_scanner.strategy.scanner_combination import \
-    ScannerCombination
+from option_combo_scanner.strategy.scanner_combination import ScannerCombination
 from option_combo_scanner.strategy.scanner_config import Config
 from option_combo_scanner.strategy.scanner_config_leg import ConfigLeg
 from option_combo_scanner.strategy.scanner_leg import ScannerLeg
@@ -22,9 +20,7 @@ class HouseKeepingGUI:
         scanner_inputs_tab_obj,
     ):
         # Get the Instrument from instrument table
-        all_instruments = SqlQueries.select_from_db_table(
-            table_name="instrument_table", columns="*"
-        )
+        all_instruments = SqlQueries.select_from_db_table(table_name="instrument_table", columns="*")
 
         # Insert the preset orders in the preset order tab[table]
         for values_dict in all_instruments:
@@ -34,59 +30,11 @@ class HouseKeepingGUI:
             scanner_inputs_tab_obj.insert_into_instrument_table(intrument_obj)
 
     @staticmethod
-    def dump_config_in_gui(
-        scanner_inputs_tab_obj,
-    ):
-
-        list_of_config_leg_object = HouseKeepingGUI.dump_all_config_in_config_tab(
-            scanner_inputs_tab_obj
-        )
-        HouseKeepingGUI.dump_all_common_config_in_config_tab(
-            scanner_inputs_tab_obj, list_of_config_leg_object
-        )
-
-    @staticmethod
-    def dump_all_config_in_config_tab(
-        scanner_inputs_tab_obj,
-    ):
-        # Get the config leg wise from Config Legs table
-        all_legs_config = SqlQueries.select_from_db_table(
-            table_name="config_legs_table", columns="*"
-        )
-        list_of_config_leg_object = []
-
-        # Insert the preset orders in the preset order tab[table]
-        for values_dict in all_legs_config:
-            config_leg_obj = ConfigLeg(values_dict)  # Mapping
-            list_of_config_leg_object.append(config_leg_obj)
-            scanner_inputs_tab_obj.insert_into_config_leg_table_helper(config_leg_obj)
-
-        return list_of_config_leg_object
-
-    @staticmethod
-    def dump_all_common_config_in_config_tab(
-        scanner_inputs_tab_obj, list_of_config_leg_object
-    ):
-        # Get the config from Config Table
-        all_config = SqlQueries.select_from_db_table(
-            table_name="config_table", columns="*"
-        )
-        # print(all_config)
-        for values in all_config:
-            values["list_of_config_leg_object"] = list_of_config_leg_object
-            config_obj = Config(values)
-            scanner_inputs_tab_obj.insert_into_common_config_table_helper(config_obj)
-
-
-
-    @staticmethod
     def dump_all_scanner_combinations_in_scanner_combination_tab(
         scanner_combination_tab_obj,
     ):
         # Get the Combintaion from combintation tabl
-        all_combinations = SqlQueries.select_from_db_table(
-            table_name="combination_table", columns="*"
-        )
+        all_combinations = SqlQueries.select_from_db_table(table_name="combination_table", columns="*")
 
         # Get the Combintaion Leg from legs table
         all_legs = SqlQueries.select_from_db_table(table_name="legs_table", columns="*")
@@ -115,9 +63,9 @@ class HouseKeepingGUI:
 
             # Creating the Leg Objects
             for leg_number in range(1, legs + 1):
-                    leg_values_dict = legs_look_up_dict[combo_id][leg_number]
+                leg_values_dict = legs_look_up_dict[combo_id][leg_number]
 
-                    list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
+                list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
 
             # Added the list of leg object
             combination["list_of_all_leg_objects"] = list_of_all_leg_objects
@@ -126,18 +74,14 @@ class HouseKeepingGUI:
             scanner_combination_object = ScannerCombination(combination)
 
             # Insert the Scanner combination in GUI
-            scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(
-                scanner_combination_object
-            )
+            scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
 
     @staticmethod
     def dump_all_indicator_values_in_indicator_tab(
         scanner_indicator_tab_obj,
     ):
         # Get the Indicators from Indicator table
-        all_indicator = SqlQueries.select_from_db_table(
-            table_name="indicator_table", columns="*"
-        )
+        all_indicator = SqlQueries.select_from_db_table(table_name="indicator_table", columns="*")
 
         for values_dict in all_indicator:
 
@@ -145,3 +89,27 @@ class HouseKeepingGUI:
 
             ### Add in the Indicator table
             scanner_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
+
+    @staticmethod
+    def dump_all_config_in_system(
+        scanner_inputs_tab_obj=None,
+    ):
+        # Get the config from Config Table
+        all_config = SqlQueries.select_from_db_table(table_name="config_table", columns="*")
+
+        # Get the config leg wise from Config Legs table
+        all_legs_config = SqlQueries.select_from_db_table(table_name="config_legs_table", columns="*")
+
+        for config_dict in all_config:
+
+            list_of_config_leg_object = []
+            # Insert the preset orders in the preset order tab[table]
+            for config_leg_dict in all_legs_config:
+                if config_leg_dict["config_id"] != config_dict["config_id"]:
+                    continue
+
+                config_leg_obj = ConfigLeg(config_leg_dict)  # Mapping
+                list_of_config_leg_object.append(config_leg_obj)
+
+            config_dict["list_of_config_leg_object"] = list_of_config_leg_object
+            config_obj = Config(config_dict)
