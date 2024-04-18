@@ -26,7 +26,10 @@ query2 = """CREATE TABLE IF NOT EXISTS `instrument_table` (
 query3 = """CREATE TABLE IF NOT EXISTS `config_table` (
             `config_id` INT AUTO_INCREMENT PRIMARY KEY,
             `no_of_leg` INT,
-            `description` VARCHAR(255)
+            `description` VARCHAR(255),
+            `status` VARCHAR(35),
+            `config_name` VARCHAR(45)
+            
         );"""
 
 query4 = """CREATE TABLE IF NOT EXISTS `config_legs_table` (
@@ -34,6 +37,7 @@ query4 = """CREATE TABLE IF NOT EXISTS `config_legs_table` (
             `instrument_id` INT,
             `config_id` INT, 
             `leg_number` INT,
+            `quantity` INT,
             `right` VARCHAR(50),
             `action` VARCHAR(50),
             `delta_range_min` DECIMAL(10, 8),
