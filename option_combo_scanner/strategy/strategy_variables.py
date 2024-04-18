@@ -5,6 +5,7 @@ from enum import Enum
 from typing import List, Tuple
 
 import pandas as pd
+from strategy.min_heap import MinHeap
 
 # # Read the config file
 config = configparser.ConfigParser()
@@ -233,4 +234,11 @@ class StrategyVariables:
 
     flag_ONE_for_max_pnl = "ONE"
 
-    list_of_sec_type_to_use_binary_search = ["OPT", "STK", "FUT", "FOP"]
+    # Used to by pass binary search for STK and OPT as we get data for those from polygon, BS for historical IV and Delta
+    list_of_sec_type_to_use_binary_search = ["FUT", "FOP"]
+
+    # Primary Heap for the Configs
+    primary_min_heap_config = MinHeap()
+
+    # Primary Heap for the Indicators
+    primary_min_heap_indicators = MinHeap()
