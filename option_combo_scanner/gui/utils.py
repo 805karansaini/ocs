@@ -11,6 +11,7 @@ import scipy
 from scipy.stats import norm
 
 from option_combo_scanner.custom_logger.logger import CustomLogger
+from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
@@ -129,63 +130,7 @@ class Utils:
         error_label = ttk.Label(message_frame, text=error_string, width=80, anchor="center")
         error_label.place(relx=0.5, rely=0.5, anchor="center")
 
-    # # Display table/treeview popup
-    # def display_treeview_popup_for_impact_calculation(title, list_of_columns_header, list_of_row_tuple):
-    #     style = ttk.Style()
 
-    #     # Pick a theme
-    #     style.theme_use("default")
-
-    #     # Configure our treeview colors
-    #     style.configure(
-    #         "Treeview",
-    #         background="#D3D3D3",
-    #         foreground="black",
-    #         rowheight=25,
-    #         fieldbackground="#D3D3D3",
-    #     )
-
-    #     # Change selected color
-    #     style.map("Treeview", background=[("selected", "blue")])
-
-    #     treeview_popup = tk.Toplevel()
-    #     treeview_popup.title(title)
-
-    #     # Create Treeview
-    #     treeview_table = ttk.Treeview(treeview_popup, columns=list_of_columns_header, show="headings")
-    #     treeview_table.pack(expand=True, fill="both")
-
-    #     # Define Our Columns
-    #     for column_name in list_of_columns_header:
-    #         treeview_table.heading(column_name, text=column_name)
-
-    #     treeview_table.tag_configure("oddrow", background="white")
-    #     treeview_table.tag_configure("evenrow", background="lightblue")
-    #     # Insert data rows
-    #     count = 0
-
-    #     for record in list_of_row_tuple:
-    #         if count % 2 == 0:
-    #             treeview_table.insert(
-    #                 parent="",
-    #                 index="end",
-    #                 iid=count,
-    #                 text="",
-    #                 values=record,
-    #                 tags=("evenrow",),
-    #             )
-    #         else:
-    #             treeview_table.insert(
-    #                 parent="",
-    #                 index="end",
-    #                 iid=count,
-    #                 text="",
-    #                 values=record,
-    #                 tags=("oddrow",),
-    #             )
-
-    #         count += 1
-    
     @staticmethod
     def display_treeview_popup(title, list_of_columns_header, list_of_row_tuple):
 
@@ -330,6 +275,24 @@ class Utils:
         Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(list_of_combo_ids)
 
     @staticmethod
+    def get_list_of_combo_ids_for_based_on_config_id(config_id):
+        # TODO - Check later. pass
+        # Query to fetch Combo ID such that config is is same
+        where_condition = f" WHERE `config_id` = '{config_id}';"
+        select_query = SqlQueries.create_select_query(
+            table_name="combination_table",
+            columns="`combo_id`",
+            where_clause=where_condition,
+        )
+
+        # Get all the combo ids for config_id
+        list_of_results_dict = SqlQueries.execute_select_query(select_query)
+
+        list_of_combo_ids = [int(float(_temp["combo_id"])) for _temp in list_of_results_dict]
+
+        return list_of_combo_ids
+
+    @staticmethod
     def remove_row_from_scanner_combination_table(
         list_of_combo_ids=None,
         instrument_id=None,
@@ -363,6 +326,7 @@ class Utils:
         list_of_indicator_ids=None,
         instrument_id=None,
     ):
+        # TODO - IMPORTANT Check KARAN ARYAN
         # Remove all the indicator based on the list_of_indicator_ids
         if list_of_indicator_ids is not None:
             # Remove rows from indicator table
@@ -398,9 +362,7 @@ class Utils:
 
             try:
                 # Update the row at once.
-                Utils.scanner_indicator_tab_object.option_indicator_table.item(
-                    indicator_id, values=row_values
-                    )
+                Utils.scanner_indicator_tab_object.option_indicator_table.item(indicator_id, values=row_values)
             except Exception as e:
                 print(f"Execption {e}")
 
