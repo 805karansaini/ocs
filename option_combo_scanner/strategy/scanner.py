@@ -44,7 +44,6 @@ class Scanner:
         self.config_obj = None  # copy.deepcopy(StrategyVariables.config_object)
         self.local_config_id_to_config_obj = copy.deepcopy(StrategyVariables.map_config_id_to_config_object)
 
-
     def check_do_we_need_to_restart_scan(
         self,
     ):
