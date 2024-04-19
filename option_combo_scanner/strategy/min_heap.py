@@ -49,3 +49,6 @@ class MinHeap:
 
     def __len__(self):
         return len(self.heap)
+
+    def __str__(self):
+        return ", ".join(map(str, self.heap))
