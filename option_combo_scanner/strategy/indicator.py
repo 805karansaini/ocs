@@ -100,6 +100,7 @@ class Indicator:
         # strategy_variables.scanner_indicator_table_df.reset_index(drop=True, inplace=True)
 
         del strategy_variables.map_indicator_id_to_indicator_object[self.indicator_id]
+        strategy_variables.primary_min_heap_indicators.delete_item(self.indicator_id)
 
     def map_indicator_id_to_indicator_object(self):
 
@@ -108,6 +109,10 @@ class Indicator:
         
         # Used by the Impact Calculation
         strategy_variables.map_instrument_to_indicator_id[self.instrument_id] = self.indicator_id
+
+        # Used for Heap Implementation
+        strategy_variables.primary_min_heap_indicators.push((-1, self.indicator_id))
+
 
         # # Create DataFrame
         # row = pd.DataFrame([self.get_tuple()], columns=strategy_variables.indicator_columns, index=[0],)
@@ -118,7 +123,6 @@ class Indicator:
         #     ignore_index=True,
         # )
 
-        # TODO - Comment
 
         # Check if the underlying contract ID is not already present in the map
         if self.underlying_conid not in strategy_variables.map_con_id_to_contract:
