@@ -143,12 +143,9 @@ class AlgoOneAPI(EClient, EWrapper):
             )
         # self.map_req_id_to_historical_data[request_id].append(historical_bars)
 
-    def historical_data_end(self, request_id: str):
-        print(f"Historical data end, Request id: {request_id}")
-        
+    def historical_data_end(self, request_id: str):        
         request_id = int(request_id)
         variables.req_mkt_data_end[request_id] = True
-
         # self.map_req_id_to_historical_data_ended[request_id] = True
 
     def error(
