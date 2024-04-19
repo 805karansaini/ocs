@@ -715,6 +715,11 @@ class variables(object):
             UserInputs.fop_exchange,
             UserInputs.fop_lot_size,
         ],
+        "IND OPT" : [
+            UserInputs.ind_opt_currency,
+            UserInputs.ind_opt_exchange,
+            UserInputs.ind_opt_lot_size,
+        ]
     }
 
     # TESTING
