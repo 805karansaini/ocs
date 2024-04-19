@@ -90,7 +90,7 @@ class ScannerCombination:
     def __str__(self) -> str:
 
         return f"Scanner Combination Object: {pprint(vars(self))}"
-    
+
     def get_combo_description(
         self,
     ):
@@ -123,7 +123,7 @@ class ScannerCombination:
                     combo_desc_string += f") -{leg_obj.qty}, "
 
         return combo_desc_string
-    
+
     def get_scanner_combination_tuple_for_gui(
         self,
     ):
@@ -149,8 +149,10 @@ class ScannerCombination:
         )
 
         return combination_tuple
-    
-    def dispaly_combination_impact(self,):
+
+    def dispaly_combination_impact(
+        self,
+    ):
 
         # Getitng the CombinationObj, ComboID, List of ComboLegObj
         combo_obj = self
@@ -159,7 +161,15 @@ class ScannerCombination:
 
         # Config ID, Confg Object, ListOfConfigLegObj
         config_id = combo_obj.config_id
-        config_obj = copy.deepcopy(strategy_variables.config_object)
+
+        if not config_id in strategy_variables.map_config_id_to_config_object:
+            Utils.display_message_popup(
+                    "Error",
+                    f"Can not compute the Impact: Unable to find Config ID: {config_id}",
+                )
+            return 
+        
+        config_obj = copy.deepcopy(strategy_variables.map_config_id_to_config_object[config_id])
         list_of_config_leg_object = config_obj.list_of_config_leg_object
 
         # Creating the list_of_combo_leg_tuples_with_config_leg
@@ -167,15 +177,30 @@ class ScannerCombination:
 
         # Adding the config_leg_obj to the leg_tuple
         for combo_leg_object, config_leg_obj in zip(list_of_combo_leg_object, list_of_config_leg_object):
-            temp_list = [combo_leg_object.symbol, combo_leg_object.strike, None, None, combo_leg_object.expiry, None, None, None, combo_leg_object.underlying_conid, config_leg_obj]
+            temp_list = [
+                combo_leg_object.symbol,
+                combo_leg_object.strike,
+                None,
+                None,
+                combo_leg_object.expiry,
+                None,
+                None,
+                None,
+                combo_leg_object.underlying_conid,
+                config_leg_obj,
+            ]
             list_of_combo_leg_tuples_with_config_leg.append(tuple(temp_list))
-        
+
         # Creating the Groups Based on the Underlying
-        map_underlying_conid_to_list_of_combination_group: dict = MaxPNLCalculation.create_group_same_und(list_of_combo_leg_tuples_with_config_leg, flag_return_dict=True)
+        map_underlying_conid_to_list_of_combination_group: dict = MaxPNLCalculation.create_group_same_und(
+            list_of_combo_leg_tuples_with_config_leg, flag_return_dict=True
+        )
         list_of_combination_groups = list(map_underlying_conid_to_list_of_combination_group.values())
 
         # Get the list of closest expiry for the groups
-        list_of_closest_expiry_for_each_group = MaxPNLCalculation.find_closest_expiry_for_groups(list_of_combination_groups,)
+        list_of_closest_expiry_for_each_group = MaxPNLCalculation.find_closest_expiry_for_groups(
+            list_of_combination_groups,
+        )
 
         # Alway use ONE Overall Nearest Expiry Calculation Mode
         closest_expiry = min(list_of_closest_expiry_for_each_group)
@@ -183,9 +208,9 @@ class ScannerCombination:
         # 1.a We want to get the Current Price of Underlying Contract.
         # 1.b We want to get the Current Market Data for Option Contracts.
         # 1.c if required data is not available, throw an error popup.
-        # 2. Manupulate the leg tuples, meaning update the None to fetched values 
+        # 2. Manupulate the leg tuples, meaning update the None to fetched values
         # 3. Impact
-        
+
         # List of underlying contracts
         list_of_underlying_contract = []
 
@@ -194,9 +219,9 @@ class ScannerCombination:
 
         list_of_multiplier_for_combo_group = []
 
-        # Underlying Contracts 
+        # Underlying Contracts
         for underlying_conid, combination_group in map_underlying_conid_to_list_of_combination_group.items():
-            
+
             # Unpacking the first leg
             symbol, _, _, _, _, _, _, _, underlying_conid, config_leg_obj = combination_group[0]
 
@@ -207,18 +232,18 @@ class ScannerCombination:
             if _instrument_id not in strategy_variables.map_instrument_id_to_instrument_object:
                 Utils.display_message_popup(
                     "Error",
-                f"Can not compute the Impact: Unable to find Instrument ID: {_instrument_id}",
+                    f"Can not compute the Impact: Unable to find Instrument ID: {_instrument_id}",
                 )
                 return
-            
+
             # Get the instrument object details for contract creation
             instrument_obj_ = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object[_instrument_id])
-            instrument_sec_type  = instrument_obj_.sec_type
+            instrument_sec_type = instrument_obj_.sec_type
             instrument_exchange = instrument_obj_.exchange
-            instrument_currency  = instrument_obj_.currency
-            instrument_multiplier  = instrument_obj_.multiplier
-            instrument_trading_class  = instrument_obj_.trading_class
-            
+            instrument_currency = instrument_obj_.currency
+            instrument_multiplier = instrument_obj_.multiplier
+            instrument_trading_class = instrument_obj_.trading_class
+
             # Appending the group/instrument multiplier
             list_of_multiplier_for_combo_group.append(instrument_multiplier)
 
@@ -252,15 +277,15 @@ class ScannerCombination:
                 contract_details = get_contract_details(underlying_contract)
                 underlying_contract.lastTradeDateOrContractMonth = contract_details.contract.lastTradeDateOrContractMonth
                 #  '{"contract_type":"FUT","ticker":"ES","right":"","expiry":"20240621","strike":0.0,"currency":"USD","trading_class":"ES","exchange":"CME","multiplier":50}', 'duration': 27, 'bar_size': 1, 'bar_unit': 'hour', 'bar_type': 'BID', 'flag_rth_only': True}}
-            
+
             # Append the underlying contract to the list
             list_of_underlying_contract.append(underlying_contract)
 
-            # Creating & Appending the OPT contracts for the group in the list 
+            # Creating & Appending the OPT contracts for the group in the list
             for combo_leg_tuple in combination_group:
                 (symbol, strike, delta, conid, expiry, bid, ask, iv, underlying_conid, config_leg_obj) = combo_leg_tuple
-                
-                # Right from the ConfigLegObject 
+
+                # Right from the ConfigLegObject
                 right = config_leg_obj.right
 
                 option_contract = get_contract(
@@ -275,13 +300,13 @@ class ScannerCombination:
                     trading_class=instrument_trading_class,
                 )
                 list_of_option_contracts.append(option_contract)
-        
+
         # Merged in list of both underlying and option contract
         list_underlying_and_option_contracts = list_of_underlying_contract + list_of_option_contracts
-        
+
         generic_tick_list = "101"
         snapshot = False
-        flag_market_open=variables.flag_market_open
+        flag_market_open = variables.flag_market_open
         max_wait_time = 9
 
         # Fetch Data for all the Contracts
@@ -297,10 +322,14 @@ class ScannerCombination:
 
         # Splitting the list for underlying and opt contracts
         number_of_groups = len(list_of_combination_groups)
-        underlying_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple = list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple[:number_of_groups]
-        options_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple = list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple[number_of_groups:]
+        underlying_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple = (
+            list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple[:number_of_groups]
+        )
+        options_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple = (
+            list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple[number_of_groups:]
+        )
 
-        list_of_underlying_price_for_combo_group  = []
+        list_of_underlying_price_for_combo_group = []
 
         # Perform Validation, to make sure we have all the data to compute impact.
         # i.e. underlying: bid, ask | option: bid,ask,iv
@@ -315,13 +344,14 @@ class ScannerCombination:
             put_oi,
             _,
             _,
-            _
+            _,
+            _,
         ) in underlying_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple:
 
             if bid_price is None or ask_price is None:
                 Utils.display_message_popup(
-                   f"Error Combo ID: {combo_id}",
-                f"Bid Price or Ask Price is None",
+                    f"Error Combo ID: {combo_id}",
+                    f"Bid Price or Ask Price is None",
                 )
                 return
                 # Show error popup and return
@@ -338,26 +368,29 @@ class ScannerCombination:
             list_of_number_of_legs_in_combo.append(N)
 
             for leg_tuple in combination_group:
-                
+
                 temp_list_of_combination_legs.append(list(leg_tuple))
 
         print(f"temp list of combination leg:{temp_list_of_combination_legs} ")
 
         # Update the legs_tuple for each combination group.
-        for i, (leg_info_list, (
-            delta,
-            iv_ask,
-            iv_bid,
-            iv_last,
-            bid_price,
-            ask_price,
-            call_oi,
-            put_oi,
-            _,
-            _,
-            _,
-        )) in enumerate(zip(temp_list_of_combination_legs, options_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple)):
-            
+        for i, (
+            leg_info_list,
+            (
+                delta,
+                iv_ask,
+                iv_bid,
+                iv_last,
+                bid_price,
+                ask_price,
+                call_oi,
+                put_oi,
+                _,
+                _,
+                _,
+                _,
+            ),
+        ) in enumerate(zip(temp_list_of_combination_legs, options_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple)):
 
             if bid_price is None or ask_price is None or iv_ask is None:
                 # Show error popup and return
@@ -366,69 +399,69 @@ class ScannerCombination:
                     f"Bid Price or Ask Price or IV is None",
                 )
                 return
-                
+
                 # return False
             else:
-                temp_list_of_combination_legs[i][5] = bid_price 
-                temp_list_of_combination_legs[i][6] = ask_price 
-                temp_list_of_combination_legs[i][7] = iv_ask 
-
+                temp_list_of_combination_legs[i][5] = bid_price
+                temp_list_of_combination_legs[i][6] = ask_price
+                temp_list_of_combination_legs[i][7] = iv_ask
 
         new_list_of_combination_groups = []
-        
+
         start = 0
         print("list_of_number_of_legs_in_combo", list_of_number_of_legs_in_combo)
         for legs__ in list_of_number_of_legs_in_combo:
-            
+
             # Start index for this new group
             end = start + legs__
 
             # New Group
             new_group = temp_list_of_combination_legs[start:end]
             new_list_of_combination_groups.append(new_group)
-            
+
             # Update the start index
             start = end
 
         # Rename the variable
         list_of_combo_group = new_list_of_combination_groups
-        
+
         print(f"list of combo group: {list_of_combo_group}")
         print(f"list_of_underlying_price_for_combo_group: {list_of_underlying_price_for_combo_group}")
 
         res = []
-        
+
         # Title and List of Impacts in the UserInputs
         title = f"Impact of Combo, Combo ID : {combo_id}"
         list_of_impact_percent = strategy_variables.list_of_percent_for_impact_calcluation
 
-        # Closest Expiry for displaying        
+        # Closest Expiry for displaying
         impact_value_groups = [closest_expiry]
-        
+
         # For each group(same underlying) calcluate the impact
-        for underlying_price, combination_group, multiplier in zip(list_of_underlying_price_for_combo_group, list_of_combo_group, list_of_multiplier_for_combo_group):
-            
+        for underlying_price, combination_group, multiplier in zip(
+            list_of_underlying_price_for_combo_group, list_of_combo_group, list_of_multiplier_for_combo_group
+        ):
+
             print(f"Underlying Price: {underlying_price}")
             print(f"Combination Group: {combination_group}\n")
 
             list_of_config_leg_objects = [_[-1] for _ in combination_group]
-
 
             group_res = []
             # Loop over the list of impact percent
             for impact_per in list_of_impact_percent:
                 underlying_strike_price = (underlying_price * (100 + impact_per)) / 100
 
-                # Get the combination payoff 
+                # Get the combination payoff
                 print(f"Impact-UnderlyingPrice: {underlying_price}, \nCombination Group: {combination_group}, {multiplier=}")
                 combination_payoff = MaxPNLCalculation.get_combination_payoff(
                     list_of_legs_tuple=combination_group,
                     list_of_config_leg_object=list_of_config_leg_objects,
-                    underlying_strike_price = underlying_strike_price,
+                    underlying_strike_price=underlying_strike_price,
                     closest_expiry=closest_expiry,
                     multiplier=multiplier,
                 )
-                
+
                 print(f"Combintaion Payoff : {combination_payoff}")
                 # Store the groupwise combination payoff
                 group_res.append(round(combination_payoff, 2))
@@ -497,7 +530,7 @@ def get_scanner_combination_details_column_and_data_from_combo_object(
         currency = leg_obj.currency
         right = leg_obj.right
         multiplier = leg_obj.multiplier
-        primary_exchange = leg_obj.primary_exchange if leg_obj.primary_exchange else ''
+        primary_exchange = leg_obj.primary_exchange if leg_obj.primary_exchange else ""
         trading_class = leg_obj.trading_class
         # append values to list
         leg_data_tuple_list.append(
