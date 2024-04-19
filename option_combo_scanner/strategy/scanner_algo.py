@@ -13,6 +13,7 @@ from com.option_comobo_scanner_idetif import (
     find_nearest_expiry_for_future_given_fut_dte,
 )
 from option_combo_scanner.cache.data_store import DataStore
+from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.indicators_calculator.helper_indicator import IndicatorHelper
@@ -22,17 +23,16 @@ from option_combo_scanner.strategy.indicator import Indicator
 # from option_combo_scanner.strategy.scanner import Scanner
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
+scanner_logger = CustomLogger.scanner_logger
+
 
 class ScannerAlgo:
     scanner_indicator_tab_obj = None
 
     # def __init__(self):
-    def __init__(self, config_obj):
+    def __init__(self, config_obj, config_id):
         self.config_obj = config_obj
-        # self.strike_and_delta_dataframe = strike_and_delta_dataframe
-
-        # Filter the nan Values
-        # self.filter_dataframe()
+        self.config_id = config_id
 
     def get_strike_and_closet_expiry_for_fop(
         self,
@@ -264,10 +264,6 @@ class ScannerAlgo:
                 (self.strike_and_delta_dataframe["Delta"] < StrategyVariables.max_delta_threshold)
             ]
 
-        # print("\nFiltered DF")
-        # from tabulate import tabulate
-        # print(tabulate(self.strike_and_delta_dataframe, headers="keys", tablefmt="psql", showindex=False))
-
     @staticmethod
     def get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange):
         # right = contract.right.lower()
@@ -292,9 +288,6 @@ class ScannerAlgo:
         # if self.check_do_we_need_to_restart_scan():
         #         print(f"Early Termination: {self.config_obj}")
         #         return []
-
-        # If we can get all the valid strikes over all the valid expiries for the leg, then we are good.
-        # list_of_filter_legs = self.filter_strikes(range_low, range_high,) # ConfigLeg, Expiry of the perivous leg N-1 Leg,
 
         # Get the all the details for contract creation
         instrument_id = int(leg_object.instrument_id)
@@ -372,6 +365,10 @@ class ScannerAlgo:
             all_strikes = sorted(all_strikes)
             for closest_expiry in expiry_date_in_range:
                 map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
+
+            print(
+                f"InstrumentID: {instrument_id} low_date: {low_range_date_str} high_date: {high_range_date_str} All Epxiry: {expiry_date_in_range}"
+            )
 
             # Update the indicator table for the given list of expiry
             self.update_indicator_table_for_instrument(
@@ -494,17 +491,20 @@ class ScannerAlgo:
     @cache
     def generate_combinations(self, remaining_no_of_legs, range_low, range_high, current_expiry, leg_object):
 
-        # get the list of filter legs between the given range for the expiry
+        scanner_logger.debug(
+            f"ScannerAlgo.generate_combinations, Config ID: {self.config_id} Inputs: {remaining_no_of_legs=} {range_low=} {range_high=} {current_expiry=} {leg_object=}"
+        )
+
+        # Get the list of filter legs between the given range for the expiry
         list_of_filter_legs = self.filter_strikes(range_low, range_high, current_expiry, remaining_no_of_legs, leg_object)
-        # Current_expiry, ConfigLeg, Expiry of the perivous leg N-1 Leg: Current Date
-        # ("Strike", "Expiry", "Delta", "ConId"),
 
-        # print(f"Leg Object: {leg_object}")
-        # print(f"List of filter leg: {list_of_filter_legs}")
+        scanner_logger.debug(
+            f"ScannerAlgo.generate_combinations, Config ID: {self.config_id} No. of Filtered Legs: {len(list_of_filter_legs)}"
+        )
 
-        # todo early teminate
+        # Check early teminate
         if self.check_do_we_need_to_restart_scan():
-            print(f"Early Termination: {self.config_obj}")
+            scanner_logger.info(f"ScannerAlgo.generate_combinations, Config ID: {self.config_id} Early Termination")
             return []
 
         list_of_partial_combination = []
@@ -537,6 +537,7 @@ class ScannerAlgo:
                 leg_number,
                 _,
                 action,
+                _qty,
                 _,
                 delta_range_min,
                 delta_range_max,
@@ -581,34 +582,61 @@ class ScannerAlgo:
                     temp.extend(next_legs_strike_delta_and_con_id)
                     list_of_partial_combination.append(temp)
 
-        # print(f"remaining_no_of_legs {remaining_no_of_legs} list_of_partial_combination", list_of_partial_combination)
         return list_of_partial_combination
 
     def filter_list_of_combination(self, list_of_combination):
+        """
+        Combo:
+        Leg 1: AAPL 20240419 C 100 +1,
+        Leg 2: AAPL 20240419 C 100 -1,
+        Leg 3: AAPL 20240419 C 110 +2,
+
+        Net Combo => AAPL 20240419 C 110 +2
+        So we will be ignoring all such combos.
+        """
 
         temp_list_of_combination = []
+
         for combo in list_of_combination:
             temp_list_of_combination.append(tuple(combo))
 
-            # temp_list_of_combination.append(tuple([strike for strike, delta in combo]))
-
+        # (instrumnt, C/P, expiry, strike, )
         set_of_combination = set(temp_list_of_combination)
 
+        # Get the list of config_leg object
+        list_of_config_leg_object = self.config_obj.list_of_config_leg_object
+
         list_of_filter_combination = []
+
         for combination in set_of_combination:
+
             set_of_legs = set()
-            for leg in combination:
-                strike = leg
-                if strike in set_of_legs:
+
+            for leg_tuple, leg_object in zip(combination, list_of_config_leg_object):
+                # Extract the Strike, Expiry
+                _, strike, delta, conid, expiry, _, _, _, _, _, _, _, _ = leg_tuple
+
+                # Get the action and instrument id from leg object
+                right = leg_object.right
+                instrument_id = leg_object.instrument_id
+
+                if (instrument_id, right, expiry, strike) in set_of_legs:
                     break
-                set_of_legs.add(strike)
+
+                # Add the unique instrument id expiry strike action
+                set_of_legs.add((instrument_id, right, expiry, strike))
             else:
                 list_of_filter_combination.append(combination)
 
         return list_of_filter_combination
 
     def remove_duplicate_combo_different_order(self, list_of_filter_combination):
-
+        """
+        Below cases are also ignored for duplicates
+        Duplicate:
+            AAPL 20240419 C 105 +1,  AAPL 20240419 C 110 +2,  AAPL 20240419 C 100 -1
+            AAPL 20240419 C 110 +2,  AAPL 20240419 C 105 +1,  AAPL 20240419 C 100 -1
+        """
         list_of_config_leg_object = self.config_obj.list_of_config_leg_object
         unique_filter_combination = []
         seen_combination = set()
@@ -625,12 +653,18 @@ class ScannerAlgo:
                 # Get the leg number & action for the leg, from the respective leg_object
                 leg_number = leg_object.leg_number
                 action = leg_object.action
+                qty = leg_object.quantity
+                instrument_id = leg_object.instrument_id
+                right = leg_object.right
                 # Unpack the Strike Delta & Conid from a Leg:  (5100.0B, 0.6981448441368908, 0)
-                _, strike, delta, conid, _, _, _, _, _, _, _, _, _ = leg_tuple
+                _, strike, delta, conid, expiry, _, _, _, _, _, _, _, _ = leg_tuple
 
-                temp_leg_tuple = (strike, action)
+                # AAPL 20240419 C 100 +1, AAPL 20240419 C 110 +2, AAPL 20240419 C 100 -1
+
+                temp_leg_tuple = (instrument_id, expiry, right, strike, action, qty)
                 temp_combination.append(temp_leg_tuple)
 
+            temp_combination = sorted(temp_combination)
             # Cast to Tuple: so combination can be hashed
             temp_combination = tuple(temp_combination)
 
@@ -643,6 +677,8 @@ class ScannerAlgo:
 
     def run_scanner(self, remaining_no_of_legs, range_low, range_high, current_date, leg_object):
 
+        scanner_logger.info(f"ScannerAlgo.run_scanner, Config ID: {self.config_id} Generating Combos")
+
         list_of_combination = self.generate_combinations(
             remaining_no_of_legs,
             range_low,
@@ -650,10 +686,20 @@ class ScannerAlgo:
             current_expiry=current_date,
             leg_object=leg_object,
         )
+
+        scanner_logger.info(f"ScannerAlgo.run_scanner, Config ID: {self.config_id} No. of Generated Combos: {len(list_of_combination)}")
+
         # print("combination", list_of_combination)
         # print("list_of_combination", list_of_combination)
         list_of_filter_combination = self.filter_list_of_combination(list_of_combination)
+
+        scanner_logger.info(f"ScannerAlgo.run_scanner, Config ID: {self.config_id} No. of Filtered Combos: {len(list_of_combination)}")
+
         list_of_filter_combination_without_dup = self.remove_duplicate_combo_different_order(list_of_filter_combination)
+
+        scanner_logger.info(
+            f"ScannerAlgo.run_scanner, Config ID: {self.config_id} No. of Unique Combos: {len(list_of_filter_combination_without_dup)}"
+        )
 
         return list_of_filter_combination_without_dup
 
