@@ -17,14 +17,15 @@ class CustomLogger:
         # Create a logger
         self.logger = logging.getLogger(self.logger_name)
 
+        # Current Date in YYYYMMDD
+        current_date = datetime.datetime.now().strftime("%Y%m%d")
+        
         # Create the log directory if it doesn't exist
-        log_dir = "Logs"
+        log_dir = fr"Logs\{current_date}"
         os.makedirs(log_dir, exist_ok=True)
 
-        current_date = datetime.datetime.now().strftime("%Y%m%d")
-
         # Create a file handler and specify the log file path
-        log_file = rf"{log_dir}\{current_date}\{self.logger_name}.txt"
+        log_file = rf"{log_dir}\{self.logger_name}.txt"
 
         file_handler = logging.FileHandler(log_file, mode="w")
 
