@@ -5,14 +5,14 @@ from enum import Enum
 from typing import List, Tuple
 
 import pandas as pd
-from strategy.min_heap import MinHeap
+
+from option_combo_scanner.strategy.min_heap import MinHeap
 
 # # Read the config file
 config = configparser.ConfigParser()
 config.read("option_scanner_user_inputs.ini")
 
 # Settings from config file
-
 time_zone_config = config["TimeZone"]
 
 
