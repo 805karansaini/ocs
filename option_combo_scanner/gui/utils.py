@@ -413,6 +413,10 @@ class Utils:
         print("market_premium=" + str(market_premium))
         print("opt_type=" + str(opt_type))    
         """
+        # Handling the case if t is 0
+        if t == 0:
+            t = 1/365
+            
 
         # Inits
         tolerance = 0.0001
@@ -465,7 +469,11 @@ class Utils:
     def get_theoretical_premium(S, r1, r2, t, X, sigma, opt_type):
         if S == 0:
             S = 0.0001
-            
+        
+        # Handling the case if t is 0
+        if t == 0:
+            t = 1/365
+
         sigma_t = sigma * math.sqrt(t)
         d1 = (math.log(S / X) + ((r1 + math.pow(sigma, 2) / 2) * t)) / sigma_t
         d2 = d1 - sigma_t
@@ -499,6 +507,10 @@ class Utils:
         """
         opt_type = opt_type.upper()
 
+        # Handling the case if t is 0
+        if t == 0:
+            t = 1/365
+            
         sigma = Utils.get_implied_volatility(S, r1, r2, t, X, market_premium, opt_type)
 
         if sigma is float("NaN"):

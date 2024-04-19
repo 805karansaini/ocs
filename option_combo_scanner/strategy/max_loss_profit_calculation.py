@@ -265,6 +265,8 @@ class MaxPNLCalculation:
             
             # InstrumentID, and InstrumentObject for multiplier
             instrument_id = config_leg_obj.instrument_id
+            quantity = config_leg_obj.quantity
+
             if instrument_id not in strategy_variables.map_instrument_id_to_instrument_object:
                 print(f"Inside get_combination_payoff function could not find instrument id: {instrument_id}")
                 return 0
@@ -299,7 +301,7 @@ class MaxPNLCalculation:
                     intial_leg_premium,
                 )
                 # Add to combination off the sign is already adjusted in the option_payoff method
-                combination_payoff += leg_payoff
+                combination_payoff += (leg_payoff * quantity)
 
             # Calculate the OptionPayoff for the further expiry than the closest expiry, holds the TimeValueOfOption
             else:
@@ -308,6 +310,11 @@ class MaxPNLCalculation:
                 leg_expiry_obj = datetime.datetime.strptime(leg_expiry, "%Y%m%d")
                 closest_expiry_obj = datetime.datetime.strptime(closest_expiry, "%Y%m%d")
                 time_to_expiration = abs(leg_expiry_obj - closest_expiry_obj).days
+
+                # Handle Case where 'time_to_expiration' is 0
+                if time_to_expiration == 0:
+                    time_to_expiration = 1
+
                 time_to_expiration = (time_to_expiration) / 365
 
                 # Theoretical Premium
@@ -317,7 +324,7 @@ class MaxPNLCalculation:
                 leg_payoff = 1*leg_payoff if config_leg_obj.action.upper() == "BUY" else -1*leg_payoff
                 leg_payoff *= int(multiplier)
                 
-                combination_payoff += leg_payoff 
+                combination_payoff += (leg_payoff * quantity)
                 print(f"        Theortical Premimum Function Inputs: {underlying_strike_price= }, RR1: {strategy_variables.riskfree_rate1}, TTE: {time_to_expiration}, Strike:{option_strike}, IV: {leg_iv}, Right: {config_leg_obj.right}")
                 print(f"        Theortical Premimum: Payoff/Ther.Prem: {leg_payoff} for Strike: {option_strike} for Expiry: {leg_expiry}")
 
@@ -424,8 +431,9 @@ class MaxPNLCalculation:
             
             # InstrumentID, and InstrumentObject for multiplier
             instrument_id = config_leg_obj.instrument_id
+            quantity = config_leg_obj.quantity
             instrument_object_for_leg_prem = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object[instrument_id])
-            # TODO HANDLE IT ARYAN - IMPORTANT
+            # TODO HANDLE IT ARYAN - IMPORTANT -  ARYAN TODO
 
             # Unpacking the combination leg tuple
             symbol, option_strike,_, _, leg_expiry, bid, ask, leg_iv,_, _ = leg
@@ -447,7 +455,7 @@ class MaxPNLCalculation:
             )
 
             # TODO 
-            combination_premium_received += leg_premium_received
+            combination_premium_received += (leg_premium_received * quantity)
 
         return combination_premium_received
 

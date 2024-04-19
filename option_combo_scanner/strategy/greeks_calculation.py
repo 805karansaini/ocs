@@ -1,10 +1,13 @@
-from collections import defaultdict
 import datetime
 import math
+from collections import defaultdict
+
 import scipy.stats
 
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
+
+
 class CalcluateGreeks:
     def compute_all_greeks(combination, list_of_config_leg_object):
 
@@ -15,15 +18,21 @@ class CalcluateGreeks:
             # Unpack the values stored in tuple
             _,strike,_,_,expiry,bid,ask,_,_,vega,theta,gamma,underlying_price = leg_tuple
             options_prem = (bid + ask)/2
+            quantity = config_leg_object.quantity
+
             # Calcluate the time to expiration for the greeks
             current_date = datetime.datetime.today().strftime("%Y%m%d")
             current_date_obj = datetime.datetime.strptime(current_date, "%Y%m%d")
 
             expiry_date_obj = datetime.datetime.strptime(expiry, "%Y%m%d")
-            time_to_expiration = (abs(current_date_obj - expiry_date_obj).days)/365
+            time_to_expiration = (abs(current_date_obj - expiry_date_obj).days)
+
+            # Handling the case when 'time_to_expiration' is 0 
+            if time_to_expiration == 0:
+                time_to_expiration = 1
+            time_to_expiration = (time_to_expiration)/365
 
             # Get the IV for the greeks calcluation
-            print
             sigma = Utils.get_implied_volatility(float(underlying_price), StrategyVariables.riskfree_rate1, 0, time_to_expiration, strike, options_prem, config_leg_object.right)
             # Calcluate Vanna greeks for each leg_tuple
             vanna = CalcluateGreeks.calculate_vanna(float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0)
@@ -59,9 +68,9 @@ class CalcluateGreeks:
             }
             for greek, value in greeks_dict.items():
                 if config_leg_object.action.upper() == "BUY":
-                    net_greeks[greek] += float(value)
+                    net_greeks[greek] += (float(value) * quantity)
                 elif config_leg_object.action.upper() == "SELL":
-                    net_greeks[greek] -= float(value)
+                    net_greeks[greek] -= (float(value) * quantity)
 
             # Append the dictionary of Greeks for the current leg to the list
             list_of_greeks_dicts_for_leg_tuple.append(greeks_dict)
