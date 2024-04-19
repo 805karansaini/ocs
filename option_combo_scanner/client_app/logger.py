@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 
@@ -20,8 +21,10 @@ class CustomLogger:
         log_dir = "Logs"
         os.makedirs(log_dir, exist_ok=True)
 
+        current_date = datetime.datetime.now().strftime("%Y%m%d")
+
         # Create a file handler and specify the log file path
-        log_file = rf"{log_dir}\{self.logger_name}.txt"
+        log_file = rf"{log_dir}\{current_date}\{self.logger_name}.txt"
 
         file_handler = logging.FileHandler(log_file, mode="w")
 

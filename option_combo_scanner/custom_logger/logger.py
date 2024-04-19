@@ -58,3 +58,6 @@ class CustomLogger:
 
     name = f"Log-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
     logger = get_logger(name=name)
+
+    name = f"Scanner-Log-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+    scanner_logger = get_logger(name=name)
