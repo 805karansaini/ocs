@@ -18,36 +18,41 @@ from option_combo_scanner.gui.scanner_inputs_tab import ScannerInputsTab
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.recovery_mode import RecoveryMode
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.indicators_calculator.indicator_calculation import \
-    IndicatorCalculation
-from option_combo_scanner.strategy.scanner import (Scanner, run_option_combo_scanner)
+from option_combo_scanner.indicators_calculator.indicator_calculation import IndicatorCalculation
+from option_combo_scanner.strategy.scanner import Scanner, run_option_combo_scanner
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 from option_combo_scanner.strategy.utilities import StrategyUtils
 
 logger = CustomLogger.logger
 
+
 def run_indicator_thread():
     # While Screen is open
     while True:
         try:
-            # S
+            # Start Time
             start_time = time.time()
-            IndicatorCalculation.compute_indicators() 
-            # E
+            
+            IndicatorCalculation.compute_indicators()
+            
+            # End Time
             end_time = time.time()
+            
             time_taken = end_time - start_time
             print(f"Time taken to compute indicators: {time_taken} seconds")
         except Exception as e:
             logger.error(f"Exception in indicator thread loop: {e}")
             print(f"Exception in indicator thread loop: {e}")
             traceback.print_exc()
-        
+
         print("End of indicators Calculation")
         time.sleep(20)
+
 
 # Method to run app
 def run_loop(app):
     app.run()
+
 
 if __name__ == "__main__":
 
@@ -62,10 +67,9 @@ if __name__ == "__main__":
         screen.window.mainloop()
 
         logger.debug("main.py run_sceen: Screen Closed")
-    
 
     # # Check if the user wants to delete the database
-    flag_start_in_recovery_mode =   StrategyVariables.flag_recovery_mode
+    flag_start_in_recovery_mode = StrategyVariables.flag_recovery_mode
 
     # Recovery Mode is False, start fresh
     if not flag_start_in_recovery_mode:
@@ -79,24 +83,22 @@ if __name__ == "__main__":
         asyncio.set_event_loop(loop)
         loop.run_forever()
         print("End in loop")
-    
+
     # Create a new event loop and start it in a new thread
     new_loop = asyncio.new_event_loop()
     t = threading.Thread(target=start_loop, args=(new_loop,))
     t.start()
 
     time.sleep(1)
-    
+
     # Creating the Data Server Client
-    ds_client = AlgoOneAPI(
-        data_server_host="25.38.187.70", data_server_port=8765, data_server_client_id=123, loop=new_loop
-    )
+    ds_client = AlgoOneAPI(data_server_host="25.38.187.70", data_server_port=8765, data_server_client_id=123, loop=new_loop)
     ds_client.start()
 
     # Wait for the connection
     while not ds_client.is_connected():
         time.sleep(0.2)
-    ######## End New Data Server Integration Changes
+    ####### End New Data Server Integration Changes
 
     com_variables.ds_client = ds_client
 
@@ -114,8 +116,7 @@ if __name__ == "__main__":
     # Start the web socket in a thread
     api_thread = threading.Thread(target=run_loop, args=(app,), daemon=True)
     api_thread.start()
-    
-    
+
     # Check if the API is connected via order id
     while True:
         if isinstance(com_variables.nextorderId, int):
@@ -151,20 +152,23 @@ if __name__ == "__main__":
 
     # TODO - Restart later on
     # Creating a separate thread
-    # scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
-    # scanner_thread.start()
+    scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
+    scanner_thread.start()
 
     indicator_thread = threading.Thread(target=run_indicator_thread, daemon=True)
     indicator_thread.start()
-    
+
     # Creating the Scanner Object
     # scanner_input = ScannerInputsTab(scanners_object)
     # While Screen is open
     while IsScreenRunning.flag_is_screen_running:
+        # print(f"\n\n# of Configs: {StrategyVariables.map_config_id_to_config_object}")
+        # print(StrategyVariables.map_config_id_to_config_object)
+
         # print(f"Threading active count: {threading.active_count()}")
         time.sleep(5)
         try:
-            # IndicatorCalculation.compute_indicators(), 
+            # IndicatorCalculation.compute_indicators(),
             pass
         except Exception as e:
             logger.error(f"Exception in main screen loop: {e}")
@@ -196,9 +200,6 @@ while count < rep:
     time.sleep(1)
 else:
     os._exit(0)
-
-
-
 
 
 """
