@@ -357,7 +357,10 @@ class IndicatorHelper:
             if value is None:
                 continue
             values_dict_for_db[key] = f"{value}" + f"|{current_time}"
-
+            
+        # If vale dict empty simply return 
+        if not values_dict_for_db:
+            return
         where_condition = f" WHERE `indicator_id` = {indicator_id};"
 
         update_query = SqlQueries.create_update_query(
