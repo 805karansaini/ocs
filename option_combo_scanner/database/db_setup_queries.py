@@ -42,8 +42,8 @@ query4 = """CREATE TABLE IF NOT EXISTS `config_legs_table` (
             `action` VARCHAR(50),
             `delta_range_min` DECIMAL(10, 8),
             `delta_range_max` DECIMAL(10, 8),
-            `dte_range_min` DECIMAL(10, 8),
-            `dte_range_max` DECIMAL(10, 8),
+            `dte_range_min` INT,
+            `dte_range_max` INT,
             FOREIGN KEY (`config_id`) REFERENCES `config_table`(`config_id`) ON DELETE CASCADE,
             FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE
         );"""
