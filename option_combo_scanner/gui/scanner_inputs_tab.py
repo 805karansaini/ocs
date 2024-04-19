@@ -976,6 +976,15 @@ class ScannerInputsTab:
                 f"No of legs is zero",
             )
             return
+        # Name should be complusory to proceed
+        if popup:
+            name_value = self.name_entry.get().strip()
+            if not name_value:
+                Utils.display_message_popup(
+                    "Error",
+                    "Name field cannot be empty",
+                )
+                return
 
         # Create value dict from the GUI table to insert in the db
         if values_dict is None:
@@ -1011,6 +1020,7 @@ class ScannerInputsTab:
             # For First leg only range between 0 to 1
             local_map_instrument_id_instrument_obj = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object)
             list_of_instrument_ids = local_map_instrument_id_instrument_obj.keys()
+
             if not leg_data["instrument_id"].isdigit():
                 Utils.display_message_popup(
                     "Error",
@@ -1018,11 +1028,30 @@ class ScannerInputsTab:
                 )
                 return
 
-            # TODO COMMENT
+            # Quantity should be INT
             if not leg_data["quantity"].isdigit():
                 Utils.display_message_popup(
                     "Error",
                     f"Quantity '{leg_data['quantity']}' is not a valid integer",
+                )
+                return
+
+            # DTE Should be INT or float
+            try:
+                dte_range_min = int(float(leg_data["dte_range_min"]))
+                dte_range_max = int(float(leg_data["dte_range_max"]))
+            except ValueError:
+                Utils.display_message_popup(
+                    "Error",
+                    f"MinDTE or MaxDTE is not a valid integer",
+                )
+                return
+
+            # MinDTE can be greater than MaxDTE
+            if dte_range_min > dte_range_max:
+                Utils.display_message_popup(
+                    "Error",
+                    f"MinDTE value cannot be greater than MaxDTE value",
                 )
                 return
 
@@ -1041,6 +1070,13 @@ class ScannerInputsTab:
                     )
                     return
 
+                if dte_range_min < 0:
+                    Utils.display_message_popup(
+                        "Error",
+                        f"MinDTE values for the first leg should be greater than or equal to 0",
+                    )
+                    return
+
                 if not Utils.is_between_zero_to_one((leg_data["delta_range_min"])):
                     Utils.display_message_popup(
                         "Error",
@@ -1048,7 +1084,7 @@ class ScannerInputsTab:
                     )
                     return
 
-                if (float(leg_data["delta_range_min"])) > (float(leg_data["delta_range_max"])):
+                if float(leg_data["delta_range_min"]) > float(leg_data["delta_range_max"]):
                     Utils.display_message_popup(
                         "Error",
                         f"MinDelta value cannot be greater than MaxDelta value",
@@ -1073,12 +1109,13 @@ class ScannerInputsTab:
                     )
                     return
 
-                if (float(leg_data["delta_range_min"])) > (float(leg_data["delta_range_max"])):
+                if float(leg_data["delta_range_min"]) > float(leg_data["delta_range_max"]):
                     Utils.display_message_popup(
                         "Error",
                         f"MinDelta value cannot be greater than MaxDelta value",
                     )
                     return
+
 
             leg_data_list.append(leg_data)
 
