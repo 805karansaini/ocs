@@ -103,6 +103,10 @@ class UserInputs(object):
     fut_lot_size = parser.getint("USER INPUTS", "fut_lot_size")
     fop_lot_size = parser.getint("USER INPUTS", "fop_lot_size")
 
+    ind_opt_currency = parser.get("USER INPUTS", "ind_opt_currency")
+    ind_opt_exchange = parser.get("USER INPUTS", "ind_opt_exchange")
+    ind_opt_lot_size = parser.getint("USER INPUTS", "ind_opt_lot_size")
+    
     ######################
     # Bottom Variables as not used in option combo scanner
     # DO NOT CHANGE ANY THING Below it

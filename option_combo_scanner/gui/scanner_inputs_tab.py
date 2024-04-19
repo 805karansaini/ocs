@@ -346,14 +346,14 @@ class ScannerInputsTab:
         ttk.Label(input_frame, text="Primary Exch.", width=12, anchor="center").grid(column=7, row=0, padx=5, pady=5)
 
         # Create a list of options
-        sec_type_options = ["", "OPT", "FOP"]
+        sec_type_options = ["", "OPT", "FOP", "IND OPT"]
 
         drop_down_items_dict = {}
 
         def update_textbox(event, currency_entry, exchange_entry, lot_size_entry, combo_new):
             selected_value = combo_new.get()
 
-            if selected_value in ["OPT", "FOP"]:
+            if selected_value in ["OPT", "FOP", "IND OPT"]:
                 (
                     default_currency,
                     default_exchange,
