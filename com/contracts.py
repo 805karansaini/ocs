@@ -23,10 +23,6 @@ def get_contract(
     trading_class=None,
 ):
 
-    # Print to console
-    if variables.flag_debug_mode:
-        print(f"Getting Contract")
-
     # Creating contract
     contract = Contract()
 
