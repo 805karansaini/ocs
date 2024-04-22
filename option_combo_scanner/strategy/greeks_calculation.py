@@ -19,7 +19,6 @@ class CalcluateGreeks:
             _,strike,_,_,expiry,bid,ask,_,_,vega,theta,gamma,underlying_price = leg_tuple
             options_prem = (bid + ask)/2
             quantity = config_leg_object.quantity
-
             # Calcluate the time to expiration for the greeks
             current_date = datetime.datetime.today().strftime("%Y%m%d")
             current_date_obj = datetime.datetime.strptime(current_date, "%Y%m%d")
