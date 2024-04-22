@@ -533,10 +533,10 @@ class ImpliedVolatility:
         # TODO Comment TODO - Kushal
         for ith_day in range(1, n_th_day):
 
-            __call_iv_value_ith_day_delta_d1 = map_ith_day_and_target_delta_d_to_call_iv_value[(ith_day, delta_d1)]
-            __call_iv_value_ith_day_delta_d2 = map_ith_day_and_target_delta_d_to_call_iv_value[(ith_day, delta_d2)]
-            __put_iv_value_ith_day_delta_d1 = map_ith_day_and_target_delta_d_to_put_iv_value[(ith_day, delta_d1)]
-            __put_iv_value_ith_day_delta_d2 = map_ith_day_and_target_delta_d_to_put_iv_value[(ith_day, delta_d2)]
+            __call_iv_value_ith_day_delta_d1 = map_ith_day_and_target_delta_d_to_call_iv_value.get((ith_day, delta_d1))
+            __call_iv_value_ith_day_delta_d2 = map_ith_day_and_target_delta_d_to_call_iv_value.get((ith_day, delta_d2))
+            __put_iv_value_ith_day_delta_d1 = map_ith_day_and_target_delta_d_to_put_iv_value.get((ith_day, delta_d1))
+            __put_iv_value_ith_day_delta_d2 = map_ith_day_and_target_delta_d_to_put_iv_value.get((ith_day, delta_d2))
 
             if (__call_iv_value_ith_day_delta_d1 is not None and __call_iv_value_ith_day_delta_d2 is not None and
                 __put_iv_value_ith_day_delta_d1 is not None and __put_iv_value_ith_day_delta_d2 is not None):
