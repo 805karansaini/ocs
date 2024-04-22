@@ -190,7 +190,7 @@ class PutCallVol:
 
         # Fetch Historical data
         for right, list_option_contracts in list_right_and_list_contracts_tuple:
-            print(f"PC VOlumne: {right}, {list_option_contracts}")
+            # print(f"PC VOlumne: {right}, {list_option_contracts}")
 
             list_of_contracts = list_option_contracts
 
