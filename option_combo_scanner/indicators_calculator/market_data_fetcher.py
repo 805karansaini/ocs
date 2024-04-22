@@ -147,8 +147,7 @@ class MarketDataFetcher:
         )
         return result
         """
-
-        # TODO - Put in variable
+        # Gettting batch size from variables
         batch_size = strategy_variables.batch_size
 
         # Splitting the contracts into batches
@@ -158,7 +157,7 @@ class MarketDataFetcher:
 
         for indx, batch in enumerate(contract_batches):
             # TODO - REMOVE
-            # print(f"Fetching data for batch: {indx + 1}")
+            print(f"Fetching data for batch: {indx + 1}")
 
             result += await asyncio.gather(
                 *[
