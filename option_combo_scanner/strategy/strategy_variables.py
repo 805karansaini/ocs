@@ -106,7 +106,7 @@ class StrategyVariables:
 
     flag_store_csv_files = parser.getboolean("USER INPUTS", "flag_store_csv_files")
     o_c_s_folder_path = rf"{parser.get('USER INPUTS','o_c_s_folder_path')}"
-    batch_size = 50
+    batch_size = 80
     batch_size_historical_data = 20
 
     # Flag if we want the option indicator in % chng
@@ -230,7 +230,7 @@ class StrategyVariables:
 
     # Max min Pain Flag
     flag_drop_empty_oi_rows = True
-    flag_test_print = False
+    flag_test_print = True
 
     flag_ONE_for_max_pnl = "ONE"
 
