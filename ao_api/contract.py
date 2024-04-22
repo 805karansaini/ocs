@@ -9,6 +9,7 @@ class ContractType(str, Enum):
     FUT = "FUT"
     FOP = "FOP"
     CUR = "CUR"
+    IND = "IND"
 
 
 class Contract(BaseModel):

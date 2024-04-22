@@ -9,7 +9,7 @@ from ao_api import decoder, msg_reader
 from ao_api.message import OUT
 from ao_api.ws_client import WebSocketClient
 from ao_api.contract import Contract, contract_to_dict
-from ao_api.enums import BarType, BarUnit
+from ao_api.enums import BarType, BarUnit, DurationUnit
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +90,7 @@ class EClient(object):
         end_datetime: Optional[str] = None,
         start_datetime: Optional[str] = None,
         duration: Optional[int] = None,
+        duration_unit: Optional[DurationUnit] = None,
         bar_size: Optional[int] = None,
         bar_unit: Optional[BarUnit] = None,
         bar_type: Optional[BarType] = None,
@@ -104,6 +105,7 @@ class EClient(object):
             end_datetime: str,
             start_datetime: str,
             duration: int,
+            duration_unit: DurationUnit,
             bar_size: int,
             bar_unit: BarUnit,
             bar_type: BarType,
@@ -128,6 +130,8 @@ class EClient(object):
                 params["start_datetime"] = start_datetime
             if duration is not None:
                 params["duration"] = duration
+            if duration_unit is not None:
+                params["duration_unit"] = duration_unit
             if bar_size is not None:
                 params["bar_size"] = bar_size
             if bar_unit is not None:

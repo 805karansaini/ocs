@@ -1,45 +1,36 @@
-import datetime
-
 from ao_api.contract import Contract, ContractType
-from ao_api.enums import BarType, BarUnit, OptionRightType
+from ao_api.enums import BarType, BarUnit, DurationUnit, OptionRightType
 
 
 class IBkrAlgoOneAdapter:
 
     @staticmethod
-    def duration(duration_string):
+    def duration(duration_string: str):
         """
-        returns: duration, start datetime, end datetime
+        returns: duration, duration_unit
         """
         duration, duration_unit = duration_string.split(" ")
         duration = int(duration)
 
+        # TODO: Also Supports Duration Unit in Mins, hours, but since in TWS mins,  hours are not supported.
+        # so we are not implementing those in IBkrAlgoOneAdapter
         if "S" in duration_unit.upper():
-            # Get current time in utc
-            end_datetime = datetime.datetime.now(datetime.timezone.utc)
-            # Subtract the seconds from the time
-            start_datetime = end_datetime - datetime.timedelta(seconds=duration)
-
-            # Convert start_datetime and end_datetime to appropriate server format
-            start_datetime = start_datetime.strftime("%Y%m%d %H%M%S")
-            end_datetime = end_datetime.strftime("%Y%m%d %H%M%S")
-
-            return None, start_datetime, end_datetime
+            return duration, DurationUnit.SECOND
         elif "D" in duration_unit.upper():
-            duration = duration
+            return duration, DurationUnit.DAY
         elif "W" in duration_unit.upper():
-            duration = duration * 5
+            return duration * 5, DurationUnit.DAY
         elif "M" in duration_unit.upper():
-            duration = duration * 22
+            return duration * 22, DurationUnit.DAY
         elif "Y" in duration_unit.upper():
-            duration = duration * 252
+            return duration * 252, DurationUnit.DAY
         else:
-            print(f"duration_string: {duration_string}")
+            print(f"Invalid duration_string: {duration_string}")
 
-        return int(duration), None, None
+        return None, None
 
     @staticmethod
-    def bar_size(bar_size):
+    def bar_size(bar_size: str):
         bar_size, bar_unit = bar_size.split(" ")
         bar_size = int(bar_size)
 

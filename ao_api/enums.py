@@ -20,3 +20,9 @@ class BarType(str, Enum):
 class OptionRightType(str, Enum):
     CALL = "C"
     PUT = "P"
+
+class DurationUnit(str, Enum):
+    SECOND = "second"
+    MINUTE = "minute"
+    HOUR = "hour"
+    DAY = "day"
