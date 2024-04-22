@@ -1,6 +1,7 @@
 import asyncio
 import copy
 import datetime
+import time
 import traceback
 from functools import cache
 
@@ -169,7 +170,7 @@ class ScannerAlgo:
 
             # Insert the new indicator row in the database (GUI and system)
             self.insert_new_indicator_row_in_db_gui_and_system(new_dict)
-
+    
     def insert_new_indicator_row_in_db_gui_and_system(self, values_dict):
 
         res, indicator_id = SqlQueries.insert_into_db_table(table_name="indicator_table", values_dict=values_dict)
@@ -177,7 +178,7 @@ class ScannerAlgo:
             return
         values_dict["indicator_id"] = indicator_id
         indicator_obj = Indicator(values_dict)
-
+        
         # Insertion of indicator data in GUI
         ScannerAlgo.scanner_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
 
@@ -207,8 +208,8 @@ class ScannerAlgo:
         Function used to get the
         list of all the available strikes
         and closest expiry for OPT sec_type
-
         """
+
         (
             all_expiry_dates_ticker,
             string_of_strike_price,
@@ -222,7 +223,7 @@ class ScannerAlgo:
             exchange=exchange,
             currency=currency,
             multiplier=multiplier,
-            fop_trading_class="",
+            fop_trading_class=trading_class,
             low_range_date_str=low_range_date_str,
             high_range_date_str=high_range_date_str,
         )
@@ -285,9 +286,8 @@ class ScannerAlgo:
         print(delta_range_low, delta_range_high, current_expiry)
         # todo early teminate
 
-        # if self.check_do_we_need_to_restart_scan():
-        #         print(f"Early Termination: {self.config_obj}")
-        #         return []
+        if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
+            return []
 
         # Get the all the details for contract creation
         instrument_id = int(leg_object.instrument_id)
@@ -315,12 +315,21 @@ class ScannerAlgo:
         low_range_date_str = (current_expiry + datetime.timedelta(days=min_dte)).strftime("%Y%m%d")
         high_range_date_str = (current_expiry + datetime.timedelta(days=max_dte)).strftime("%Y%m%d")
 
-        if sec_type == "FOP":
+        if sec_type in ["FOP", "IND KA"]:
+
+            if sec_type == "FOP":
+                underlying_sec_type = "FUT"
+            elif sec_type == "IND":
+                underlying_sec_type = "IND"
+            else:
+                print(f"dasd INSIDE SCAN ALGO FILTER STRIKE :{sec_type}")
+
+
             # get all the strikes and list of expiry
             (all_strikes, closest_expiry, underlying_conid, expiry_date_in_range) = self.get_strike_and_closet_expiry_for_fop(
                 symbol=symbol,
                 dte=1,
-                underlying_sec_type="FUT",
+                underlying_sec_type=underlying_sec_type,
                 exchange=exchange,
                 currency=currency,
                 multiplier=multiplier,
@@ -343,7 +352,15 @@ class ScannerAlgo:
             )
             # if all_strikes is None or closest_expiry == None:
             #     continue
-        elif sec_type == "OPT":
+        elif sec_type in ["OPT", "IND"]:
+
+            if sec_type == "OPT":
+                underlying_sec_type = "STK"
+            elif sec_type == "IND":
+                underlying_sec_type = "IND"
+            else:
+                print(f"dasd INSIDE SCAN ALGO FILTER STRIKE :{sec_type}")
+
             (
                 all_strikes_string,
                 closest_expiry,
@@ -352,11 +369,11 @@ class ScannerAlgo:
             ) = self.get_strike_and_closet_expiry_for_opt(
                 symbol=symbol,
                 dte=1,
-                underlying_sec_type="STK",
+                underlying_sec_type=underlying_sec_type,
                 exchange=exchange,
                 currency=currency,
                 multiplier=multiplier,
-                trading_class="",
+                trading_class=trading_class,
                 low_range_date_str=low_range_date_str,
                 high_range_date_str=high_range_date_str,
             )
@@ -377,17 +394,17 @@ class ScannerAlgo:
                 map_closest_expiry_to_underlying_conid,
             )
 
+
         # todo early teminate
-        if self.check_do_we_need_to_restart_scan():
-            print(f"Early Termination: {self.config_obj}")
+        if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
             return []
+        
 
         for expiry in expiry_date_in_range:
             # key: ocs_mkt_ symbol, expiry, sectype, right, trading_class, multiplier  exchange
 
             # todo early teminate
-            if self.check_do_we_need_to_restart_scan():
-                print(f"Early Termination: {self.config_obj}")
+            if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
                 return []
 
             # get the key for caching the raw dataframe
@@ -397,12 +414,7 @@ class ScannerAlgo:
             # print(data_frame)
             if data_frame is not None:
                 df = data_frame.copy()
-            else:
-                # # TODO REMOVE IT ARYAN
-                if symbol == "ES":
-                    all_strikes = [5250, 5255, 5260]
-                elif symbol == "NQ":
-                    all_strikes = [18550, 18555, 18560, 18565]
+            else:                
 
                 # get the list of call and put option contract
                 list_of_call_option_contracts, list_of_put_option_contracts = IndicatorHelper.get_list_of_call_and_put_option_contracts(
@@ -420,16 +432,29 @@ class ScannerAlgo:
 
                 print(f"InstrumentID: {instrument_id} Expiry: {expiry}")
 
-                # get the market data dataframe for call/put
+                # TODO - ARAYAN Only Get data for single right, call or put depending on the leg config
+                if right.upper() == "CALL":
+                    list_of_put_option_contracts = []
+                else:
+                    list_of_call_option_contracts = []
+                
+                # Get the market data dataframe for call/put
                 df_call, df_put = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
                     list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
                 )
+
+                from tabulate import tabulate
+                print("\n\n\nCALL")
+                print(tabulate(df_call, headers="keys", tablefmt="psql", showindex=False))
+                
+                print("\n\n\nPUT")
+                print(tabulate(df_put, headers="keys", tablefmt="psql", showindex=False))
+
                 df_call["underlying_conid"] = underlying_conid
                 df_put["underlying_conid"] = underlying_conid
 
                 # todo early teminate
-                if self.check_do_we_need_to_restart_scan():
-                    print(f"Early Termination: {self.config_obj}")
+                if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
                     return []
 
                 if right.upper() == "CALL":
@@ -446,18 +471,14 @@ class ScannerAlgo:
                     df = df_put.copy()
             # print(df.to_string())
             # print(df.to_string())
-            df.dropna(subset=["Delta", "Bid", "Ask", "AskIV"], inplace=True)
+            df.dropna(subset=["Delta", "Bid", "Ask", "AskIV", "UnderlyingPrice"], inplace=True)
 
             if right.upper() == "PUT":
                 df["Delta"] = df["Delta"].abs()
             # Make a copy of the dataframe to avoid modifying the original dataframe
 
             filtered_dataframe = df.copy()
-            if symbol == "ES":
-                filtered_dataframe = filtered_dataframe[(filtered_dataframe["Strike"] >= 5250) & (filtered_dataframe["Strike"] <= 5260)]
-            elif symbol == "NQ":
-                filtered_dataframe = filtered_dataframe[(filtered_dataframe["Strike"] >= 18550) & (filtered_dataframe["Strike"] <= 18565)]
-
+            
             # Filter strikes based on delta_range_low and delta_range_high
             filtered_dataframe = filtered_dataframe[
                 (filtered_dataframe["Delta"] >= delta_range_low) & (filtered_dataframe["Delta"] <= delta_range_high)
@@ -497,14 +518,13 @@ class ScannerAlgo:
 
         # Get the list of filter legs between the given range for the expiry
         list_of_filter_legs = self.filter_strikes(range_low, range_high, current_expiry, remaining_no_of_legs, leg_object)
-
+        print(f"list of filter leg: {list_of_filter_legs}")
         scanner_logger.debug(
             f"ScannerAlgo.generate_combinations, Config ID: {self.config_id} No. of Filtered Legs: {len(list_of_filter_legs)}"
         )
 
         # Check early teminate
-        if self.check_do_we_need_to_restart_scan():
-            scanner_logger.info(f"ScannerAlgo.generate_combinations, Config ID: {self.config_id} Early Termination")
+        if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
             return []
 
         list_of_partial_combination = []
@@ -703,6 +723,26 @@ class ScannerAlgo:
 
         return list_of_filter_combination_without_dup
 
+    
+    def check_do_we_need_to_skip_current_scan(
+        self,
+    ):
+        """
+        True: Indicates skip the current scan (config)
+        False: Indicates continue with  the current scan (config)
+        """
+
+        # If Config ID is None, please skip this scan
+        if self.config_id is None:
+            scanner_logger.info(f"Inside Scan Algo: Config ID: {self.config_id} do not exist skipping scan")
+            return True
+        # If Config got deleted, please skip this scan
+        elif not self.config_id in StrategyVariables.map_config_id_to_config_object:
+            scanner_logger.info(f"Inside Scan Algo: Config ID: {self.config_id} do not exist skipping scan")
+            return True
+
+        return False
+
     def check_do_we_need_to_restart_scan(
         self,
     ):
@@ -710,21 +750,11 @@ class ScannerAlgo:
         False: Indicates do not need to restart scan
         True: Indicates do need to restart scan
         """
-        # If config got changed
-        local_config_object = self.get_config_from_variables()
 
-        if local_config_object:
-            if not self.config_obj.config_id == local_config_object.config_id:
-                return True
-
+        # User Clicked on Force Restart
         if StrategyVariables.flag_force_restart_scanner:
+            scanner_logger.info(f"Inside Scan Algo: Config ID: {self.config_id} Scanned Combo, Force Restart")
             return True
 
         return False
 
-    def get_config_from_variables(
-        self,
-    ):
-        local_config_object = copy.deepcopy(StrategyVariables.config_object)
-
-        return local_config_object
