@@ -62,11 +62,17 @@ class IndicatorCalculation:
 
             # Local copy of the instrument object
             local_instrument_obj = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
-
+            
             symbol = indicator_object.symbol
             expiry = indicator_object.expiry
             sec_type = local_instrument_obj.sec_type
-            underlying_sec_type = "STK" if sec_type.upper() == "OPT" else "FUT"
+            if sec_type.upper() == "OPT":
+                underlying_sec_type_ = "STK"
+            elif sec_type.upper() == "FOP":
+                underlying_sec_type_ = "FUT"
+            elif sec_type.upper() == "IND":
+                underlying_sec_type_ = "IND"
+            underlying_sec_type = underlying_sec_type_ #"STK" if sec_type.upper() == "OPT" else "FUT"
             exchange = local_instrument_obj.exchange
             currency = local_instrument_obj.currency
             multiplier = local_instrument_obj.multiplier
