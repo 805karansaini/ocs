@@ -11,7 +11,7 @@ config.read("option_scanner_user_inputs.ini")
 logging_level = config["Logging"]["logging_level"]
 
 
-def get_logger(name: str):
+def get_logger(name: str, current_time):
     logger_name = str(name)
 
     if logging_level == "DEBUG":
@@ -32,7 +32,7 @@ def get_logger(name: str):
     logger = logging.getLogger(logger_name)
 
     # Create the log directory if it doesn't exist
-    log_dir = rf"Logs"
+    log_dir = rf"Logs\{current_time}"
     os.makedirs(log_dir, exist_ok=True)
 
     # Create a file handler and specify the log file path
@@ -56,8 +56,9 @@ class CustomLogger:
     Custom logger class to log the responses from the cTrader server
     """
 
-    name = f"Log-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-    logger = get_logger(name=name)
+    current_time = datetime.datetime.now().strftime("%Y%m%d_%H-%M-%S")
+    name = f"Log-{current_time}"
+    logger = get_logger(name=name, current_time=current_time)
 
-    name = f"Scanner-Log-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-    scanner_logger = get_logger(name=name)
+    name = f"Scanner-Log-{current_time}"
+    scanner_logger = get_logger(name=name, current_time=current_time)
