@@ -1,7 +1,9 @@
 import asyncio
+
 from com.contracts import *
-from com.variables import *
 from com.leg_identifier import get_list_of_strikes_and_expiries_async
+from com.variables import *
+
 
 # Method to get trading class for FOP
 async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None):
@@ -33,10 +35,7 @@ async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None)
             expiry_date,
         ) = fop_row_of_values
 
-        if sec_type == "OPT" and symbol.strip().upper() in [
-            "NDX",
-            "SPX",
-        ]:
+        if sec_type == "IND":
             # Creating the IND contract to fetch the contract deatils for conids
             fut_contract = get_contract(
                 symbol,
@@ -58,8 +57,7 @@ async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None)
         reqId = variables.nextorderId
         variables.nextorderId += 1
 
-        print(fut_contract)
-        # Getting the contract details  
+        # Getting the contract details
         contract_details = await get_contract_details_async(fut_contract, reqId)
 
         # Getting the copy of the expiry to conid dict for the contract
@@ -105,9 +103,7 @@ async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None)
         # Sorting the dict with date
         fut_expiry_to_conid_dict = dict(sorted(fut_expiry_to_conid_dict.items()))
 
-        for date_number, (date_, fut_con_id) in enumerate(
-            fut_expiry_to_conid_dict.items()
-        ):
+        for date_number, (date_, fut_con_id) in enumerate(fut_expiry_to_conid_dict.items()):
 
             if date_number >= 3:
                 break
@@ -115,20 +111,13 @@ async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None)
             reqId = variables.nextorderId
             variables.nextorderId += 1
             # TODO
-            if symbol.strip().upper() in [
-                "NDX",
-                "SPX",
-            ]:
+            if sec_type in ["IND"]:
                 print(symbol, fut_con_id, exchange, "IND", "", reqId)
                 # ReqSecDef
-                await get_list_of_strikes_and_expiries_async(
-                    symbol, fut_con_id, "", "IND", "", reqId
-                )
+                await get_list_of_strikes_and_expiries_async(symbol, fut_con_id, "", "IND", "", reqId)
             else:
                 # ReqSecDef
-                await get_list_of_strikes_and_expiries_async(
-                    symbol, fut_con_id, exchange, "FUT", "", reqId
-                )
+                await get_list_of_strikes_and_expiries_async(symbol, fut_con_id, exchange, "FUT", "", reqId)
 
             all_trading_class.extend(variables.map_reqid_to_all_trading_class[reqId])
 
@@ -152,10 +141,30 @@ async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None)
 
     return all_trading_class
 
+
 # Method to manage for searching trading class for FOP
 async def identify_the_trading_class_for_all_the_fop_leg_in_combination_async(
     leg_row_values_list,
 ):
+    """
+    leg_row = [
+        "",  # action
+        sec_type,
+        symbol,
+        "",  # dte
+        "",  # delta
+        "",  # right
+        "",  # qty
+        lot_size,
+        exchange,
+        trading_class,
+        currency,
+        conid,
+        primary_exchange,
+        "",  # Strike
+        "",  # expiry
+    ]
+    """
 
     # Contains leg_row values for FOP and None for anything else
     filtered_leg_rows_list_containing_fop_legs = []
@@ -182,14 +191,7 @@ async def identify_the_trading_class_for_all_the_fop_leg_in_combination_async(
         ] = leg_row_values
 
         # If sec_type is FOP, symbol and exchange must be available and append the values to "filtered_leg_rows_list_containing_fop_legs"
-        if (sec_type == "FOP") or (
-            sec_type == "OPT"
-            and symbol.strip().upper()
-            in [
-                "NDX",
-                "SPX",
-            ]
-        ):
+        if sec_type in ["FOP", "IND"]:
 
             # Formatting values
             symbol = symbol.strip().upper()
