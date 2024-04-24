@@ -44,8 +44,7 @@ query4 = """CREATE TABLE IF NOT EXISTS `config_legs_table` (
             `delta_range_max` DECIMAL(10, 8),
             `dte_range_min` INT,
             `dte_range_max` INT,
-            FOREIGN KEY (`config_id`) REFERENCES `config_table`(`config_id`) ON DELETE CASCADE,
-            FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE
+            FOREIGN KEY (`config_id`) REFERENCES `config_table`(`config_id`) ON DELETE CASCADE
         );"""
 
 query5 = """CREATE TABLE IF NOT EXISTS `combination_table` (
@@ -96,64 +95,15 @@ query6 = """CREATE TABLE IF NOT EXISTS `legs_table` (
         );"""
 
 query7 = """CREATE TABLE IF NOT EXISTS `config_indicator_relation` (
+            `leg_number` INT,
             `config_id` INT,
             `instrument_id` INT,
             `expiry` VARCHAR(15),
-            PRIMARY KEY (`config_id`, `instrument_id`, `expiry`),
+            `unix_time` BIGINT,
+            PRIMARY KEY (`config_id`, `leg_number`, `instrument_id`, `expiry`, `unix_time`),
             FOREIGN KEY (`config_id`) REFERENCES `config_table`(`config_id`) ON DELETE CASCADE,
             FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE
         );"""
-
-
-# query8 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
-#         `indicator_id` INT AUTO_INCREMENT PRIMARY KEY,
-#         `instrument_id` INT,
-#         `underlying_conid` VARCHAR(20),
-#         `symbol` VARCHAR(15),
-#         `sec_type` VARCHAR(15), 
-#         `expiry` VARCHAR(15), 
-#         `multiplier` INT,
-#         `exchange` VARCHAR(20),
-#         `trading_class` VARCHAR(20),
-
-#         `hv` VARCHAR(15),
-#         `iv_d1` VARCHAR(15),
-#         `iv_d2` VARCHAR(15),
-#         `avg_iv` VARCHAR(15),
-#         `rr_d1` VARCHAR(15),
-#         `rr_d2` VARCHAR(15),
-#         `avg_iv_avg_14d` VARCHAR(15),
-#         `change_rr_d1_1D` VARCHAR(15),
-#         `change_rr_d2_1D` VARCHAR(15),
-#         `change_rr_d1_14D` VARCHAR(15),
-#         `change_rr_d2_14D` VARCHAR(15),
-#         `hv_14d_avg_14d` VARCHAR(15),
-#         `put_call_ratio_current` VARCHAR(15),
-#         `put_call_ratio_avg` VARCHAR(15),
-#         `pc_change` VARCHAR(15),
-
-#         `hv_14d_avg_iv` VARCHAR(15),
-
-
-#         `rr_25_50` VARCHAR(15),
-#         `rr_change_last_close` VARCHAR(15),
-#         `max_pain` VARCHAR(15),
-#         `min_pain` VARCHAR(15),
-#         `avg_hv` VARCHAR(15),
-#         `open_interest_support` VARCHAR(15),
-#         `open_interest_resistance` VARCHAR(15),
-#         `put_volume` VARCHAR(15),
-#         `call_volume` VARCHAR(15),
-        
-#         `Change_underlying_options_price_today` VARCHAR(15),
-#         `chg_uderlying_opt_price_14d` VARCHAR(15),
-        
-#         `change_in_iv` VARCHAR(15),
-#         `pc_change_iv_change` VARCHAR(15),
-#         FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE
-#     );"""
-
-
 
 query8 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
         `indicator_id` INT AUTO_INCREMENT PRIMARY KEY,
@@ -208,7 +158,6 @@ query8 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
 
         FOREIGN KEY (`instrument_id`) REFERENCES `instrument_table`(`instrument_id`) ON DELETE CASCADE
     );"""
-
 
 
 # TODO ARYAN:  DELTEE all indicators row when instrument is deete
