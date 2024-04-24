@@ -55,26 +55,29 @@ class HouseKeepingGUI:
 
         # Iterating over all the combinations
         for combination in all_combinations:
+            
+            try:
+                combo_id = int(combination["combo_id"])
+                legs = int(combination["number_of_legs"])
+                # list of leg object
+                list_of_all_leg_objects = []
 
-            combo_id = int(combination["combo_id"])
-            legs = int(combination["number_of_legs"])
-            # list of leg object
-            list_of_all_leg_objects = []
+                # Creating the Leg Objects
+                for leg_number in range(1, legs + 1):
+                    leg_values_dict = legs_look_up_dict[combo_id][leg_number]
 
-            # Creating the Leg Objects
-            for leg_number in range(1, legs + 1):
-                leg_values_dict = legs_look_up_dict[combo_id][leg_number]
+                    list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
 
-                list_of_all_leg_objects.append(ScannerLeg(leg_values_dict))
+                # Added the list of leg object
+                combination["list_of_all_leg_objects"] = list_of_all_leg_objects
 
-            # Added the list of leg object
-            combination["list_of_all_leg_objects"] = list_of_all_leg_objects
+                # Creating the Scanner Combination Object
+                scanner_combination_object = ScannerCombination(combination)
 
-            # Creating the Scanner Combination Object
-            scanner_combination_object = ScannerCombination(combination)
-
-            # Insert the Scanner combination in GUI
-            scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
+                # Insert the Scanner combination in GUI
+                scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
+            except Exception as e:
+                print(e)
 
     @staticmethod
     def dump_all_indicator_values_in_indicator_tab(
