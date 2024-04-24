@@ -4,10 +4,11 @@ import time
 import pandas as pd
 
 from ao_api.enums import BarUnit
+from ao_api.ibkr_ao_adapter import IBkrAlgoOneAdapter
 from com.variables import variables as variables
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
-from ao_api.ibkr_ao_adapter import IBkrAlgoOneAdapter
+
 logger = CustomLogger.logger
 
 
@@ -43,12 +44,12 @@ class HistoricalDataFetcher:
         use_rth = variables.flag_use_rth
         format_date = 1
         keep_up_to_date = False
-        
+
         # Error Received
         variables.req_error[reqId] = False
 
         contract = IBkrAlgoOneAdapter.contract(contract)
-        duration, start_datetime, end_datetime = IBkrAlgoOneAdapter.duration(duration_string)
+        duration, duration_unit = IBkrAlgoOneAdapter.duration(duration_string)
         bar_size, bar_unit = IBkrAlgoOneAdapter.bar_size(bar_size)
         flag_rth_only = IBkrAlgoOneAdapter.flag_rth_only(use_rth)
         bar_type = IBkrAlgoOneAdapter.bar_type(what_to_show)
@@ -58,14 +59,15 @@ class HistoricalDataFetcher:
         # DS Client Requesting the Data
         variables.ds_client.get_historical_bars(
             request_id=reqId,
-            contract=contract, # Contract
+            contract=contract,  # Contract
             duration=duration,
-            start_datetime=start_datetime,
-            end_datetime=end_datetime,
-            bar_unit=bar_unit,
-            bar_size=bar_size,
+            duration_unit=duration_unit,
+            # start_datetime=start_datetime,
+            # end_datetime=end_datetime,
+            bar_unit=bar_unit,  # min
+            bar_size=bar_size,  # 1
             flag_rth_only=flag_rth_only,
-            bar_type=bar_type,
+            bar_type=bar_type,  # What to Show
         )
 
         """
@@ -90,7 +92,7 @@ class HistoricalDataFetcher:
         #         end_date_time,        ""
         #         duration_string,      "14 D", 1 D, 15 D
         #         bar_size_setting,      1 mins, 1 hour, 2 hours. bar size, bar unit
-        #         what_to_show, 
+        #         what_to_show,
         #         use_rth,  False
         #         format_date,
         #         keep_up_to_d1ate,
@@ -114,14 +116,16 @@ class HistoricalDataFetcher:
 
     @staticmethod
     def fetch_historical_data_for_list_of_contracts(list_of_all_option_contracts, bar_size, list_of_duration_size, what_to_show):
-        
+
         # Historical Data Batch Size
         batch_size = StrategyVariables.batch_size_historical_data
 
         # Splitting the contracts into batches
-        contract_batches = [list_of_all_option_contracts[i : i + batch_size] for i in range(0, len(list_of_all_option_contracts), batch_size)]
+        contract_batches = [
+            list_of_all_option_contracts[i : i + batch_size] for i in range(0, len(list_of_all_option_contracts), batch_size)
+        ]
         duration_batches = [list_of_duration_size[i : i + batch_size] for i in range(0, len(list_of_duration_size), batch_size)]
-    
+
         # List of all request ids TODO
         list_of_req_id_for_historical_data = []
 
@@ -145,7 +149,9 @@ class HistoricalDataFetcher:
             while variables.cas_wait_time_for_historical_data > (counter * variables.sleep_time_between_iters):
 
                 # Waitting for the request to end or give error
-                if all([variables.req_mkt_data_end[req_id] or variables.req_error[req_id] for req_id in list_of_req_id_for_historical_data]):
+                if all(
+                    [variables.req_mkt_data_end[req_id] or variables.req_error[req_id] for req_id in list_of_req_id_for_historical_data]
+                ):
                     break
 
                 # Sleep for sleep_time_waiting_for_tws_response
