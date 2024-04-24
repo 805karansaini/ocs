@@ -16,6 +16,7 @@ from option_combo_scanner.ibapi_ao.variables import Variables as variables
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
 logger = CustomLogger.logger
+scanner_logger = CustomLogger.scanner_logger
 
 ORDER_PRESET_COLUMNS = [
     "Unique ID",
@@ -129,7 +130,6 @@ class Utils:
         # Add labels and entry fields for each column in the table
         error_label = ttk.Label(message_frame, text=error_string, width=80, anchor="center")
         error_label.place(relx=0.5, rely=0.5, anchor="center")
-
 
     @staticmethod
     def display_treeview_popup(title, list_of_columns_header, list_of_row_tuple):
@@ -264,8 +264,6 @@ class Utils:
 
         return values
 
-
-
     @staticmethod
     def clear_scanner_combination_table():
 
@@ -276,7 +274,7 @@ class Utils:
 
     @staticmethod
     def get_list_of_combo_ids_for_based_on_config_id(config_id):
-        # TODO - Check later. pass
+
         # Query to fetch Combo ID such that config is is same
         where_condition = f" WHERE `config_id` = '{config_id}';"
         select_query = SqlQueries.create_select_query(
@@ -320,6 +318,12 @@ class Utils:
 
             # Remove rows from scanned combo table
             Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(list_of_combo_ids)
+
+        for index, row_id in enumerate(Utils.scanner_combination_tab_object.scanner_combination_table.get_children()):
+            if index % 2 == 0:
+                Utils.scanner_combination_tab_object.scanner_combination_table.item(row_id, tags=("evenrow",))
+            else:
+                Utils.scanner_combination_tab_object.scanner_combination_table.item(row_id, tags=("oddrow",))
 
     @staticmethod
     def remove_row_from_indicator_table(
@@ -366,19 +370,9 @@ class Utils:
             except Exception as e:
                 print(f"Execption {e}")
 
-
     @staticmethod
     def create_and_display_impact_popup():
         pass
-
-
-
-
-
-
-
-
-
 
     @staticmethod
     def get_implied_volatility(S, r1, r2, t, X, market_premium, opt_type):
@@ -397,7 +391,7 @@ class Utils:
         0,
         time_to_expiration,
         float(contract.strike),
-        market_premium,  
+        market_premium,
         right,
         """
         max_iters = 50
@@ -415,8 +409,7 @@ class Utils:
         """
         # Handling the case if t is 0
         if t == 0:
-            t = 1/365
-            
+            t = 1 / 365
 
         # Inits
         tolerance = 0.0001
@@ -469,10 +462,10 @@ class Utils:
     def get_theoretical_premium(S, r1, r2, t, X, sigma, opt_type):
         if S == 0:
             S = 0.0001
-        
+
         # Handling the case if t is 0
         if t == 0:
-            t = 1/365
+            t = 1 / 365
 
         sigma_t = sigma * math.sqrt(t)
         d1 = (math.log(S / X) + ((r1 + math.pow(sigma, 2) / 2) * t)) / sigma_t
@@ -502,15 +495,15 @@ class Utils:
         0,
         time_to_expiration,
         float(contract.strike),
-        market_premium,  
+        market_premium,
         right,
         """
         opt_type = opt_type.upper()
 
         # Handling the case if t is 0
         if t == 0:
-            t = 1/365
-            
+            t = 1 / 365
+
         sigma = Utils.get_implied_volatility(S, r1, r2, t, X, market_premium, opt_type)
 
         if sigma is float("NaN"):
@@ -531,4 +524,47 @@ class Utils:
         except Exception as e:
             return float("NaN"), float("NaN")
 
-    
+    @staticmethod
+    def deletion_indicator_rows_based_on_config_tuple_relation(list_of_config_relation_tuple_for_deletion):
+
+        for config_id, instrument_id, expiry in list_of_config_relation_tuple_for_deletion:
+
+            # Query to get the rows count
+            where_condition = f" WHERE `instrument_id` = {instrument_id} AND `expiry` = {expiry};"
+            select_query = SqlQueries.create_select_query(
+                table_name="config_indicator_relation",
+                columns="Count(*)",
+                where_clause=where_condition,
+            )
+            count_of_existing_row = SqlQueries.execute_select_query(select_query)
+            count_row = count_of_existing_row[0]["Count(*)"]
+
+            scanner_logger.info(
+                f"      Config ID: --  Inside Utils.deletion_indicator_rows_based_on_config_tuple_relation, #Row Count: {count_row} for <{config_id, instrument_id, expiry}> "
+            )
+
+            if count_row == 0:
+                select_query = SqlQueries.create_select_query(
+                    table_name="indicator_table",
+                    columns="indicator_id",
+                    where_clause=where_condition,
+                )
+                dict_of_all_indicator_ids = SqlQueries.execute_select_query(select_query)
+                list_of_indicator_ids = [row["indicator_id"] for row in dict_of_all_indicator_ids]
+
+                scanner_logger.info(
+                    f"      Config ID: --  Inside Utils.deletion_indicator_rows_based_on_config_tuple_relation, Delete Indicator IDs: {list_of_indicator_ids}> "
+                )
+
+                Utils.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids)
+
+    @staticmethod
+    def delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_deletion):
+        for indicator_id in list_of_indicator_ids_deletion:
+            where_condition = f"WHERE `indicator_id` = {indicator_id}"
+            delete_query = SqlQueries.create_delete_query(table_name="indicator_table", where_clause=where_condition)
+            res = SqlQueries.execute_delete_query(delete_query)
+
+        # Remove from system
+        if list_of_indicator_ids_deletion:
+            Utils.remove_row_from_indicator_table(list_of_indicator_ids=list_of_indicator_ids_deletion)

@@ -387,7 +387,7 @@ class ScannerCombinationTab:
 
         # selected_item = self.scanner_combination_table.selection()[0]
         # details = self.scanner_combination_table.item(selected_item)
-        print(columns, row_data_list)
+        # print(columns, row_data_list)
         self.create_csv_structure_for_main_app(row_data_list, combo_id)
 
     def create_and_display_impact_popup(self):
