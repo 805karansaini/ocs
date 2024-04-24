@@ -32,12 +32,12 @@ def run_indicator_thread():
         try:
             # Start Time
             start_time = time.time()
-            
+
             IndicatorCalculation.compute_indicators()
-            
+
             # End Time
             end_time = time.time()
-            
+
             time_taken = end_time - start_time
             print(f"Time taken to compute indicators: {time_taken} seconds")
         except Exception as e:
@@ -144,6 +144,7 @@ if __name__ == "__main__":
         time.sleep(0.5)
 
     StrategyVariables.screen = screen
+    com_variables.screen = screen
 
     c = 0
 
