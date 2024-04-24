@@ -48,6 +48,6 @@ class Config:
     def remove_from_system(
         self,
     ):
-        print(f"Deleteing the config: {self.config_id}")
+        # print(f"Deleteing the config: {self.config_id}")
         del strategy_variables.map_config_id_to_config_object[self.config_id]
         strategy_variables.primary_min_heap_config.delete_item(self.config_id)
