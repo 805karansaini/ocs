@@ -63,7 +63,7 @@ class AlgoOneAPI(EClient, EWrapper):
             print(f"Unable to connect to data server, Exception: {exp}")
 
     def historical_data(self, request_id: str, historical_bars: dict):
-        print(f"Historical Data: reqId: {request_id} Bar: {historical_bars}")
+        # print(f"Historical Data: reqId: {request_id} Bar: {historical_bars}")
         request_id = int(request_id)
         
         # # Formatting bar_date and converting to users target_timezone
