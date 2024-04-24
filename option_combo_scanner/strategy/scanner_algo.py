@@ -91,96 +91,39 @@ class ScannerAlgo:
 
         return all_strikes, closest_expiry_date, underlying_conid, expiry_date_in_range
 
-    def update_indicator_table_for_instrument(
-        self,
-        instrument_object,
-        set_of_all_closest_expiry,
-        map_closest_expiry_to_underlying_conid,
-    ):
-        """Updates the indicator table for a given instrument."""
-
-        exchange = instrument_object.exchange
-        where_condition = f" WHERE `instrument_id` = {instrument_object.instrument_id};"
-        select_query = SqlQueries.create_select_query(
-            table_name="indicator_table",
-            columns="`indicator_id`, `trading_class`, `expiry`",
-            where_clause=where_condition,
-        )
-
-        # Get all the old rows from indicator table
-        all_the_existing_rows_form_db_table = SqlQueries.execute_select_query(select_query)
-
-        map_indicator_id_to_expiry_and_trading_class_str = {}
-        map_expiry_and_trading_class_str_to_indicator_id = {}
-
-        for old_indicator_dict in all_the_existing_rows_form_db_table:
-            indicator_id = int(old_indicator_dict["indicator_id"])
-            expiry_and_trading_class_str = f"{old_indicator_dict['expiry']}{old_indicator_dict['trading_class']}"
-
-            map_indicator_id_to_expiry_and_trading_class_str[indicator_id] = expiry_and_trading_class_str
-            map_expiry_and_trading_class_str_to_indicator_id[expiry_and_trading_class_str] = indicator_id
-
-        # getting the new indicator_rows
-        list_of_new_expiry_and_trading_class_str = []
-        for expiry in set_of_all_closest_expiry:
-            _temp = f"{expiry}{instrument_object.trading_class}"
-            list_of_new_expiry_and_trading_class_str.append(_temp)
-
-        list_of_indicator_ids_for_deletion = []
-
-        # Lopping on old one
-        for (
-            exp_trad_cls,
-            indicator_id,
-        ) in map_expiry_and_trading_class_str_to_indicator_id.items():
-            if not exp_trad_cls in list_of_new_expiry_and_trading_class_str:
-                list_of_indicator_ids_for_deletion.append(indicator_id)
-
-        # self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
-
-        if list_of_indicator_ids_for_deletion:
-            self.delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_for_deletion)
-
-        # Insert all new indicator row
-        # old nahi hai, but new mai hai
-        # LOOOPING ON NEW ONE
-        for exp_trad_cls in list_of_new_expiry_and_trading_class_str:
-
-            if exp_trad_cls in map_expiry_and_trading_class_str_to_indicator_id:
-                continue
-
-            # TODO Need underlying conid  TODO Comment
-
-            # Extract expiry date from the expiry and trading class string
-            expiry = exp_trad_cls[:8]
-            # Retrieve the underlying contract ID associated with the closest expiry
-            underlying_conid = map_closest_expiry_to_underlying_conid[int(expiry)]
-
-            #  Create a dictionary containing information about the new instrument
-            new_dict = {
-                "instrument_id": instrument_object.instrument_id,
-                "symbol": instrument_object.symbol,
-                "sec_type": instrument_object.sec_type,
-                "multiplier": instrument_object.multiplier,
-                "trading_class": instrument_object.trading_class,
-                "expiry": expiry,
-                "underlying_conid": underlying_conid,
-                "exchange": exchange,
-            }
-
-            # Insert the new indicator row in the database (GUI and system)
-            self.insert_new_indicator_row_in_db_gui_and_system(new_dict)
-    
     def insert_new_indicator_row_in_db_gui_and_system(self, values_dict):
 
         res, indicator_id = SqlQueries.insert_into_db_table(table_name="indicator_table", values_dict=values_dict)
         if not res:
+            scanner_logger.info(
+                f"      Config ID: {self.config_id}  Inside ScannerAlgo.insert_new_indicator_row_in_db_gui_and_system, Insertion Result for Indicator Row: {res} Indicator ID: {indicator_id}"
+            )
             return
+
         values_dict["indicator_id"] = indicator_id
         indicator_obj = Indicator(values_dict)
-        
+
         # Insertion of indicator data in GUI
         ScannerAlgo.scanner_indicator_tab_obj.insert_into_indicator_table(indicator_obj)
+
+    def delete_row_in_config_indicator_relation_db(self, list_of_config_relation_tuple_for_deletion):
+
+        # Looping Over config-indicaor-relation-tuple and deleting those
+        for config_id, leg_number, instrument_id, expiry in list_of_config_relation_tuple_for_deletion:
+            where_condition = f" WHERE `config_id` = {config_id} AND `instrument_id` = {instrument_id} AND `expiry` = {expiry};"
+
+            # Delete Query
+            delete_query = SqlQueries.create_delete_query(table_name="config_indicator_relation", where_clause=where_condition)
+            res = SqlQueries.execute_delete_query(delete_query)
+
+            scanner_logger.info(
+                f"      Config ID: {self.config_id}  Inside ScannerAlgo.delete_row_in_config_indicator_relation_db, InstrumentID: {instrument_id}, Deletion Result: {res} <{config_id, instrument_id, expiry}> "
+            )
+
+    # Insert row for instrumenent-config-indicator relationship table
+    def insert_row_in_config_indicator_relation_db(self, values_dict):
+        res, indicator_id = SqlQueries.insert_into_db_table(table_name="config_indicator_relation", values_dict=values_dict)
+        return res
 
     def delete_indicator_row_from_db_gui_and_system(self, list_of_indicator_ids_deletion):
         for indicator_id in list_of_indicator_ids_deletion:
@@ -283,22 +226,28 @@ class ScannerAlgo:
         Returns:
             pandas.DataFrame: Filtered dataframe containing strikes within the given delta range
         """
-        print(delta_range_low, delta_range_high, current_expiry)
+        # print(delta_range_low, delta_range_high, current_expiry)
         # todo early teminate
 
+        scanner_logger.debug(f"")
+
+        # Checking if we need to skip or restart scan
         if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
             return []
 
         # Get the all the details for contract creation
         instrument_id = int(leg_object.instrument_id)
         if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
-            print(f"Inside filter_strikes for scanner algo function could not find instrument id: {instrument_id}")
+            scanner_logger.info(
+                f"Config ID: {self.config_id} Leg Number: {leg_number} Inside ScannerAlgo.filter_strikes, function could not find instrument id: {instrument_id}"
+            )
             return []
 
         instrument_object = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
         min_dte = leg_object.dte_range_min
         max_dte = leg_object.dte_range_max
         right = leg_object.right
+        leg_number = leg_object.leg_number
 
         symbol = instrument_object.symbol
         sec_type = instrument_object.sec_type
@@ -315,15 +264,16 @@ class ScannerAlgo:
         low_range_date_str = (current_expiry + datetime.timedelta(days=min_dte)).strftime("%Y%m%d")
         high_range_date_str = (current_expiry + datetime.timedelta(days=max_dte)).strftime("%Y%m%d")
 
-        if sec_type in ["FOP", "IND KA"]:
+        scanner_logger.info(
+            f"Config ID: {self.config_id} Leg Number: {leg_number} Inside ScannerAlgo.filter_strikes, InstrumentID: {instrument_id} LowDate: {low_range_date_str} HighDate: {high_range_date_str}"
+        )
+
+        if sec_type in ["FOP"]:
 
             if sec_type == "FOP":
                 underlying_sec_type = "FUT"
-            elif sec_type == "IND":
-                underlying_sec_type = "IND"
             else:
-                print(f"dasd INSIDE SCAN ALGO FILTER STRIKE :{sec_type}")
-
+                pass
 
             # get all the strikes and list of expiry
             (all_strikes, closest_expiry, underlying_conid, expiry_date_in_range) = self.get_strike_and_closet_expiry_for_fop(
@@ -338,8 +288,15 @@ class ScannerAlgo:
                 high_range_date_str=high_range_date_str,
             )
 
-            print(
-                f"InstrumentID: {instrument_id} low_date: {low_range_date_str} high_date: {high_range_date_str} All Epxiry: {expiry_date_in_range}"
+            # For cases where any of this is None return a empty list
+            if all_strikes is None or closest_expiry is None or underlying_conid is None or expiry_date_in_range is None:
+                scanner_logger.info(
+                    f"Config ID: {self.config_id}  Inside ScannerAlgo.filter_strikes, For Und SecType: {underlying_sec_type}, [all_strikes, closest_expiry, underlying_conid,] is None"
+                )
+                return []
+
+            scanner_logger.info(
+                f"Config ID: {self.config_id} Leg Number: {leg_number} Inside ScannerAlgo.filter_strikes, InstrumentID: {instrument_id} All Expiry in Range: {expiry_date_in_range}"
             )
 
             for closest_expiry in expiry_date_in_range:
@@ -349,9 +306,9 @@ class ScannerAlgo:
                 instrument_object,
                 expiry_date_in_range,
                 map_closest_expiry_to_underlying_conid,
+                leg_number,
             )
-            # if all_strikes is None or closest_expiry == None:
-            #     continue
+
         elif sec_type in ["OPT", "IND"]:
 
             if sec_type == "OPT":
@@ -359,7 +316,7 @@ class ScannerAlgo:
             elif sec_type == "IND":
                 underlying_sec_type = "IND"
             else:
-                print(f"dasd INSIDE SCAN ALGO FILTER STRIKE :{sec_type}")
+                pass
 
             (
                 all_strikes_string,
@@ -377,28 +334,35 @@ class ScannerAlgo:
                 low_range_date_str=low_range_date_str,
                 high_range_date_str=high_range_date_str,
             )
+
+            # For cases where any of this is None return a empty list
+            if all_strikes_string is None or closest_expiry is None or underlying_conid is None or expiry_date_in_range is None:
+                scanner_logger.info(
+                    f"Config ID: {self.config_id}  Inside ScannerAlgo.filter_strikes, For Und SecType: {underlying_sec_type}, [all_strikes, closest_expiry, underlying_conid,] is None"
+                )
+                return []
+
+            scanner_logger.info(
+                f"Config ID: {self.config_id} Leg Number: {leg_number} Inside ScannerAlgo.filter_strikes, InstrumentID: {instrument_id} All Expiry in Range: {expiry_date_in_range}"
+            )
+
             all_strikes = [float(_) for _ in all_strikes_string[1:-1].split(",")]
 
             all_strikes = sorted(all_strikes)
             for closest_expiry in expiry_date_in_range:
                 map_closest_expiry_to_underlying_conid[int(closest_expiry)] = underlying_conid
 
-            print(
-                f"InstrumentID: {instrument_id} low_date: {low_range_date_str} high_date: {high_range_date_str} All Epxiry: {expiry_date_in_range}"
-            )
-
             # Update the indicator table for the given list of expiry
             self.update_indicator_table_for_instrument(
                 instrument_object,
                 expiry_date_in_range,
                 map_closest_expiry_to_underlying_conid,
+                leg_number,
             )
-
 
         # todo early teminate
         if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
             return []
-        
 
         for expiry in expiry_date_in_range:
             # key: ocs_mkt_ symbol, expiry, sectype, right, trading_class, multiplier  exchange
@@ -411,12 +375,12 @@ class ScannerAlgo:
             key = ScannerAlgo.get_key_from_contract_for_scanner_algo(symbol, expiry, sec_type, right, trading_class, multiplier, exchange)
             # print(key)
             data_frame = DataStore.get_data(key)
+
             # print(data_frame)
             if data_frame is not None:
                 df = data_frame.copy()
-            else:                
-
-                # get the list of call and put option contract
+            else:
+                # Get the list of call and put option contract
                 list_of_call_option_contracts, list_of_put_option_contracts = IndicatorHelper.get_list_of_call_and_put_option_contracts(
                     symbol,
                     sec_type,
@@ -430,25 +394,27 @@ class ScannerAlgo:
                     all_strikes,
                 )
 
-                print(f"InstrumentID: {instrument_id} Expiry: {expiry}")
-
-                # TODO - ARAYAN Only Get data for single right, call or put depending on the leg config
+                # Only Get data for single right, call or put depending on the leg config
                 if right.upper() == "CALL":
                     list_of_put_option_contracts = []
                 else:
                     list_of_call_option_contracts = []
-                
+
                 # Get the market data dataframe for call/put
                 df_call, df_put = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
                     list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
                 )
 
-                from tabulate import tabulate
-                print("\n\n\nCALL")
-                print(tabulate(df_call, headers="keys", tablefmt="psql", showindex=False))
-                
-                print("\n\n\nPUT")
-                print(tabulate(df_put, headers="keys", tablefmt="psql", showindex=False))
+                # from tabulate import tabulate
+
+                # scanner_logger.info(
+                #     f"Config ID: {self.config_id} Leg Number: {leg_number} Inside ScannerAlgo.filter_strikes, InstrumentID: {instrument_id} All Expiry in Range: {expiry_date_in_range}"
+                # )
+
+                # print("\n\n\n")
+                # print(tabulate(df_call, headers="keys", tablefmt="psql", showindex=False))
+                # print("\n\n\nPUT")
+                # print(tabulate(df_put, headers="keys", tablefmt="psql", showindex=False))
 
                 df_call["underlying_conid"] = underlying_conid
                 df_put["underlying_conid"] = underlying_conid
@@ -469,16 +435,15 @@ class ScannerAlgo:
                     )
                     DataStore.store_data(key, df_put)
                     df = df_put.copy()
-            # print(df.to_string())
-            # print(df.to_string())
+
             df.dropna(subset=["Delta", "Bid", "Ask", "AskIV", "UnderlyingPrice"], inplace=True)
 
             if right.upper() == "PUT":
                 df["Delta"] = df["Delta"].abs()
-            # Make a copy of the dataframe to avoid modifying the original dataframe
 
+            # Make a copy of the dataframe to avoid modifying the original dataframe
             filtered_dataframe = df.copy()
-            
+
             # Filter strikes based on delta_range_low and delta_range_high
             filtered_dataframe = filtered_dataframe[
                 (filtered_dataframe["Delta"] >= delta_range_low) & (filtered_dataframe["Delta"] <= delta_range_high)
@@ -515,10 +480,9 @@ class ScannerAlgo:
         scanner_logger.debug(
             f"ScannerAlgo.generate_combinations, Config ID: {self.config_id} Inputs: {remaining_no_of_legs=} {range_low=} {range_high=} {current_expiry=} {leg_object=}"
         )
-
         # Get the list of filter legs between the given range for the expiry
         list_of_filter_legs = self.filter_strikes(range_low, range_high, current_expiry, remaining_no_of_legs, leg_object)
-        print(f"list of filter leg: {list_of_filter_legs}")
+        # print(f"list of filter leg: {list_of_filter_legs}")
         scanner_logger.debug(
             f"ScannerAlgo.generate_combinations, Config ID: {self.config_id} No. of Filtered Legs: {len(list_of_filter_legs)}"
         )
@@ -552,7 +516,6 @@ class ScannerAlgo:
             # get the next leg object to scan
             list_of_config_leg_object = self.config_obj.list_of_config_leg_object
             leg_object = list_of_config_leg_object[-remaining_no_of_legs]
-
             (
                 leg_number,
                 _,
@@ -723,7 +686,6 @@ class ScannerAlgo:
 
         return list_of_filter_combination_without_dup
 
-    
     def check_do_we_need_to_skip_current_scan(
         self,
     ):
@@ -757,4 +719,110 @@ class ScannerAlgo:
             return True
 
         return False
+
+    def update_indicator_table_for_instrument(
+        self,
+        instrument_object,
+        set_of_all_closest_expiry,
+        map_closest_expiry_to_underlying_conid,
+        leg_number,
+    ):
+        """Updates the indicator table for a given instrument."""
+
+        # Instrument ID
+        instrument_id = instrument_object.instrument_id
+
+        scanner_logger.info(
+            f"      Config ID: {self.config_id}  Inside ScannerAlgo.update_indicator_table_for_instrument, InstrumentID: {instrument_id}, Set of Valid Expiry: {set_of_all_closest_expiry}"
+        )
+
+        c_time = int(time.time())
+
+        # Get old rows such that, where unix time  < 10 min ago, config_id, leg_number, instument_id.
+        where_condition = f" WHERE `unix_time` < {c_time  - (10 * 60)} AND `config_id` = {self.config_id} AND `instrument_id` = {instrument_id} AND `leg_number` = {leg_number};"
+
+        select_query = SqlQueries.create_select_query(
+            table_name="config_indicator_relation",
+            columns="*",
+            where_clause=where_condition,
+        )
+
+        # Get all the old rows from config_relation_table
+        all_the_existing_rows_form_db_table = SqlQueries.execute_select_query(select_query)
+        list_of_config_relation_tuple_for_deletion = [
+            (row["config_id"], row["instrument_id"], row["expiry"]) for row in all_the_existing_rows_form_db_table
+        ]
+
+        scanner_logger.info(
+            f"      Config ID: {self.config_id}  Inside ScannerAlgo.update_indicator_table_for_instrument, InstrumentID: {instrument_id}, List of Old Valid Deletion Tuple: {list_of_config_relation_tuple_for_deletion}"
+        )
+
+        # Getting the new current list of <ConfigID, InstrumentID, Expiry> from Scanner
+        list_of_current_config_relation_tuple = []
+
+        # Getting each expiry from set of closest expiry
+        for expiry in set_of_all_closest_expiry:
+            list_of_current_config_relation_tuple.append((self.config_id, leg_number, instrument_id, expiry))
+
+        scanner_logger.info(
+            f"      Config ID: {self.config_id}  Inside ScannerAlgo.update_indicator_table_for_instrument, InstrumentID: {instrument_id}, List of Current Valid ConfigIndicatorRelation Tuple: {list_of_current_config_relation_tuple}"
+        )
+
+        # Insert all the insertion list in the config_relation table
+        for config_id, leg_number, instrument_id, expiry in list_of_current_config_relation_tuple:
+            config_indicator_relation_dict = {
+                "config_id": config_id,
+                "leg_number": leg_number,
+                "instrument_id": instrument_id,
+                "expiry": expiry,
+                "unix_time": c_time,
+            }
+            res = self.insert_row_in_config_indicator_relation_db(values_dict=config_indicator_relation_dict)
+            scanner_logger.info(
+                f"      Config ID: {self.config_id}  Inside ScannerAlgo.update_indicator_table_for_instrument, InstrumentID: {instrument_id}, Insertion Result: {res} <{config_id, instrument_id, expiry}> "
+            )
+
+        # Addition of Indicators in Indicator Table from insertion list
+        for config_id, leg_number, instrument_id, expiry in list_of_current_config_relation_tuple:
+            underlying_conid = map_closest_expiry_to_underlying_conid[int(expiry)]
+
+            # Query to get the count of rows
+            where_condition = f" WHERE `instrument_id` = {instrument_id} AND `expiry` = {expiry};"
+            select_query = SqlQueries.create_select_query(
+                table_name="config_indicator_relation",
+                columns="Count(*)",
+                where_clause=where_condition,
+            )
+
+            # Getting the Count of rows
+            count_of_existing_row = SqlQueries.execute_select_query(select_query)
+            count_row = count_of_existing_row[0]["Count(*)"]
+
+            scanner_logger.info(
+                f"      Config ID: {self.config_id}  Inside ScannerAlgo.update_indicator_table_for_instrument, InstrumentID: {instrument_id}, #Rows: {count_row} for <{instrument_id, expiry}> "
+            )
+
+            if count_row == 1:
+
+                new_dict = {
+                    "instrument_id": instrument_object.instrument_id,
+                    "symbol": instrument_object.symbol,
+                    "sec_type": instrument_object.sec_type,
+                    "multiplier": instrument_object.multiplier,
+                    "trading_class": instrument_object.trading_class,
+                    "expiry": expiry,
+                    "underlying_conid": underlying_conid,
+                    "exchange": instrument_object.exchange,
+                }
+                self.insert_new_indicator_row_in_db_gui_and_system(new_dict)
+
+        where_condition = f" WHERE `unix_time` < {c_time  - (10 * 60)} AND `config_id` = {self.config_id} AND `instrument_id` = {instrument_id} AND `leg_number` = {leg_number};"
+
+        # Delet old rows where unix time  < 10 min ago, config_id, leg_number, instument_id
+        delete_query = SqlQueries.create_delete_query(table_name="config_indicator_relation", where_clause=where_condition)
+        res = SqlQueries.execute_delete_query(delete_query)
+        if not res and list_of_config_relation_tuple_for_deletion:
+            print(f"Error: Deletion not succesful for config_indicator_relation: {self.config_id}")
+
+        Utils.deletion_indicator_rows_based_on_config_tuple_relation(list_of_config_relation_tuple_for_deletion)
 
