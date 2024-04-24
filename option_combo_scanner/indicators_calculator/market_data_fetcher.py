@@ -156,8 +156,6 @@ class MarketDataFetcher:
         result = []
 
         for indx, batch in enumerate(contract_batches):
-            # TODO - REMOVE
-            print(f"Fetching data for batch: {indx + 1}")
 
             result += await asyncio.gather(
                 *[

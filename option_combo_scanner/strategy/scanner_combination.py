@@ -371,7 +371,6 @@ class ScannerCombination:
 
                 temp_list_of_combination_legs.append(list(leg_tuple))
 
-        print(f"temp list of combination leg:{temp_list_of_combination_legs} ")
 
         # Update the legs_tuple for each combination group.
         for i, (
@@ -409,7 +408,7 @@ class ScannerCombination:
         new_list_of_combination_groups = []
 
         start = 0
-        print("list_of_number_of_legs_in_combo", list_of_number_of_legs_in_combo)
+
         for legs__ in list_of_number_of_legs_in_combo:
 
             # Start index for this new group
@@ -425,8 +424,6 @@ class ScannerCombination:
         # Rename the variable
         list_of_combo_group = new_list_of_combination_groups
 
-        print(f"list of combo group: {list_of_combo_group}")
-        print(f"list_of_underlying_price_for_combo_group: {list_of_underlying_price_for_combo_group}")
 
         res = []
 
@@ -446,6 +443,21 @@ class ScannerCombination:
             print(f"Combination Group: {combination_group}\n")
 
             list_of_config_leg_objects = [_[-1] for _ in combination_group]
+            
+            # Calcaulte the combinations premium received
+            combination_premium_received = MaxPNLCalculation.calculate_combination_premium(combination_group, list_of_config_leg_objects,)
+            
+            # Sort the combination_group based on the STRIKE, expiry
+            sorted_legs_tuple = sorted(combination_group, key=lambda x: (x[1], x[4]))  
+
+            # Rearrange list_of_config_leg_objects based on the sorting of combination_group
+            sorted_indices = [combination_group.index(leg) for leg in sorted_legs_tuple]
+
+            temp_list_of_config_leg_objects = copy.deepcopy(list_of_config_leg_objects)
+
+            # Creating a list of leg_object and Renaming the variable
+            list_of_config_leg_objects = [temp_list_of_config_leg_objects[i] for i in sorted_indices]
+            combination_group = sorted_legs_tuple
 
             group_res = []
             # Loop over the list of impact percent
@@ -453,7 +465,6 @@ class ScannerCombination:
                 underlying_strike_price = (underlying_price * (100 + impact_per)) / 100
 
                 # Get the combination payoff
-                print(f"Impact-UnderlyingPrice: {underlying_price}, \nCombination Group: {combination_group}, {multiplier=}")
                 combination_payoff = MaxPNLCalculation.get_combination_payoff(
                     list_of_legs_tuple=combination_group,
                     list_of_config_leg_object=list_of_config_leg_objects,
@@ -462,21 +473,19 @@ class ScannerCombination:
                     multiplier=multiplier,
                 )
 
-                print(f"Combintaion Payoff : {combination_payoff}")
+                combination_payoff += combination_premium_received
+
                 # Store the groupwise combination payoff
                 group_res.append(round(combination_payoff, 2))
             # Finally Store all the Group Impact Calcluation
             res.append(group_res)
-            print(res)
 
         # res = [ [ -20, -10 for a group1], [ -20, -10 for a group2]]
-        print("Final List", res)
         # Get the sum of correspoding percentage impact value groupwise
         impact_sum_value_groups = [round(sum(group_percentages), 2) for group_percentages in zip(*res)]
 
         # Final list of impact value along with the closest expiry
         impact_value_groups.extend(impact_sum_value_groups)
-        print(f"impact_value_groups: {impact_value_groups}")
         impact_columns = ["Date"] + ["{}% Impact".format(int(impact)) for impact in list_of_impact_percent]
 
         Utils.display_treeview_popup(title, impact_columns, [impact_value_groups])
