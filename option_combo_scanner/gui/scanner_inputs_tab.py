@@ -90,6 +90,8 @@ class ScannerInputsTab:
         self.last_edited_description = None
         self.last_edited_status = None
 
+        self.flag_config_manager_pop_opened = False
+
         self.create_scanner_inputs_tab()
 
     def create_scanner_inputs_tab(self):
@@ -209,9 +211,20 @@ class ScannerInputsTab:
         instrument_id = self.instrument_table.selection()[0]  # get the item ID of the selected row
         instrument_id = int(instrument_id)
 
-        self.remove_instruments([int(instrument_id)])
+        # Start Remove Instrument Thread
+        remove_instrument_thread = threading.Thread(
+            target=self.remove_instruments,
+            args=([int(instrument_id)],),
+        )
+        remove_instrument_thread.start()
+
+        # TODO - REMOVE ARYAN
+        # self.remove_instruments([int(instrument_id)])
 
     def remove_instruments(self, list_of_instrument_ids: list):
+        # Start flow for instrument get deleted
+        self.delete_instrument_flow(list_of_instrument_ids)
+
         for instrument_id in list_of_instrument_ids:
             where_clause = f"WHERE instrument_id = {instrument_id}"
             # Database Remove
@@ -346,14 +359,14 @@ class ScannerInputsTab:
         ttk.Label(input_frame, text="Primary Exch.", width=12, anchor="center").grid(column=7, row=0, padx=5, pady=5)
 
         # Create a list of options
-        sec_type_options = ["", "OPT", "FOP", "IND OPT"]
+        sec_type_options = ["", "OPT", "FOP", "IND"]
 
         drop_down_items_dict = {}
 
         def update_textbox(event, currency_entry, exchange_entry, lot_size_entry, combo_new):
             selected_value = combo_new.get()
 
-            if selected_value in ["OPT", "FOP", "IND OPT"]:
+            if selected_value in ["OPT", "FOP", "IND"]:
                 (
                     default_currency,
                     default_exchange,
@@ -539,6 +552,9 @@ class ScannerInputsTab:
                 def replace_textbox_with_dropdown(list_of_trading_classes):
                     # Getting result of each individual leg separately
                     for row_indx, trading_classes in enumerate(list_of_trading_classes, start=1):
+
+                        list_of_trading_classes = sorted(list_of_trading_classes)
+
                         print(f"Trading class: {list_of_trading_classes}")
                         # Check if result
                         if trading_classes != []:
@@ -670,7 +686,15 @@ class ScannerInputsTab:
                 currency = input_frame.grid_slaves(row=row_loc, column=5)[0].get().strip()
                 conid = input_frame.grid_slaves(row=row_loc, column=6)[0].get()
                 primary_exchange = input_frame.grid_slaves(row=row_loc, column=7)[0].get()
-
+                
+                # Added Validation for FOP and IND that trading class must be given
+                if sec_type in ["FOP", "IND"] and not trading_class:
+                    Utils.display_message_popup(
+                        "Error",
+                        f"Trading Class should be present for FOP or IND",
+                    )
+                    add_instrument_button.config(state="normal")
+                    return
                 combo_values.append(
                     (
                         sec_type,
@@ -976,6 +1000,7 @@ class ScannerInputsTab:
                 f"No of legs is zero",
             )
             return
+        
         # Name should be complusory to proceed
         if popup:
             name_value = self.name_entry.get().strip()
@@ -999,6 +1024,7 @@ class ScannerInputsTab:
 
         leg_data_list = []
 
+        # Iteration over config leg object
         for i in range(int(len(self.leg_config_table.get_children()))):
 
             # Prepare leg-wise data
@@ -1017,105 +1043,9 @@ class ScannerInputsTab:
                 # Add other leg-wise data as needed
             }
 
-            # For First leg only range between 0 to 1
-            local_map_instrument_id_instrument_obj = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object)
-            list_of_instrument_ids = local_map_instrument_id_instrument_obj.keys()
-
-            if not leg_data["instrument_id"].isdigit():
-                Utils.display_message_popup(
-                    "Error",
-                    f"Instrument ID '{leg_data['instrument_id']}' is not a valid integer",
-                )
+            # Validate Config Leg
+            if self.config_legs_validation(i, leg_data=leg_data) == False:
                 return
-
-            # Quantity should be INT
-            if not leg_data["quantity"].isdigit():
-                Utils.display_message_popup(
-                    "Error",
-                    f"Quantity '{leg_data['quantity']}' is not a valid integer",
-                )
-                return
-
-            # DTE Should be INT or float
-            try:
-                dte_range_min = int(float(leg_data["dte_range_min"]))
-                dte_range_max = int(float(leg_data["dte_range_max"]))
-            except ValueError:
-                Utils.display_message_popup(
-                    "Error",
-                    f"MinDTE or MaxDTE is not a valid integer",
-                )
-                return
-
-            # MinDTE can be greater than MaxDTE
-            if dte_range_min > dte_range_max:
-                Utils.display_message_popup(
-                    "Error",
-                    f"MinDTE value cannot be greater than MaxDTE value",
-                )
-                return
-
-            if int(leg_data["instrument_id"]) not in list_of_instrument_ids:
-                Utils.display_message_popup(
-                    "Error",
-                    f"Instrument ID doesn't exist in Instrument Table",
-                )
-                return
-
-            if i == 0:
-                if not Utils.is_between_zero_to_one((leg_data["delta_range_max"])):
-                    Utils.display_message_popup(
-                        "Error",
-                        f"Delta values for the first leg should be between 0 and 1",
-                    )
-                    return
-
-                if dte_range_min < 0:
-                    Utils.display_message_popup(
-                        "Error",
-                        f"MinDTE values for the first leg should be greater than or equal to 0",
-                    )
-                    return
-
-                if not Utils.is_between_zero_to_one((leg_data["delta_range_min"])):
-                    Utils.display_message_popup(
-                        "Error",
-                        f"Delta values for the first leg should be between 0 and 1",
-                    )
-                    return
-
-                if float(leg_data["delta_range_min"]) > float(leg_data["delta_range_max"]):
-                    Utils.display_message_popup(
-                        "Error",
-                        f"MinDelta value cannot be greater than MaxDelta value",
-                    )
-                    return
-
-            else:
-                # For legs 1 onwards validation for -1 to 1 value
-                # Validation
-
-                if not Utils.is_between_minus_one_to_one((leg_data["delta_range_max"])):
-                    Utils.display_message_popup(
-                        "Error",
-                        f"Delta values should be in between -1 to 1",
-                    )
-                    return
-
-                if not Utils.is_between_minus_one_to_one((leg_data["delta_range_min"])):
-                    Utils.display_message_popup(
-                        "Error",
-                        f"Delta values should be in between -1 to 1",
-                    )
-                    return
-
-                if float(leg_data["delta_range_min"]) > float(leg_data["delta_range_max"]):
-                    Utils.display_message_popup(
-                        "Error",
-                        f"MinDelta value cannot be greater than MaxDelta value",
-                    )
-                    return
-
 
             leg_data_list.append(leg_data)
 
@@ -1226,7 +1156,7 @@ class ScannerInputsTab:
 
         # Place in center
         leg_config_table_frame.place(relx=0.5, anchor=tk.CENTER)
-        leg_config_table_frame.place(y=600)
+        leg_config_table_frame.place(y=570)
 
         # Treeview Scrollbar
         tree_scroll = Scrollbar(leg_config_table_frame)
@@ -1236,7 +1166,7 @@ class ScannerInputsTab:
         self.leg_config_table = ttk.Treeview(
             leg_config_table_frame,
             yscrollcommand=tree_scroll.set,
-            height=8,
+            height=9,
             selectmode="extended",
         )
         # Pack to the screen
@@ -1368,68 +1298,92 @@ class ScannerInputsTab:
     # Function to Create Config Manager Popup
     def create_config_manager_popup(self):
 
-        # Popup and Title
-        popup = tk.Toplevel()
-        popup.title("Config Manager")
+        if self.flag_config_manager_pop_opened:
 
-        # Config Manager Frame
-        config_manager_input_frame = ttk.Frame(popup, padding=20)
-        config_manager_input_frame.pack(fill=tk.BOTH, expand=True)  # Fill and expand to fit the popup
+            # Show error pop up
+            error_title = f"Config Manager Popup"
+            error_string = f"Config Manager Window Already Opened."
+            Utils.display_message_popup(error_title, error_string)
+            return
 
-        # Treeview Scrollbar
-        tree_scroll = Scrollbar(config_manager_input_frame)
-        tree_scroll.pack(side="right", fill="y")
+        self.flag_config_manager_pop_opened = True
 
-        # Create Treeview
-        self.leg_config_manager_table = ttk.Treeview(
-            config_manager_input_frame,
-            yscrollcommand=tree_scroll.set,
-            height=8,
-            selectmode="extended",
-        )
-        self.leg_config_manager_table.pack(fill=tk.BOTH, expand=True)  # Fill and expand to fit the frame
+        try:
+            # Popup and Title
+            popup = tk.Toplevel()
+            popup.title("Config Manager")
 
-        # Configure the scrollbar
-        tree_scroll.config(command=self.leg_config_manager_table.yview)
+            # Config Manager Frame
+            config_manager_input_frame = ttk.Frame(popup, padding=20)
+            config_manager_input_frame.pack(fill=tk.BOTH, expand=True)  # Fill and expand to fit the popup
 
-        # Columns
-        self.leg_config_manager_table["columns"] = [col[0] for col in leg_config_manager_table_columns_width]
+            # Treeview Scrollbar
+            tree_scroll = Scrollbar(config_manager_input_frame)
+            tree_scroll.pack(side="right", fill="y")
 
-        # Creating Columns
-        self.leg_config_manager_table.column("#0", width=0, stretch="no")
-        for col_name, col_width, col_heading in leg_config_manager_table_columns_width:
-            self.leg_config_manager_table.column(col_name, anchor="center", width=col_width)
-            self.leg_config_manager_table.heading(col_name, text=col_heading, anchor="center")
-
-        # Background
-        self.leg_config_manager_table.tag_configure("oddrow", background="white")
-        self.leg_config_manager_table.tag_configure("evenrow", background="lightblue")
-
-        # Get All Config from the db to populate the Table
-        configs = self.retrieve_configs_from_database()
-
-        # Populate the Config Manager Table
-        for index, config in enumerate(configs):
-            tag = "oddrow" if index % 2 == 1 else "evenrow"
-            config_id = config.get("config_id", "")
-            config_values = [
-                config_id,
-                config.get("config_name", ""),
-                config.get("description", ""),
-                config.get("status", ""),
-            ]
-
-            self.leg_config_manager_table.insert(
-                "",
-                "end",
-                iid=config_id,
-                text=index + 1,
-                values=config_values,
-                tags=(tag,),
+            # Create Treeview
+            self.leg_config_manager_table = ttk.Treeview(
+                config_manager_input_frame,
+                yscrollcommand=tree_scroll.set,
+                height=8,
+                selectmode="extended",
             )
+            self.leg_config_manager_table.pack(fill=tk.BOTH, expand=True)  # Fill and expand to fit the frame
 
-        # Right Click menu for config manager table
-        self.leg_config_manager_table.bind("<Button-3>", self.leg_config_manager_table_right_click_menu)
+            # Configure the scrollbar
+            tree_scroll.config(command=self.leg_config_manager_table.yview)
+
+            # Columns
+            self.leg_config_manager_table["columns"] = [col[0] for col in leg_config_manager_table_columns_width]
+
+            # Creating Columns
+            self.leg_config_manager_table.column("#0", width=0, stretch="no")
+            for col_name, col_width, col_heading in leg_config_manager_table_columns_width:
+                self.leg_config_manager_table.column(col_name, anchor="center", width=col_width)
+                self.leg_config_manager_table.heading(col_name, text=col_heading, anchor="center")
+
+            # Background
+            self.leg_config_manager_table.tag_configure("oddrow", background="white")
+            self.leg_config_manager_table.tag_configure("evenrow", background="lightblue")
+
+            # Get All Config from the db to populate the Table
+            configs = self.retrieve_configs_from_database()
+
+            # Populate the Config Manager Table
+            for index, config in enumerate(configs):
+                tag = "oddrow" if index % 2 == 1 else "evenrow"
+                config_id = config.get("config_id", "")
+                config_values = [
+                    config_id,
+                    config.get("config_name", ""),
+                    config.get("description", ""),
+                    config.get("status", ""),
+                ]
+
+                self.leg_config_manager_table.insert(
+                    "",
+                    "end",
+                    iid=config_id,
+                    text=index + 1,
+                    values=config_values,
+                    tags=(tag,),
+                )
+
+            try:
+                # Right Click menu for config manager table
+                self.leg_config_manager_table.bind("<Button-3>", self.leg_config_manager_table_right_click_menu)
+            except Exception as e:
+                pass
+
+            popup.protocol("WM_DELETE_WINDOW", lambda: self.config_manager_on_close(popup))
+
+        except Exception as e:
+            self.flag_config_manager_pop_opened = False
+            print("error in config manager popup")
+
+    def config_manager_on_close(self, popup):
+        popup.destroy()
+        self.flag_config_manager_pop_opened = False
 
     # Function for Right CLick in Config Manager
     def leg_config_manager_table_right_click_menu(self, event):
@@ -1471,37 +1425,71 @@ class ScannerInputsTab:
 
         # if True:
         try:
-            # TODO Add Validation that the config exits, put in try except block as well.
+            # Validation to check that config exits, put in try except block as well.
             if int(config_id) not in strategy_variables.map_config_id_to_config_object:
                 print(f"Config id {config_id} doesn't exist")
                 return
+
             # Retrieve the config_id from the selected item
             config_id = int(config_id)
             if current_status == "Active":
                 new_status = "Inactive"
             elif current_status == "Inactive":
                 new_status = "Active"
+
+                config_obj = copy.deepcopy(strategy_variables.map_config_id_to_config_object[config_id])
+                values_dict = {
+                    "description": config_obj.description,
+                    "status": config_obj.status,
+                    "config_name": config_obj.config_name,
+                    "no_of_leg": config_obj.no_of_leg,
+                }
+
+                for config_leg_object in config_obj.list_of_config_leg_object:
+                    leg_number = config_leg_object.leg_number
+                    leg_data = {
+                        "leg_number": leg_number,
+                        "instrument_id": config_leg_object.instrument_id,
+                        "action": config_leg_object.action,
+                        "right": config_leg_object.right,
+                        "quantity": config_leg_object.quantity,
+                        "delta_range_min": config_leg_object.delta_range_min,
+                        "delta_range_max": config_leg_object.delta_range_max,
+                        "dte_range_min": config_leg_object.dte_range_min,
+                        "dte_range_max": config_leg_object.dte_range_max,
+                        # Add other leg-wise data as needed
+                    }
+
+                    if self.config_legs_validation(leg_number, leg_data) == False:
+                        return
             else:
                 return  # Do nothing if status is neither "Active" nor "Inactive"
-
-            # Change in the GUI to the new status
-            updated_values = list(self.leg_config_manager_table.item(str(config_id), "values"))
-            updated_values[3] = new_status  # Update status to the new status
-            self.leg_config_manager_table.item(str(config_id), values=updated_values)
 
             # Update the db for that config id with the new status
             res = self.update_config_status_in_db(config_id, new_status)
 
             # Update if update in db was successful
             if res:
+
+                # Change in the GUI to the new status
+                updated_values = list(self.leg_config_manager_table.item(str(config_id), "values"))
+                updated_values[3] = new_status  # Update status to the new status
+                self.leg_config_manager_table.item(str(config_id), values=updated_values)
+
                 # Update in Config Object
                 strategy_variables.map_config_id_to_config_object[config_id].status = new_status
+
+            # If config status is inactive remove indicator row, combination row
+            if new_status == "Inactive":
+                flag_only_status_update = True
+                self.delete_config_details_from_manager(config_id=config_id, flag_only_status_update=flag_only_status_update)
 
         except Exception as e:
             print(f"An error occurred: {e}")
 
     # Function to update the config status in db
     def update_config_status_in_db(self, config_id, new_status):
+
         # Update the status for the specified config_id
         where_condition = f"WHERE `config_id` = {config_id};"
         values_dict_for_db = {"status": new_status}  # New values for update
@@ -1514,7 +1502,7 @@ class ScannerInputsTab:
         # Update values in rows
         res = SqlQueries.execute_update_query(update_query)
         if not res:
-            print(f"Could not change the status of the config_id: {config_id}")
+            print(f"Could not update the config status, config_id: {config_id}")
 
         return res
 
@@ -1591,8 +1579,9 @@ class ScannerInputsTab:
         return config_details_list
 
     # Delete the config details from the manager table and db
-    def delete_config_details_from_manager(self, config_id=None):
+    def delete_config_details_from_manager(self, config_id=None, flag_only_status_update=False):
 
+        # If Config is nto given, get from the config manager table
         if config_id is None:
             selected_item = self.leg_config_manager_table.selection()
             if selected_item:
@@ -1602,20 +1591,53 @@ class ScannerInputsTab:
         else:
             config_id = int(float(config_id))
 
+        # Get list of combo id based on config id, from DB
         list_of_combo_ids = Utils.get_list_of_combo_ids_for_based_on_config_id(config_id)
 
+        # Get all the rows from config_indicator_rela table, such that config_id is N.
+        where_condition = f" WHERE `config_id` = {config_id};"
+        select_query = SqlQueries.create_select_query(
+            table_name="config_indicator_relation",
+            columns="*",
+            where_clause=where_condition,
+        )
+
+        # Getting the Count of rows
+        all_config_existing_row = SqlQueries.execute_select_query(select_query)
+        list_of_config_ids_relation = [(row["config_id"], row["instrument_id"], row["expiry"]) for row in all_config_existing_row]
+
         # Delete the config details from the database
-        res = self.delete_config_from_database(config_id)
+        if flag_only_status_update == False:
+            res = self.delete_config_from_database(config_id)
 
-        if res:
-            config_id = int(float(config_id))
-            print(f"Delete Config: {config_id}")
+            if res:
+                config_id = int(float(config_id))
+                print(f"Delete Config: {config_id}")
 
-            # TODO - remove from the system
-            strategy_variables.map_config_id_to_config_object[config_id].remove_from_system()
+                # Remove from the system
+                strategy_variables.map_config_id_to_config_object[config_id].remove_from_system()
+        else:
+            # Get all the rows from config_indicator_rela table, such that config_id is N.
+            where_condition = f" WHERE `config_id` = {config_id};"
+            delete_query = SqlQueries.create_delete_query(
+                table_name="config_indicator_relation",
+                where_clause=where_condition,
+            )
 
-            Utils.remove_row_from_scanner_combination_table(list_of_combo_ids)
-            pass
+            # Delete the rows from config indicator relation
+            delete_query = SqlQueries.execute_delete_query(query=delete_query)
+
+            # Delete the rows from combination table db
+            delete_query = SqlQueries.create_delete_query(
+                table_name="combination_table",
+                where_clause=where_condition,
+            )
+
+            delete_query = SqlQueries.execute_delete_query(query=delete_query)
+
+        # Remove from combination and deletion from indicator relation
+        Utils.remove_row_from_scanner_combination_table(list_of_combo_ids)
+        Utils.deletion_indicator_rows_based_on_config_tuple_relation(list_of_config_ids_relation)
 
     # Function to delete config from the database
     def delete_config_from_database(self, config_id):
@@ -1673,9 +1695,26 @@ class ScannerInputsTab:
 
         self.status_combobox = ttk.Combobox(input_frame, width=28, state="readonly")
         self.status_combobox["values"] = ["Active", "Inactive"]
-        self.status_combobox.current(1)
-        self.status_combobox.state = "readonly"
+        self.status_combobox.current(0)
         self.status_combobox.grid(column=1, row=1, padx=5, pady=5)
+
+        # Binding the Status DropDown with a,A,i,I
+        self.status_combobox.bind(
+            "a",
+            lambda event: self.select_active_inactive(event, True, self.status_combobox),
+        )
+        self.status_combobox.bind(
+            "A",
+            lambda event: self.select_active_inactive(event, True, self.status_combobox),
+        )
+        self.status_combobox.bind(
+            "i",
+            lambda event: self.select_active_inactive(event, False, self.status_combobox),
+        )
+        self.status_combobox.bind(
+            "I",
+            lambda event: self.select_active_inactive(event, False, self.status_combobox),
+        )
 
         self.description_entry = tk.Text(input_frame, width=23, height=8)
         self.description_entry.grid(column=1, row=2, padx=5, pady=5)
@@ -1686,3 +1725,241 @@ class ScannerInputsTab:
             command=lambda: self.save_config_button_click(popup),
         )
         proceed_button.grid(column=1, row=3, padx=5, pady=10)
+
+    ###########################
+    ###########################
+    ###########################
+    ###########################
+
+
+    def delete_instrument_flow(self, list_of_instrument_ids):
+        """
+        # for config_id in Set: <5 Config IDs>
+        #     Create a deepcopy of Config Obj:
+        #     (save_config_click)Save Config Funtionality to be reused. <delete_config_details_from_manager(config_id)>
+
+        #     Create a deepcopy of Config Obj:
+        #         list_of_config_leg_object
+        #     New but use almost same code: save_config_button_click w/ no validations
+            
+        """
+        # Get all the configs that matches instrument_id
+        for instrument_id in list_of_instrument_ids:
+            # Query to get the config ids
+            where_condition = f" WHERE `instrument_id` = {instrument_id};"
+            select_query = SqlQueries.create_select_query(
+                table_name="config_legs_table",
+                columns="`config_id`",
+                where_clause=where_condition,
+            )
+
+            # Get all the rows from config_legs_table
+            all_the_existing_rows_form_db_table = SqlQueries.execute_select_query(select_query)
+            # Get list of config ids
+
+            list_of_config_ids = [row["config_id"] for row in all_the_existing_rows_form_db_table]
+            for config_id in list_of_config_ids:
+                if config_id not in strategy_variables.map_config_id_to_config_object:
+                    continue
+                config_obj = copy.deepcopy(strategy_variables.map_config_id_to_config_object[config_id])
+
+                # Call the save click button functionality to first delete instrument id and then create new and save
+                self.save_config_click_for_instrument_delete(instrument_id, config_id, config_obj)
+
+    # Functionality for Save Config Button Click when Instrument get deleted
+    def save_config_click_for_instrument_delete(self, instrument_id, config_id, config_obj):
+        # Delete the config id from config
+        self.delete_config_details_from_manager(config_id)
+
+        # Addition of new config new inactive status
+        values_dict = {
+            "description": config_obj.description,
+            "status": "Inactive",
+            "config_name": config_obj.config_name,
+        }
+        # Call the Save config function with the updated config details when instrument deleted
+        self.save_config_button_click_for_instrument_delete(instrument_id, values_dict=values_dict, config_obj=config_obj)
+
+    # TODO - check karan arayan
+    # Function for Save Config Button Click when instrument deleted
+    def save_config_button_click_for_instrument_delete(
+        self,
+        instrument_id,
+        config_obj,
+        values_dict,
+    ):
+        # Get the no of legs from config object
+        no_of_leg = int(config_obj.no_of_leg)
+
+        # Validate if No of Legs is Zero
+        if no_of_leg == 0:
+            Utils.display_message_popup(
+                "Error",
+                f"No of legs is zero",
+            )
+            return
+
+        # Add No of legs to dict for insertion in db
+        values_dict["no_of_leg"] = no_of_leg
+
+        leg_data_list = []
+
+        # Get the list of config leg objects
+        list_of_config_leg_objects = config_obj.list_of_config_leg_object
+
+        # Iteration over config leg object
+        for i, config_leg_object in enumerate(list_of_config_leg_objects):
+
+            # Set instrument id as -1 if it is deleted
+            instrument_id = -1 if config_leg_object.instrument_id == instrument_id else config_leg_object.instrument_id
+
+            # print(item_values)
+            leg_data = {
+                "leg_number": i + 1,
+                "instrument_id": instrument_id,
+                "action": config_leg_object.action.upper(),
+                "right": config_leg_object.right.upper(),
+                "quantity": config_leg_object.quantity,
+                "delta_range_min": config_leg_object.delta_range_min,
+                "delta_range_max": config_leg_object.delta_range_max,
+                "dte_range_min": config_leg_object.dte_range_min,
+                "dte_range_max": config_leg_object.dte_range_max,
+                # Add other leg-wise data as needed
+            }
+            leg_data_list.append(leg_data)
+
+        # Run the transaction for the leg data
+        is_transaction_successful, config_id = SqlQueries.run_config_update_transaction(
+            common_config_dict=values_dict,
+            list_of_config_legs_dict=leg_data_list,
+        )
+
+        if not is_transaction_successful:
+            Utils.display_message_popup(
+                "Error",
+                f"Could not insert Rows in table. Please retry again",
+            )
+            return
+
+        list_of_config_leg_object = [ConfigLeg(config_leg_dict) for config_leg_dict in leg_data_list]
+        values_dict["config_id"] = config_id
+        values_dict["list_of_config_leg_object"] = list_of_config_leg_object
+
+        # Creation of Config Object  (Leg)
+        config_obj = Config(values_dict)
+
+        # Insert leg-wise data into the config_leg_table
+        self.insert_into_config_leg_table(config_obj)
+
+    def select_active_inactive(self, event, flag_active, status_combo_box):
+        # Update the value in dropdown
+        status_combo_box.config(state="normal")
+        status_combo_box.delete(0, tk.END)  # Clear any existing text
+        if flag_active:
+            status_combo_box.insert(0, "Active")
+        else:
+            status_combo_box.insert(0, "Inactive")
+        status_combo_box.config(state="readonly")
+
+    # Validate Config Legs
+    def config_legs_validation(self, i, leg_data):
+
+        # For First leg only range between 0 to 1
+        local_map_instrument_id_instrument_obj = copy.deepcopy(strategy_variables.map_instrument_id_to_instrument_object)
+        list_of_instrument_ids = local_map_instrument_id_instrument_obj.keys()
+        if not str(leg_data["instrument_id"]).isdigit():
+            Utils.display_message_popup(
+                "Error",
+                f"Instrument ID '{leg_data['instrument_id']}' is not a valid integer",
+            )
+            return False
+
+        # Quantity should be INT
+        if not str(leg_data["quantity"]).isdigit():
+            Utils.display_message_popup(
+                "Error",
+                f"Quantity '{leg_data['quantity']}' is not a valid integer",
+            )
+            return False
+
+        # DTE Should be INT or float
+        try:
+            dte_range_min = int(float(leg_data["dte_range_min"]))
+            dte_range_max = int(float(leg_data["dte_range_max"]))
+        except ValueError:
+            Utils.display_message_popup(
+                "Error",
+                f"MinDTE or MaxDTE is not a valid integer",
+            )
+            return False
+
+        # MinDTE can be greater than MaxDTE
+        if dte_range_min > dte_range_max:
+            Utils.display_message_popup(
+                "Error",
+                f"MinDTE value cannot be greater than MaxDTE value",
+            )
+            return False
+
+        if int(leg_data["instrument_id"]) not in list_of_instrument_ids:
+            Utils.display_message_popup(
+                "Error",
+                f"Instrument ID doesn't exist in Instrument Table",
+            )
+            return False
+
+        if i == 0:
+            if not Utils.is_between_zero_to_one((leg_data["delta_range_max"])):
+                Utils.display_message_popup(
+                    "Error",
+                    f"Delta values for the first leg should be between 0 and 1",
+                )
+                return False
+
+            if dte_range_min < 0:
+                Utils.display_message_popup(
+                    "Error",
+                    f"MinDTE values for the first leg should be greater than or equal to 0",
+                )
+                return False
+
+            if not Utils.is_between_zero_to_one((leg_data["delta_range_min"])):
+                Utils.display_message_popup(
+                    "Error",
+                    f"Delta values for the first leg should be between 0 and 1",
+                )
+                return False
+
+            if float(leg_data["delta_range_min"]) > float(leg_data["delta_range_max"]):
+                Utils.display_message_popup(
+                    "Error",
+                    f"MinDelta value cannot be greater than MaxDelta value",
+                )
+                return False
+
+        else:
+            # For legs 1 onwards validation for -1 to 1 value
+            # Validation
+
+            if not Utils.is_between_minus_one_to_one((leg_data["delta_range_max"])):
+                Utils.display_message_popup(
+                    "Error",
+                    f"Delta values should be in between -1 to 1",
+                )
+                return False
+
+            if not Utils.is_between_minus_one_to_one((leg_data["delta_range_min"])):
+                Utils.display_message_popup(
+                    "Error",
+                    f"Delta values should be in between -1 to 1",
+                )
+                return False
+
+            if float(leg_data["delta_range_min"]) > float(leg_data["delta_range_max"]):
+                Utils.display_message_popup(
+                    "Error",
+                    f"MinDelta value cannot be greater than MaxDelta value",
+                )
+                return False
+
+        return True
