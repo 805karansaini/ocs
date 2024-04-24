@@ -49,6 +49,8 @@ class StrategyVariables:
 
     # User Input for the calc. mode in in the max PnL cacl
     calculation_mode_for_combination_max_pnl = MaxPNLEnum.GNE
+    # ONE: Overall Nearest Expiry
+    # GNE: Group Nearest Expiry
 
     # Input for delta
     delta_d1_indicator_input = parser.getfloat("USER INPUTS", "delta_d1_indicator_input")
@@ -230,7 +232,7 @@ class StrategyVariables:
 
     # Max min Pain Flag
     flag_drop_empty_oi_rows = True
-    flag_test_print = True
+    flag_test_print = False
 
     flag_ONE_for_max_pnl = "ONE"
 
