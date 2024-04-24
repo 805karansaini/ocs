@@ -103,6 +103,24 @@ class ScreenGUI(threading.Thread):
                 except Exception as exp:
                     pass
 
+    # Method to dispaly error pop up
+    def display_error_popup(self, error_title, error_string):
+
+        # Create a error popup window
+        error_popup = tk.Toplevel()
+        error_popup.title(error_title)
+
+        error_popup.geometry("400x100")
+
+        # Create a frame for the input fields
+        error_frame = ttk.Frame(error_popup, padding=20)
+        error_frame.pack(fill="both", expand=True)
+
+        # Add labels and entry fields for each column in the table
+        error_label = ttk.Label(
+            error_frame, text=error_string, width=80, anchor="center"
+        )
+        error_label.place(relx=0.5, rely=0.5, anchor="center")
 
 if __name__ == "__main__":
     screen_gui_app = ScreenGUI()
