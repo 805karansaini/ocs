@@ -246,7 +246,7 @@ class ImpliedVolatility:
         dte = abs(current_date_obj_for_dte - expiry_date_obj_for_dte).days
         # underlying_contract.conId = 265598
 
-        print("underlying_contract: ", underlying_contract)
+        # print("underlying_contract: ", underlying_contract)
         # Get Underlying Price
         underlying_bid, underlying_ask = asyncio.run(MarketDataFetcher.get_current_price_for_contract(underlying_contract))
 
@@ -474,7 +474,7 @@ class ImpliedVolatility:
 
             sec_type = list_of_all_option_contracts[0].secType
 
-            print(f"SecType: {sec_type}")
+            # print(f"SecType: {sec_type}")
             if not sec_type in StrategyVariables.list_of_sec_type_to_use_binary_search:
                 start_time = time.perf_counter()
 
