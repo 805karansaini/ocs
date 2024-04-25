@@ -12,6 +12,7 @@ main.spec
 
 # Ignore documents directory
 .documents/
+OCSFiles/
 
 # Ignore Python cache
 __pycache__/
