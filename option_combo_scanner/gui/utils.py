@@ -476,7 +476,8 @@ class Utils:
         elif opt_type == "PUT":
             return X * math.exp(-r2 * t) * norm.cdf(-d2) - S * math.exp((r1 - r2) * t) * norm.cdf(-d1)
         else:
-            sys.exit("Unknown opt_type = " + opt_type)
+            return 0.01
+            # sys.exit("Unknown opt_type = " + opt_type)
 
     @staticmethod
     def get_delta(S, r1, r2, t, X, market_premium, opt_type):

@@ -112,7 +112,7 @@ async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None)
             variables.nextorderId += 1
             # TODO
             if sec_type in ["IND"]:
-                print(symbol, fut_con_id, exchange, "IND", "", reqId)
+                # print(symbol, fut_con_id, exchange, "IND", "", reqId)
                 # ReqSecDef
                 await get_list_of_strikes_and_expiries_async(symbol, fut_con_id, "", "IND", "", reqId)
             else:

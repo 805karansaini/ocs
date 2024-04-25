@@ -439,8 +439,8 @@ class ScannerCombination:
             list_of_underlying_price_for_combo_group, list_of_combo_group, list_of_multiplier_for_combo_group
         ):
 
-            print(f"Underlying Price: {underlying_price}")
-            print(f"Combination Group: {combination_group}\n")
+            # print(f"Underlying Price: {underlying_price}")
+            # print(f"Combination Group: {combination_group}\n")
 
             list_of_config_leg_objects = [_[-1] for _ in combination_group]
             

@@ -56,7 +56,7 @@ class MaxPNLCalculation:
     @staticmethod
     def calcluate_max_pnl(combination, list_of_config_leg_object):
         # Combination
-        print(f"Combintaion: {combination}")
+        # print(f"Combintaion: {combination}")
 
         # Mode for Combo Calculation
         flag_overall_nearest_expiry = strategy_variables.calculation_mode_for_combination_max_pnl
@@ -230,17 +230,17 @@ class MaxPNLCalculation:
                 # print(f"LegTuple: {leg_tuple} {combo_pay_off_for_current_strike= } {slope_right_numerator= } {strike_right= }")
 
         # TODO- print list_of_combination_payoff_at_all_strikes
-        print(f"        List of Combination Payoff W/P Prem. for all Strikes: {list_of_combination_payoff_at_all_strikes}")
-        print(f"        Premimum: {combination_premium_received}")
+        # print(f"        List of Combination Payoff W/P Prem. for all Strikes: {list_of_combination_payoff_at_all_strikes}")
+        # print(f"        Premimum: {combination_premium_received}")
         
         # TODO - list_of_combination_payoff_at_all_strikes + combination premium
         list_of_combination_payoff_at_all_strikes = [ _ + combination_premium_received for _ in list_of_combination_payoff_at_all_strikes]
-        print(f"        List of Combination Payoff W/ Prem for all Strikes: {list_of_combination_payoff_at_all_strikes}")
+        # print(f"        List of Combination Payoff W/ Prem for all Strikes: {list_of_combination_payoff_at_all_strikes}")
 
         
 
-        print(f"        Payoff(right) - Payoff(right-1) {slope_right_numerator}")
-        print(f"        Payoff(left) - Payoff(left+1) {slope_left_numerator}")
+        # print(f"        Payoff(right) - Payoff(right-1) {slope_right_numerator}")
+        # print(f"        Payoff(left) - Payoff(left+1) {slope_left_numerator}")
 
         # Update the Max Profit
         if abs(slope_right_numerator/slope_right_deno) > 0.90:
@@ -272,7 +272,7 @@ class MaxPNLCalculation:
     # Calulating Combination Payoff for Strike
     @staticmethod
     def get_combination_payoff(list_of_legs_tuple, list_of_config_leg_object, underlying_strike_price, closest_expiry, multiplier=None):
-        print(f"\n      Get Combintaion Payoff:- LegTuple: {list_of_legs_tuple} underlying_strike_price,closest_expiry {[underlying_strike_price, closest_expiry,]}")
+        # print(f"\n      Get Combintaion Payoff:- LegTuple: {list_of_legs_tuple} underlying_strike_price,closest_expiry {[underlying_strike_price, closest_expiry,]}")
         
         # Default Values        
         combination_payoff = 0
