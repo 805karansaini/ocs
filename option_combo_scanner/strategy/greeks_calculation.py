@@ -1,3 +1,4 @@
+import copy
 import datetime
 import math
 from collections import defaultdict
@@ -16,6 +17,16 @@ class CalcluateGreeks:
 
         # Loop over the leg tuple of each combination
         for leg_tuple, config_leg_object in zip(combination, list_of_config_leg_object):
+            
+            # Mulitplier
+            # InstrumentID, and InstrumentObject for multiplier
+            instrument_id = config_leg_object.instrument_id
+            if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
+                multiplier = 100
+                print("compute_all_greeks: Not Found", multiplier)
+            else:
+                multiplier = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id].multiplier)
+                print("compute_all_greeks: Found", multiplier)
 
             # print(f"Leg Tuple: {leg_tuple}")
 
@@ -103,9 +114,9 @@ class CalcluateGreeks:
             }
             for greek, value in greeks_dict.items():
                 if config_leg_object.action.upper() == "BUY":
-                    net_greeks[greek] += float(value) * quantity
+                    net_greeks[greek] += float(value) * quantity * multiplier
                 elif config_leg_object.action.upper() == "SELL":
-                    net_greeks[greek] -= float(value) * quantity
+                    net_greeks[greek] -= float(value) * quantity * multiplier
 
         return net_greeks
 

@@ -70,7 +70,7 @@ class HistoricalVolatility:
                 print(f"Could not compute the H. V. Related value. Exception {e}")
 
         # check if flag for calculating hv for daily candles is true
-        if True: # StrategyVariables.flag_hv_daily:
+        if True:  # StrategyVariables.flag_hv_daily:
             # Get dataframe with 1 D candles
             combination_price_dataframe_for_hv = HistoricalVolatility.group_dataframe_by_time_and_create_1d_candle_first_open_last_close(
                 combination_price_dataframe.copy()
@@ -299,7 +299,6 @@ class HistoricalVolatility:
             current_underlying_hv_value = list_of_hv_values_for_n_days[-1] if len(list_of_hv_values_for_n_days) > 0 else None
             if StrategyVariables.flag_test_print:
                 print(f"Current HV value for conid: {con_id},", current_underlying_hv_value)
-            
 
             # Average HV over N-Days
             if len(list_of_hv_values_for_n_days) != 0:
@@ -309,10 +308,10 @@ class HistoricalVolatility:
                 average_underlying_hv_over_n_days = None
             # average_underlying_hv_over_n_days = sum(list_of_hv_values_for_n_days) / len(list_of_hv_values_for_n_days)
             # print(f"Average HV value ove n days for conid: {con_id},", average_underlying_hv_over_n_days)
-            
+
             # Calculate Change in underlying
             n_day_ago_date = 14
-            one_day_ago_date = 1 
+            one_day_ago_date = 1
             one_day_ago_date = unique_dates[-one_day_ago_date]
             n_day_ago_date = unique_dates[-n_day_ago_date]
 
@@ -350,7 +349,6 @@ class HistoricalVolatility:
                     if absoulte_change_in_underlying_over_one_day
                     else absoulte_change_in_underlying_over_one_day
                 ),
-                
                 "absoulte_change_in_underlying_over_n_days": (
                     round(absoulte_change_in_underlying_over_n_days, 2)
                     if absoulte_change_in_underlying_over_n_days

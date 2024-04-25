@@ -157,7 +157,7 @@ class Scanner:
 
             if self.check_do_we_need_to_skip_current_scan():
                 continue
-
+            
             list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
 
             # To do early teminate
@@ -324,12 +324,24 @@ class Scanner:
                 action = leg_object.action
                 quantity = leg_object.quantity
                 _, _, delta, _, _, _, _, _, _, _, _, _, _ = leg_tuple
+
+                # Mulitplier
+                # InstrumentID, and InstrumentObject for multiplier
+                instrument_id = leg_object.instrument_id
+                if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
+                    multiplier = 100
+                    print("Net Delta: Not Found", multiplier)
+
+                else:
+                    multiplier = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id].multiplier)
+                    print("Net Delta: Found", multiplier)
+
                 # if Buy will add the delta
                 if action.upper() == "Buy".upper():
-                    net_combo += delta * quantity
+                    net_combo += delta * quantity * multiplier
                 # If Sell will substract the delta
                 else:
-                    net_combo -= delta * quantity
+                    net_combo -= delta * quantity * multiplier
             net_combo = f"{float(net_combo):,.4f}"
             list_of_combo_net_deltas.append(net_combo)
         return list_of_combo_net_deltas

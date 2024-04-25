@@ -48,6 +48,10 @@ class HistoricalDataFetcher:
         # Error Received
         variables.req_error[reqId] = False
 
+        # For IND we only have the Trades Data
+        if contract.secType in ["IND"]:
+            what_to_show = "TRADES"
+
         contract = IBkrAlgoOneAdapter.contract(contract)
         duration, duration_unit = IBkrAlgoOneAdapter.duration(duration_string)
         bar_size, bar_unit = IBkrAlgoOneAdapter.bar_size(bar_size)
