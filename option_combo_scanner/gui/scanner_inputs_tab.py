@@ -555,7 +555,7 @@ class ScannerInputsTab:
 
                         list_of_trading_classes = sorted(list_of_trading_classes)
 
-                        print(f"Trading class: {list_of_trading_classes}")
+                        # print(f"Trading class: {list_of_trading_classes}")
                         # Check if result
                         if trading_classes != []:
                             # Get the grid slave of the input frame for FOP trading class textbox
