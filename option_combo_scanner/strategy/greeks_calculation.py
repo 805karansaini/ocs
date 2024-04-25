@@ -17,7 +17,7 @@ class CalcluateGreeks:
         # Loop over the leg tuple of each combination
         for leg_tuple, config_leg_object in zip(combination, list_of_config_leg_object):
 
-            print(f"Leg Tuple: {leg_tuple}")
+            # print(f"Leg Tuple: {leg_tuple}")
 
             # Unpack the values stored in tuple
             _, strike, _, _, expiry, bid, ask, _, _, vega, theta, gamma, underlying_price = leg_tuple
