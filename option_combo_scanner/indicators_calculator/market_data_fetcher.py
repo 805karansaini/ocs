@@ -35,6 +35,7 @@ class MarketDataFetcher:
         variables.options_theta[reqId] = None
         variables.options_gamma[reqId] = None
         variables.und_price[reqId] = None
+        variables.last_price[reqId] = None
 
         # Set request type depending on whether the market is live or not
         if flag_market_open:
@@ -90,6 +91,7 @@ class MarketDataFetcher:
                     and variables.options_theta[reqId] is not None
                     and variables.options_gamma[reqId] is not None
                     and variables.und_price[reqId] is not None
+                    and variables.last_price[reqId] is not None
                 )
             ):
 
@@ -114,6 +116,7 @@ class MarketDataFetcher:
                     variables.options_theta[reqId],
                     variables.options_gamma[reqId],
                     variables.und_price[reqId],
+                    variables.last_price[reqId],
                 )
 
             # Response not yet ended
