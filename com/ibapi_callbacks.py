@@ -526,6 +526,10 @@ class IBapi(
         if (tickType == TickTypeEnum.ASK) and (price != -1):
             variables.ask_price[reqId] = price
 
+        # Updating ask price, if price is not -1
+        if (tickType == TickTypeEnum.LAST) and (price != -1):
+            variables.last_price[reqId] = price
+
     # Callback for placeOrder
     def orderStatus(
         self,

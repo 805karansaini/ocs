@@ -188,6 +188,7 @@ class MarketDataFetcher:
 
         variables.ask_price[reqId] = None
         variables.bid_price[reqId] = None
+        variables.last_price[reqId] = None
 
         # Print to console
         if variables.flag_debug_mode:
@@ -222,7 +223,7 @@ class MarketDataFetcher:
                 (variables.req_error[reqId] == True)
                 or (counter >= int(variables.max_wait_time_for_mkt_data / variables.sleep_time_waiting_for_tws_response))
                 or (variables.req_mkt_data_end[reqId])
-                or (variables.bid_price[reqId] is not None and variables.ask_price[reqId] is not None)
+                or (variables.bid_price[reqId] is not None and variables.ask_price[reqId] is not None and variables.last_price[reqId] is not None)
             ):
                 # Unsubscribe market data
                 variables.app.cancelMktData(reqId)
@@ -231,6 +232,7 @@ class MarketDataFetcher:
                 return (
                     variables.bid_price[reqId],
                     variables.ask_price[reqId],
+                    variables.last_price[reqId],
                 )
 
             # Response not yet ended

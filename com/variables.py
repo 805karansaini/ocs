@@ -157,6 +157,7 @@ class variables(object):
     # dict for storing price candle data
     bid_price = {}
     ask_price = {}
+    last_price = {}
     bid_size = {}
     ask_size = {}
     volume = {}
