@@ -248,8 +248,11 @@ class ScannerCombination:
             list_of_multiplier_for_combo_group.append(instrument_multiplier)
 
             # If the Intrument SecType is OPT, create underlying STK contract
-            if instrument_sec_type == "OPT":
-                underlying_sec_type = "STK"
+            if instrument_sec_type in ["OPT", "IND"]:
+                if instrument_sec_type == "OPT":
+                    underlying_sec_type = "STK"
+                else:
+                    underlying_sec_type = "IND"
                 underlying_multiplier = 1
 
                 underlying_contract = get_contract(
@@ -285,13 +288,20 @@ class ScannerCombination:
             for combo_leg_tuple in combination_group:
                 (symbol, strike, delta, conid, expiry, bid, ask, iv, underlying_conid, config_leg_obj) = combo_leg_tuple
 
+                if instrument_sec_type in ["OPT", "FOP"]:
+                    _opt_instrument_sec_type = instrument_sec_type
+                    _opt_instrument_exchange = instrument_exchange
+                elif instrument_sec_type in ["IND"]:
+                    _opt_instrument_sec_type = "OPT"
+                    _opt_instrument_exchange = "SMART"
+
                 # Right from the ConfigLegObject
                 right = config_leg_obj.right
 
                 option_contract = get_contract(
                     symbol,
-                    instrument_sec_type,
-                    instrument_exchange,
+                    _opt_instrument_sec_type,
+                    _opt_instrument_exchange,
                     instrument_currency,
                     expiry,
                     strike,
@@ -346,19 +356,20 @@ class ScannerCombination:
             _,
             _,
             _,
-        ) in underlying_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple:
+            last_price
+        ), __und_contract in zip(underlying_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple, list_of_underlying_contract):
 
-            if bid_price is None or ask_price is None:
+            if __und_contract.secType == "IND" and last_price is not None:
+                list_of_underlying_price_for_combo_group.append(last_price)
+            elif __und_contract.secType != "IND" and (bid_price is not None or ask_price is not None):
+                ba_mid = (bid_price + ask_price) / 2
+                list_of_underlying_price_for_combo_group.append(ba_mid)
+            else:
                 Utils.display_message_popup(
                     f"Error Combo ID: {combo_id}",
                     f"Bid Price or Ask Price is None",
                 )
                 return
-                # Show error popup and return
-                # return False
-            else:
-                ba_mid = (bid_price + ask_price) / 2
-                list_of_underlying_price_for_combo_group.append(ba_mid)
 
         temp_list_of_combination_legs = []
         list_of_number_of_legs_in_combo = []
@@ -388,6 +399,7 @@ class ScannerCombination:
                 _,
                 _,
                 _,
+                last_price,
             ),
         ) in enumerate(zip(temp_list_of_combination_legs, options_list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple)):
 
@@ -423,7 +435,6 @@ class ScannerCombination:
 
         # Rename the variable
         list_of_combo_group = new_list_of_combination_groups
-
 
         res = []
 
