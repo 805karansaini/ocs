@@ -23,10 +23,10 @@ class CalcluateGreeks:
             instrument_id = config_leg_object.instrument_id
             if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
                 multiplier = 100
-                print("compute_all_greeks: Not Found", multiplier)
+                # print("compute_all_greeks: Not Found", multiplier)
             else:
                 multiplier = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id].multiplier)
-                print("compute_all_greeks: Found", multiplier)
+                # print("compute_all_greeks: Found", multiplier)
 
             # print(f"Leg Tuple: {leg_tuple}")
 
