@@ -317,7 +317,8 @@ class IndicatorHelper:
                 vega,
                 theta,
                 gamma,
-                und_price
+                und_price,
+                last_price,
             ) in zip(
                 list_of_all_option_contracts,
                 list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple,

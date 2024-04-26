@@ -101,9 +101,9 @@ class IndicatorCalculation:
                 print(f"Underlying Contract: {underlying_contract}")
                 print(f"All Strikes: {all_strikes}")
             
-            # Can not compute the values for this indcator row continue
+            # Can not compute the values for this indcator row continue  
             if underlying_contract is None or all_strikes is None:
-                print(f"Inside calculate_realtime_market_data_based_indicators getting for Underlying Contract: {underlying_contract}")
+                # print(f"Inside calculate_realtime_market_data_based_indicators getting for Underlying Contract: {underlying_contract}")
                 continue
 
             try:
