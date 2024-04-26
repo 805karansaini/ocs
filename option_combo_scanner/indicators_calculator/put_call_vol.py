@@ -150,6 +150,11 @@ class PutCallVol:
             list_of_all_put_option_contracts = []
 
             for strike in list_of_all_call_strikes:
+                # Sec Type for IND Support gets OPT
+                if sec_type == "IND":
+                    sec_type = "OPT"
+                    exchange = "SMART"
+
                 opt_contract = get_contract(
                     symbol=symbol,
                     sec_type=sec_type,
@@ -164,6 +169,11 @@ class PutCallVol:
                 list_of_all_call_option_contracts.append(opt_contract)
 
             for strike in list_of_all_put_strikes:
+                # Sec Type for IND Support gets OPT
+                if sec_type == "IND":
+                    sec_type = "OPT"
+                    exchange = "SMART"
+
                 opt_contract = get_contract(
                     symbol=symbol,
                     sec_type=sec_type,

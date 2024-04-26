@@ -41,7 +41,7 @@ class IndicatorCalculation:
 
             # if indicator id is not present, continue
             if indicator_id not in StrategyVariables.map_indicator_id_to_indicator_object:
-                print(f"Inside calculate_realtime_market_data_based_indicators could not find indicator id: {indicator_id}")
+                # print(f"Inside calculate_realtime_market_data_based_indicators could not find indicator id: {indicator_id}")
                 continue
 
             # Get the unix time
@@ -57,26 +57,33 @@ class IndicatorCalculation:
 
             # Get all the strikes, so that we can create the FOP OPT contract, for which the below data is required(Strike, Delta, IV )
             if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
-                print(f"Inside calculate_realtime_market_data function could not find instrument id: {instrument_id}")
+                # print(f"Inside calculate_realtime_market_data function could not find instrument id: {instrument_id}")
                 continue
 
             # Local copy of the instrument object
             local_instrument_obj = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id])
             
+            # CRITICAL CHANGE IND SUPPORT - START
             symbol = indicator_object.symbol
             expiry = indicator_object.expiry
             sec_type = local_instrument_obj.sec_type
+
+            # Underlying SecType
             if sec_type.upper() == "OPT":
-                underlying_sec_type_ = "STK"
+                underlying_sec_type = "STK"
             elif sec_type.upper() == "FOP":
-                underlying_sec_type_ = "FUT"
+                underlying_sec_type = "FUT"
             elif sec_type.upper() == "IND":
-                underlying_sec_type_ = "IND"
-            underlying_sec_type = underlying_sec_type_ #"STK" if sec_type.upper() == "OPT" else "FUT"
+                underlying_sec_type = "IND"
+            else:
+                continue
+
+            underlying_sec_type = underlying_sec_type 
             exchange = local_instrument_obj.exchange
             currency = local_instrument_obj.currency
             multiplier = local_instrument_obj.multiplier
             trading_class = local_instrument_obj.trading_class
+            # CRITICAL CHANGE IND SUPPORT - END
 
             underlying_contract, all_strikes = IndicatorHelper.get_underlying_contract_and_all_strikes(
                 indicator_object,
@@ -89,7 +96,11 @@ class IndicatorCalculation:
                 multiplier,
                 trading_class,
             )
-
+            
+            if StrategyVariables.flag_test_print:
+                print(f"Underlying Contract: {underlying_contract}")
+                print(f"All Strikes: {all_strikes}")
+            
             # Can not compute the values for this indcator row continue
             if underlying_contract is None or all_strikes is None:
                 print(f"Inside calculate_realtime_market_data_based_indicators getting for Underlying Contract: {underlying_contract}")
@@ -97,7 +108,8 @@ class IndicatorCalculation:
 
             try:
                 if flag_realtime_indicators:
-
+                    
+                    # Calculate RealTime Market Data Based Indicators, and return call and put strikes for selected delta
                     list_of_call_strike, list_of_put_strikes = ImpliedVolatility.compute(
                         indicator_object,
                         symbol,
@@ -111,6 +123,7 @@ class IndicatorCalculation:
                         underlying_contract,
                         all_strikes,
                     )
+
                     if StrategyVariables.flag_put_call_indicator_based_on_selected_deltas_only == True and (
                         list_of_call_strike is None or list_of_put_strikes is None
                     ):

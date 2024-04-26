@@ -99,7 +99,6 @@ class IndicatorHelper:
         Function used to get the
         list of all the available strikes
         and closest expiry for OPT sec_type
-
         """
         (
             all_expiry_dates_ticker,
@@ -114,7 +113,7 @@ class IndicatorHelper:
             exchange=exchange,
             currency=currency,
             multiplier=multiplier,
-            fop_trading_class="",
+            fop_trading_class=trading_class,
         )
 
         if all_strikes is not None:
@@ -172,7 +171,7 @@ class IndicatorHelper:
                 # Get contract details.
                 # Update uncontrcat details
 
-            elif underlying_sec_type == "STK":
+            elif underlying_sec_type in ["STK", "IND"]:
                 (
                     all_strikes,
                     closest_expiry_date,
@@ -213,6 +212,12 @@ class IndicatorHelper:
         trading_class,
         all_strikes,
     ):
+
+        # Sec Type for IND Support gets OPT
+        if sec_type == "IND":
+            sec_type = "OPT"
+            exchange = "SMART"
+
         # Init list
         list_of_all_call_option_contracts = []
         list_of_all_put_option_contracts = []

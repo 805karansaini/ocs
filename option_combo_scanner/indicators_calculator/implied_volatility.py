@@ -54,8 +54,8 @@ class ImpliedVolatility:
 
         # Print Here Target Delta Strike, Dlta, IV TODO  
         if StrategyVariables.flag_test_print:
-            print(f"Call Nearest Data: {nearest_call_data.to_string()} target_Delta: {target_delta}, IV: {nearest_call_data[iv_column_name]}")
-            print(f"Put Nearest Data: {nearest_put_data.to_string()} target_Delta: {target_delta}, IV: {nearest_put_data[iv_column_name]}")
+            print(f"Risk Reversal:  target_Delta: {target_delta}, IV: {nearest_call_data[iv_column_name]}  \nCall Nearest Data: \n{nearest_call_data.to_string()} ")
+            print(f"Risk Reversal:  target_Delta: {target_delta}, IV: {nearest_put_data[iv_column_name]}   \nPut Nearest Data: \n{nearest_put_data.to_string()}")
 
         # Calculate risk reversal based on the nearest call and put deltas to the target delta.
         risk_reversal = nearest_call_data[iv_column_name] - nearest_put_data[iv_column_name]
@@ -246,20 +246,35 @@ class ImpliedVolatility:
         dte = abs(current_date_obj_for_dte - expiry_date_obj_for_dte).days
         # underlying_contract.conId = 265598
 
-        # print("underlying_contract: ", underlying_contract)
         # Get Underlying Price
-        underlying_bid, underlying_ask = asyncio.run(MarketDataFetcher.get_current_price_for_contract(underlying_contract))
+        underlying_bid, underlying_ask, last_price = asyncio.run(MarketDataFetcher.get_current_price_for_contract(underlying_contract))
 
-        # Price is not available
-        if underlying_bid is None or underlying_ask is None:
-            # Can not compute the values
-            print(
-                f"Indicator ID: {indicator_object.indicator_id}, Inside implied volatiltiy compute unable to get underlying_bid: {underlying_bid}, underlying_ask: {underlying_ask}"
-            )
-            return None, None
+        if StrategyVariables.flag_test_print:
+            print(f"Indicator ID: {indicator_id}, Underlying Contract: {underlying_contract}")
+            print(f"Indicator ID: {indicator_id}, Underlying Bid: {underlying_bid}, Underlying Ask: {underlying_ask}")
+            # time.sleep(100)
 
-        # Current underlying price
-        current_underlying_price = (underlying_bid + underlying_ask) / 2
+        # Current underlying price is last_price in case of INDEX
+        if sec_type == "IND":
+            if last_price is None:
+                return None, None
+            else:
+                current_underlying_price = last_price
+        else:
+            # Price is not available
+            if underlying_bid is None or underlying_ask is None:
+                # Can not compute the values
+                print(
+                    f"Indicator ID: {indicator_object.indicator_id}, Inside implied volatiltiy compute unable to get underlying_bid: {underlying_bid}, underlying_ask: {underlying_ask}"
+                )
+                return None, None
+
+            # Current underlying price
+            else:
+                current_underlying_price = (underlying_bid + underlying_ask) / 2
+
+        if StrategyVariables.flag_test_print:
+            print(f"Indicator ID: {indicator_id}, Current Underlying Price: {current_underlying_price}")
 
         # Getting the underlying_contarct, and all the call and put option contracts
         (
@@ -290,7 +305,7 @@ class ImpliedVolatility:
         )
 
         # Print to console
-        if variables.flag_debug_mode:
+        if StrategyVariables.flag_test_print:
             print(f"\nCall ")
             print(
                 tabulate(
@@ -392,10 +407,14 @@ class ImpliedVolatility:
 
         # Current Avg IV Calculate
         current_avg_iv = (current_iv_d1 + current_iv_d2) / 2 if current_iv_d1 and current_iv_d2 else None
-        # print(f"Indicaor ID: {indicator_object.indicator_id}")
-        # print(
-            # f"{current_iv_d1=},  {current_iv_d2=} , {current_rr_d1=}, {current_rr_d2=}, {max_pain_strike=}, {min_pain_strike=} , {support_strike=}, {resistance_strike=}, {current_avg_iv=}"
-        # )
+        
+        # Print to console
+        if StrategyVariables.flag_test_print:
+            print(f"Indicaor ID: {indicator_object.indicator_id}")
+            print(
+                f"{current_iv_d1=},  {current_iv_d2=} , {current_rr_d1=}, {current_rr_d2=}, {max_pain_strike=}, {min_pain_strike=} , {support_strike=}, {resistance_strike=}, {current_avg_iv=}"
+            )
+
         # Update these values here # TODO IMPRT
         values_dict = {
             "current_iv_d1": round(current_iv_d1 * 100, 2) if current_iv_d1 else current_iv_d1,
@@ -450,7 +469,6 @@ class ImpliedVolatility:
             )
             return None, None
         else:
-            # TODO REMOVE
             if StrategyVariables.flag_test_print:
                 print(f"Indicator ID: {indicator_id}, Underlying DataFrame")
                 print(underlying_df.to_string())
@@ -474,14 +492,20 @@ class ImpliedVolatility:
 
             sec_type = list_of_all_option_contracts[0].secType
 
+            flag_binnary_serach = False
             # print(f"SecType: {sec_type}")
             if not sec_type in StrategyVariables.list_of_sec_type_to_use_binary_search:
                 start_time = time.perf_counter()
 
                 # Get the Data in one go and store in the DataStore
                 BinarySearchDeltaIV.get_historical_data_for_list_of_contracts_and_store_in_data_store(list_of_all_option_contracts)
-
+                
+                flag_binnary_serach = True
                 print(f"Total Time Took: {time.perf_counter() - start_time}")
+
+            # Print to Console
+            if StrategyVariables.flag_test_print:
+                print(f"OPT Contract: {list_of_all_option_contracts[0]},  SecType: {sec_type}, Use BS: {flag_binnary_serach}")
 
             for ith_day in range(1, n_th_day):
 

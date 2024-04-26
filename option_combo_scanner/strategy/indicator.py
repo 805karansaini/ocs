@@ -7,8 +7,7 @@ from com.contracts import get_contract, get_contract_details
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.strategy_variables import \
-    StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
 
 logger = CustomLogger.logger
 
@@ -82,10 +81,7 @@ class Indicator:
             if hasattr(self, key):
                 setattr(self, key, value)
             else:
-                # TODO - ARYAN
-                logger.error(
-                    f"Inside Indicator Object : {self.indicator_id} '{key}' is not an attribute of this class. new value: {value}"
-                )
+                logger.error(f"Inside Indicator Object : {self.indicator_id} '{key}' is not an attribute of this class. new value: {value}")
 
     def remove_indicator_from_system(self):
 
@@ -106,34 +102,33 @@ class Indicator:
 
         # Assigning the current object to the 'indicator_object' variable within the 'strategy_variables'
         strategy_variables.map_indicator_id_to_indicator_object[self.indicator_id] = self
-        
+
         # Used by the Impact Calculation
         strategy_variables.map_instrument_to_indicator_id[self.instrument_id] = self.indicator_id
 
         # Used for Heap Implementation
         strategy_variables.primary_min_heap_indicators.push((-1, self.indicator_id))
-
-
-        # # Create DataFrame
-        # row = pd.DataFrame([self.get_tuple()], columns=strategy_variables.indicator_columns, index=[0],)
-
-        # # Add Row to dataframe (concat)
-        # strategy_variables.scanner_indicator_table_df = pd.concat(
-        #     [strategy_variables.scanner_indicator_table_df, row],
-        #     ignore_index=True,
-        # )
-
+        
 
         # Check if the underlying contract ID is not already present in the map
         if self.underlying_conid not in strategy_variables.map_con_id_to_contract:
+            # Exchange of Instrument
+            exchange = self.exchange
+
             # Underlying SecType
-            underlying_sec_type = "FUT" if self.sec_type == "FOP" else "STK"
+            if self.sec_type == "FOP":
+                underlying_sec_type = "FUT"
+            elif self.sec_type == "OPT":
+                underlying_sec_type = "STK"
+                exchange = "SMART"
+            elif self.sec_type == "IND":
+                underlying_sec_type = "IND"
 
             # Create an underlying contract
             underlying_contract = get_contract(
                 self.symbol,
                 underlying_sec_type,
-                "SMART" if underlying_sec_type == "STK" else self.exchange,
+                exchange,
                 self.currency,
                 multiplier=self.multiplier,
                 con_id=self.underlying_conid,
@@ -147,11 +142,11 @@ class Indicator:
             strategy_variables.map_con_id_to_contract[self.underlying_conid] = underlying_contract
 
     def get_tuple(self):
-        
-        # LastAllowedTime: CurrentTime - CacheTime, Permissible time for the indicator cache        
+
+        # LastAllowedTime: CurrentTime - CacheTime, Permissible time for the indicator cache
         indicator_cache_time_in_seconds: int = strategy_variables.indicator_cache_time_in_seconds
         current_time = datetime.datetime.now(variables.target_timezone_obj)
-        last_allowed_time =  current_time - datetime.timedelta(seconds=indicator_cache_time_in_seconds)
+        last_allowed_time = current_time - datetime.timedelta(seconds=indicator_cache_time_in_seconds)
 
         # Decode the values
         current_underlying_hv_value = self.decode_value(self.current_underlying_hv_value, last_allowed_time)
@@ -176,7 +171,7 @@ class Indicator:
             pc_change_iv_change = round(absolute_pc_change_since_yesterday / absolute_change_in_avg_iv_since_yesterday, 2)
         else:
             pc_change_iv_change = None
-        
+
         absoulte_change_in_underlying_over_n_days = self.decode_value(self.absoulte_change_in_underlying_over_n_days, last_allowed_time)
         absoulte_change_in_underlying_over_one_day = self.decode_value(self.absoulte_change_in_underlying_over_one_day, last_allowed_time)
         # Calculate Chg Underlying/Chg Option Price
@@ -193,7 +188,6 @@ class Indicator:
                 res.append(round(absoulte_change_in_underlying_over_one_day / val_, 2))
             else:
                 res.append(None)
-
 
         for val_ in [
             self.decode_value(self.chg_in_call_opt_price_since_nth_day_d1, last_allowed_time),
@@ -215,20 +209,17 @@ class Indicator:
             self.symbol,
             self.sec_type,
             self.expiry,
-            
             # Decode Values
             current_underlying_hv_value,
             self.decode_value(self.average_underlying_hv_over_n_days, last_allowed_time),
             self.decode_value(self.absoulte_change_in_underlying_over_n_days, last_allowed_time),
             self.decode_value(self.percentage_change_in_underlying_over_n_days, last_allowed_time),
             current_hv_minus_iv,
-
             self.decode_value(self.current_iv_d1, last_allowed_time),
             self.decode_value(self.current_iv_d2, last_allowed_time),
             current_avg_iv,
             self.decode_value(self.absolute_change_in_avg_iv_since_yesterday, last_allowed_time),
             self.decode_value(self.percentage_change_in_avg_iv_since_yesterday, last_allowed_time),
-            
             self.decode_value(self.avg_iv_over_n_days, last_allowed_time),
             self.decode_value(self.current_rr_d1, last_allowed_time),
             self.decode_value(self.current_rr_d2, last_allowed_time),
@@ -240,28 +231,26 @@ class Indicator:
             self.decode_value(self.min_pain_strike, last_allowed_time),
             self.decode_value(self.oi_support_strike, last_allowed_time),
             self.decode_value(self.oi_resistance_strike, last_allowed_time),
-            
             self.decode_value(self.put_call_volume_ratio_current_day, last_allowed_time),
             self.decode_value(self.put_call_volume_ratio_average_over_n_days, last_allowed_time),
             absolute_pc_change_since_yesterday,
             # Computed
-            
             pc_change_iv_change,
         ]
 
         tup.extend(res)
-        
+
         tup = ["N/A" if _ is None else _ for _ in tup]
 
         return tuple(tup)
 
     def decode_value(self, value, last_allowed_time):
-        
+
         if value is None:
             return None
         # if not isinstance(value, str):
         #     value = str(value)
-        
+
         # value = 62.58434308994543|2024-03-08 23:30:38.481088+02:00
         try:
             value, time_stamp = value.split("|")
@@ -272,7 +261,7 @@ class Indicator:
                 if time_stamp:
                     time_stamp = datetime.datetime.strptime(time_stamp, "%Y-%m-%d %H:%M:%S.%f%z")
                     if time_stamp < last_allowed_time:
-                        return None    
+                        return None
                 return float(value)
         except Exception as e:
             print(f"Value: {value}, {e}")
