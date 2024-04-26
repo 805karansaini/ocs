@@ -326,7 +326,8 @@ class Scanner:
                 action = leg_object.action
                 quantity = leg_object.quantity
                 _, _, delta, _, _, _, _, _, _, _, _, _, _ = leg_tuple
-
+                delta = float(delta)
+                
                 # Mulitplier
                 # InstrumentID, and InstrumentObject for multiplier
                 instrument_id = leg_object.instrument_id
@@ -336,6 +337,7 @@ class Scanner:
 
                 else:
                     multiplier = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id].multiplier)
+                    multiplier = int(float(multiplier))
                     # print("Net Delta: Found", multiplier)
 
                 # if Buy will add the delta
@@ -344,6 +346,7 @@ class Scanner:
                 # If Sell will substract the delta
                 else:
                     net_combo -= delta * quantity * multiplier
+
             net_combo = f"{float(net_combo):,.4f}"
             list_of_combo_net_deltas.append(net_combo)
         return list_of_combo_net_deltas

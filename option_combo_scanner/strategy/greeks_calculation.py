@@ -26,6 +26,7 @@ class CalcluateGreeks:
                 # print("compute_all_greeks: Not Found", multiplier)
             else:
                 multiplier = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id].multiplier)
+                multiplier = int(float(multiplier))
                 # print("compute_all_greeks: Found", multiplier)
 
             # print(f"Leg Tuple: {leg_tuple}")
@@ -33,8 +34,8 @@ class CalcluateGreeks:
             # Unpack the values stored in tuple
             _, strike, _, _, expiry, bid, ask, _, _, vega, theta, gamma, underlying_price = leg_tuple
             options_prem = (bid + ask) / 2
-            quantity = config_leg_object.quantity
-
+            quantity = int(config_leg_object.quantity)
+             
             # Calcluate the time to expiration for the greeks
             current_date = datetime.datetime.today().strftime("%Y%m%d")
             current_date_obj = datetime.datetime.strptime(current_date, "%Y%m%d")
