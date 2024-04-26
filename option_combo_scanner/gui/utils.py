@@ -569,3 +569,24 @@ class Utils:
         # Remove from system
         if list_of_indicator_ids_deletion:
             Utils.remove_row_from_indicator_table(list_of_indicator_ids=list_of_indicator_ids_deletion)
+
+    @staticmethod
+    def flag_check_early_termination_of_indicator(instrument_id=None, indicator_id=None):
+
+        try:
+            if instrument_id:
+                instrument_id = int(float(instrument_id))
+                if not instrument_id in StrategyVariables.map_instrument_id_to_instrument_object:
+                    return True
+        except Exception as e:
+            pass
+
+        try:
+            if indicator_id:
+                indicator_id = int(float(indicator_id))
+                if not indicator_id in StrategyVariables.map_indicator_id_to_indicator_object:
+                    return True
+        except Exception as e:
+            pass
+
+        return False
