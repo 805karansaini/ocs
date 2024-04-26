@@ -91,6 +91,8 @@ class ScannerInputsTab:
         self.last_edited_status = None
 
         self.flag_config_manager_pop_opened = False
+        self.force_start_scan_button = None
+        self.force_start_scan_button_text = "Disable Scan"
 
         self.create_scanner_inputs_tab()
 
@@ -117,13 +119,13 @@ class ScannerInputsTab:
         add_instrument_button.grid(column=1, row=0, padx=5, pady=5)
 
         # Force Start Scan Button
-        force_start_scan_button = ttk.Button(
+        self.force_start_scan_button = ttk.Button(
             add_instrument_frame,
-            text="Force Start Scan",
+            text=self.force_start_scan_button_text,
             command=lambda: self.force_start_scan_button_click(),
         )
 
-        force_start_scan_button.grid(column=3, row=0, padx=5, pady=5)
+        self.force_start_scan_button.grid(column=3, row=0, padx=5, pady=5)
 
         # Place in center
         add_instrument_frame.place(relx=0.5, anchor=tk.CENTER)
@@ -172,7 +174,26 @@ class ScannerInputsTab:
         self.instrument_table.bind("<Button-3>", self.instrument_table_right_click_menu)
 
     def force_start_scan_button_click(self):
-        strategy_variables.flag_force_restart_scanner = True
+
+        # Rename the Button text
+        if self.force_start_scan_button_text == "Disable Scan":
+            self.force_start_scan_button_text = "Enable Scan"
+        else:
+            self.force_start_scan_button_text = "Disable Scan"
+        self.force_start_scan_button.config(text=self.force_start_scan_button_text)
+
+        # Change the Scan State (True State): Mean the scan should always be in this state
+        strategy_variables.flag_scanner_running_state = not strategy_variables.flag_scanner_running_state
+
+        try:
+            # Enable Terminate Scan Flag        
+            if not strategy_variables.flag_scanner_running_state and strategy_variables.combo_scanner_object:
+                strategy_variables.combo_scanner_object.flag_terminate_scan = True
+        except Exception as e:
+            pass 
+
+        if strategy_variables.flag_scanner_running_state:
+            strategy_variables.last_scanned_time = None
 
     def instrument_table_right_click_menu(self, event):
         # get the Treeview row that was clicked
@@ -1402,9 +1423,9 @@ class ScannerInputsTab:
             menu = tk.Menu(self.leg_config_manager_table, tearoff=0)
 
             if status == "Inactive":
-                new_status = "Active"
+                new_status = "Activate"
             else:
-                new_status = "Inactive"
+                new_status = "Inactivate"
 
             menu.add_command(
                 label=new_status, command=lambda: threading.Thread(target=self.update_config_status(config_id, status)).start()
@@ -1612,7 +1633,7 @@ class ScannerInputsTab:
 
             if res:
                 config_id = int(float(config_id))
-                print(f"Delete Config: {config_id}")
+                # print(f"Delete Config: {config_id}")
 
                 # Remove from the system
                 strategy_variables.map_config_id_to_config_object[config_id].remove_from_system()

@@ -46,6 +46,7 @@ class Scanner:
     ):
         self.config_id = None
         self.config_obj = None  # copy.deepcopy(StrategyVariables.config_object)
+        self.flag_terminate_scan = False
 
     def check_do_we_need_to_skip_current_scan(
         self,
@@ -75,7 +76,7 @@ class Scanner:
         """
 
         # User Clicked on Force Restart
-        if StrategyVariables.flag_force_restart_scanner:
+        if self.flag_terminate_scan:
             scanner_logger.info(f"Inside Start Scanner: Config ID: {self.config_id} Scanned Combo, Force Restart")
             return True
 
@@ -157,7 +158,7 @@ class Scanner:
 
             if self.check_do_we_need_to_skip_current_scan():
                 continue
-            
+
             list_of_combo_net_deltas = self.get_list_combo_net_delta(list_of_all_generated_combination=list_of_all_generated_combination)
 
             # To do early teminate
@@ -306,6 +307,7 @@ class Scanner:
         res = ScannerAlgo(
             config_obj=self.config_obj,
             config_id=self.config_id,
+            scanner_object=self,
         ).run_scanner(remaining_no_of_legs, delta_range_low, delta_range_high, current_date, leg_object)
 
         scanner_logger.info(f"Scanner.generate_combinations, Config ID: {self.config_id} Done Running the Scanner Algo")
@@ -330,11 +332,11 @@ class Scanner:
                 instrument_id = leg_object.instrument_id
                 if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
                     multiplier = 100
-                    print("Net Delta: Not Found", multiplier)
+                    # print("Net Delta: Not Found", multiplier)
 
                 else:
                     multiplier = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id].multiplier)
-                    print("Net Delta: Found", multiplier)
+                    # print("Net Delta: Found", multiplier)
 
                 # if Buy will add the delta
                 if action.upper() == "Buy".upper():
@@ -352,8 +354,7 @@ def run_option_combo_scanner():
     pass
 
     """
-    StrategyVariables.flag_force_restart_scanner = False
-    last_scanned_time = None
+    StrategyVariables.last_scanned_time = None
 
     scanner_logger.info(f"Started the Scanner Thread")
 
@@ -361,25 +362,35 @@ def run_option_combo_scanner():
         current_time = time.time()
 
         try:
-
-            if (
-                StrategyVariables.flag_force_restart_scanner
-                or last_scanned_time is None
-                or current_time - last_scanned_time > StrategyVariables.rescan_time_in_seconds
+            # If the scanner running state is enabled, and we need to run first scan or a rescan, then run it 
+            if StrategyVariables.flag_scanner_running_state and (
+                StrategyVariables.last_scanned_time is None or current_time - StrategyVariables.last_scanned_time > StrategyVariables.rescan_time_in_seconds
             ):
-                StrategyVariables.flag_force_restart_scanner = False
 
                 scanner_logger.info(f"Starting the Scanner")
 
                 try:
+                    # Create the Scan Object
                     scanner_object = Scanner()
+
+                    # Set the object to scan object
+                    StrategyVariables.combo_scanner_object = scanner_object
+
+                    # Run the Scan
                     scanner_object.start_scanner()
+
+                    # Set the object to None
+                    StrategyVariables.combo_scanner_object = None
+
                 except Exception as e:
                     # Print the traceback
                     traceback.print_exc()
 
+                    # Set the object to None
+                    StrategyVariables.combo_scanner_object = None
+
                 # Update last_time
-                last_scanned_time = time.time()
+                StrategyVariables.last_scanned_time = time.time()
 
         except Exception as e:
             print(f"Inside run_option_combo_scanner: {e}")

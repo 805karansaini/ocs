@@ -244,3 +244,11 @@ class StrategyVariables:
 
     # Primary Heap for the Indicators
     primary_min_heap_indicators = MinHeap()
+
+    # Current Scanner State
+    flag_scanner_running_state = True
+
+    # Combo Scanner Object, Contains flag_terminate_scan
+    combo_scanner_object = None
+
+    last_scanned_time = None

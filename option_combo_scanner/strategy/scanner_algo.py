@@ -31,9 +31,10 @@ class ScannerAlgo:
     scanner_indicator_tab_obj = None
 
     # def __init__(self):
-    def __init__(self, config_obj, config_id):
+    def __init__(self, config_obj, config_id, scanner_object):
         self.config_obj = config_obj
         self.config_id = config_id
+        self.scanner_object = scanner_object
 
     def get_strike_and_closet_expiry_for_fop(
         self,
@@ -400,6 +401,7 @@ class ScannerAlgo:
                 else:
                     list_of_call_option_contracts = []
 
+                # TODO: Aryan Karan Early termination
                 # Get the market data dataframe for call/put
                 df_call, df_put = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
                     list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
@@ -714,7 +716,7 @@ class ScannerAlgo:
         """
 
         # User Clicked on Force Restart
-        if StrategyVariables.flag_force_restart_scanner:
+        if self.scanner_object.flag_terminate_scan:
             scanner_logger.info(f"Inside Scan Algo: Config ID: {self.config_id} Scanned Combo, Force Restart")
             return True
 
@@ -825,4 +827,3 @@ class ScannerAlgo:
             print(f"Error: Deletion not succesful for config_indicator_relation: {self.config_id}")
 
         Utils.deletion_indicator_rows_based_on_config_tuple_relation(list_of_config_relation_tuple_for_deletion)
-
