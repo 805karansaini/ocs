@@ -121,6 +121,14 @@ class PutCallVol:
             u. PC Change only  (PC Change / I.V. Change:
         """
 
+        # Instrument ID
+        indicator_id = indicator_object.indicator_id
+        instrument_id = indicator_object.instrument_id
+
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return 
+        
         if not flag_put_call_indicator_based_on_selected_deltas_only:
             # Get the current date
             current_date_for_dte = datetime.datetime.today().strftime("%Y%m%d")
@@ -187,6 +195,10 @@ class PutCallVol:
                 )
                 list_of_all_put_option_contracts.append(opt_contract)
 
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return
+        
         # WE WANT HISTORICAL DATA what_to_show = TRADES
         what_to_show = "TRADES"
 
@@ -240,6 +252,10 @@ class PutCallVol:
                         file_name = fr"Put_{contract.strike}"
                         StrategyUtils.save_option_combo_scanner_csv_file(daily_volume_data_df, folder_name, file_name)
             
+            # Check for early termination
+            if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+                return
+
         # Map to store total volume for Call and Put
         map_date_to_total_put_volume = {}
         map_date_to_total_call_volume = {}
@@ -259,7 +275,7 @@ class PutCallVol:
 
         latest_date = sorted_dates_set[0]
 
-        print(f"Indicaor ID: {indicator_object.indicator_id}")
+        # print(f"Indicaor ID: {indicator_object.indicator_id}")
 
         for date in sorted_dates_set:
             # Get the total volume for Call and Put
@@ -285,6 +301,10 @@ class PutCallVol:
             
             # Store the put-call volume ratio for the date
             map_date_to_put_call_volume_ratio[date] = put_call_volum_ratio
+
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return
 
         # Make Sure length of dict >= 2  sorted_dates_set
         put_call_volume_ratio_current_day = map_date_to_put_call_volume_ratio[latest_date]
@@ -315,6 +335,10 @@ class PutCallVol:
             absolute_pc_change_since_yesterday = None
         if StrategyVariables.flag_test_print:
             print(f"Absolute PC Change since yesterday", absolute_pc_change_since_yesterday)
+
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return
 
         values_dict = {
             "put_call_volume_ratio_current_day": (
