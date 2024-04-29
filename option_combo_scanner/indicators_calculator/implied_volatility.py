@@ -239,6 +239,13 @@ class ImpliedVolatility:
         # Indicator ID
         indicator_id = indicator_object.indicator_id
 
+        # Get Instrument ID
+        instrument_id = indicator_object.instrument_id
+
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
+
         # Get the current date
         current_date_for_dte = datetime.datetime.today().strftime("%Y%m%d")
         current_date_obj_for_dte = datetime.datetime.strptime(current_date_for_dte, "%Y%m%d")
@@ -276,6 +283,10 @@ class ImpliedVolatility:
         if StrategyVariables.flag_test_print:
             print(f"Indicator ID: {indicator_id}, Current Underlying Price: {current_underlying_price}")
 
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
+        
         # Getting the underlying_contarct, and all the call and put option contracts
         (
             list_of_all_call_option_contracts,
@@ -293,6 +304,10 @@ class ImpliedVolatility:
             all_strikes,
         )
 
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
+        
         generic_tick_list = "101"  # "101, 100"
         snapshot = False
 
@@ -301,8 +316,13 @@ class ImpliedVolatility:
             call_option_mkt_data_df,
             put_option_mkt_data_df,
         ) = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
-            list_of_all_call_option_contracts, list_of_all_put_option_contracts, snapshot=snapshot, generic_tick_list=generic_tick_list
+            list_of_all_call_option_contracts, list_of_all_put_option_contracts, snapshot=snapshot, generic_tick_list=generic_tick_list, instrument_id=instrument_id, indicator_id=indicator_id
         )
+
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
+        
 
         # Print to console
         if StrategyVariables.flag_test_print:
@@ -345,6 +365,10 @@ class ImpliedVolatility:
         iv_column_name = "AskIV"
         delta_column_name = "Delta"
 
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
+        
         ##############################################
         # Calculating Current IV and RR
         ##############################################
@@ -428,6 +452,10 @@ class ImpliedVolatility:
             "oi_resistance_strike": round(resistance_strike, 2) if resistance_strike else resistance_strike,
         }
 
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
+        
         # Update value in DB, Object & GUI
         IndicatorHelper.update_indicator_values_for_indcator_id(indicator_id=indicator_object.indicator_id, values_dict=values_dict)
 
@@ -462,6 +490,10 @@ class ImpliedVolatility:
         underlying_reqid_price = list_of_underlying_reqid_price[0]
         underlying_df = variables.map_req_id_to_historical_data_dataframe[underlying_reqid_price]
 
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
+        
         # Get the Sorted Date Set, In Latest to Oldest Value manner
         if underlying_df.empty:
             print(
@@ -501,7 +533,7 @@ class ImpliedVolatility:
                 BinarySearchDeltaIV.get_historical_data_for_list_of_contracts_and_store_in_data_store(list_of_all_option_contracts)
                 
                 flag_binnary_serach = True
-                print(f"Total Time Took: {time.perf_counter() - start_time}")
+                # print(f"Total Time Took: {time.perf_counter() - start_time}")
 
             # Print to Console
             if StrategyVariables.flag_test_print:
@@ -509,6 +541,10 @@ class ImpliedVolatility:
 
             for ith_day in range(1, n_th_day):
 
+                # Check for early termination
+                if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+                    return None, None
+            
                 if len(all_the_dates_in_underlying_data) > ith_day:
                     ith_days_old_date = all_the_dates_in_underlying_data[-(ith_day + 1)]
                 else:
@@ -588,6 +624,9 @@ class ImpliedVolatility:
         else:
             avg_iv_over_n_days = None
         
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
 
         # Calcualte AbsoluteChange & PercentageChange Since Yesterday
         yesterday_avg_iv = map_ith_day_to_ith_day_avg_iv[f"1D-AvgIV"]
@@ -606,14 +645,23 @@ class ImpliedVolatility:
         # map_ith_day_and_target_delta_d_to_put_iv_value[(ith_day, target_delta)] = iv_at_target_delta
         # map_ith_day_and_target_delta_d_to_put_strike[(ith_day, target_delta)] = None if strikeee is None else float(strikeee) 
 
-        yesterday_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(1, delta_d1)]
-        yesterday_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(1, delta_d2)]
-        yesterday_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(1, delta_d1)]
-        yesterday_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(1, delta_d2)]
-        n_th_day_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(n_th_day_last, delta_d1)]
-        n_th_day_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(n_th_day_last, delta_d2)]
-        n_th_day_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(n_th_day_last, delta_d1)]
-        n_th_day_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(n_th_day_last, delta_d2)]
+        # yesterday_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(1, delta_d1)]
+        # yesterday_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(1, delta_d2)]
+        # yesterday_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(1, delta_d1)]
+        # yesterday_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(1, delta_d2)]
+        # n_th_day_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(n_th_day_last, delta_d1)]
+        # n_th_day_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(n_th_day_last, delta_d2)]
+        # n_th_day_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(n_th_day_last, delta_d1)]
+        # n_th_day_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(n_th_day_last, delta_d2)]
+
+        yesterday_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get((1, delta_d1), None)
+        yesterday_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get((1, delta_d2), None)
+        yesterday_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get((1, delta_d1), None)
+        yesterday_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get((1, delta_d2), None)
+        n_th_day_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get((n_th_day_last, delta_d1), None)
+        n_th_day_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get((n_th_day_last, delta_d2), None)
+        n_th_day_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get((n_th_day_last, delta_d1), None)
+        n_th_day_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get((n_th_day_last, delta_d2), None)
 
         # Calculating the RR for Yesterday & LastDay at DeltaD1 and DeltaD2
 
@@ -636,7 +684,6 @@ class ImpliedVolatility:
             n_th_day_delta_d2_risk_reveral = (n_th_day_delta_d2_call_iv - n_th_day_delta_d2_put_iv)
         else:
             n_th_day_delta_d2_risk_reveral = None
-
 
         # print(f"Indicaor ID: {indicator_object.indicator_id}")
         # Calculating the PercentangeInRR since Yesterday & LastDay at DeltaD1 and DeltaD2
@@ -678,6 +725,10 @@ class ImpliedVolatility:
         else:
             percentage_change_in_rr_since_14_day_d2 = None
 
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
+
         values_dict = {
             "avg_iv_over_n_days": round(avg_iv_over_n_days * 100, 2) if avg_iv_over_n_days else avg_iv_over_n_days,
             "absolute_change_in_avg_iv_since_yesterday": (
@@ -711,6 +762,10 @@ class ImpliedVolatility:
                 else percentage_change_in_rr_since_yesterday_d2
             ),
         }
+
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
 
         # Update value in DB, Object & GUI
         IndicatorHelper.update_indicator_values_for_indcator_id(indicator_id=indicator_object.indicator_id, values_dict=values_dict)
@@ -755,6 +810,10 @@ class ImpliedVolatility:
             print("Map Change in option Price")
             pprint.pprint(map_var_to_change_in_option_price_value)
 
+        # Check for early termination
+        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            return None, None
+        
         # Update value in DB, Object & GUI
         IndicatorHelper.update_indicator_values_for_indcator_id(
             indicator_id=indicator_object.indicator_id, values_dict=map_var_to_change_in_option_price_value
@@ -838,6 +897,9 @@ class ImpliedVolatility:
         Change since yesterday close
         Change from 14days(N) Open
         """
+        indicator_id = indicator_object.indicator_id
+        instrument_id = indicator_object.instrument_id
+        
         n_th_day = n_th_day - 1
         map_var_to_change_in_option_price_value = {}
 
@@ -894,6 +956,11 @@ class ImpliedVolatility:
         for indx, (req_id, duration, contract) in enumerate(
             zip(list_of_req_id_for_historical_data, list_of_duration_size, list_of_contracts)
         ):
+            
+            # Check for early termination
+            if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+                return map_var_to_change_in_option_price_value
+        
             chng_opt_price = None
             # Retrieve historical data dataframe for the current contract
             df = variables.map_req_id_to_historical_data_dataframe[req_id]
