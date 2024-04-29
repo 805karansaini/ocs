@@ -39,13 +39,13 @@ def run_indicator_thread():
             end_time = time.time()
 
             time_taken = end_time - start_time
-            print(f"Time taken to compute indicators: {time_taken} seconds")
+            # print(f"Time taken to compute indicators: {time_taken} seconds")
         except Exception as e:
             logger.error(f"Exception in indicator thread loop: {e}")
             print(f"Exception in indicator thread loop: {e}")
             traceback.print_exc()
 
-        print("End of indicators Calculation")
+        # print("End of indicators Calculation")
         time.sleep(20)
 
 
@@ -59,14 +59,13 @@ if __name__ == "__main__":
     def run_screen():
         global screen
 
-        # Create Screen GUIat
-
+        # Create Screen GUI
         screen = ScreenGUI()
 
         # Run the screen main loop, when close set 'variables.screen' as False
         screen.window.mainloop()
 
-        logger.debug("main.py run_sceen: Screen Closed")
+        logger.debug("main.py run_screen: Screen Closed")
 
     # # Check if the user wants to delete the database
     flag_start_in_recovery_mode = StrategyVariables.flag_recovery_mode
@@ -92,7 +91,12 @@ if __name__ == "__main__":
     time.sleep(1)
 
     # Creating the Data Server Client
-    ds_client = AlgoOneAPI(data_server_host="25.38.187.70", data_server_port=8765, data_server_client_id=123, loop=new_loop)
+    ds_client = AlgoOneAPI(
+        data_server_host=StrategyVariables.ds_host,
+        data_server_port=StrategyVariables.ds_port,
+        data_server_client_id=StrategyVariables.ds_connection_id,
+        loop=new_loop,
+    )
     ds_client.start()
 
     # Wait for the connection
