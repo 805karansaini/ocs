@@ -311,9 +311,14 @@ class HistoricalVolatility:
 
             # Calculate Change in underlying
             n_day_ago_date = 14
-            one_day_ago_date = 1
+            one_day_ago_date = 2
             one_day_ago_date = unique_dates[-one_day_ago_date]
             n_day_ago_date = unique_dates[-n_day_ago_date]
+
+            # Print to console
+            if StrategyVariables.flag_test_print:
+                print(f"Conid: {con_id} All Date: {unique_dates}")
+                print(f"Conid: {con_id} OldDates: One Day: {one_day_ago_date} N Day: {n_day_ago_date}")
 
             # 1_days_ago_close_price = COMPUTE from DF
             # Filter the DataFrame to get rows where Date matches date_var
@@ -331,7 +336,7 @@ class HistoricalVolatility:
                 absoulte_change_in_underlying_over_one_day = current_close_price - one_day_ago_close_price
                 # print(f"Absolte chg in underlying over one day for conid: {con_id},", absoulte_change_in_underlying_over_one_day)
             except Exception as e:
-                print(f"Exception Absolte chg in underlying over one day for conid {con_id} e: {e}")
+                # print(f"Exception Absolte chg in underlying over one day for conid {con_id} e: {e}")
                 absoulte_change_in_underlying_over_one_day = None
 
             try:
