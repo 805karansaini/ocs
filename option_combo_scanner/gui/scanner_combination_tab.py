@@ -333,15 +333,18 @@ class ScannerCombinationTab:
         # Title for the Scanned Combintation Details
         title = f"Scanned Combintation Details, Combo ID : {combo_id}"
 
-        (
-            columns,
-            row_data_list,
-        ) = get_scanner_combination_details_column_and_data_from_combo_object(combo_id)
+        try:
+            (
+                columns,
+                row_data_list,
+            ) = get_scanner_combination_details_column_and_data_from_combo_object(combo_id)
 
-        # selected_item = self.scanner_combination_table.selection()[0]
-        # details = self.scanner_combination_table.item(selected_item)
-        # print(columns, row_data_list)
-        self.create_csv_structure_for_main_app(row_data_list, combo_id)
+            # selected_item = self.scanner_combination_table.selection()[0]
+            # details = self.scanner_combination_table.item(selected_item)
+            # print(columns, row_data_list)
+            self.create_csv_structure_for_main_app(row_data_list, combo_id)
+        except Exception as e:
+            pass
 
     def wrapper_create_and_display_impact_popup(self):
         # Get the combo_id from table
@@ -462,7 +465,7 @@ class ScannerCombinationTab:
             leg_row = [
                 "#LEG",
                 action,
-                sectype,
+                "OPT" if sectype == "IND" else sectype,
                 symbol,
                 "None",
                 "None",
@@ -472,7 +475,7 @@ class ScannerCombinationTab:
                 exchange,
                 trading_class,
                 currency,
-                conid,
+                "" if int(float(conid)) == 0 else conid,
                 primaryexchange,
                 strike,
                 expiry,
