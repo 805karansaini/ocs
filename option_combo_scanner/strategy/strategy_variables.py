@@ -232,7 +232,6 @@ class StrategyVariables:
 
     # Max min Pain Flag
     flag_drop_empty_oi_rows = True
-    flag_test_print = False
 
     flag_ONE_for_max_pnl = "ONE"
 
@@ -252,3 +251,11 @@ class StrategyVariables:
     combo_scanner_object = None
 
     last_scanned_time = None
+
+    # Indicator Test Prints
+    flag_test_print = False
+
+    # Data Server Host/Port/Connection ID
+    ds_host = parser.get("USER INPUTS", "data_server_host")
+    ds_port = parser.getint("USER INPUTS", "data_server_port")
+    ds_connection_id = parser.getint("USER INPUTS", "data_server_connection_id")
