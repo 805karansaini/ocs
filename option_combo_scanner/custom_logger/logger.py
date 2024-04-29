@@ -30,9 +30,10 @@ def get_logger(name: str, current_time):
 
     # Create a logger
     logger = logging.getLogger(logger_name)
-
+    
+    date = current_time[:8]
     # Create the log directory if it doesn't exist
-    log_dir = rf"Logs\{current_time}"
+    log_dir = rf"Logs\{date}\{current_time}"
     os.makedirs(log_dir, exist_ok=True)
 
     # Create a file handler and specify the log file path
