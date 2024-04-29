@@ -19,7 +19,6 @@ from option_combo_scanner.indicators_calculator.market_data_fetcher import \
     MarketDataFetcher
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
-
 class IndicatorHelper:
 
     @staticmethod
@@ -254,7 +253,7 @@ class IndicatorHelper:
 
     @staticmethod
     def get_mkt_data_df_for_call_and_put_options(
-        list_of_all_call_option_contracts, list_of_all_put_option_contracts, snapshot, generic_tick_list
+        list_of_all_call_option_contracts, list_of_all_put_option_contracts, snapshot, generic_tick_list, instrument_id=None, indicator_id=None 
     ):
         """
         Loop for Call and put, reqMktData and return dataframes
@@ -292,6 +291,10 @@ class IndicatorHelper:
         # Loop for Call and put, reqMktData and return dataframes
         for indx in range(2):
 
+            # Check for early termination
+            if GUIUtils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+                return call_option_mkt_data_df, put_option_mkt_data_df
+            
             data_frame_dict = {col: [] for col in columns}
 
             list_of_all_option_contracts = list_of_all_call_option_contracts if indx == 0 else list_of_all_put_option_contracts
