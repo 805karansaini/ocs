@@ -10,7 +10,8 @@ from tkinter import Scrollbar, filedialog, messagebox, ttk
 
 import pandas as pd
 
-from com.identify_trading_class_for_fop import identify_the_trading_class_for_all_the_fop_leg_in_combination_async
+from com.identify_trading_class_for_fop import \
+    identify_the_trading_class_for_all_the_fop_leg_in_combination_async
 from com.variables import variables
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
@@ -18,7 +19,8 @@ from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.strategy.instrument import Instrument
 from option_combo_scanner.strategy.scanner_config import Config
 from option_combo_scanner.strategy.scanner_config_leg import ConfigLeg
-from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import \
+    StrategyVariables as strategy_variables
 
 MESSAGE_TIME_IN_SECONDS = 6  # in seconds
 
@@ -64,10 +66,12 @@ class ScannerInputsTab:
         "Bear Put Spread": "Bear Put Spread.csv",
         "Calendar Call Spread": "Calendar Call Spread.csv",
         "Calendar Put Spread": "Calendar Put Spread.csv",
-        "Iron Condor": "Iron Condor.csv",
-        "Iron Fly": "Iron Fly.csv",
         "Straddle": "Straddle.csv",
         "Strangle": "Strangle.csv",
+        "Iron Condor (Strangles)": "Iron Condor (Strangles).csv",
+        "Iron Condor (Spreads)" : "Iron Condor (Spreads).csv",
+        "Iron Fly (Straddle + Strangle)": "Iron Fly (Straddle + Strangle).csv",
+        "Iron Fly (Spreads)" : "Iron Fly (Spreads).csv",
         # Add more mappings for other dropdown options
     }
 
@@ -908,7 +912,7 @@ class ScannerInputsTab:
         dropdown_label.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
 
         # Templare dropdown
-        dropdown = ttk.Combobox(config_input_frame, state="readonly")
+        dropdown = ttk.Combobox(config_input_frame, width=27, state="readonly")
         # getting the values for templates from map
         dropdown["values"] = tuple(self.dropdown_file_mapping.keys())
         dropdown.current(0)
@@ -927,7 +931,7 @@ class ScannerInputsTab:
         # No of legs label and entry
         leg_label = ttk.Label(config_input_frame, text="#Legs", anchor="center", width=12)
         leg_label.grid(column=2, row=0, padx=5, pady=(0, 5), sticky="n")
-        self.no_of_legs_entry = ttk.Entry(config_input_frame)
+        self.no_of_legs_entry = ttk.Entry(config_input_frame, width=27)
         self.no_of_legs_entry.grid(column=2, row=1, padx=5, pady=5)
 
         # Add Update Leg Config Button
