@@ -8,7 +8,7 @@ class ContractType(str, Enum):
     OPT = "OPT"
     FUT = "FUT"
     FOP = "FOP"
-    CUR = "CUR"
+    CUR = "CASH"
     IND = "IND"
 
 

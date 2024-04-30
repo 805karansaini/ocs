@@ -87,9 +87,7 @@ class IBkrAlgoOneAdapter:
         expiry = contract_object.lastTradeDateOrContractMonth
         strike = None if float(contract_object.strike) == 0 else contract_object.strike
         right = IBkrAlgoOneAdapter.right(contract_object.right)
-        multiplier = (
-            None if contract_object.multiplier == "" else contract_object.multiplier
-        )
+        multiplier = None if contract_object.multiplier == "" else contract_object.multiplier
         trading_class = contract_object.tradingClass
 
         ao_contract = Contract(

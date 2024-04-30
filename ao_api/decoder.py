@@ -79,9 +79,9 @@ class Decoder:
     def process_error_msg(self, response_mssg):
 
         reqId = response_mssg["request_id"]
-        error_code = response_mssg.get('error_code', None)
-        error_msg = response_mssg.get('error_msg', None)
-        advance_order_reject_json = response_mssg.get('advance_order_reject_json', None)
+        error_code = response_mssg.get("error_code", None)
+        error_msg = response_mssg.get("error_msg", None)
+        advance_order_reject_json = response_mssg.get("advance_order_reject_json", None)
 
         self.wrapper.error(reqId, error_code, error_msg, advance_order_reject_json)
 
@@ -93,13 +93,13 @@ class Decoder:
             self.wrapper.historical_data(reqId, bar)
 
     def process_historical_data_end_msg(self, response_mssg):
-        
+
         try:
             reqId = response_mssg["request_id"]
             start = None  # response_mssg["result"][0]
             end = None
             self.wrapper.historical_data_end(
-                reqId, 
+                reqId,
             )
         except Exception as e:
             print(

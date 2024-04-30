@@ -17,9 +17,11 @@ class BarType(str, Enum):
     BID = "BID"
     ASK = "ASK"
 
+
 class OptionRightType(str, Enum):
     CALL = "C"
     PUT = "P"
+
 
 class DurationUnit(str, Enum):
     SECOND = "second"

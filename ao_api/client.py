@@ -85,7 +85,7 @@ class EClient(object):
 
     def get_historical_bars(
         self,
-        request_id: str,
+        request_id: int,
         contract: Contract,
         end_datetime: Optional[str] = None,
         start_datetime: Optional[str] = None,

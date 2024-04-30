@@ -26,9 +26,7 @@ class WebSocketClient:
         """
         try:
             # Connect via WS
-            self.websocket = await websockets.connect(
-                self.endpoint, max_size=None, ping_timeout=None, close_timeout=None
-            )
+            self.websocket = await websockets.connect(self.endpoint, max_size=None, ping_timeout=None, close_timeout=None)
 
             self.loop = asyncio.get_event_loop()
         except Exception as e:
