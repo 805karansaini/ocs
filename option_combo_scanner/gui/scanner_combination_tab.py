@@ -207,7 +207,7 @@ class ScannerCombinationTab:
 
         list_of_all_filtered_combo_ids = local_scanner_combo_table_df["Combo ID"].to_list()
 
-        # Sort the dataframe according to the header # TODO
+        # Sort the dataframe according to the header
         for combo_id in list_of_all_filtered_combo_ids:
             combo_id = int(combo_id)
             scanner_combination_object = StrategyVariables.map_combo_id_to_scanner_combination_object[combo_id]
