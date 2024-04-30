@@ -46,10 +46,16 @@ class StrategyVariables:
     ocs_bridge_to_main_app_host = parser.get("USER INPUTS", "ocs_bridge_to_main_app_host")
     ocs_bridge_to_main_app_port = parser.get("USER INPUTS", "ocs_bridge_to_main_app_port")
 
+    calculation_mode_for_max_pnl = parser.get("USER INPUTS", "calculation_mode_for_max_pnl")
+
     # User Input for the calc. mode in in the max PnL cacl
-    calculation_mode_for_combination_max_pnl = MaxPNLEnum.GNE
-    # ONE: Overall Nearest Expiry
-    # GNE: Group Nearest Expiry
+    if calculation_mode_for_max_pnl.upper() == "GNE":
+        # GNE: Group Nearest Expiry
+        calculation_mode_for_combination_max_pnl = MaxPNLEnum.GNE
+
+    elif calculation_mode_for_max_pnl.upper() == "ONE":
+        # ONE: Overall Nearest Expiry
+        calculation_mode_for_combination_max_pnl = MaxPNLEnum.ONE
 
     # Input for delta
     delta_d1_indicator_input = parser.getfloat("USER INPUTS", "delta_d1_indicator_input")
@@ -232,7 +238,7 @@ class StrategyVariables:
     # Max min Pain Flag
     flag_drop_empty_oi_rows = True
 
-    flag_ONE_for_max_pnl = "ONE"
+    # flag_ONE_for_max_pnl = "ONE"
 
     # Used to by pass binary search for STK and OPT as we get data for those from polygon, BS for historical IV and Delta
     list_of_sec_type_to_use_binary_search = ["FUT", "FOP"]
