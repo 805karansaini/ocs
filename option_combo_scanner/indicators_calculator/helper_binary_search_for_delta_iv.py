@@ -46,55 +46,58 @@ class BinarySearchDeltaIV:
         # Cal Delta, Indx computed delta, iv
         list_of_strike_delta_iv_tuple = [(None, None, None) for _ in list_of_target_deltas]
 
-        for i, target_delta in enumerate(list_of_target_deltas):
-            (
-                list_of_new_contracts,
-                map_strike_to_calculated_delta,
-                map_strike_to_calculated_iv,
-            ) = BinarySearchDeltaIV.custom_binary_search(
-                underlying_price,
-                right,
-                time_to_expiration,
-                list_of_all_contracts,
-                target_delta,
-                target_date,
-            )
+        try:
+            for i, target_delta in enumerate(list_of_target_deltas):
+                (
+                    list_of_new_contracts,
+                    map_strike_to_calculated_delta,
+                    map_strike_to_calculated_iv,
+                ) = BinarySearchDeltaIV.custom_binary_search(
+                    underlying_price,
+                    right,
+                    time_to_expiration,
+                    list_of_all_contracts,
+                    target_delta,
+                    target_date,
+                )
 
-            """
-            Supressed prints
-            print(f"Target Delta: {target_delta}")
-            # Create a pandas DataFrame
-            df_temp = pd.DataFrame(
-                {f"Strikes: ": list_of_all_strikes, f"{right} Delta": list_of_calculated_delta, f"{right} IV": list_of_calculated_iv}
-            )
+                """
+                Supressed prints
+                print(f"Target Delta: {target_delta}")
+                # Create a pandas DataFrame
+                df_temp = pd.DataFrame(
+                    {f"Strikes: ": list_of_all_strikes, f"{right} Delta": list_of_calculated_delta, f"{right} IV": list_of_calculated_iv}
+                )
 
-            # Print the DataFrame using tabulate
-            print(tabulate.tabulate(df_temp, headers="keys", tablefmt="psql"))
-            """
+                # Print the DataFrame using tabulate
+                print(tabulate.tabulate(df_temp, headers="keys", tablefmt="psql"))
+                """
 
-            temp_list_of_strike = [float(contract.strike) for contract in list_of_new_contracts]
-            # print(f"TargetDate: {target_date} Right: {right} Target Delta: {target_delta}")
-            # print(f"List of Strikes: {temp_list_of_strike}")
-            # print(f"Map Strike to Calculated Delta: {map_strike_to_calculated_delta}")
-            # print(f"Map Strike to Calculated IV: {map_strike_to_calculated_iv}")
+                temp_list_of_strike = [float(contract.strike) for contract in list_of_new_contracts]
+                # print(f"TargetDate: {target_date} Right: {right} Target Delta: {target_delta}")
+                # print(f"List of Strikes: {temp_list_of_strike}")
+                # print(f"Map Strike to Calculated Delta: {map_strike_to_calculated_delta}")
+                # print(f"Map Strike to Calculated IV: {map_strike_to_calculated_iv}")
 
-            for strike in temp_list_of_strike:
-                if (
-                    strike in map_strike_to_calculated_delta
-                    and map_strike_to_calculated_delta[strike] is not None
-                    and map_strike_to_calculated_iv[strike] is not None
-                ):
-                    delta = map_strike_to_calculated_delta[strike]
-                    iv = map_strike_to_calculated_iv[strike]
+                for strike in temp_list_of_strike:
+                    if (
+                        strike in map_strike_to_calculated_delta
+                        and map_strike_to_calculated_delta[strike] is not None
+                        and map_strike_to_calculated_iv[strike] is not None
+                    ):
+                        delta = map_strike_to_calculated_delta[strike]
+                        iv = map_strike_to_calculated_iv[strike]
 
-                    if list_of_strike_delta_iv_tuple[i] == (None, None, None):
-                        list_of_strike_delta_iv_tuple[i] = (strike, delta, iv)
-                    else:
-                        old_strike, old_delta, old_iv = list_of_strike_delta_iv_tuple[i]
-
-                        if abs(target_delta - old_delta) > abs(target_delta - delta):
+                        if list_of_strike_delta_iv_tuple[i] == (None, None, None):
                             list_of_strike_delta_iv_tuple[i] = (strike, delta, iv)
+                        else:
+                            old_strike, old_delta, old_iv = list_of_strike_delta_iv_tuple[i]
 
+                            if abs(target_delta - old_delta) > abs(target_delta - delta):
+                                list_of_strike_delta_iv_tuple[i] = (strike, delta, iv)
+        except Exception as e:
+            pass
+        
         return list_of_strike_delta_iv_tuple
 
     @staticmethod
