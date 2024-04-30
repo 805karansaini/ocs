@@ -38,15 +38,16 @@ instruments_table_columns_width = [
 ]
 
 leg_config_table_columns_width = [
-    ("LegNo", 170, "Leg No"),
-    ("InstrumentID", 170, "Instrument ID"),
-    ("Action", 170, "Action"),
-    ("Right", 170, "Right"),
-    ("Quantity", 170, "Quantity"),
-    ("MinDelta", 170, "MinDelta"),
-    ("MaxDelta", 170, "MaxDelta"),
-    ("MinDTE", 170, "MinDTE"),
-    ("MaxDTE", 170, "MaxDTE"),
+    ("LegNo", 153, "Leg No"),
+    ("Ticker", 153, "Ticker"),
+    ("Instrument ID", 153, "Instrument ID"),
+    ("Action", 153, "Action"),
+    ("Right", 153, "Right"),
+    ("Quantity", 153, "Quantity"),
+    ("MinDelta", 153, "MinDelta"),
+    ("MaxDelta", 153, "MaxDelta"),
+    ("MinDTE", 153, "MinDTE"),
+    ("MaxDTE", 153, "MaxDTE"),
 ]
 
 leg_config_manager_table_columns_width = [
@@ -242,9 +243,6 @@ class ScannerInputsTab:
             args=([int(instrument_id)],),
         )
         remove_instrument_thread.start()
-
-        # TODO - REMOVE ARYAN
-        # self.remove_instruments([int(instrument_id)])
 
     def remove_instruments(self, list_of_instrument_ids: list):
         # Start flow for instrument get deleted
@@ -792,23 +790,24 @@ class ScannerInputsTab:
         popup.destroy()
 
     def insert_row_in_config_table_gui(self, num_legs, current_row_number):
-
         for i in range(num_legs):
 
             # Entry and Combo box Inputs
             desc = current_row_number + i + 1
+            instrument_description = ""
             instrument_id = ""
             action_value = "BUY"
             right_value = "CALL"
             quantity = "1"
-            delta_min_value = "0.4"
-            delta_max_value = "0.6"
+            delta_min_value = "0.45"
+            delta_max_value = "0.55"
             dte_min_value = "1"
             dte_max_value = "7"
             right_value = "CALL"
 
             row_values = (
                 desc,
+                instrument_description,
                 instrument_id,
                 action_value,
                 right_value,
@@ -885,7 +884,6 @@ class ScannerInputsTab:
         save_config_button = ttk.Button(
             self.scanner_inputs_tab,
             text="Save Config",
-            # TODO - ARYAN Use THread
             command=lambda: threading.Thread(target=self.save_config_click).start(),
         )
         save_config_button.place(x=700, y=728, width=115, height=35)
@@ -1057,14 +1055,18 @@ class ScannerInputsTab:
 
             leg_data = {
                 "leg_number": i + 1,
-                "instrument_id": (item_values[1]),
-                "action": item_values[2].upper(),
-                "right": item_values[3].upper(),
-                "quantity": item_values[4],
-                "delta_range_min": item_values[5],
-                "delta_range_max": item_values[6],
-                "dte_range_min": item_values[7],
-                "dte_range_max": item_values[8],
+
+                # Instrument Description
+                # "instrument_desc" : item_values[1],
+                
+                "instrument_id": (item_values[2]),
+                "action": item_values[3].upper(),
+                "right": item_values[4].upper(),
+                "quantity": item_values[5],
+                "delta_range_min": item_values[6],
+                "delta_range_max": item_values[7],
+                "dte_range_min": item_values[8],
+                "dte_range_max": item_values[9],
                 # Add other leg-wise data as needed
             }
 
@@ -1126,6 +1128,26 @@ class ScannerInputsTab:
         # Iterate over rows of the DataFrame
         for index, row in dataframe.iterrows():
             row_values = tuple(row)
+
+            # Create a list
+            row_values = list(row_values)
+            
+            try:
+                # Get the Instrument ID
+                instrument_id = int(float(row_values[1]))
+            except Exception as e:
+                instrument_id = -1
+
+            # Create the Instrument Description
+            if instrument_id in strategy_variables.map_instrument_id_to_instrument_object: 
+                symbol = strategy_variables.map_instrument_id_to_instrument_object[instrument_id].symbol
+                instrument_description = f"{symbol.upper()}"
+            else:
+                instrument_description = ""
+
+            # Insert the Value in the row values list
+            row_values.insert(1, instrument_description)
+
             # print(row_values)
             # Get the current number of items in the treeview
             num_items = len(self.leg_config_table.get_children())
@@ -1154,6 +1176,22 @@ class ScannerInputsTab:
 
         # Get the current number of items in the treeview
         num_items = len(self.leg_config_table.get_children())
+
+        # Create a list
+        row_values = list(row_values)
+        
+        # Get the Instrument ID
+        instrument_id = int(float(row_values[1]))
+        
+        # Create the Instrument Description
+        if instrument_id in strategy_variables.map_instrument_id_to_instrument_object: 
+            symbol = strategy_variables.map_instrument_id_to_instrument_object[instrument_id].symbol
+            instrument_description = f"{symbol.upper()}"
+        else:
+            instrument_description = ""
+
+        # Insert the Value in the row values list
+        row_values.insert(1, instrument_description)
 
         if num_items % 2 == 1:
             self.leg_config_table.insert(
@@ -1220,6 +1258,7 @@ class ScannerInputsTab:
 
         # Create an Entry widget
         self.entry = tk.Entry(leg_config_table_frame)
+
         # Create combo box
         self.combo_box_action = ttk.Combobox(
             leg_config_table_frame,
@@ -1246,12 +1285,19 @@ class ScannerInputsTab:
             self.entry.place_forget()
         except Exception as e:
             pass
+
         try:
-            self.combo_box.place_forget()
+            self.combo_box_right.place_forget()
+        except Exception as e:
+            pass
+        
+        try:
+            self.combo_box_action.place_forget()
         except Exception as e:
             pass
 
     def on_double_click(self, event):
+
         self.forget_entry_end_combo(event)
 
         # Get the item and column clicked
@@ -1273,21 +1319,24 @@ class ScannerInputsTab:
                 # Destroy any existing Combobox or Entry widget
                 if hasattr(self, "combo_box"):
                     self.combo_box.destroy()
+                if hasattr(self, "combo_box_right"):
+                    self.combo_box_right.destroy()
+                if hasattr(self, "combo_box_action"):
+                    self.combo_box_action.destroy()
                 if hasattr(self, "entry"):
                     self.entry.destroy()
 
                 # Create Combobox for Action column
-                if column_index == 1:
+                if column_index in [1, 2]:
                     return
-                if column_index == 3:
+                if column_index == 4:
                     self.combo_box_action = ttk.Combobox(self.leg_config_table, values=["BUY", "SELL"], state="readonly")
                     self.combo_box_action.set(current_value)
                     self.combo_box_action.place(x=x, y=y, width=width, height=height)
                     self.combo_box_action.bind("<Return>", lambda event: self.save_combobox_changes(item, column_index))
                     self.combo_box_action.bind("<FocusOut>", lambda event: self.combo_box_action.destroy())
-
                 # Create Combobox for Right column
-                elif column_index == 4:
+                elif column_index == 5:
                     self.combo_box_right = ttk.Combobox(self.leg_config_table, values=["CALL", "PUT"], state="readonly")
                     self.combo_box_right.set(current_value)
                     self.combo_box_right.place(x=x, y=y, width=width, height=height)
@@ -1304,21 +1353,37 @@ class ScannerInputsTab:
                     self.entry.focus_set()
 
     def save_combobox_changes(self, item, column_index):
-        if column_index == 3:
+
+        if column_index == 4:
             new_value = self.combo_box_action.get()
-            self.leg_config_table.set(item, "#3", new_value)  # Use "#3" instead of column_index
+            self.leg_config_table.set(item, "#4", new_value)  # Use "#3" instead of column_index
             self.combo_box_action.destroy()
             self.leg_config_table.focus_set()
-        elif column_index == 4:
+        elif column_index == 5:
             new_value = self.combo_box_right.get()
-            self.leg_config_table.set(item, "#4", new_value)  # Use "#4" instead of column_index
+            self.leg_config_table.set(item, "#5", new_value)  # Use "#4" instead of column_index
             self.combo_box_right.destroy()
             self.leg_config_table.focus_set()
 
     def save_entry_changes(self, item, column_index):
         new_value = self.entry.get()
-        self.leg_config_table.set(item, "#{}".format(column_index), new_value)  # Use "#{}".format(column_index) instead of column_index
+        self.leg_config_table.set(item, f"#{column_index}", new_value)  # Use "#{}".format(column_index) instead of column_index
         self.entry.destroy()
+
+        if column_index == 3:
+            try:
+                instrument_id = int(float(new_value))
+            except Exception as e:
+                instrument_id = -1
+
+            # Create the Instrument Description
+            if instrument_id in strategy_variables.map_instrument_id_to_instrument_object: 
+                symbol = strategy_variables.map_instrument_id_to_instrument_object[instrument_id].symbol
+                instrument_description = f"{symbol.upper()}"
+            else:
+                instrument_description = ""
+
+            self.leg_config_table.set(item, "#2", instrument_description)  # Use "#{}".format(column_index) instead of column_index
 
     # Function to Create Config Manager Popup
     def create_config_manager_popup(self):
@@ -1805,7 +1870,6 @@ class ScannerInputsTab:
         # Call the Save config function with the updated config details when instrument deleted
         self.save_config_button_click_for_instrument_delete(instrument_id, values_dict=values_dict, config_obj=config_obj)
 
-    # TODO - check karan arayan
     # Function for Save Config Button Click when instrument deleted
     def save_config_button_click_for_instrument_delete(
         self,

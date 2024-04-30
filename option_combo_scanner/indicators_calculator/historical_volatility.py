@@ -179,7 +179,6 @@ class HistoricalVolatility:
         counter = 0
         while variables.cas_wait_time_for_historical_data > (counter * variables.sleep_time_waiting_for_tws_response):
 
-            # KARAN CHANGED IT - TODO - 20231027
             if all([variables.req_mkt_data_end[req_id] or variables.req_error[req_id] for req_id in req_id_list]):
                 break
 

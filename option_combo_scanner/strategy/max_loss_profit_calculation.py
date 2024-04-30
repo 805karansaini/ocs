@@ -222,23 +222,18 @@ class MaxPNLCalculation:
                     closest_expiry=closest_expiry,
                 )
                 
-                # TODO - comment 
-                # getting the payoff(right) - payoff(right - 1) and divide by the multiplier
+                # Slope Right Numerator
                 slope_right_numerator = (max_strike_right_payoff - max_strike_right_one_payoff)/int(instrument_object_for_multiplier.multiplier)
                 slope_right_deno = 1
 
                 # print(f"LegTuple: {leg_tuple} {combo_pay_off_for_current_strike= } {slope_right_numerator= } {strike_right= }")
 
-        # TODO- print list_of_combination_payoff_at_all_strikes
         # print(f"        List of Combination Payoff W/P Prem. for all Strikes: {list_of_combination_payoff_at_all_strikes}")
         # print(f"        Premimum: {combination_premium_received}")
         
-        # TODO - list_of_combination_payoff_at_all_strikes + combination premium
         list_of_combination_payoff_at_all_strikes = [ _ + combination_premium_received for _ in list_of_combination_payoff_at_all_strikes]
+
         # print(f"        List of Combination Payoff W/ Prem for all Strikes: {list_of_combination_payoff_at_all_strikes}")
-
-        
-
         # print(f"        Payoff(right) - Payoff(right-1) {slope_right_numerator}")
         # print(f"        Payoff(left) - Payoff(left+1) {slope_left_numerator}")
 

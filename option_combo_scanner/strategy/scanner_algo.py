@@ -228,8 +228,8 @@ class ScannerAlgo:
             pandas.DataFrame: Filtered dataframe containing strikes within the given delta range
         """
         # print(delta_range_low, delta_range_high, current_expiry)
-        # todo early teminate
-
+        
+        # Check early termination
         scanner_logger.debug(f"")
 
         # Checking if we need to skip or restart scan
@@ -361,14 +361,14 @@ class ScannerAlgo:
                 leg_number,
             )
 
-        # todo early teminate
+        # Check early termination
         if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
             return []
 
         for expiry in expiry_date_in_range:
             # key: ocs_mkt_ symbol, expiry, sectype, right, trading_class, multiplier  exchange
 
-            # todo early teminate
+            # Check early termination
             if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
                 return []
 
@@ -401,7 +401,6 @@ class ScannerAlgo:
                 else:
                     list_of_call_option_contracts = []
 
-                # TODO: Aryan Karan Early termination
                 # Get the market data dataframe for call/put
                 df_call, df_put = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
                     list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
@@ -421,7 +420,7 @@ class ScannerAlgo:
                 df_call["underlying_conid"] = underlying_conid
                 df_put["underlying_conid"] = underlying_conid
 
-                # todo early teminate
+                # Check early termination
                 if self.check_do_we_need_to_restart_scan() or self.check_do_we_need_to_skip_current_scan():
                     return []
 

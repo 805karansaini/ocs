@@ -160,5 +160,4 @@ query8 = """CREATE TABLE IF NOT EXISTS `indicator_table` (
     );"""
 
 
-# TODO ARYAN:  DELTEE all indicators row when instrument is deete
 all_queries = [query2, query3, query4, query5, query6, query7, query8]

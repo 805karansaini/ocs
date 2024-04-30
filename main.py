@@ -132,7 +132,6 @@ if __name__ == "__main__":
 
     # Expose app to all methods
     com_variables.app = app
-    # TODO - have multi apps later on
     com_variables.cas_app = app
 
     # Start Screen Now
@@ -155,7 +154,6 @@ if __name__ == "__main__":
     logger.debug("GUI Screen Initialized")
     print("GUI Screen Initialized")
 
-    # TODO - Restart later on
     # Creating a separate thread
     scanner_thread = threading.Thread(target=run_option_combo_scanner, daemon=True)
     scanner_thread.start()

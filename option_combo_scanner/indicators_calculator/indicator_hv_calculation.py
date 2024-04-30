@@ -75,11 +75,6 @@ def calculate_standard_deviation(
         np.std(combination_price_dataframe["Candle Return"]) * 100, 8
     )
     
-    # TODO - REMOVE IT
-    # Print the DataFrame using tabulate
-    # print(combination_price_dataframe.to_string())
-    # print(tabulate.tabulate(combination_price_dataframe, headers="keys", tablefmt="psql"))
-
     # Save DF to CSV File (HV) Export data-frame to csv file
     # if flag is True Save CSV file
     if StrategyVariables.flag_store_csv_files:
@@ -134,8 +129,7 @@ def calculate_parkinson_range_without_gaps(
     combination_price_dataframe,
 ):
 
-    # assigning the column name for open and close data from dataframe
-    # TODO ARYAN
+    # Assigning the column name for open and close data from dataframe
     open_price_column_name = "Combination Open"
     close_price_column_name = "Combination Close"
 
@@ -177,8 +171,7 @@ def calculate_parkinson_range_without_gaps(
 
     # If we are calculating the Parksionson's range without gaps for Intraday values and for individual legs,
     #  columns will be PV_term x, PV_Term_Sq x
-    # TODO ARYAN
-    # assigining the column name for pv_term and pv_term sq
+    # Assigining the column name for pv_term and pv_term sq
     pv_term_values_column_name = "PV_term"
     pv_term_sq_values_column_name = "PV_Term_Sq"
 
@@ -223,13 +216,10 @@ def calculate_parkinson_range_with_gaps(
 ):
 
     # If we are calculating the Parksionson's range with gaps for Intraday values and for individual legs, columns will be Open x, Close x
-    # TODO ARYAN COMMMENT
-
     open_price_column_name = "Combination Open"
     close_price_column_name = "Combination Close"
 
     # If we are calculating the Parksionson's range with gaps for Intraday values and for individual legs, columns will be High x, low x
-    # TODO ARYAN COMMMENT
     low_price_column_name = "Combination Low with Gaps"
     high_price_column_name = "Combination High with Gaps"
 
@@ -273,7 +263,6 @@ def calculate_parkinson_range_with_gaps(
     )
 
     # If we are calculating the Parksionson's range with gaps for Intraday values and for individual legs, columns will be PV_term x, PV_Term_Sq x
-    # TODO ARYAN COMMMENT
     pv_term_values_column_name = "PV_term"
     pv_term_sq_values_column_name = "PV_Term_Sq"
 
@@ -312,7 +301,6 @@ def calculate_combo_atr(
     # Calculate TR
     combo_daily_open_close_df["TR"] = 0.0
 
-    # TODO - COmmment ARYAN
     # If we are calculating the ATR for Intraday values and for individual legs, columns will be Open x, Close x
     open_price_column_name = "Combination Open"
     close_price_column_name = "Combination Close"

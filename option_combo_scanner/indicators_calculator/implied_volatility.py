@@ -52,7 +52,7 @@ class ImpliedVolatility:
         nearest_call_data = df_call.loc[nearest_call_index]
         nearest_put_data = df_put.loc[nearest_put_index]
 
-        # Print Here Target Delta Strike, Dlta, IV TODO  
+        # Print Here Target Delta Strike, Dlta, IV
         if StrategyVariables.flag_test_print:
             print(f"Risk Reversal:  target_Delta: {target_delta}, IV: {nearest_call_data[iv_column_name]}  \nCall Nearest Data: \n{nearest_call_data.to_string()} ")
             print(f"Risk Reversal:  target_Delta: {target_delta}, IV: {nearest_put_data[iv_column_name]}   \nPut Nearest Data: \n{nearest_put_data.to_string()}")
@@ -97,7 +97,7 @@ class ImpliedVolatility:
 
         # If you want to fill NaN values with 0
         merged_df.fillna(0, inplace=True)
-        merged_df = merged_df.sort_values(by="Strike", ascending=True)  # TODO
+        merged_df = merged_df.sort_values(by="Strike", ascending=True)
 
         # Assume market expires at each strike price
         merged_df["Loss Value of Calls"] = 0
@@ -439,7 +439,7 @@ class ImpliedVolatility:
                 f"{current_iv_d1=},  {current_iv_d2=} , {current_rr_d1=}, {current_rr_d2=}, {max_pain_strike=}, {min_pain_strike=} , {support_strike=}, {resistance_strike=}, {current_avg_iv=}"
             )
 
-        # Update these values here # TODO IMPRT
+        # Update these values here
         values_dict = {
             "current_iv_d1": round(current_iv_d1 * 100, 2) if current_iv_d1 else current_iv_d1,
             "current_iv_d2": round(current_iv_d2 * 100, 2) if current_iv_d2 else current_iv_d2,
@@ -590,7 +590,6 @@ class ImpliedVolatility:
                         map_ith_day_and_target_delta_d_to_put_strike[(ith_day, target_delta)] = None if strikeee is None else float(strikeee) 
                         map_ith_day_and_target_delta_d_to_put_delta_value[(ith_day, target_delta)] = _
 
-        # TODO Comment TODO - Kushal
         for ith_day in range(1, n_th_day):
 
             __call_iv_value_ith_day_delta_d1 = map_ith_day_and_target_delta_d_to_call_iv_value.get((ith_day, delta_d1))
@@ -926,7 +925,7 @@ class ImpliedVolatility:
 
         list_of_contracts = []
 
-        # Comment TODO
+        # List of rights for getting option price 
         list_of_rights = ["Call", "Call", "Put", "Put"] * 2
 
         for strike, right in zip(list_of_strikes, list_of_rights):
@@ -947,7 +946,7 @@ class ImpliedVolatility:
         what_to_show = "BID"
         list_of_duration_size_for_fetcher = [f"{_} D" for _ in list_of_duration_size]
 
-        # Put it in the Variable # ARYAN TODO
+        # Getting the Setting
         bar_size = StrategyVariables.historical_price_data_bar_size
         list_of_req_id_for_historical_data = HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
             list_of_contracts, bar_size, list_of_duration_size_for_fetcher, what_to_show

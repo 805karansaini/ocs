@@ -36,7 +36,6 @@ class Instrument:
             if hasattr(self, key):
                 setattr(self, key, value)
             else:
-                # TODO - ARYAN
                 logger.error(
                     f"Inside OrdePreset Object change_value UID: {self.unique_id} '{key}' is not an attribute of this class. new value: {value}"
                 )

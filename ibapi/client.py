@@ -17,19 +17,18 @@ import logging
 import queue
 import socket
 
-from ibapi import decoder, reader, comm
-from ibapi.connection import Connection
-from ibapi.message import OUT
-from ibapi.common import *  # @UnusedWildImport
-from ibapi.contract import Contract
-from ibapi.order import Order, COMPETE_AGAINST_BEST_OFFSET_UP_TO_MID
-from ibapi.execution import ExecutionFilter
-from ibapi.scanner import ScannerSubscription
+from ibapi import comm, decoder, reader
 from ibapi.comm import make_field, make_field_handle_empty
-from ibapi.utils import current_fn_name, BadMessage
+from ibapi.common import *  # @UnusedWildImport
+from ibapi.connection import Connection
+from ibapi.contract import Contract
 from ibapi.errors import *  # @UnusedWildImport
+from ibapi.execution import ExecutionFilter
+from ibapi.message import OUT
+from ibapi.order import COMPETE_AGAINST_BEST_OFFSET_UP_TO_MID, Order
+from ibapi.scanner import ScannerSubscription
 from ibapi.server_versions import *  # @UnusedWildImport
-from ibapi.utils import ClientException
+from ibapi.utils import BadMessage, ClientException, current_fn_name
 
 # TODO: use pylint
 

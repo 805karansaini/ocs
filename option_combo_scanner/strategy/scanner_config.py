@@ -15,7 +15,7 @@ class Config:
     ):
         [setattr(self, key, value) for key, value in values_dict.items()]
 
-        # Manage Conid, contract, Subscription # TODO
+        # Manage Conid, contract, Subscription
         self.config_id = int(float(self.config_id))
         self.map_config_id_to_config_object()
 

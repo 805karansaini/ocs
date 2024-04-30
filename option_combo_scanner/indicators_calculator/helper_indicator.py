@@ -358,7 +358,7 @@ class IndicatorHelper:
         Update in DB, GUI, Sys everywhere
         """
 
-        # TODO - rewrite
+        # Values for updation in DB
         values_dict_for_db = {}
         current_time = datetime.datetime.now(variables.target_timezone_obj)
 

@@ -216,7 +216,7 @@ class PutCallVol:
 
             list_of_contracts = list_option_contracts
 
-            # TODO Get From Variables
+            # Get From Variables
             bar_size = StrategyVariables.put_call_volume_bar_size
             duration_size = StrategyVariables.put_call_volume_lookback_days
 

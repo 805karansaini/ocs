@@ -130,11 +130,10 @@ class HistoricalDataFetcher:
         ]
         duration_batches = [list_of_duration_size[i : i + batch_size] for i in range(0, len(list_of_duration_size), batch_size)]
 
-        # List of all request ids TODO
+        # List of all request ids
         list_of_req_id_for_historical_data = []
 
         for indx, (contract_batch, duration_batch) in enumerate(zip(contract_batches, duration_batches)):
-            # TODO - REMOVE
             # print(f"Fetching Historical data for batch: {indx + 1}/{len(contract_batches)}")
 
             for indx, (contract, duration_size) in enumerate(zip(contract_batch, duration_batch)):

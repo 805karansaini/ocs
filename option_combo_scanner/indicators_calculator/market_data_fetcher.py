@@ -98,9 +98,9 @@ class MarketDataFetcher:
                 # Unsubscribe market data
                 variables.app.cancelMktData(reqId)
 
-                # Print to console # TODO ARAYAN
+                # Print to console
                 if variables.flag_debug_mode:
-                    print(f"Inside MarketDataFetcher: Successfully fetched Implied Volatility for reqId = {reqId}")
+                    print(f"Inside MarketDataFetcher: Successfully fetched Option Delta & Implied Volatility for reqId = {reqId}")
 
                 # Return Implied Volatility
                 return (
@@ -121,17 +121,15 @@ class MarketDataFetcher:
 
             # Response not yet ended
             else:
-                # If in debug mode and the counter is divisible by 20, print a debug message TODO change teh comment ARYAN
+                # If in debug mode and the counter is divisible by 20, print a debug message
                 if (variables.flag_debug_mode) and (counter % 20 == 0):
-                    print("Waiting for delta for reqId = ", reqId)
+                    print("Waiting for option_delta_and_iv for reqId = ", reqId)
 
                 # Wait for response
                 await asyncio.sleep(variables.sleep_time_waiting_for_tws_response)
                 counter += 1
 
-    # TODO ARYAN
     # Using list comprehension to get Delta and gather the results with await
-
     # retrieves delta and implied volatility for a list of option contracts asynchronously.
 
     @staticmethod
@@ -240,9 +238,9 @@ class MarketDataFetcher:
 
             # Response not yet ended
             else:
-                # Print to console TODO change teh comment ARYAN
+                # Print to console
                 if (variables.flag_debug_mode) and (counter % 20 == 0):
-                    print("Waiting for mktData for reqId = ", reqId)
+                    print("Waiting for current price of contract for reqId = ", reqId)
 
                 # Wait for response
                 await asyncio.sleep(variables.sleep_time_waiting_for_tws_response)
@@ -256,7 +254,7 @@ class MarketDataFetcher:
         Return [(Bid, Ask)..]
         """
 
-        # TODO - Put in variable
+        # Getting Bar Size
         batch_size = strategy_variables.batch_size
 
         # Splitting the contracts into batches
@@ -265,7 +263,6 @@ class MarketDataFetcher:
         result = []
 
         for indx, batch in enumerate(contract_batches):
-            # TODO - REMOVE
             # print(f"Fetching data for batch: {indx + 1}")
 
             result += await asyncio.gather(

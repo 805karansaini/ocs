@@ -173,7 +173,6 @@ class IndicatorCalculation:
                         )
 
                 else:
-                    # TODO- Remame
                     PutCallVol.compute(
                         indicator_object,
                         symbol,

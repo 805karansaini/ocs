@@ -59,7 +59,7 @@ class AlgoOneAPI(EClient, EWrapper):
                     await asyncio.sleep(1)
 
         except Exception as exp:
-            # TODO we should log it and not show it to the user.
+            # we should log it and not show it to the user.
             print(f"Unable to connect to data server, Exception: {exp}")
 
     def historical_data(self, request_id: str, historical_bars: dict):
@@ -177,4 +177,3 @@ class AlgoOneAPI(EClient, EWrapper):
             # asyncio.run(self._start_setup())
         except Exception as e:
             print("Inside Start: ", e)
-        # TODO - Handle Reconnection

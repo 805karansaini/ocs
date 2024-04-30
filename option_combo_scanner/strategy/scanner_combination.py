@@ -80,7 +80,6 @@ class ScannerCombination:
     def remove_scanned_combo_from_system(self):
 
         # Remove row from dataframe
-        # TODO Check
         strategy_variables.scanner_combo_table_df = strategy_variables.scanner_combo_table_df.drop(
             strategy_variables.scanner_combo_table_df[strategy_variables.scanner_combo_table_df["Combo ID"] == self.combo_id].index
         )

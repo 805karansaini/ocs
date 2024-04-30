@@ -149,7 +149,7 @@ class Scanner:
                 )
                 continue
 
-            #  We need to loop over the configs now - IMPT V2 KARAN ARYAN
+            #  We need to loop over the configs now - IMPT V2
             list_of_all_generated_combination = self.generate_combinations()
 
             # To do early teminate
@@ -206,7 +206,7 @@ class Scanner:
 
         for combination, combo_net_delta in zip(list_of_all_generated_combination, list_of_combo_net_delta):
 
-            # todo early teminate
+            # Check early termination
             if self.check_do_we_need_to_restart_scan():
                 return
 
@@ -327,7 +327,7 @@ class Scanner:
                 quantity = leg_object.quantity
                 _, _, delta, _, _, _, _, _, _, _, _, _, _ = leg_tuple
                 delta = float(delta)
-                
+
                 # Mulitplier
                 # InstrumentID, and InstrumentObject for multiplier
                 instrument_id = leg_object.instrument_id
@@ -365,9 +365,10 @@ def run_option_combo_scanner():
         current_time = time.time()
 
         try:
-            # If the scanner running state is enabled, and we need to run first scan or a rescan, then run it 
+            # If the scanner running state is enabled, and we need to run first scan or a rescan, then run it
             if StrategyVariables.flag_scanner_running_state and (
-                StrategyVariables.last_scanned_time is None or current_time - StrategyVariables.last_scanned_time > StrategyVariables.rescan_time_in_seconds
+                StrategyVariables.last_scanned_time is None
+                or current_time - StrategyVariables.last_scanned_time > StrategyVariables.rescan_time_in_seconds
             ):
 
                 scanner_logger.info(f"Starting the Scanner")

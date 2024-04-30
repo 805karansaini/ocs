@@ -330,7 +330,6 @@ class Utils:
         list_of_indicator_ids=None,
         instrument_id=None,
     ):
-        # TODO - IMPORTANT Check KARAN ARYAN
         # Remove all the indicator based on the list_of_indicator_ids
         if list_of_indicator_ids is not None:
             # Remove rows from indicator table
