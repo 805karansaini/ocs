@@ -548,7 +548,7 @@ class ImpliedVolatility:
                 if len(all_the_dates_in_underlying_data) > ith_day:
                     ith_days_old_date = all_the_dates_in_underlying_data[-(ith_day + 1)]
                 else:
-                    print(f"Underying data is not available for {ith_day} ago")
+                    # print(f"Underying data is not available for {ith_day} ago")
                     continue
 
                 # Date Time object i days ago date
@@ -902,15 +902,25 @@ class ImpliedVolatility:
         n_th_day = n_th_day - 1
         map_var_to_change_in_option_price_value = {}
 
-        yesterday_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike[(1, delta_d1)]
-        yesterday_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike[(1, delta_d2)]
-        yesterday_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike[(1, delta_d1)]
-        yesterday_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike[(1, delta_d2)]
+        # yesterday_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike[(1, delta_d1)]
+        # yesterday_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike[(1, delta_d2)]
+        # yesterday_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike[(1, delta_d1)]
+        # yesterday_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike[(1, delta_d2)]
 
-        n_th_day_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike[(n_th_day, delta_d1)]
-        n_th_day_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike[(n_th_day, delta_d2)]
-        n_th_day_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike[(n_th_day, delta_d1)]
-        n_th_day_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike[(n_th_day, delta_d2)]
+        # n_th_day_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike[(n_th_day, delta_d1)]
+        # n_th_day_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike[(n_th_day, delta_d2)]
+        # n_th_day_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike[(n_th_day, delta_d1)]
+        # n_th_day_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike[(n_th_day, delta_d2)]
+
+        yesterday_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike.get((1, delta_d1), None)
+        yesterday_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike.get((1, delta_d2), None)
+        yesterday_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike.get((1, delta_d1), None)
+        yesterday_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike.get((1, delta_d2), None)
+
+        n_th_day_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike.get((n_th_day, delta_d1), None)
+        n_th_day_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike.get((n_th_day, delta_d2), None)
+        n_th_day_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike.get((n_th_day, delta_d1), None)
+        n_th_day_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike.get((n_th_day, delta_d2), None)
 
         list_of_strikes = [
             yesterday_call_strike_d1,
