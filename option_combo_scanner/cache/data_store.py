@@ -8,7 +8,7 @@ class DataStore:
     Only for Stroing Historical Price Data
     """
     data_store = {}
-    MAX_CACHE_TIME_IN_SECONDS = 240
+    MAX_CACHE_TIME_IN_SECONDS = 300
     
     @staticmethod
     def store_data(key, df):
