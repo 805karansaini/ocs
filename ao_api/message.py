@@ -1,9 +1,32 @@
 # Incoming msg id's
 class IN:
     ERR_MSG = "error"
+    WARNING_MSG = "warning"
     HISTORICAL_DATA = "historical_data"
+    OPTION_CONTRACTS_DATA = "option_contracts_data"
     HISTORICAL_DATA_END = "data_end"
-
+    OPTION_CONTRACTS_DATA_END = "option_contracts_data_end"
+    TICK_OPTION_COMPUTATION = "tick_option_computation"
+    TICK_PRICE = "tick_price"
+    TICK_SIZE = "tick_size"
+    MARKET_SNAPSHOT_END = "market_snapshot_end"
+    CONTRACT_DETAILS = "contract_details"
+    CONTRACT_DETAILS_END = "contract_details_end"
+    ORDER_STATUS = "order_status"
+    OPEN_ORDER = "open_order"
+    EXECUTIONS = "executions"
+    EXECUTIONS_END = "executions_end"
+    POSITIONS = "position"
+    POSITIONS_END = "positions_end"
+    REQUEST_ID = "request_id"
+    ALL_ACCOUNTS_DATA = "all_accounts_data"
+    MANAGED_ACCOUNTS = "managed_accounts"
+    ACCOUNT_UPDATES = "account_update"
+    ACCOUNT_UPDATES_END = "account_update_end"
+    PNL = "pnl"
+    PNL_SINGLE = "pnl_single"
+    MARKET_RULE = "market_rule"
+    TICK_GENERIC = "tick_generic"
 
 class OUT:
     pass

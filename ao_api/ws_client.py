@@ -1,12 +1,12 @@
 import asyncio
 import json
 import queue
-import time
 
 import websockets
 
-from option_combo_scanner.client_app.logger import CustomLogger
+from logger import CustomLogger
 
+FLAG_LOG_REQUEST_RESPONSES = True
 
 class WebSocketClient:
     """
@@ -26,11 +26,13 @@ class WebSocketClient:
         """
         try:
             # Connect via WS
-            self.websocket = await websockets.connect(self.endpoint, max_size=None, ping_timeout=None, close_timeout=None)
+            self.websocket = await websockets.connect(
+                self.endpoint, max_size=None, ping_timeout=None, close_timeout=None
+            )
 
             self.loop = asyncio.get_event_loop()
         except Exception as e:
-            pass
+            print("Error while connecting: ", e)
 
     async def disconnect(self):
         """
@@ -74,7 +76,16 @@ class WebSocketClient:
 
                 # Insert the response in the Queue
                 self.queue.put(json_response)
-                self.custom_logger.logger.info(response)
+
+                # Logging
+                if FLAG_LOG_REQUEST_RESPONSES:
+                    request_id = json_response.get("request_id", None)
+                    response_type = json_response.get("response_type", None)
+                    self.custom_logger.logger.info(
+                        f"Received response for reqId: {request_id} responseType: {response_type} Response Size: {len(json_response.get('result', []))}"
+                    )
+                    # self.custom_logger.logger.info(json_response)
+
             except websockets.exceptions.ConnectionClosed as e:
                 self.websocket = None
                 self.custom_logger.logger.info(f"WebSocket connection closed: {e}")
@@ -106,3 +117,7 @@ class WebSocketClient:
 
     async def async_send_request(self, request):
         await self.websocket.send(request)
+        
+        if FLAG_LOG_REQUEST_RESPONSES:
+            # Logging
+            self.custom_logger.logger.info(f"Sent request: {request}")
