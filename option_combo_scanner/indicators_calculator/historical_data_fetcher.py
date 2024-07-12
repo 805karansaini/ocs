@@ -20,7 +20,9 @@ class HistoricalDataFetcher:
 
     # Method to request historical data
     @staticmethod
-    def request_historical_data_for_contract(contract, bar_size, duration_size, what_to_show, req_id=None, cas_app=True):
+    def request_historical_data_for_contract(
+        contract, bar_size, duration_size, what_to_show, req_id=None, cas_app=True
+    ):
 
         # print(f"IBKR: {contract}")
         # If req_id was not provided, getting request ID
@@ -35,7 +37,9 @@ class HistoricalDataFetcher:
         variables.req_mkt_data_end[reqId] = False
 
         # Map req_id to dataframe containing historical_data
-        variables.map_req_id_to_historical_data_dataframe[reqId] = pd.DataFrame(columns=variables.historical_data_columns)
+        variables.map_req_id_to_historical_data_dataframe[reqId] = pd.DataFrame(
+            columns=variables.historical_data_columns
+        )
 
         # Static for reqHistoricalData
         end_date_time = ""
@@ -52,7 +56,9 @@ class HistoricalDataFetcher:
         if contract.secType in ["IND"]:
             what_to_show = "TRADES"
 
-        contract = IBkrAlgoOneAdapter.contract(contract)
+        print(f"AO: {contract}")
+
+        contract = IBkrAlgoOneAdapter.convert_ibapi_to_ao_contract(contract)
         duration, duration_unit = IBkrAlgoOneAdapter.duration(duration_string)
         bar_size, bar_unit = IBkrAlgoOneAdapter.bar_size(bar_size)
         flag_rth_only = IBkrAlgoOneAdapter.flag_rth_only(use_rth)
@@ -66,8 +72,6 @@ class HistoricalDataFetcher:
             contract=contract,  # Contract
             duration=duration,
             duration_unit=duration_unit,
-            # start_datetime=start_datetime,
-            # end_datetime=end_datetime,
             bar_unit=bar_unit,  # min
             bar_size=bar_size,  # 1
             flag_rth_only=flag_rth_only,
@@ -119,41 +123,59 @@ class HistoricalDataFetcher:
         #     )
 
     @staticmethod
-    def fetch_historical_data_for_list_of_contracts(list_of_all_option_contracts, bar_size, list_of_duration_size, what_to_show):
+    def fetch_historical_data_for_list_of_contracts(
+        list_of_all_option_contracts, bar_size, list_of_duration_size, what_to_show
+    ):
 
         # Historical Data Batch Size
         batch_size = StrategyVariables.batch_size_historical_data
 
         # Splitting the contracts into batches
         contract_batches = [
-            list_of_all_option_contracts[i : i + batch_size] for i in range(0, len(list_of_all_option_contracts), batch_size)
+            list_of_all_option_contracts[i : i + batch_size]
+            for i in range(0, len(list_of_all_option_contracts), batch_size)
         ]
-        duration_batches = [list_of_duration_size[i : i + batch_size] for i in range(0, len(list_of_duration_size), batch_size)]
+        duration_batches = [
+            list_of_duration_size[i : i + batch_size]
+            for i in range(0, len(list_of_duration_size), batch_size)
+        ]
 
         # List of all request ids
         list_of_req_id_for_historical_data = []
 
-        for indx, (contract_batch, duration_batch) in enumerate(zip(contract_batches, duration_batches)):
+        for indx, (contract_batch, duration_batch) in enumerate(
+            zip(contract_batches, duration_batches)
+        ):
             # print(f"Fetching Historical data for batch: {indx + 1}/{len(contract_batches)}")
 
-            for indx, (contract, duration_size) in enumerate(zip(contract_batch, duration_batch)):
+            for indx, (contract, duration_size) in enumerate(
+                zip(contract_batch, duration_batch)
+            ):
 
                 # Getting req_id
                 reqId = variables.cas_app.nextorderId
                 variables.cas_app.nextorderId += 1
 
                 # Send the request
-                HistoricalDataFetcher.request_historical_data_for_contract(contract, bar_size, duration_size, what_to_show, reqId)
+                HistoricalDataFetcher.request_historical_data_for_contract(
+                    contract, bar_size, duration_size, what_to_show, reqId
+                )
 
                 # Append the reqId to list
                 list_of_req_id_for_historical_data.append(reqId)
 
             counter = 0
-            while variables.cas_wait_time_for_historical_data > (counter * variables.sleep_time_between_iters):
+            while variables.cas_wait_time_for_historical_data > (
+                counter * variables.sleep_time_between_iters
+            ):
 
                 # Waitting for the request to end or give error
                 if all(
-                    [variables.req_mkt_data_end[req_id] or variables.req_error[req_id] for req_id in list_of_req_id_for_historical_data]
+                    [
+                        variables.req_mkt_data_end[req_id]
+                        or variables.req_error[req_id]
+                        for req_id in list_of_req_id_for_historical_data
+                    ]
                 ):
                     break
 

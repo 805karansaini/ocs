@@ -62,6 +62,24 @@ class AlgoOneAPI(EClient, EWrapper):
             # we should log it and not show it to the user.
             print(f"Unable to connect to data server, Exception: {exp}")
 
+    async def _start_setup(self):
+        """
+        Wrapper to setup conn and keeps running the event loop
+        """
+        # Connect to Data Server via WS
+        await self.setup_api_connection()
+
+        while self.is_connected():
+            await asyncio.sleep(5)
+
+    def start(self):
+        try:
+            print(self.loop)
+            asyncio.run_coroutine_threadsafe(self._start_setup(), self.loop)
+            # asyncio.run(self._start_setup())
+        except Exception as e:
+            print("Inside Start: ", e)
+
     def historical_data(self, request_id: str, historical_bars: dict):
         # print(f"Historical Data: reqId: {request_id} Bar: {historical_bars}")
         request_id = int(request_id)

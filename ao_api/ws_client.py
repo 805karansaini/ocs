@@ -4,7 +4,7 @@ import queue
 
 import websockets
 
-from logger import CustomLogger
+from ao_api.custom_logger import CustomLogger
 
 FLAG_LOG_REQUEST_RESPONSES = True
 
