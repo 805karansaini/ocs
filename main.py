@@ -1,3 +1,7 @@
+import warnings
+
+# Ignore all warnings
+warnings.filterwarnings("ignore")
 import asyncio
 import datetime
 import os
