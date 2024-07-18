@@ -182,9 +182,12 @@ class Decoder:
                 vega = data["vega"]
                 theta = data["theta"]
                 iv = data["iv"]
+                underlying_price = data["underlying_price"]
+                option_price = data["option_price"]
+                pvDividend = data["pvDividend"]
 
                 self.wrapper.tick_option_computation(
-                    reqId, tick_type, delta, gamma, vega, theta, iv
+                    reqId, tick_type, delta, gamma, vega, theta, iv, underlying_price, option_price, pvDividend
                 )
         except Exception as e:
             print("Error in process_tick_option_computation_msg", e)

@@ -258,7 +258,7 @@ class ImpliedVolatility:
 
         if StrategyVariables.flag_test_print:
             print(f"Indicator ID: {indicator_id}, Underlying Contract: {underlying_contract}")
-            print(f"Indicator ID: {indicator_id}, Underlying Bid: {underlying_bid}, Underlying Ask: {underlying_ask}")
+            print(f"Indicator ID: {indicator_id}, Underlying Bid: {underlying_bid}, Underlying Ask: {underlying_ask} Last Price: {last_price}")
             # time.sleep(100)
 
         # Current underlying price is last_price in case of INDEX

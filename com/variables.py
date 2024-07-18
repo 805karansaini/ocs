@@ -11,6 +11,7 @@ from com.user_inputs import *
 class variables(object):
 
     ds_client = None
+    use_api_bridge = True
     # TWS API Params
     ibkr_tws_host = UserInputs.ibkr_tws_host
     ibkr_tws_port = UserInputs.ibkr_tws_port

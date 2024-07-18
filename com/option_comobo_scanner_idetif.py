@@ -378,11 +378,21 @@ def get_list_of_strikes_and_expiries(
         futFopExchange if futFopExchange != "" else "SMART"
     )
 
-    # print(reqId, ticker, futFopExchange, underlying_sec_type, conid)
     # Fetching all the expiry and strikes for the ticker
-    variables.app.reqSecDefOptParams(
-        reqId, ticker, futFopExchange, underlying_sec_type, conid
-    )
+    # Send request to API bridge or TWS
+    if variables.use_api_bridge:
+        variables.ds_client.req_option_contracts(
+            request_id=reqId,
+            ticker=ticker,
+            underlying_sec_type=underlying_sec_type,
+            futFopExchange=futFopExchange,
+            conid=conid,
+            flag_use_tws_only=False,
+        )
+    else:
+        variables.app.reqSecDefOptParams(
+            reqId, ticker, futFopExchange, underlying_sec_type, conid
+        )
 
     # Timeout
     counter = 0
@@ -468,9 +478,20 @@ async def get_list_of_strikes_and_expiries_async(
     )
 
     # Fetching all the expiry and strikes for the ticker
-    variables.app.reqSecDefOptParams(
-        reqId, ticker, futFopExchange, underlying_sec_type, conid
-    )
+    # Send request to API bridge or TWS
+    if variables.use_api_bridge:
+        variables.ds_client.req_option_contracts(
+            request_id=reqId,
+            ticker=ticker,
+            underlying_sec_type=underlying_sec_type,
+            futFopExchange=futFopExchange,
+            conid=conid,
+            flag_use_tws_only=False,
+        )
+    else:
+        variables.app.reqSecDefOptParams(
+            reqId, ticker, futFopExchange, underlying_sec_type, conid
+        )
 
     # Timeout
     counter = 0

@@ -1,15 +1,21 @@
 import asyncio
 import time
 
+from ao_api.ibkr_ao_adapter import IBkrAlgoOneAdapter
 from com.variables import variables
-from option_combo_scanner.strategy.strategy_variables import \
-    StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import (
+    StrategyVariables as strategy_variables,
+)
 
 
 class MarketDataFetcher:
     @staticmethod
     async def get_option_delta_and_implied_volatility(
-        contract, flag_market_open=True, generic_tick_list="", snapshot=True, max_wait_time=None
+        contract,
+        flag_market_open=True,
+        generic_tick_list="",
+        snapshot=True,
+        max_wait_time=None,
     ):
         # Handle Case where TWS is not available
         if variables.app.nextorderId is None:
@@ -44,7 +50,7 @@ class MarketDataFetcher:
             variables.app.reqMarketDataType(2)  # frozen
 
         # Set remaining params
-        genericTickList = generic_tick_list
+        generic_tick_list = generic_tick_list
         regulatory = False
         snapshot = snapshot  # A true value will return a one=time snapshot, while a false value will provide streaming data.
 
@@ -52,15 +58,32 @@ class MarketDataFetcher:
         if variables.flag_debug_mode:
             print(f"Fetching MKt Data contract = {contract} reqId = ", reqId)
 
-        # Send request
-        variables.app.reqMktData(
-            reqId,
-            contract,
-            genericTickList,
-            snapshot,
-            regulatory,
-            [],
-        )
+        # Use API Bridge
+        if variables.use_api_bridge:
+
+            # Convert the ibapi contract to the api bridge contract
+            contract = IBkrAlgoOneAdapter.convert_ibapi_to_ao_contract(contract)
+
+            if snapshot or generic_tick_list:
+                variables.ds_client.req_market_snapshot(
+                    reqId, contract, generic_tick_list, priority=1
+                )
+            else:
+                # if snapshot is False then subscribe to real time quotes
+                variables.ds_client.subscribe_real_time_quotes(
+                    reqId, contract, priority=1
+                )
+
+        else:
+            # Send request
+            variables.app.reqMktData(
+                reqId,
+                contract,
+                generic_tick_list,
+                snapshot,
+                regulatory,
+                [],
+            )
 
         # Wait for response from TWS
         max_wait_time_for_mkt_data = variables.max_wait_time_for_mkt_data
@@ -75,7 +98,13 @@ class MarketDataFetcher:
             # (Error received for the request) OR (Timeout of 14 secs) OR (Response end indicated by API) OR (delta value is available)
             if (
                 (variables.req_error[reqId] == True)
-                or (counter >= int(max_wait_time_for_mkt_data / variables.sleep_time_waiting_for_tws_response))
+                or (
+                    counter
+                    >= int(
+                        max_wait_time_for_mkt_data
+                        / variables.sleep_time_waiting_for_tws_response
+                    )
+                )
                 or (variables.req_mkt_data_end[reqId])
                 or (
                     variables.options_delta[reqId] is not None
@@ -84,7 +113,6 @@ class MarketDataFetcher:
                     and variables.options_iv_last[reqId] is not None
                     and variables.bid_price[reqId] is not None
                     and variables.ask_price[reqId] is not None
-                    
                     and variables.call_option_open_interest[reqId] is not None
                     and variables.put_option_open_interest[reqId] is not None
                     and variables.options_vega[reqId] is not None
@@ -96,11 +124,16 @@ class MarketDataFetcher:
             ):
 
                 # Unsubscribe market data
-                variables.app.cancelMktData(reqId)
+                if variables.use_api_bridge:
+                    variables.ds_client.unsubscribe_real_time_quotes(reqId, priority=1)
+                else:
+                    variables.app.cancelMktData(reqId)
 
                 # Print to console
                 if variables.flag_debug_mode:
-                    print(f"Inside MarketDataFetcher: Successfully fetched Option Delta & Implied Volatility for reqId = {reqId}")
+                    print(
+                        f"Inside MarketDataFetcher: Successfully fetched Option Delta & Implied Volatility for reqId = {reqId}"
+                    )
 
                 # Return Implied Volatility
                 return (
@@ -134,7 +167,11 @@ class MarketDataFetcher:
 
     @staticmethod
     async def get_option_delta_and_implied_volatility_for_contracts_list_async(
-        contracts_list, flag_market_open=True, generic_tick_list="", snapshot=True, max_wait_time=None
+        contracts_list,
+        flag_market_open=True,
+        generic_tick_list="",
+        snapshot=True,
+        max_wait_time=None,
     ):
         """
         # Use Batch Size of 80
@@ -152,7 +189,10 @@ class MarketDataFetcher:
         batch_size = strategy_variables.batch_size
 
         # Splitting the contracts into batches
-        contract_batches = [contracts_list[i : i + batch_size] for i in range(0, len(contracts_list), batch_size)]
+        contract_batches = [
+            contracts_list[i : i + batch_size]
+            for i in range(0, len(contracts_list), batch_size)
+        ]
 
         result = []
 
@@ -161,7 +201,11 @@ class MarketDataFetcher:
             result += await asyncio.gather(
                 *[
                     MarketDataFetcher.get_option_delta_and_implied_volatility(
-                        contract, flag_market_open, generic_tick_list, snapshot, max_wait_time,
+                        contract,
+                        flag_market_open,
+                        generic_tick_list,
+                        snapshot,
+                        max_wait_time,
                     )
                     for contract in batch
                 ]
@@ -194,7 +238,9 @@ class MarketDataFetcher:
         # Print to console
         if variables.flag_debug_mode:
             # Getting req_id
-            print(f"Req ID = {reqId}: Requesting Market Data for (snapshot: {snapshot}) Contract: {contract}")
+            print(
+                f"Req ID = {reqId}: Requesting Market Data for (snapshot: {snapshot}) Contract: {contract}"
+            )
 
         # Set request type depending on whether the market is live or not
         if variables.flag_market_open:
@@ -206,15 +252,32 @@ class MarketDataFetcher:
         snapshot = snapshot  # A true value will return a one=time snapshot, while a false value will provide streaming data.
         regulatory = False
 
-        # Send the request
-        variables.app.reqMktData(
-            reqId,
-            contract,
-            generic_tick_list,
-            snapshot,
-            regulatory,
-            [],
-        )
+        # Use API Bridge
+        if variables.use_api_bridge:
+
+            # Convert the ibapi contract to the api bridge contract
+            contract = IBkrAlgoOneAdapter.convert_ibapi_to_ao_contract(contract)
+
+            if snapshot or generic_tick_list:
+                variables.ds_client.req_market_snapshot(
+                    reqId, contract, generic_tick_list, priority=1
+                )
+            else:
+                # if snapshot is False then subscribe to real time quotes
+                variables.ds_client.subscribe_real_time_quotes(
+                    reqId, contract, priority=1
+                )
+
+        else:
+            # Send the request
+            variables.app.reqMktData(
+                reqId,
+                contract,
+                generic_tick_list,
+                snapshot,
+                regulatory,
+                [],
+            )
 
         # Wait for response from TWS
         counter = 0
@@ -222,12 +285,25 @@ class MarketDataFetcher:
             # (Error received for the request) OR (Timeout of 14 secs) OR (Response end indicated by API) OR (bid and ask value is available)
             if (
                 (variables.req_error[reqId] == True)
-                or (counter >= int(variables.max_wait_time_for_mkt_data / variables.sleep_time_waiting_for_tws_response))
+                or (
+                    counter
+                    >= int(
+                        variables.max_wait_time_for_mkt_data
+                        / variables.sleep_time_waiting_for_tws_response
+                    )
+                )
                 or (variables.req_mkt_data_end[reqId])
-                or (variables.bid_price[reqId] is not None and variables.ask_price[reqId] is not None and variables.last_price[reqId] is not None)
+                or (
+                    variables.bid_price[reqId] is not None
+                    and variables.ask_price[reqId] is not None
+                    and variables.last_price[reqId] is not None
+                )
             ):
                 # Unsubscribe market data
-                variables.app.cancelMktData(reqId)
+                if variables.use_api_bridge:
+                    variables.ds_client.unsubscribe_real_time_quotes(reqId, priority=1)
+                else:
+                    variables.app.cancelMktData(reqId)
 
                 # Return Bid And Ask
                 return (
@@ -248,7 +324,8 @@ class MarketDataFetcher:
 
     @staticmethod
     async def get_current_price_for_list_of_contracts_async(
-        contracts_list, snapshot=True,
+        contracts_list,
+        snapshot=True,
     ):
         """
         Return [(Bid, Ask)..]
@@ -258,7 +335,10 @@ class MarketDataFetcher:
         batch_size = strategy_variables.batch_size
 
         # Splitting the contracts into batches
-        contract_batches = [contracts_list[i : i + batch_size] for i in range(0, len(contracts_list), batch_size)]
+        contract_batches = [
+            contracts_list[i : i + batch_size]
+            for i in range(0, len(contracts_list), batch_size)
+        ]
 
         result = []
 

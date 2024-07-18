@@ -7,15 +7,17 @@ class DataStore:
     """
     Only for Stroing Historical Price Data
     """
+
     data_store = {}
-    MAX_CACHE_TIME_IN_SECONDS = 300
-    
+    MAX_CACHE_TIME_IN_SECONDS = 3000
+
     @staticmethod
     def store_data(key, df):
         """
         Store a Pandas DataFrame in the data store with the given key.
         """
         DataStore.data_store[key] = (df, time.time())
+
     @staticmethod
     def get_data(key):
         """
@@ -24,11 +26,14 @@ class DataStore:
         """
         if key in DataStore.data_store:
             df, timestamp = DataStore.data_store[key]
-            if time.time() - timestamp <= DataStore.MAX_CACHE_TIME_IN_SECONDS:  # 30 minutes in seconds
+            if (
+                time.time() - timestamp <= DataStore.MAX_CACHE_TIME_IN_SECONDS
+            ):  # 30 minutes in seconds
                 return df
             else:
                 del DataStore.data_store[key]  # Remove the expired DataFrame
         return None
+
 
 # # Example usage
 # data_store = DataStore()

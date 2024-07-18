@@ -192,14 +192,6 @@ class IBapi(
 
             self.reqMarketRule(rule_ids)
 
-    # Method to to get price increments for market
-    def marketRule(self, marketRuleId: int, priceIncrements: ListOfPriceIncrements):
-
-        super().marketRule(marketRuleId, priceIncrements)
-
-        # map rule id to price increments
-        variables.map_rule_id_to_increments[marketRuleId] = priceIncrements
-
     # Callback for reqContractDetails
     def contractDetailsEnd(self, reqId: int):
 
@@ -211,23 +203,6 @@ class IBapi(
         # Print to console
         if variables.flag_debug_mode:
             print("contractDetailsEnd. ReqId:", reqId)
-
-    # Callback for trading account
-    def managedAccounts(self, accountsList: str):
-        """Receives a comma-separated string with the managed account ids."""
-
-        if accountsList.count(",") > 0:
-            # Get account in current session
-            variables.current_session_accounts = sorted(
-                list(set(accountsList[:-1].split(",")))
-            )
-
-            #variables.current_session_accounts = [variables.current_session_accounts[0]]
-        else:
-            variables.current_session_accounts = [accountsList]
-
-        # add row for each account in df
-        add_accounts_in_df()
 
     # Callback for reqMktData (Delta)
     def tickOptionComputation(
@@ -530,6 +505,7 @@ class IBapi(
         if (tickType == TickTypeEnum.LAST) and (price != -1):
             variables.last_price[reqId] = price
 
+    """
     # Callback for placeOrder
     def orderStatus(
         self,
@@ -945,15 +921,10 @@ class IBapi(
             # Request PNL for con id mapped to account
             variables.app.reqPnLSingle(req_id, account, "", contract.conId)
 
-        """print("Position.", "Account:", account, "Symbol:", contract.symbol, "SecType:",
-
-        contract.secType, "Currency:", contract.currency,
-
-        "Position:", decimalMaxString(position), "Avg cost:", floatMaxString(avgCost))"""
-
     # Callback for position end
     def positionEnd(self):
         variables.flag_pnl_single = False
 
         super().positionEnd()
         self.cancelPositions()
+    """

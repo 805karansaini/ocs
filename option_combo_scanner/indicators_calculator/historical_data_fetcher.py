@@ -56,7 +56,7 @@ class HistoricalDataFetcher:
         if contract.secType in ["IND"]:
             what_to_show = "TRADES"
 
-        print(f"AO: {contract}")
+        # print(f"AO: {contract}")
 
         contract = IBkrAlgoOneAdapter.convert_ibapi_to_ao_contract(contract)
         duration, duration_unit = IBkrAlgoOneAdapter.duration(duration_string)

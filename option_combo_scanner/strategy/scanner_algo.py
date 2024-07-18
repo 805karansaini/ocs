@@ -6,6 +6,7 @@ import traceback
 from functools import cache
 
 import pandas as pd
+import tabulate
 
 from com.contracts import get_contract
 from com.option_comobo_scanner_idetif import (
@@ -406,16 +407,15 @@ class ScannerAlgo:
                     list_of_call_option_contracts, list_of_put_option_contracts, snapshot=False, generic_tick_list="101"
                 )
 
-                # from tabulate import tabulate
 
                 # scanner_logger.info(
                 #     f"Config ID: {self.config_id} Leg Number: {leg_number} Inside ScannerAlgo.filter_strikes, InstrumentID: {instrument_id} All Expiry in Range: {expiry_date_in_range}"
                 # )
 
-                # print("\n\n\n")
-                # print(tabulate(df_call, headers="keys", tablefmt="psql", showindex=False))
-                # print("\n\n\nPUT")
-                # print(tabulate(df_put, headers="keys", tablefmt="psql", showindex=False))
+                # print("\n\n\nFiltered Strikes Call")
+                # print(tabulate.tabulate(df_call, headers="keys", tablefmt="psql", showindex=False))
+                # print("\n\n\nFliter Strikes Put")
+                # print(tabulate.tabulate(df_put, headers="keys", tablefmt="psql", showindex=False))
 
                 df_call["underlying_conid"] = underlying_conid
                 df_put["underlying_conid"] = underlying_conid
@@ -439,15 +439,23 @@ class ScannerAlgo:
 
             df.dropna(subset=["Delta", "Bid", "Ask", "AskIV", "UnderlyingPrice"], inplace=True)
 
-            if right.upper() == "PUT":
-                df["Delta"] = df["Delta"].abs()
+            # if right.upper() == "PUT":
+            #     df["Delta"] = df["Delta"].abs()
+
+            # # Make a copy of the dataframe to avoid modifying the original dataframe
+            # filtered_dataframe = df.copy()
+
+            # # Filter strikes based on delta_range_low and delta_range_high
+            # filtered_dataframe = filtered_dataframe[
+            #     (filtered_dataframe["Delta"] >= delta_range_low) & (filtered_dataframe["Delta"] <= delta_range_high)
+            # ]
 
             # Make a copy of the dataframe to avoid modifying the original dataframe
             filtered_dataframe = df.copy()
 
             # Filter strikes based on delta_range_low and delta_range_high
             filtered_dataframe = filtered_dataframe[
-                (filtered_dataframe["Delta"] >= delta_range_low) & (filtered_dataframe["Delta"] <= delta_range_high)
+                (filtered_dataframe["Delta"].abs() >= delta_range_low) & (filtered_dataframe["Delta"].abs() <= delta_range_high)
             ]
 
             list_of_filtered_legs_tuple.extend(

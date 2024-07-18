@@ -66,8 +66,12 @@ class EWrapper:
         vega: float,
         theta: float,
         iv: float,
+        underlying_price: float, 
+        option_price: float,
+        pvDividend: float
     ):
-        """Return the requested option computation data"""
+        """Return the requested option computation data.
+        (Values are None if not available)"""
         pass
 
     def tick_generic(self, request_id: int, tick_type: str, value: float):
