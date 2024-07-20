@@ -40,7 +40,7 @@ from com.screen_portflio_tab import ScreenPortfolio
 class ScreenGUI(threading.Thread):
     def __init__(self):
         self.window = tk.Tk()
-        self.window.title("Trading App")
+        self.window.title("Option Combo Scanner")
         self.window.geometry("1600x800")  # Set the window size
 
         # Create the notebook widget with three tabs

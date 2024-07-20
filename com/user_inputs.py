@@ -5,6 +5,7 @@ Created on 14-Mar-2023
 """
 
 import configparser
+import os
 
 from com.enum_input_class import *
 
@@ -71,9 +72,12 @@ def get_hv_method(method_str):
 
 
 class UserInputs(object):
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..", "option_scanner_user_inputs.ini")
 
     parser = configparser.ConfigParser()
-    parser.read("option_scanner_user_inputs.ini")
+    parser.read(option_scanner_user_inputs_ini_file_path)
 
     flag_debug_mode = parser.getboolean("USER INPUTS", "flag_debug_mode")
     target_timezone = parser.get("TimeZone", "target_timezone")

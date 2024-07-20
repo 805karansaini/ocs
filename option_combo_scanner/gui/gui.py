@@ -22,7 +22,7 @@ class ScreenGUI(threading.Thread):
         self.flag_stopped_all_task = False
 
         self.window = tk.Tk()
-        self.window.title("Trading App")
+        self.window.title("Option Combo Scanner")
         self.window.geometry("1600x800")  # Set the window size
 
         # Create the notebook widget with three tabs
@@ -121,6 +121,7 @@ class ScreenGUI(threading.Thread):
             error_frame, text=error_string, width=80, anchor="center"
         )
         error_label.place(relx=0.5, rely=0.5, anchor="center")
+
 
 if __name__ == "__main__":
     screen_gui_app = ScreenGUI()

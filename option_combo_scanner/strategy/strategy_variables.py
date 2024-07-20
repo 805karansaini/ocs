@@ -1,5 +1,6 @@
 import configparser
 import datetime
+import os
 import threading
 from enum import Enum
 from typing import List, Tuple
@@ -10,7 +11,11 @@ from option_combo_scanner.strategy.min_heap import MinHeap
 
 # # Read the config file
 config = configparser.ConfigParser()
-config.read("option_scanner_user_inputs.ini")
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..",  "..", "option_scanner_user_inputs.ini")
+
+config.read(option_scanner_user_inputs_ini_file_path)
 
 # Settings from config file
 time_zone_config = config["TimeZone"]
@@ -29,7 +34,7 @@ class StrategyVariables:
     """
 
     parser = configparser.ConfigParser()
-    parser.read("option_scanner_user_inputs.ini")
+    parser.read(option_scanner_user_inputs_ini_file_path)
 
     map_instrument_id_to_instrument_object = {}
     map_config_id_to_config_object = {}
@@ -113,6 +118,7 @@ class StrategyVariables:
 
     flag_store_csv_files = parser.getboolean("USER INPUTS", "flag_store_csv_files")
     o_c_s_folder_path = rf"{parser.get('USER INPUTS','o_c_s_folder_path')}"
+    
     batch_size = 80
     batch_size_historical_data = 20
 

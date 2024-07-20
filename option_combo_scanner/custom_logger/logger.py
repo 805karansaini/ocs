@@ -5,7 +5,12 @@ import os
 
 # Read the config file
 config = configparser.ConfigParser()
-config.read("option_scanner_user_inputs.ini")
+
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..",  "..", "option_scanner_user_inputs.ini")
+
+config.read(option_scanner_user_inputs_ini_file_path)
 
 # Settings from config file
 logging_level = config["Logging"]["logging_level"]
@@ -32,8 +37,15 @@ def get_logger(name: str, current_time):
     logger = logging.getLogger(logger_name)
     
     date = current_time[:8]
+
+    # Create the log directory if it doesn't exist
+    # Get the script directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     # Create the log directory if it doesn't exist
     log_dir = rf"Logs\{date}\{current_time}"
+    log_dir = os.path.join(script_dir, "..", "..", log_dir)
+
+    # Create the log directory if it doesn't exist
     os.makedirs(log_dir, exist_ok=True)
 
     # Create a file handler and specify the log file path

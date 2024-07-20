@@ -1,6 +1,7 @@
 import configparser
 import copy
 import datetime
+import os
 import time
 
 import mysql.connector
@@ -13,7 +14,11 @@ from option_combo_scanner.database.db_setup_queries import all_queries, query0, 
 logger = CustomLogger.logger
 # Read the config file
 config = configparser.ConfigParser()
-config.read("option_scanner_user_inputs.ini")
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..",  "..", "option_scanner_user_inputs.ini")
+
+config.read(option_scanner_user_inputs_ini_file_path)
 
 dbconfig = config["Database"]
 timezone_config = config["TimeZone"]
