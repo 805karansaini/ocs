@@ -383,7 +383,8 @@ class IndicatorHelper:
 
         # If unable to update return
         if not res:
-            print(f"IV values not updated in DB", {indicator_id})
+            pass
+            # print(f"IV values not updated in DB", {indicator_id})
             # return
         
         # Update Values here
