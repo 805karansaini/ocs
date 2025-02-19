@@ -15,7 +15,6 @@ def calculate_hv(
     combination_price_dataframe,
     avg_price_combo,
 ):
-
     try:
         # Redirecting to Standard deviation of closing prices method
         if hv_method.name == "STANDARD_DEVIATION":
@@ -50,9 +49,8 @@ def calculate_hv(
 
         else:
             print(f"Wrong HV Method was given... Exiting")
-            
-    except Exception as e:
 
+    except Exception as e:
         if variables.flag_debug_mode:
             print(f"Inside calculate HV, error is {e}")
 
@@ -64,7 +62,6 @@ def calculate_standard_deviation(
     conid,
     combination_price_dataframe,
 ):
-
     # Calculating candle return for the long term candle(Regulary HV Calcultaions)
     combination_price_dataframe["Candle Return"] = combination_price_dataframe[
         "Combination Close"
@@ -74,14 +71,16 @@ def calculate_standard_deviation(
     standard_dev_result = round(
         np.std(combination_price_dataframe["Candle Return"]) * 100, 8
     )
-    
+
     # Save DF to CSV File (HV) Export data-frame to csv file
     # if flag is True Save CSV file
     if StrategyVariables.flag_store_csv_files:
         folder_name = "OCS_HV"
         file_name = rf"Standard deviation_HV_Unique_id_{conid}"
 
-        StrategyUtils.save_option_combo_scanner_csv_file(combination_price_dataframe, folder_name, file_name)
+        StrategyUtils.save_option_combo_scanner_csv_file(
+            combination_price_dataframe, folder_name, file_name
+        )
 
     # Using standard deviation for relative change among prices
     return standard_dev_result
@@ -89,7 +88,6 @@ def calculate_standard_deviation(
 
 # Calculating parkison's range formula with given values
 def calculate_parkinson_range_formula_calculations(high_prices, low_prices):
-
     # Converting list to numpy array
     high_prices, low_prices = np.array(high_prices), np.array(low_prices)
 
@@ -103,11 +101,9 @@ def calculate_parkinson_range_formula_calculations(high_prices, low_prices):
 
     # Check if the ndarray is empty
     if parkinson_volatility_term_square.size == 0:
-
         parkinson_range = "N/A"
 
     else:
-
         # Applying parkinson's range formula
         parkinson_range = np.sqrt(
             (1 / (4 * np.log(2))) * np.mean(parkinson_volatility_term_square)
@@ -128,7 +124,6 @@ def calculate_parkinson_range_without_gaps(
     conid,
     combination_price_dataframe,
 ):
-
     # Assigning the column name for open and close data from dataframe
     open_price_column_name = "Combination Open"
     close_price_column_name = "Combination Close"
@@ -138,25 +133,25 @@ def calculate_parkinson_range_without_gaps(
     high_price_column_name = "Combination High"
 
     # Comnbination High
-    combination_price_dataframe[
-        high_price_column_name
-    ] = combination_price_dataframe.apply(
-        lambda row: max(
-            row[open_price_column_name],
-            row[close_price_column_name],
-        ),
-        axis=1,
+    combination_price_dataframe[high_price_column_name] = (
+        combination_price_dataframe.apply(
+            lambda row: max(
+                row[open_price_column_name],
+                row[close_price_column_name],
+            ),
+            axis=1,
+        )
     )
 
     # Combination Low
-    combination_price_dataframe[
-        low_price_column_name
-    ] = combination_price_dataframe.apply(
-        lambda row: min(
-            row[open_price_column_name],
-            row[close_price_column_name],
-        ),
-        axis=1,
+    combination_price_dataframe[low_price_column_name] = (
+        combination_price_dataframe.apply(
+            lambda row: min(
+                row[open_price_column_name],
+                row[close_price_column_name],
+            ),
+            axis=1,
+        )
     )
 
     # Applying parkinson's range formula
@@ -177,23 +172,24 @@ def calculate_parkinson_range_without_gaps(
 
     # Adding 2 columns in data frame namely parkinson_volatility_term and parkinson_volatility_term_square
     combination_price_dataframe[pv_term_values_column_name] = parkinson_volatility_term
-    combination_price_dataframe[
-        pv_term_sq_values_column_name
-    ] = parkinson_volatility_term_square
-    
-    # If Flag Save OCS Files 
+    combination_price_dataframe[pv_term_sq_values_column_name] = (
+        parkinson_volatility_term_square
+    )
+
+    # If Flag Save OCS Files
     if StrategyVariables.flag_store_csv_files:
         folder_name = "OCS_HV"
         file_name = rf"parkinson_volatility_HV_Unique_id_{conid}"
 
-        StrategyUtils.save_option_combo_scanner_csv_file(combination_price_dataframe, folder_name, file_name)
+        StrategyUtils.save_option_combo_scanner_csv_file(
+            combination_price_dataframe, folder_name, file_name
+        )
 
     return parkinson_range_result
 
 
 # Determining Combination high with gaps from csv
 def get_combination_high_with_gaps(open_prices, close_prices):
-
     return [
         max(open_prices[index], close_prices[index], close_prices[index - 1])
         for index in range(1, len(open_prices))
@@ -202,7 +198,6 @@ def get_combination_high_with_gaps(open_prices, close_prices):
 
 # Determining Combination low with gaps from csv
 def get_combination_low_with_gaps(open_prices, close_prices):
-
     return [
         min(open_prices[index], close_prices[index], close_prices[index - 1])
         for index in range(1, len(open_prices))
@@ -214,7 +209,6 @@ def calculate_parkinson_range_with_gaps(
     conid,
     combination_price_dataframe,
 ):
-
     # If we are calculating the Parksionson's range with gaps for Intraday values and for individual legs, columns will be Open x, Close x
     open_price_column_name = "Combination Open"
     close_price_column_name = "Combination Close"
@@ -277,13 +271,15 @@ def calculate_parkinson_range_with_gaps(
         pv_term_sq_values_column_name,
         parkinson_volatility_term_square,
     )
-    
-    # If Flag Save OCS Files 
+
+    # If Flag Save OCS Files
     if StrategyVariables.flag_store_csv_files:
         folder_name = "OCS_HV"
         file_name = rf"parkinson_volatility_with_gaps_HV_Unique_id_{conid}"
 
-        StrategyUtils.save_option_combo_scanner_csv_file(combination_price_dataframe, folder_name, file_name)
+        StrategyUtils.save_option_combo_scanner_csv_file(
+            combination_price_dataframe, folder_name, file_name
+        )
 
     return parkinson_range_result
 
@@ -294,7 +290,6 @@ def calculate_combo_atr(
     combo_daily_open_close_df,
     atr_type="Historical Volatility",
 ):
-
     # Take 'K' Data Points
     k = len(combo_daily_open_close_df)
 
@@ -306,7 +301,6 @@ def calculate_combo_atr(
     close_price_column_name = "Combination Close"
 
     for i in range(len(combo_daily_open_close_df)):
-
         if i == 0:
             combo_daily_open_close_df.loc[i, "TR"] = max(
                 combo_daily_open_close_df.loc[i, open_price_column_name],
@@ -339,19 +333,19 @@ def calculate_combo_atr(
                 + combo_daily_open_close_df.loc[i, "TR"]
             ) / k
 
-    # If Flag Save OCS Files 
+    # If Flag Save OCS Files
     if StrategyVariables.flag_store_csv_files:
         folder_name = "OCS_HV"
         file_name = rf"ATR_HV_Unique_id_{conid}"
 
-        StrategyUtils.save_option_combo_scanner_csv_file(combo_daily_open_close_df, folder_name, file_name)
-
+        StrategyUtils.save_option_combo_scanner_csv_file(
+            combo_daily_open_close_df, folder_name, file_name
+        )
 
     # ATR
     try:
         atr = combo_daily_open_close_df.iloc[-1]["ATR"]
     except Exception as e:
-
         if variables.flag_debug_mode:
             # Print to console
             print(f"Unable to calculate ATR")
@@ -378,7 +372,6 @@ def calculate_combo_atr_for_positive_negative_candles(combo_daily_open_close_df)
     previous_close_price_column_name = "Previous Close"
 
     for i in range(len(combo_daily_open_close_df)):
-
         if i == 0:
             combo_daily_open_close_df.loc[i, "TR"] = max(
                 combo_daily_open_close_df.loc[i, open_price_column_name],
@@ -440,7 +433,6 @@ def get_timestamp_of_lowest_and_highest_point_of_price(latest_day_dataframe):
 
     try:
         for _, row in latest_day_dataframe.iterrows():
-
             open_price = row["Combination Open"]
             close_price = row["Combination Close"]
             date_time_stamp = row["Time"]
@@ -453,7 +445,6 @@ def get_timestamp_of_lowest_and_highest_point_of_price(latest_day_dataframe):
                 highest_timestamp = date_time_stamp
                 high_price = close_price
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(e)
 
@@ -496,7 +487,6 @@ def calculate_candle_volatility(
     current_day_close_prices,
     number_of_candles_since_day_open,
 ):
-
     # Calculating sum of absolute changes in prices since market opened
     sum_of_change_since_market_opened_on_candle_basis = sum_of_abs_changes(
         current_day_open_prices, current_day_close_prices

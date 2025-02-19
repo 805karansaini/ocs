@@ -9,16 +9,15 @@ from com.variables import *
 from com.contracts import *
 import asyncio
 
+
 # Gets option delta from TWS, Using reqMktData, Changed Time from 11Sec to 14Sec
 # Note: On TWS the reqMktData time is 11sec, but while looking for more than 8 legs(11 legs), most of the time(always)-we were
 # not able to get the deltas for last 3 legs, therefore karan changed the wait from 11secs to 14secs(and it started workig, resolving all 11 legs)
 async def get_opt_delta(contract_opt, flag_market_open):
-
     # print("Contract : ", contract_opt)
     # Get reqID
     reqId = variables.nextorderId
     variables.nextorderId += 1
-
 
     # Init response
     variables.options_delta[reqId] = None
@@ -40,8 +39,6 @@ async def get_opt_delta(contract_opt, flag_market_open):
     if variables.flag_debug_mode:
         print("Fetching delta for option contract = ", contract_opt, "reqId = ", reqId)
 
-
-
     # Send request
     variables.app.reqMktData(
         reqId,
@@ -55,7 +52,6 @@ async def get_opt_delta(contract_opt, flag_market_open):
     # Wait for response from TWS
     counter = 0
     while True:
-
         # (Error received for the request) OR (Timeout of 14 secs) OR (Response end indicated by API) OR (delta value is available)
         if (
             (variables.req_error[reqId] == True)
@@ -63,7 +59,6 @@ async def get_opt_delta(contract_opt, flag_market_open):
             or (variables.req_mkt_data_end[reqId])
             or (variables.options_delta[reqId] is not None)
         ):
-
             # Unsubscribe market data
             if not variables.flag_snapshot_req_mkt_data:
                 variables.app.cancelMktData(reqId)
@@ -82,7 +77,6 @@ async def get_opt_delta(contract_opt, flag_market_open):
 
         # Response not yet ended
         else:
-
             # Print to console
             if (variables.flag_debug_mode) and (counter % 20 == 0):
                 print("Waiting for delta for reqId = ", reqId)
@@ -95,6 +89,7 @@ async def get_opt_delta(contract_opt, flag_market_open):
 # # Making/Wrapping 'get_opt_delta' to be async
 # async def get_opt_delta_async(contract_opt, flag_market_open):
 #     return await asyncio.to_thread(get_opt_delta, contract_opt,flag_market_open)
+
 
 # Using list comprehension to get Delta and gather the results with await
 async def async_get_deltas(contracts_list, flag_market_open):

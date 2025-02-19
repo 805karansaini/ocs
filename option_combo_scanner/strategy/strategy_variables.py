@@ -13,7 +13,9 @@ from option_combo_scanner.strategy.min_heap import MinHeap
 config = configparser.ConfigParser()
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
-option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..",  "..", "option_scanner_user_inputs.ini")
+option_scanner_user_inputs_ini_file_path = os.path.join(
+    script_dir, "..", "..", "option_scanner_user_inputs.ini"
+)
 
 config.read(option_scanner_user_inputs_ini_file_path)
 
@@ -48,10 +50,16 @@ class StrategyVariables:
     ibkr_tws_port = parser.getint("USER INPUTS", "ibkr_tws_port")
     ibkr_tws_connection_id = parser.getint("USER INPUTS", "ibkr_tws_connection_id")
 
-    ocs_bridge_to_main_app_host = parser.get("USER INPUTS", "ocs_bridge_to_main_app_host")
-    ocs_bridge_to_main_app_port = parser.get("USER INPUTS", "ocs_bridge_to_main_app_port")
+    ocs_bridge_to_main_app_host = parser.get(
+        "USER INPUTS", "ocs_bridge_to_main_app_host"
+    )
+    ocs_bridge_to_main_app_port = parser.get(
+        "USER INPUTS", "ocs_bridge_to_main_app_port"
+    )
 
-    calculation_mode_for_max_pnl = parser.get("USER INPUTS", "calculation_mode_for_max_pnl")
+    calculation_mode_for_max_pnl = parser.get(
+        "USER INPUTS", "calculation_mode_for_max_pnl"
+    )
 
     # User Input for the calc. mode in in the max PnL cacl
     if calculation_mode_for_max_pnl.upper() == "GNE":
@@ -63,20 +71,28 @@ class StrategyVariables:
         calculation_mode_for_combination_max_pnl = MaxPNLEnum.ONE
 
     # Input for delta
-    delta_d1_indicator_input = parser.getfloat("USER INPUTS", "delta_d1_indicator_input")
-    delta_d2_indicator_input = parser.getfloat("USER INPUTS", "delta_d2_indicator_input")
+    delta_d1_indicator_input = parser.getfloat(
+        "USER INPUTS", "delta_d1_indicator_input"
+    )
+    delta_d2_indicator_input = parser.getfloat(
+        "USER INPUTS", "delta_d2_indicator_input"
+    )
     riskfree_rate1 = parser.getfloat("USER INPUTS", "riskfree_rate1")
 
     # For HV # Take candle size from the
-    user_input_lookback_days_historical_volatility = parser.getint("USER INPUTS", "user_input_lookback_days_historical_volatility")
-    user_input_average_historical_volatility_days = parser.getint("USER INPUTS", "user_input_average_historical_volatility_days")
+    user_input_lookback_days_historical_volatility = parser.getint(
+        "USER INPUTS", "user_input_lookback_days_historical_volatility"
+    )
+    user_input_average_historical_volatility_days = parser.getint(
+        "USER INPUTS", "user_input_average_historical_volatility_days"
+    )
 
     user_input_bar_size_historical_volatility = 1
     bar_size_historical_volatility = f"{user_input_bar_size_historical_volatility} hour"
-    lookback_days_historical_volatility = f"{user_input_lookback_days_historical_volatility} D"
-    duration_size_historical_volatility = (
-        f"{user_input_average_historical_volatility_days  + user_input_lookback_days_historical_volatility - 1} D"
+    lookback_days_historical_volatility = (
+        f"{user_input_lookback_days_historical_volatility} D"
     )
+    duration_size_historical_volatility = f"{user_input_average_historical_volatility_days + user_input_lookback_days_historical_volatility - 1} D"
 
     avg_iv_lookback_days = parser.getint("USER INPUTS", "avg_iv_lookback_days")
 
@@ -86,20 +102,28 @@ class StrategyVariables:
     )
 
     # Put Call Volume Variable
-    user_input_lookback_days_for_pcr = parser.getint("USER INPUTS", "user_input_lookback_days_for_pcr")  # Days
+    user_input_lookback_days_for_pcr = parser.getint(
+        "USER INPUTS", "user_input_lookback_days_for_pcr"
+    )  # Days
     put_call_volume_lookback_days = f"{user_input_lookback_days_for_pcr} D"
     put_call_volume_bar_size_int = 4
     put_call_volume_bar_size = f"{put_call_volume_bar_size_int} hours"
 
     # get historical price data variables
-    historical_price_data_bar_size_int = parser.getint("USER INPUTS", "historical_price_data_bar_size")
+    historical_price_data_bar_size_int = parser.getint(
+        "USER INPUTS", "historical_price_data_bar_size"
+    )
     historical_price_data_bar_size = f"{historical_price_data_bar_size_int} hours"
 
     list_of_percent_for_impact_calcluation_str = parser["USER INPUTS"][
         "list_of_percent_for_impact_calcluation"
     ]  # sorted(set([2, -2, 5, -5, 10, -10, 20, -20]))
-    list_of_percent_for_impact_calcluation = [float(x.strip()) for x in list_of_percent_for_impact_calcluation_str.split(",")]
-    list_of_percent_for_impact_calcluation = sorted(set(list_of_percent_for_impact_calcluation))
+    list_of_percent_for_impact_calcluation = [
+        float(x.strip()) for x in list_of_percent_for_impact_calcluation_str.split(",")
+    ]
+    list_of_percent_for_impact_calcluation = sorted(
+        set(list_of_percent_for_impact_calcluation)
+    )
 
     ###########################
     # Scanner
@@ -109,16 +133,20 @@ class StrategyVariables:
     flag_recovery_mode = parser.getboolean("USER INPUTS", "flag_recovery_mode")
 
     # Indicator Cache time in seconds for the scanner
-    indicator_cache_time_in_seconds = parser.getfloat("USER INPUTS", "indicator_cache_time_in_seconds")
+    indicator_cache_time_in_seconds = parser.getfloat(
+        "USER INPUTS", "indicator_cache_time_in_seconds"
+    )
 
     # Variables used in filtering in range 0 to 1 threshold
-    flag_enable_filter_based_delta_threshold = parser.getboolean("USER INPUTS", "flag_enable_filter_based_delta_threshold")
+    flag_enable_filter_based_delta_threshold = parser.getboolean(
+        "USER INPUTS", "flag_enable_filter_based_delta_threshold"
+    )
     min_delta_threshold = 0.009
     max_delta_threshold = 0.990
 
     flag_store_csv_files = parser.getboolean("USER INPUTS", "flag_store_csv_files")
-    o_c_s_folder_path = rf"{parser.get('USER INPUTS','o_c_s_folder_path')}"
-    
+    o_c_s_folder_path = rf"{parser.get('USER INPUTS', 'o_c_s_folder_path')}"
+
     batch_size = 80
     batch_size_historical_data = 20
 

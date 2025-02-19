@@ -26,7 +26,6 @@ class MinHeap:
 
     def update(self, old_item, new_item):
         try:
-
             self.heap[self.heap.index(old_item)] = new_item
             heapq.heapify(self.heap)
         except Exception as e:

@@ -8,6 +8,7 @@ from ao_api.custom_logger import CustomLogger
 
 FLAG_LOG_REQUEST_RESPONSES = True
 
+
 class WebSocketClient:
     """
     Simple WebSocket client
@@ -52,7 +53,6 @@ class WebSocketClient:
         Closes the connection
         """
         try:
-
             if self.websocket:
                 await self.websocket.close()
 
@@ -117,7 +117,7 @@ class WebSocketClient:
 
     async def async_send_request(self, request):
         await self.websocket.send(request)
-        
+
         if FLAG_LOG_REQUEST_RESPONSES:
             # Logging
             self.custom_logger.logger.info(f"Sent request: {request}")

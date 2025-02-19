@@ -50,7 +50,6 @@ class ScreenWatchList(object):
             all_watchlist_name = sorted(all_watchlist_name)
             all_watchlist_name.insert(0, "ALL")
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -81,13 +80,11 @@ class ScreenWatchList(object):
         self.watchlist_drop_down.place(relx=0.91, y=10, anchor="center")
 
         try:
-
             # Get all account groups
             account_group_df = get_all_account_groups_from_db()
 
             # Checking if dataframe is empty
             if account_group_df.empty:
-
                 # Reset group id column
                 reset_group_id()
 
@@ -119,7 +116,6 @@ class ScreenWatchList(object):
             all_account_groups = ["ALL"] + all_account_groups
 
         except Exception as e:
-
             all_account_groups = ["ALL"]
 
         # Drop down for account group
@@ -135,7 +131,6 @@ class ScreenWatchList(object):
         self.account_group_drop_down.place(relx=0.8, y=10, anchor="center")
 
         def on_select(event):
-
             # Get the current value of the Combobox
             selected_watchlist = self.watchlist_drop_down.get()
             self.display_selected_watchlist(selected_watchlist)
@@ -144,7 +139,6 @@ class ScreenWatchList(object):
         self.watchlist_drop_down.bind("<<ComboboxSelected>>", on_select)
 
         def on_select_account_group(event):
-
             # Get the current value of the Combobox
             selected_account_group = self.account_group_drop_down.get()
 
@@ -163,9 +157,13 @@ class ScreenWatchList(object):
             variables.screen.update_orders_book_table_watchlist_changed()
             variables.screen.screen_position_obj.update_positions_table_watchlist_changed()
 
-            variables.screen.screen_portfolio_tab.update_portfolio_combo_table(flag_delete=True)
+            variables.screen.screen_portfolio_tab.update_portfolio_combo_table(
+                flag_delete=True
+            )
 
-            variables.screen.screen_portfolio_tab.update_portfolio_legs_table(flag_delete=True)
+            variables.screen.screen_portfolio_tab.update_portfolio_legs_table(
+                flag_delete=True
+            )
 
         # Bind the function to the Combobox
         self.account_group_drop_down.bind(
@@ -204,7 +202,6 @@ class ScreenWatchList(object):
 
     # Method to create watchlist table
     def create_watchlist_tab(self):
-
         # Create Treeview Frame for active combo table
         create_watchlist_button_frame = ttk.Frame(self.watchlist_tab, padding=10)
         create_watchlist_button_frame.pack(pady=10)
@@ -284,7 +281,6 @@ class ScreenWatchList(object):
 
     # Method to create account group table
     def create_accounts_group_table(self):
-
         # Create Treeview Frame for active combo table
         create_accounts_group_button_frame = ttk.Frame(self.watchlist_tab, padding=10)
         create_accounts_group_button_frame.pack(pady=5)
@@ -383,7 +379,6 @@ class ScreenWatchList(object):
 
     # Method to edit account group
     def edit_account_group(self):
-
         group_id = self.accounts_group_table.selection()[
             0
         ]  # get the item ID of the selected row
@@ -414,7 +409,6 @@ class ScreenWatchList(object):
     def display_popup_to_edit_account_ids_in_account_group(
         self, group_id, group_name, account_ids
     ):
-
         # Get current session accounts
         local_current_session_accounts = copy.deepcopy(
             variables.current_session_accounts
@@ -442,11 +436,9 @@ class ScreenWatchList(object):
 
         # check Account ids present in Account group is empty
         if local_account_id_list_for_account_group in [None, "None", ""]:
-
             local_account_id_list_for_account_group = []
 
         else:
-
             # Split the string by comma and convert each element to an integer
             local_account_id_list_for_account_group = [
                 account_id
@@ -555,9 +547,9 @@ class ScreenWatchList(object):
         columns_in_non_selected_account_ids_table = ("Account ID",)
 
         # Define Our Columns
-        self.treeview_non_selected_account_id_table[
-            "columns"
-        ] = columns_in_non_selected_account_ids_table
+        self.treeview_non_selected_account_id_table["columns"] = (
+            columns_in_non_selected_account_ids_table
+        )
 
         # First Column hiding it
         self.treeview_non_selected_account_id_table.column("#0", width=0, stretch="no")
@@ -581,9 +573,7 @@ class ScreenWatchList(object):
         )
 
         def on_click_transfer_account_id_to_selected():
-
             try:
-
                 # Get Account ids for selected row
                 selected_item = (
                     self.treeview_non_selected_account_id_table.selection()
@@ -608,9 +598,7 @@ class ScreenWatchList(object):
                     )
 
         def on_click_transfer_account_id_to_non_selected():
-
             try:
-
                 # Get unique ids for selected row
                 selected_item = (
                     self.treeview_table_selected_account_ids.selection()
@@ -634,7 +622,6 @@ class ScreenWatchList(object):
                     )
 
         def edit_list_of_account_id_for_watchlist():
-
             # Get all selected Account id which is present in selected table
             all_selected_account_ids = local_account_id_list_for_account_group
 
@@ -642,7 +629,6 @@ class ScreenWatchList(object):
             all_selected_account_ids = sorted(all_selected_account_ids)
 
             try:
-
                 # Create string of selected Account ids
                 account_ids_string = ",".join(map(str, all_selected_account_ids))
 
@@ -720,9 +706,9 @@ class ScreenWatchList(object):
         columns_in_selected_account_ids_table = ("Account ID",)
 
         # Define Our Columns
-        self.treeview_table_selected_account_ids[
-            "columns"
-        ] = columns_in_selected_account_ids_table
+        self.treeview_table_selected_account_ids["columns"] = (
+            columns_in_selected_account_ids_table
+        )
 
         # First Column hiding it
         self.treeview_table_selected_account_ids.column("#0", width=0, stretch="no")
@@ -745,9 +731,7 @@ class ScreenWatchList(object):
         def fill_non_selected_account_id_table(
             all_account_ids_in_system, local_account_id_list_for_account_group
         ):
-
             try:
-
                 # Get all item IDs in the Treeview
                 item_ids = self.treeview_non_selected_account_id_table.get_children()
 
@@ -767,7 +751,6 @@ class ScreenWatchList(object):
 
                 # Iterate through selected Account ids
                 for account_id in account_ids_not_in_selected:
-
                     values = (account_id,)
 
                     if num_items % 2 == 1:
@@ -798,9 +781,7 @@ class ScreenWatchList(object):
         def fill_selected_account_id_table(
             all_account_ids_in_system, local_account_id_list_for_account_group
         ):
-
             try:
-
                 # Get all item IDs in the Treeview
                 item_ids = self.treeview_table_selected_account_ids.get_children()
 
@@ -856,7 +837,6 @@ class ScreenWatchList(object):
 
     # Method to delete account group
     def delete_account_group(self):
-
         group_id = self.accounts_group_table.selection()[
             0
         ]  # get the item ID of the selected row
@@ -883,7 +863,6 @@ class ScreenWatchList(object):
         self.update_account_group_table()
 
         try:
-
             # Get all account groups
             account_group_df = get_all_account_groups_from_db()
 
@@ -919,12 +898,10 @@ class ScreenWatchList(object):
             variables.screen.update_orders_book_table_watchlist_changed()
 
         except Exception as e:
-
             all_account_groups = ["ALL"]
 
     # Method to create new account group
     def create_account_group_pop_up(self):
-
         # Display Popup Ask User Input
         create_account_group_pop_up = tk.Toplevel()
         create_account_group_pop_up.title("Create Account Group")
@@ -964,13 +941,11 @@ class ScreenWatchList(object):
     def add_account_group_to_system(
         self, create_account_group_pop_up, account_group_entry
     ):
-
         # Get input from account group name field
         account_group_name = account_group_entry.get().strip().upper()
 
         # Check if account group name is non empty
         if account_group_name == "":
-
             # Show error and return
             error_title = "Error, Empty Account Group Name"
             error_string = "Account Group Name can not be empty"
@@ -986,7 +961,6 @@ class ScreenWatchList(object):
 
         # Check if name is already present
         if account_group_name in all_account_groups:
-
             # Show error and return
             error_title = "Error, Account Group Name Already Exists"
             error_string = "Account Group Name Can Not Be Repeated"
@@ -1001,7 +975,6 @@ class ScreenWatchList(object):
         self.update_account_group_table()
 
         try:
-
             # Get all account groups
             account_group_df = get_all_account_groups_from_db()
 
@@ -1021,7 +994,6 @@ class ScreenWatchList(object):
             self.account_group_drop_down["values"] = all_account_groups
 
         except Exception as e:
-
             all_account_groups = ["ALL"]
 
         # Destroy pop up
@@ -1029,7 +1001,6 @@ class ScreenWatchList(object):
 
     # Method to update account group table
     def update_account_group_table(self):
-
         try:
             # All the Unique IDs in the System
             # Get account group dataframe
@@ -1044,7 +1015,6 @@ class ScreenWatchList(object):
 
             # Update the rows
             for i, row_val in local_account_group_table_dataframe.iterrows():
-
                 # Group Id of row val
                 group_id = int(float(row_val["Group ID"]))
 
@@ -1071,7 +1041,6 @@ class ScreenWatchList(object):
 
             # Move According to data Color here, Change Color
             for i, row in local_account_group_table_dataframe.iterrows():
-
                 # Group Id of row val
                 group_id = row["Group ID"]
 
@@ -1086,7 +1055,6 @@ class ScreenWatchList(object):
                 counter_row += 1
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(f"Error Inside update_account_group_table, Exp: {e}")
@@ -1114,7 +1082,6 @@ class ScreenWatchList(object):
 
     # Method to create watchlist
     def create_watchlist(self):
-
         # Display Popup Ask User Input
         create_watchlist_popup = tk.Toplevel()
         create_watchlist_popup.title("Create Watchlist")
@@ -1150,7 +1117,6 @@ class ScreenWatchList(object):
 
     # Method to add watchlist to system
     def add_watchlist_to_system(self, create_watchlist_popup, watchlist_name_entry):
-
         watchlist_name = watchlist_name_entry.get().strip().upper()
 
         # If the name is empty show a error popup
@@ -1170,7 +1136,6 @@ class ScreenWatchList(object):
 
         # Make sure it does not exist already
         if watchlist_name in all_watchlist_name:
-
             # if so show a popup that watchlist with name exist
             error_title = "Error, Watchlist Already Exists"
             error_string = (
@@ -1221,7 +1186,6 @@ class ScreenWatchList(object):
     def edit_watchlist(
         self,
     ):
-
         watchlist_id = self.watchlist_table.selection()[
             0
         ]  # get the item ID of the selected row
@@ -1248,7 +1212,6 @@ class ScreenWatchList(object):
     def display_popup_to_edit_unique_ids_in_watchlist(
         self, watchlist_id, watchlist_name, unique_ids
     ):
-
         # Get combo object using unique ids
         local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
 
@@ -1274,7 +1237,6 @@ class ScreenWatchList(object):
         if local_unique_id_list_for_watchlist in [None, "None", ""]:
             local_unique_id_list_for_watchlist = []
         else:
-
             # Split the string by comma and convert each element to an integer
             local_unique_id_list_for_watchlist = [
                 int(float(unique_id))
@@ -1385,9 +1347,9 @@ class ScreenWatchList(object):
         columns_in_non_selected_unique_ids_table = ("Unique ID", "Tickers")
 
         # Define Our Columns
-        self.treeview_non_selected_unique_id_table[
-            "columns"
-        ] = columns_in_non_selected_unique_ids_table
+        self.treeview_non_selected_unique_id_table["columns"] = (
+            columns_in_non_selected_unique_ids_table
+        )
 
         # First Column hiding it
         self.treeview_non_selected_unique_id_table.column("#0", width=0, stretch="no")
@@ -1417,9 +1379,7 @@ class ScreenWatchList(object):
         )
 
         def on_click_transfer_unique_id_to_selected():
-
             try:
-
                 # Get unique ids for selected row
                 selected_item = (
                     self.treeview_non_selected_unique_id_table.selection()
@@ -1448,9 +1408,7 @@ class ScreenWatchList(object):
                     )
 
         def on_click_transfer_unique_id_to_non_selected():
-
             try:
-
                 # Get unique ids for selected row
                 selected_item = (
                     self.treeview_table_selected_unique_ids.selection()
@@ -1478,7 +1436,6 @@ class ScreenWatchList(object):
                     )
 
         def edit_list_of_unique_id_for_watchlist():
-
             # Get all selected unique id which is present in selected table
             all_selected_unique_ids = local_unique_id_list_for_watchlist
 
@@ -1486,7 +1443,6 @@ class ScreenWatchList(object):
             all_selected_unique_ids = sorted(all_selected_unique_ids)
 
             try:
-
                 # Create string of selected unique ids
                 unique_ids_string = ",".join(map(str, all_selected_unique_ids))
 
@@ -1566,9 +1522,9 @@ class ScreenWatchList(object):
         columns_in_selected_unique_ids_table = ("Unique ID", "Tickers")
 
         # Define Our Columns
-        self.treeview_table_selected_unique_ids[
-            "columns"
-        ] = columns_in_non_selected_unique_ids_table
+        self.treeview_table_selected_unique_ids["columns"] = (
+            columns_in_non_selected_unique_ids_table
+        )
 
         # First Column hiding it
         self.treeview_table_selected_unique_ids.column("#0", width=0, stretch="no")
@@ -1599,9 +1555,7 @@ class ScreenWatchList(object):
             all_unique_ids_in_system,
             local_unique_id_list_of_selected_watchlist,
         ):
-
             try:
-
                 # Get all item IDs in the Treeview
                 item_ids = self.treeview_non_selected_unique_id_table.get_children()
 
@@ -1653,9 +1607,7 @@ class ScreenWatchList(object):
             all_unique_ids_in_system,
             local_unique_id_list_of_selected_watchlist,
         ):
-
             try:
-
                 # Get all item IDs in the Treeview
                 item_ids = self.treeview_table_selected_unique_ids.get_children()
 
@@ -1717,7 +1669,6 @@ class ScreenWatchList(object):
     def delete_watchlist(
         self,
     ):
-
         watchlist_id = self.watchlist_table.selection()[
             0
         ]  # get the item ID of the selected row
@@ -1757,7 +1708,6 @@ class ScreenWatchList(object):
 
         # if currently choosen watchlist was deleted show default one
         if variables.selected_watchlist == watchlist_name:
-
             # Setting watchlist name to ALL
             variables.selected_watchlist = "ALL"
             variables.unique_id_list_of_selected_watchlist = "ALL"
@@ -1780,7 +1730,6 @@ class ScreenWatchList(object):
 
     # Method to reformat watchlist table
     def restyle_the_watchlist_after_deletion(self):
-
         count = 0
         for row in self.watchlist_table.get_children():
             if count % 2 == 0:
@@ -1792,7 +1741,6 @@ class ScreenWatchList(object):
 
     # Method to insert rows in watchlist
     def insert_watchlist_in_watchlist_table(self, row_value):
-
         value = [val for val in row_value]
         if value[2] in [None, "None"]:
             value[2] = ""
@@ -1828,16 +1776,14 @@ class ScreenWatchList(object):
         watchlist_id,
         unique_ids_string,
     ):
-
         watchlist_id_in_table = self.watchlist_table.get_children()
 
         if str(watchlist_id) in watchlist_id_in_table:
-
             self.watchlist_table.set(str(watchlist_id), 2, unique_ids_string)
+
 
 # Method to add all watchlist rows in table
 def insert_all_watchlists_in_watchlists_table():
-
     # Get all the watchlist from the db
     all_watchlist_dataframe = get_all_watchlists_from_db()
 

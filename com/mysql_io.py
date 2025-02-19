@@ -9,12 +9,10 @@ from com.variables import *
 
 # Returns the last saved unique ID from both the tables.
 def get_unique_id_db():
-
     max_unique_id = 0
 
     # Get the max present unique ID from combination table
     for sql_database_name in variables.all_sql_databases:
-
         # Init active_sqlalchemy_connection for active and archive DB
         active_sqlalchemy_connection = (
             variables.active_sqlalchemy_connection
@@ -23,7 +21,6 @@ def get_unique_id_db():
         )
 
         try:
-
             # get_max unique ID SQL query
             get_max_unique_id_query = text(
                 f"SELECT MAX(`Unique ID`) FROM {variables.sql_table_combination}"
@@ -41,7 +38,6 @@ def get_unique_id_db():
                 )
 
         except:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -53,10 +49,8 @@ def get_unique_id_db():
 
 # Drop all DB tables
 def drop_tables():
-
     # Dropping table one at a time
     for sql_database_name in variables.all_sql_databases:
-
         # Init active_sqlalchemy_connection for active and archive DB
         active_sqlalchemy_connection = (
             variables.active_sqlalchemy_connection
@@ -66,7 +60,6 @@ def drop_tables():
 
         for table_name in variables.all_sql_tables_in_db_with_correct_dropping_order:
             try:
-
                 # Drop_table SQL query
                 drop_table = text(f"Drop TABLE `{sql_database_name}`.`{table_name}`")
                 result = active_sqlalchemy_connection.execute(drop_table)
@@ -79,7 +72,6 @@ def drop_tables():
                     )
 
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print(
@@ -88,7 +80,6 @@ def drop_tables():
 
     # DROP THE META DATA TABLE
     try:
-
         # Drop_table SQL query
         drop_table = text(f"Drop TABLE `{variables.sql_table_meta_data}`")
         result = variables.active_sqlalchemy_connection.execute(drop_table)
@@ -99,14 +90,12 @@ def drop_tables():
             print(f"Dropped table = {variables.sql_table_meta_data}")
 
     except:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Unable to drop table = {variables.sql_table_meta_data}")
 
     # DROP THE Watchlist DATA TABLE
     try:
-
         # Drop_table SQL query
         drop_table = text(f"Drop TABLE `{variables.sql_table_watchlist}`")
         result = variables.active_sqlalchemy_connection.execute(drop_table)
@@ -117,14 +106,12 @@ def drop_tables():
             print(f"Dropped table = {variables.sql_table_watchlist}")
 
     except:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Unable to drop table = {variables.sql_table_watchlist}")
 
     # DROP THE Accounts group DATA TABLE
     try:
-
         # Drop_table SQL query
         drop_table = text(f"Drop TABLE `{variables.sql_table_account_group}`")
         result = variables.active_sqlalchemy_connection.execute(drop_table)
@@ -135,14 +122,12 @@ def drop_tables():
             print(f"Dropped table = {variables.sql_table_account_group}")
 
     except:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Unable to drop table = {variables.sql_table_account_group}")
 
     # DROP THE Watchlist DATA TABLE
     try:
-
         # Drop_table SQL query
         drop_table = text(f"Drop TABLE `{variables.sql_table_account_conditions}`")
         result = variables.active_sqlalchemy_connection.execute(drop_table)
@@ -153,13 +138,11 @@ def drop_tables():
             print(f"Dropped table = {variables.sql_table_account_conditions}")
 
     except:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Unable to drop table = {variables.sql_table_account_conditions}")
 
     try:
-
         # Drop_table SQL query
         drop_table = text(f"Drop TABLE `{variables.sql_table_filter_table}`")
         result = variables.active_sqlalchemy_connection.execute(drop_table)
@@ -170,14 +153,13 @@ def drop_tables():
             print(f"Dropped table = {variables.sql_table_filter_table}")
 
     except:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Unable to drop table = {variables.sql_table_filter_table}")
 
+
 # Method to insert combination in DB table
 def insert_combination_db(active_flag, combination_obj, insert_in_cas_table=False):
-
     # Init
     unique_id = combination_obj.unique_id
     buy_legs = combination_obj.buy_legs
@@ -201,7 +183,6 @@ def insert_combination_db(active_flag, combination_obj, insert_in_cas_table=Fals
 
     # Loop over leg object and insert it into the database
     for leg_obj in buy_legs + sell_legs:
-
         action = leg_obj.action
         symbol = leg_obj.symbol
         sec_type = leg_obj.sec_type
@@ -234,9 +215,9 @@ def insert_combination_db(active_flag, combination_obj, insert_in_cas_table=Fals
                     f"Unable to insert the identified butterfly in to database, Unique ID: {unique_id}"
                 )
 
+
 # Method to drop cache table
 def drop_cache_table():
-
     # Drop Cache Table query
     query_drop_cache_table = f"""DROP TABLE `{variables.sql_table_cache}`"""
 
@@ -245,7 +226,6 @@ def drop_cache_table():
         variables.active_sqlalchemy_connection,
         variables.archive_sqlalchemy_connection,
     ]:
-
         try:
             active_sqlalchemy_connection.execute(query_drop_cache_table)
 
@@ -253,7 +233,6 @@ def drop_cache_table():
             if variables.flag_debug_mode:
                 print("Query successfully executed: ", query_drop_cache_table)
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print("Query failed: ", query_drop_cache_table, "Exception: ", e)
@@ -261,7 +240,6 @@ def drop_cache_table():
 
 # Method to get query to create ladder table
 def get_query_to_create_ladder_table():
-
     try:
         # Get columns of ladder table
         local_scale_trader_table_columns = copy.deepcopy(
@@ -275,12 +253,10 @@ def get_query_to_create_ladder_table():
 
         # Add ladder id and unique id fields (have datatype INT NOT NULL) to table
         for column_name in local_scale_trader_table_columns[0:2]:
-
             query_create_ladder_table += rf" `{column_name}` INT NOT NULL,"
 
         # Add columns to create DB ladder table query
         for column_name in local_scale_trader_table_columns[2:]:
-
             query_create_ladder_table += rf" `{column_name}` VARCHAR(40),"
 
         # Add closing bracket to complete query
@@ -292,14 +268,12 @@ def get_query_to_create_ladder_table():
         return query_create_ladder_table
 
     except Exception as e:
-
         # Return None if exception occurs
         return None
 
 
 # Method to get query to create sequence table - ask karana bout foriegn key use
 def get_query_to_create_sequence_table():
-
     try:
         # Get columns of sequence table
         local_sequence_table_columns = copy.deepcopy(variables.sequence_table_columns)
@@ -311,15 +285,12 @@ def get_query_to_create_sequence_table():
 
         # Add columns in query of creating sequence table
         for column_name in local_sequence_table_columns:
-
             # For ID columns datatype will be INT NOT NULL
             if column_name in ["Sequence ID", "Ladder ID"]:
-
                 query_create_sequence_table += rf"`{column_name}` INT NOT NULL,"
 
             # For rest of columns datatype will be VARCHAR()
             else:
-
                 query_create_sequence_table += rf"`{column_name}` VARCHAR(40),"
 
         # Add closing bracket to complete query
@@ -332,15 +303,14 @@ def get_query_to_create_sequence_table():
         return query_create_sequence_table
 
     except Exception as e:
-
         # Return None if exception occurs
         return None
+
 
 # Method to create cache db table
 def create_cache_table(
     flag_recovery_mode=True,
 ):
-
     # Drop preexisting table if recover_mode is True
     if flag_recovery_mode:
         drop_cache_table()
@@ -353,7 +323,6 @@ def create_cache_table(
 
     # Create part of query where we put column name and datatype
     for column_name in cache_table_columns:
-
         if column_name == variables.unqiue_id_col_name_for_cache:
             query_create_cache_table += rf"`{column_name}` INT NOT NULL,"
         elif column_name == variables.tickers_col_name_for_cache:
@@ -378,7 +347,6 @@ def create_cache_table(
             variables.active_sqlalchemy_connection,
             variables.archive_sqlalchemy_connection,
         ]:
-
             try:
                 result = active_sqlalchemy_connection.execute(query_create_cache_table)
                 time.sleep(variables.sleep_time_db)
@@ -387,14 +355,13 @@ def create_cache_table(
                 if variables.flag_debug_mode:
                     print("Query successfully executed: ", query_create_cache_table)
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print("Query failed: ", query_create_cache_table, "Exception: ", e)
 
+
 # Check if db table needs to be recreated
 def check_if_cache_table_needs_to_be_recreated():
-
     # Active DB
     sql_database_name = variables.active_sql_db_name
 
@@ -431,7 +398,6 @@ def check_if_cache_table_needs_to_be_recreated():
 
         # Check if columns in cache table and cas table are same
         if column_names_in_current_cache_table == cache_table_columns:
-
             # It will indicate that columns in both tables are same
             return False
         else:
@@ -439,12 +405,12 @@ def check_if_cache_table_needs_to_be_recreated():
             return True
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Query failed: {query_get_cache_table_desc} Exp: {e}")
 
         return True
+
 
 # Method to create query to create conditional series db table
 def get_query_to_create_conditional_series_table():
@@ -472,9 +438,9 @@ def get_query_to_create_conditional_series_table():
         return query
 
     except Exception as e:
-
         # Return None if exception occurs
         return None
+
 
 # Method to get query to create conditional series sequence table
 def get_query_to_create_conditional_series_sequence_table():
@@ -503,17 +469,14 @@ def get_query_to_create_conditional_series_sequence_table():
         return query
 
     except Exception as e:
-
         # Return None if exception occurs
         return None
 
 
 # Create fresh tables
 def create_tables():
-
     # Loop over the archive and active database to create tables
     for sql_database_name in variables.all_sql_databases:
-
         # Create fresh 'Combination table' table - no rows are being added here
         query_create_combination_table = text(
             f"CREATE TABLE `{sql_database_name}`.`{variables.sql_table_combination}` \
@@ -651,7 +614,6 @@ def create_tables():
 
         # Execute all the query to create tables
         for query_num, table_creation_query in enumerate(list_query_to_create_table):
-
             # Do not create metadata table in Archive DB
             if (query_num in [6, 7]) and (
                 sql_database_name == variables.archive_sql_db_name
@@ -666,7 +628,6 @@ def create_tables():
                 if variables.flag_debug_mode:
                     print("Query successfully executed: ", table_creation_query)
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print("Query failed: ", table_creation_query, e)
@@ -691,7 +652,6 @@ def create_tables():
     ]
 
     for insertion_query in all_insertion_query:
-
         try:
             result = variables.active_sqlalchemy_connection.execute(insertion_query)
             time.sleep(variables.sleep_time_db)
@@ -709,7 +669,6 @@ def create_tables():
 
 # Inserts the unique id into cache table once a combo is created
 def insert_combination_unique_id_to_cache_table_db(unique_id):
-
     try:
         # Create insert query for unique id
         insert_query = f"INSERT INTO {variables.sql_table_cache} (`Unique ID`) VALUES ('{unique_id}');"
@@ -726,10 +685,8 @@ def insert_combination_unique_id_to_cache_table_db(unique_id):
 
         return True, "No Error", "No Error"
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f"Unique ID= {unique_id}, Query failed for inserting new combination unique id: ",
                 insert_query,
@@ -743,7 +700,6 @@ def update_cas_table_combination_data_to_cache_table_db(
     unique_id,
     dict_of_col_name_and_values_to_be_updated_in_cache_table,
 ):
-
     # Create column part of query
     update_query = f"UPDATE {variables.sql_table_cache} SET"
 
@@ -762,7 +718,6 @@ def update_cas_table_combination_data_to_cache_table_db(
             col_name,
             col_value,
         ) in dict_of_col_name_and_values_to_be_updated_in_cache_table.items():
-
             col_name = str(col_name)
             col_value = str(col_value)
 
@@ -778,7 +733,6 @@ def update_cas_table_combination_data_to_cache_table_db(
 
         update_query = update_query[:-1] + f" WHERE `Unique ID` = {unique_id};"
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Error in updating vaues in combo prices, {e}")
@@ -797,10 +751,8 @@ def update_cas_table_combination_data_to_cache_table_db(
             )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f"Unique ID= {unique_id}, Query failed: ",
                 update_query,
@@ -810,7 +762,6 @@ def update_cas_table_combination_data_to_cache_table_db(
 
 # Gettting the row of cache values for unique id from the cache table # TODO - Get whole DF at once
 def get_cache_values_for_combo_from_db(unique_id):
-
     # Query to get all rows from the DB
     query_get_all_rows = text(
         f"SELECT * FROM `{variables.sql_table_cache}` WHERE `Unique ID` = {unique_id}"
@@ -844,11 +795,10 @@ def get_cache_values_for_combo_from_db(unique_id):
 
         return pd.DataFrame()
 
+
 # Method to terminate series in db table
 def terminate_series(unique_id, series_id=None):
-
     try:
-
         query = text(
             f"UPDATE `{variables.sql_table_conditional_series}` SET `Status` = 'Terminated',`Is Started Once` = 'Yes' WHERE `Unique ID` = '{unique_id}' AND `Status`<>'Completed';"
         )
@@ -863,9 +813,7 @@ def terminate_series(unique_id, series_id=None):
         variables.screen.screen_conditional_series_tab.update_conditional_series_table()
 
     except Exception as e:
-
         if variables.flag_debug_mode:
-
             print(f"Failed execution for terminating series, {e}")
 
 
@@ -873,7 +821,6 @@ def terminate_series(unique_id, series_id=None):
 def move_active_data_to_archive_db(
     unique_id, flag_move_cas_condition_table_row=False, account_id=None
 ):
-
     # check if flag to move only row in table is true
     if flag_move_cas_condition_table_row:
         local_sql_tables_to_edit = [copy.deepcopy(variables.sql_table_cas_status)]
@@ -888,7 +835,6 @@ def move_active_data_to_archive_db(
 
     # check if dataframe is empty
     if not local_scale_trade_table_dataframe.empty:
-
         # Use the query method to get the value of ladder ids for unique id
         ladder_ids_for_unique_id = list(
             variables.scale_trade_table_dataframe.loc[
@@ -905,14 +851,12 @@ def move_active_data_to_archive_db(
 
     # If no ladder ids found for unique id then set ladder_ids_filter_string to None
     if ladder_ids_filter_string == "":
-
         # Initialize ladder ids for unique id to none
         ladder_ids_filter_string = "'None'"
 
     # It should work as we controlled list of table names
     # Process the tables. Move the data from active to archive and delete data from the active table
     for sql_table_name in local_sql_tables_to_edit:
-
         # Get All the Data for unique_id from the table(Active DB)
 
         # Query to get all rows from the DB
@@ -922,20 +866,17 @@ def move_active_data_to_archive_db(
 
         # If table name is same as sequence table name
         if sql_table_name == variables.sql_table_sequence:
-
             query_get_all_rows_unique_id = text(
                 f"SELECT * FROM `{sql_table_name}` WHERE `Ladder ID` IN ({ladder_ids_filter_string})"
             )
 
         # If table name is same as cas status table name
         if sql_table_name == variables.sql_table_cas_status and account_id == None:
-
             query_get_all_rows_unique_id = text(
                 f"SELECT * FROM `{sql_table_name}` WHERE `Unique ID` = {unique_id} AND `Status` <> 'Failed'"
             )
         # If table name is same as cas status table name
         elif sql_table_name == variables.sql_table_cas_status and account_id != None:
-
             query_get_all_rows_unique_id = text(
                 f"SELECT * FROM `{sql_table_name}` WHERE `Unique ID` = {unique_id} AND `Status` <> 'Failed' AND `Account ID` = '{account_id}'"
             )
@@ -958,7 +899,6 @@ def move_active_data_to_archive_db(
                     query_get_all_rows_unique_id,
                 )
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 # print(e)
@@ -968,7 +908,6 @@ def move_active_data_to_archive_db(
                 )
 
         try:
-
             if variables.flag_debug_mode:
                 print(f"Moving data unique Id = {unique_id}")
                 print(all_rows)
@@ -982,7 +921,6 @@ def move_active_data_to_archive_db(
             )
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 # print(e)
@@ -991,7 +929,6 @@ def move_active_data_to_archive_db(
                 )
 
     if not flag_move_cas_condition_table_row:
-
         # Bring sequence table before ladder table
         local_sql_tables_to_edit = [
             variables.sql_table_sequence
@@ -1000,9 +937,7 @@ def move_active_data_to_archive_db(
     # It should work as we controlled list of table names
     # Delete data from the active table
     for sql_table_name in local_sql_tables_to_edit:
-
         try:
-
             # Delete data from active table
             query_delete_rows = text(
                 f"DELETE FROM `{sql_table_name}` WHERE `Unique ID` = {unique_id}"
@@ -1010,7 +945,6 @@ def move_active_data_to_archive_db(
 
             # If table name is same as sequence table name
             if sql_table_name == variables.sql_table_sequence:
-
                 # Delete data from active table
                 query_delete_rows = text(
                     f"DELETE FROM `{sql_table_name}` WHERE `Ladder ID` IN ({ladder_ids_filter_string})"
@@ -1018,7 +952,6 @@ def move_active_data_to_archive_db(
 
             # If table name is same as sequence table name
             if sql_table_name == variables.sql_table_cas_status and account_id == None:
-
                 # Delete data from active table
                 query_delete_rows = text(
                     f"DELETE FROM `{sql_table_name}` WHERE `Unique ID` = {unique_id} AND `Status` <> 'Failed'"
@@ -1026,7 +959,6 @@ def move_active_data_to_archive_db(
             elif (
                 sql_table_name == variables.sql_table_cas_status and account_id != None
             ):
-
                 # Delete data from active table
                 query_delete_rows = text(
                     f"DELETE FROM `{sql_table_name}` WHERE `Unique ID` = {unique_id} AND `Status` <> 'Failed' AND `Account ID` = '{account_id}'"
@@ -1035,7 +967,6 @@ def move_active_data_to_archive_db(
             result = variables.active_sqlalchemy_connection.execute(query_delete_rows)
             time.sleep(variables.sleep_time_db)
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 # print(e)
@@ -1046,7 +977,6 @@ def move_active_data_to_archive_db(
 
 # delete failed cas conditions
 def purge_cas_conditions():
-
     try:
         # Delete data from active table
         query_delete_rows = text(
@@ -1056,10 +986,8 @@ def purge_cas_conditions():
         result = variables.active_sqlalchemy_connection.execute(query_delete_rows)
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f" Could not failed cas conditions data from active table {variables.sql_table_cas_status}"
             )
@@ -1067,7 +995,6 @@ def purge_cas_conditions():
 
 # Get all the primary variables from DB. (Used in Recovery Mode) Also Used in Cache
 def get_primary_vars_db(table_name):
-
     # Query to get all rows from the DB
     query_get_all_rows = text(f"SELECT * FROM `{table_name}`")
 
@@ -1099,9 +1026,9 @@ def get_primary_vars_db(table_name):
 
         return pd.DataFrame()
 
+
 # Method to get all pending trailing stop loss orders
 def get_all_pending_trailing_sl_orders():
-
     query_all_pending_trailing_sl = text(
         f"SELECT * FROM `{variables.sql_table_combination_status}` WHERE (`Order Type` = 'Trailing Stop Loss' AND `Status` = 'Pending')"
     )
@@ -1126,7 +1053,6 @@ def get_all_pending_trailing_sl_orders():
 
         return all_rows_df
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             # print(e)
@@ -1136,9 +1062,9 @@ def get_all_pending_trailing_sl_orders():
 
         return pd.DataFrame()
 
+
 # Method to update references price in db table
 def update_reference_price_in_db_and_order_book(prices_unique_id):
-
     # Get all the pending trailing sl order
     all_pending_trailing_sl_orders = get_all_pending_trailing_sl_orders()
 
@@ -1158,7 +1084,6 @@ def update_reference_price_in_db_and_order_book(prices_unique_id):
         status = row["Status"]
 
         if action == "BUY" and (prices_unique_id[unique_id]["BUY"] != None):
-
             if (float(prices_unique_id[unique_id]["BUY"]) < reference_price) or (
                 trigger_price == "None"
             ):
@@ -1199,7 +1124,6 @@ def update_reference_price_in_db_and_order_book(prices_unique_id):
                         )
 
         elif action == "SELL" and (prices_unique_id[unique_id]["SELL"] != None):
-
             if (float(prices_unique_id[unique_id]["SELL"]) > reference_price) or (
                 trigger_price == "None"
             ):
@@ -1233,31 +1157,34 @@ def update_reference_price_in_db_and_order_book(prices_unique_id):
                             f"Successfully Update Reference Price, Query successfully executed: {query}"
                         )
                 except Exception as e:
-
                     if variables.flag_debug_mode:
-
                         print(
                             f"Unable to Update Reference Price, Failed Query: {query}"
                         )
 
+
 # Method to insert dummy order in db table
-def insert_dummy_order_in_order_status(unique_id,
-                                        combo_contract,
-                                        order_action,
-                                        order_total_quantity,
-                                        account_id,
-                                        order_time, current_price):
-
-
+def insert_dummy_order_in_order_status(
+    unique_id,
+    combo_contract,
+    order_action,
+    order_total_quantity,
+    account_id,
+    order_time,
+    current_price,
+):
     try:
-
         # ticker string
-        ticker_str = combo_contract.symbol + "," + str(order_total_quantity) + "," + str(combo_contract.con_id)
+        ticker_str = (
+            combo_contract.symbol
+            + ","
+            + str(order_total_quantity)
+            + ","
+            + str(combo_contract.con_id)
+        )
 
     except Exception as e:
-
         pass
-
 
     # Query to insert the order into Order Status Table in DB
     insr_query = text(
@@ -1277,12 +1204,10 @@ def insert_dummy_order_in_order_status(unique_id,
         result = variables.active_sqlalchemy_connection.execute(insr_query)
         time.sleep(variables.sleep_time_db)
     except:
-
         # Print to console
         print(
             f"Unique ID = {unique_id}: Unable to insert the identified butterfly in to database, Unique ID: {unique_id}"
         )
-
 
 
 # Insert all  the information regarding one butterfly order in DB. (Used when we are placing entry order)
@@ -1309,7 +1234,7 @@ def insert_combination_order_in_combo_status_db(
     execution_engine=False,
     limit_iv=None,
     trigger_iv=None,
-        actual_entry_price=None,
+    actual_entry_price=None,
 ):
     # (unique_id, action, quantity, order_type, entry_price, tp_price, sl_price, trailing_sl,status):
 
@@ -1335,9 +1260,9 @@ def insert_combination_order_in_combo_status_db(
                 f"Unable to insert the identified butterfly in to database, Unique ID: {unique_id}"
             )
 
+
 # Method to fetch order status from db table
 def get_ticker_order_status_db(order_id):
-
     try:
         query_get_order_ids = text(
             f"SELECT `Ticker` FROM `{variables.sql_table_order_status}` WHERE (`Order ID` = '{order_id}')"
@@ -1349,15 +1274,14 @@ def get_ticker_order_status_db(order_id):
 
         return ticker[0][0]
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(e)
 
         return None
 
+
 # Method to insert order ids in order in db able
 def insert_order_ids_in_combo_status(unique_id, order_time):
-
     try:
         query_get_order_ids = text(
             f"SELECT `Order ID` FROM `{variables.sql_table_order_status}` WHERE (`Order Time` = '{order_time}' AND `Unique ID` = '{unique_id}')"
@@ -1380,9 +1304,9 @@ def insert_order_ids_in_combo_status(unique_id, order_time):
         if variables.flag_debug_mode:
             print(e)
 
+
 # Method fetch fill price of leg orders from db table
 def get_avg_fill_prices_for_order_ids_db(order_time, column_name):
-
     try:
         query_get_order_ids = text(
             f"SELECT `{column_name}` FROM `{variables.sql_table_order_status}` WHERE (`Order Time` = '{order_time}')"
@@ -1397,17 +1321,15 @@ def get_avg_fill_prices_for_order_ids_db(order_time, column_name):
         return values_list
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(f"Exception inside 'get_avg_fill_prices_for_order_ids_db', Exp: {e}")
 
         return None
 
+
 # Method to get all pending orders.
 def get_pending_orders():
-
     try:
         query_pending_orders = text(
             f"SELECT * FROM `{variables.sql_table_combination_status}` WHERE `Status` = 'Pending'"
@@ -1419,10 +1341,10 @@ def get_pending_orders():
 
         return df_pending_orders
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(e)
         return None
+
 
 # Method to fetch sent orders in db table
 def get_sent_combo_orders():
@@ -1437,14 +1359,13 @@ def get_sent_combo_orders():
 
         return df_pending_orders
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(e)
         return None
 
+
 # Method to get status for order ids
 def get_all_order_ids_status_not_equal_filled():
-
     try:
         query_order_id_status_not_equal_filled = text(
             f"SELECT `Order ID` FROM `{variables.sql_table_order_status}` WHERE (NOT (`Status` = 'Filled'))"
@@ -1455,7 +1376,6 @@ def get_all_order_ids_status_not_equal_filled():
         time.sleep(variables.sleep_time_db)
 
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(e)
 
@@ -1467,6 +1387,7 @@ def get_all_order_ids_status_not_equal_filled():
     except Exception as e:
         return []
 
+
 # Method to update status for combo orders.
 def update_combination_order_status_in_db(
     unique_id,
@@ -1476,11 +1397,9 @@ def update_combination_order_status_in_db(
     status,
     exit_position_qty=None,
     exit_type=None,
-        actual_entry_price = None,
+    actual_entry_price=None,
 ):
-
     try:
-
         if exit_type == None:
             query_update = text(
                 f"UPDATE `{variables.sql_table_combination_status}` SET `Last Update Time` = '{last_update_time}', `Entry Price` = '{entry_price}', `Status` = '{status}', `Actual Entry Price` = '{actual_entry_price}' WHERE (`Unique ID` = '{unique_id}' AND `Order Time`= '{original_order_time}') "
@@ -1499,9 +1418,9 @@ def update_combination_order_status_in_db(
         if variables.flag_debug_mode:
             print("Inside update_combination_order_status_in_db (My Sql IO) error:", e)
 
+
 # Method to get order times for combo
 def get_order_times_for_combination(unique_id):
-
     query = text(
         f"SELECT `Order Time` FROM `{variables.sql_table_combination_status}` WHERE `Unique ID` = '{unique_id}'"
     )
@@ -1519,7 +1438,6 @@ def get_order_times_for_combination(unique_id):
                 f"Unique ID: {unique_id}, Successfully executed query: {query}, to get_order_times_for_combination."
             )
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             pass
@@ -1545,9 +1463,9 @@ def get_order_times_for_combination(unique_id):
 
         return pd.DataFrame()
 
+
 # Method to get order book cleaned time
 def get_order_book_cleaned_time():
-
     query = text(
         f"SELECT `Order Book Cleaned Time` FROM `{variables.sql_table_meta_data}`"
     )
@@ -1566,9 +1484,9 @@ def get_order_book_cleaned_time():
 
         return None
 
+
 # Method to update order book cleaned time
 def update_order_book_cleaned_time(update_time):
-
     query = text(
         f"UPDATE `{variables.sql_table_meta_data}` SET `Order Book Cleaned Time`='{update_time}'"
     )
@@ -1582,9 +1500,9 @@ def update_order_book_cleaned_time(update_time):
         if variables.flag_debug_mode:
             print(f"Inside MySql IO update_order_book_cleaned_time Exception : {e} ")
 
+
 # Method to get all combo orders form db table
 def get_all_combinaiton_orders_from_db(order_book_cleaned_time=None):
-
     # When Order Book Cleaned Time is given and Not Given
     if order_book_cleaned_time == None:
         query = text(f"SELECT * FROM `{variables.sql_table_combination_status}`")
@@ -1617,11 +1535,10 @@ def get_all_combinaiton_orders_from_db(order_book_cleaned_time=None):
 
 ################ Old code not For this project ######################
 
+
 # Fetches and Returns the last saved 'State' from {variables.sql_table_identified_butterfly}, otherwise returns 'None'
 def get_state_db(unique_id):
-
     try:
-
         # Query to get State from 'variables.sql_table_identified_butterfly'  in DB
         query = text(
             f"SELECT `State` FROM {variables.sql_table_identified_butterfly} WHERE `Unique ID` = '{unique_id}'"
@@ -1643,7 +1560,6 @@ def get_state_db(unique_id):
 
 # Update the last saved 'State' in {variables.sql_table_identified_butterfly} for {unique_id} table
 def update_state_db(unique_id, state):
-
     try:
         update_state_query = text(
             f"UPDATE {variables.sql_table_identified_butterfly} SET `State` = '{state}' WHERE `Unique ID` = '{unique_id}'"
@@ -1658,7 +1574,6 @@ def update_state_db(unique_id, state):
             )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -1668,7 +1583,6 @@ def update_state_db(unique_id, state):
 
 # Get list of orderid present in database
 def order_id_database():
-
     # Print to console
     if variables.flag_debug_mode:
         print(f"Getting all the Order IDs from Database")
@@ -1688,9 +1602,9 @@ def order_id_database():
 
     return order_id_db
 
+
 # Method to get open order ids
 def get_open_order_ids(unique_id):
-
     query = text(
         f"SELECT `Order ID` from `{variables.sql_table_order_status}` WHERE ((`Unique ID` = '{unique_id}') AND (`Status`='Submitted' or `Status`='PreSubmitted'))"
     )
@@ -1707,9 +1621,9 @@ def get_open_order_ids(unique_id):
             print("No open orders found")
         return []
 
+
 # Method to check if all sub order got filled or not for unique id
 def check_all_orders_filled(unique_id, order_time):
-
     query = text(
         f"SELECT COUNT(`Status`) FROM `{variables.sql_table_order_status}` WHERE ( (`Unique ID` = '{unique_id}') AND (`Order Time` ='{order_time}') AND (NOT (`Status` = 'Filled' OR `Status` = 'Inactive' OR `Status` = 'Cancelled')))"
     )
@@ -1725,11 +1639,11 @@ def check_all_orders_filled(unique_id, order_time):
             print("Unable to check orders status for sending next orders")
         return None
 
+
 # Method to update pending order as cancelled
 def mark_pending_combo_order_cancelled(
     unique_id, order_time, status, last_update_time, updated_status, reason_for_failed
 ):
-
     query = text(
         f"UPDATE `{variables.sql_table_combination_status}` SET `Status`='{updated_status}', `Reason For Failed`='{reason_for_failed}', `Last Update Time`='{last_update_time}' WHERE `Unique ID` = '{unique_id}' AND `Order Time` = '{order_time}' AND `Status` = '{status}' "
     )
@@ -1746,9 +1660,9 @@ def mark_pending_combo_order_cancelled(
             )
         return None
 
+
 # Method to get all cancelled or filled orders
 def get_all_cancelled_or_filled_combo_order():
-
     query = text(
         f"SELECT `Order Time` FROM `{variables.sql_table_combination_status}` WHERE (`Status`='Filled' OR `Status`='Cancelled' OR `Status`='Failed') "
     )
@@ -1768,9 +1682,9 @@ def get_all_cancelled_or_filled_combo_order():
             print("Unable to get filled or cancelled combination orders")
         return []
 
+
 # Method to update highest and lowest price in cache tble
 def update_high_low_price_in_db(unique_id, high, low, is_intraday):
-
     if is_intraday:
         high_col = "1-Day High"
         low_col = "1-Day Low"
@@ -1794,11 +1708,11 @@ def update_high_low_price_in_db(unique_id, high, low, is_intraday):
             print("Unable to update high low price for {unique_id=} {is_intraday=}")
             print(e)
 
+
 # Method to insert highest lowest prices in db table
 def insert_high_low_prices_in_db(
     unique_id, n_day_high="N/A", n_day_low="N/A", day_high="N/A", day_low="N/A"
 ):
-
     query = text(
         f"INSERT INTO `{variables.sql_table_cache}` ( `Unique ID` , `N-Day High` , `N-Day Low`, \
                          `1-Day High`, `1-Day Low` ) VALUES ( '{unique_id}', '{n_day_high}', '{n_day_low}', '{day_high}', '{day_low}') "
@@ -1811,13 +1725,12 @@ def insert_high_low_prices_in_db(
         if variables.flag_debug_mode:
             print("Inserted Price for {unique_id} in db.")
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(e)
 
+
 # Method to update last updated time
 def update_last_longterm_or_intraday_updated_time(is_intraday):
-
     # Init
     if is_intraday:
         col_name = "CAS Intraday Updated Time"
@@ -1839,10 +1752,9 @@ def update_last_longterm_or_intraday_updated_time(is_intraday):
         if variables.flag_debug_mode:
             print(f"Updated Last update time for {col_name} in db.")
     except Exception as e:
-
         if variables.flag_debug_mode:
-
             print(e)
+
 
 # Method to replace evaluation unique id for cas condition in db table
 def replace_eval_unique_id_cas_condition_db(
@@ -1860,7 +1772,6 @@ def replace_eval_unique_id_cas_condition_db(
         if variables.flag_debug_mode:
             print(f"Query Executed successfully : {query}")
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(f"Query Failed : {query}")
 
@@ -1868,11 +1779,9 @@ def replace_eval_unique_id_cas_condition_db(
 
     # if table is cas status then set column for it
     if table_name == variables.sql_table_cas_status:
-
         column_name = "Trading Combination Unique ID"
 
     else:
-
         column_name = "Trading Unique ID"
 
     # Query to update time
@@ -1887,9 +1796,9 @@ def replace_eval_unique_id_cas_condition_db(
         if variables.flag_debug_mode:
             print(f"Query Executed successfully : {query}")
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(f"Query Failed : {query}")
+
 
 # # Method to update cas condition table as failed
 def failed_eval_unique_id_cas_condition_db(eval_unique_id):
@@ -1905,9 +1814,9 @@ def failed_eval_unique_id_cas_condition_db(eval_unique_id):
         if variables.flag_debug_mode:
             print(f"Query Executed successfully : {query}")
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(f"Query Failed : {query}")
+
 
 # Method to insert cas condition order in db table
 def insert_cas_condition_in_db(
@@ -1934,7 +1843,6 @@ def insert_cas_condition_in_db(
     evalaution_unique_id=None,
     series_id=None,
 ):
-
     # Query to insert
     insr_query = text(
         f"INSERT INTO `{variables.active_sql_db_name}`.`{variables.sql_table_cas_status}` \
@@ -1952,15 +1860,14 @@ def insert_cas_condition_in_db(
         time.sleep(variables.sleep_time_db)
     except Exception as e:
         if variables.flag_debug_mode:
-
             print(
                 f"Unable to insert the CAS condition {unique_id=} {cas_type} {condition=} {status=} in to database, Unique ID: {unique_id}"
             )
             print(insr_query)
 
+
 # Method to check if cas conditional order exist for unique id or not
 def do_cas_condition_exists_for_unique_id_in_db(unique_id, condition_type=None):
-
     get_count_query = text(
         f"SELECT COUNT(*) FROM `{variables.active_sql_db_name}`.`{variables.sql_table_cas_status}` \
          WHERE (`Unique ID` = '{unique_id}'  AND (`Status` = 'Pending' OR `Status` = 'Failed')) "
@@ -1988,7 +1895,6 @@ def do_cas_condition_exists_for_unique_id_in_db(unique_id, condition_type=None):
         return result
     except Exception as e:
         if variables.flag_debug_mode:
-
             print(e)
             print(
                 f"Unable to Execute the query to check if condition exists in CAS Status Table for Unique ID: {unique_id}, Query : {get_count_query}"
@@ -1997,9 +1903,9 @@ def do_cas_condition_exists_for_unique_id_in_db(unique_id, condition_type=None):
         # Returning 100 so the condition can not be added in CAS Add or Switch
         return 100
 
+
 # Method to check if conditional series exist for unique id
 def do_cas_condition_series_exists_for_unique_id_in_db(unique_id):
-
     get_count_query = text(
         f"SELECT COUNT(*) FROM `{variables.active_sql_db_name}`.`{variables.sql_table_conditional_series}` \
          WHERE (`Unique ID` = '{unique_id}'  AND (`Status` <> 'Completed') AND (`Status` <> 'Terminated') AND (`Status` <> 'Parked')) "
@@ -2021,7 +1927,6 @@ def do_cas_condition_series_exists_for_unique_id_in_db(unique_id):
         return result
     except Exception as e:
         if variables.flag_debug_mode:
-
             print(e)
             print(
                 f"Unable to Execute the query to check if condition exists in CAS Status Table for Unique ID: {unique_id}, Query : {get_count_query}"
@@ -2030,9 +1935,9 @@ def do_cas_condition_series_exists_for_unique_id_in_db(unique_id):
         # Returning 100 so the condition can not be added in CAS Add or Switch
         return 100
 
+
 # Method to get all cas conditional order from db table
 def get_all_cas_conditions_from_db(only_pending=False):
-
     # Only want the pending conditions
     if only_pending:
         query = text(
@@ -2060,7 +1965,6 @@ def get_all_cas_conditions_from_db(only_pending=False):
         return all_rows_df
     except Exception as e:
         if variables.flag_debug_mode:
-
             print(e)
             print(
                 f"Unable to Execute the query to check if condition exists in CAS Status Table for Query : {query}"
@@ -2072,7 +1976,6 @@ def get_all_cas_conditions_from_db(only_pending=False):
 
 # Delete CAS Condition from cas_condition_table_dbs for unique id
 def delete_cas_condition_from_db_for_unique_id(unique_id):
-
     query = text(
         f"DELETE FROM `{variables.sql_table_cas_status}` WHERE `Unique ID` = '{unique_id}' "
     )
@@ -2088,7 +1991,6 @@ def delete_cas_condition_from_db_for_unique_id(unique_id):
 
     except Exception as e:
         if variables.flag_debug_mode:
-
             print(e)
             print(
                 f"Unable to Execute the query to DELETE the CAS Condition from CAS Status Table for Unique ID: {unique_id}, Query : {query}"
@@ -2097,7 +1999,6 @@ def delete_cas_condition_from_db_for_unique_id(unique_id):
 
 # Delete all cas legs for unique id
 def delete_cas_legs_from_db_for_unique_id(unique_id):
-
     query = text(
         f"DELETE FROM `{variables.sql_table_cas_legs}` WHERE `Unique ID` = '{unique_id}' "
     )
@@ -2113,7 +2014,6 @@ def delete_cas_legs_from_db_for_unique_id(unique_id):
 
     except Exception as e:
         if variables.flag_debug_mode:
-
             print(e)
             print(
                 f"Unable to Execute the query to DELETE the CAS Legs from CAS Legs Table for Unique ID: {unique_id}, Query : {query}"
@@ -2122,16 +2022,13 @@ def delete_cas_legs_from_db_for_unique_id(unique_id):
 
 # Update CAS condition status for unique id
 def update_cas_condition_status(unique_id, status, account_id=None):
-
     # Checking if account id is not none
     if account_id == None:
-
         query = text(
             f"UPDATE `{variables.sql_table_cas_status}` SET `Status` = '{status}' WHERE `Unique ID` = '{unique_id}' AND `Status` <> 'Failed'"
         )
 
     else:
-
         query = text(
             f"UPDATE `{variables.sql_table_cas_status}` SET `Status` = '{status}' WHERE `Unique ID` = '{unique_id}' AND `Status` <> 'Failed' AND `Account ID` = '{account_id}'"
         )
@@ -2147,7 +2044,6 @@ def update_cas_condition_status(unique_id, status, account_id=None):
 
     except Exception as e:
         if variables.flag_debug_mode:
-
             print(e)
             print(
                 f"Unable to Execute the query to UPDATE the CAS status for Unique ID: {unique_id}, Query : {query}"
@@ -2156,16 +2052,13 @@ def update_cas_condition_status(unique_id, status, account_id=None):
 
 # Update CAS condition status for unique id
 def update_cas_condition_reason_for_failed(unique_id, reason, account_id=None):
-
     # Checking if account id is not none
     if account_id == None:
-
         query = text(
             f"UPDATE `{variables.sql_table_cas_status}` SET `Reason For Failed` = '{reason}' WHERE `Unique ID` = '{unique_id}' AND `Status` = 'Failed'"
         )
 
     else:
-
         query = text(
             f"UPDATE `{variables.sql_table_cas_status}` SET `Reason For Failed` = '{reason}' WHERE `Unique ID` = '{unique_id}' AND `Status` = 'Failed' AND `Account ID` = '{account_id}'"
         )
@@ -2181,7 +2074,6 @@ def update_cas_condition_reason_for_failed(unique_id, reason, account_id=None):
 
     except Exception as e:
         if variables.flag_debug_mode:
-
             print(e)
             print(
                 f"Unable to Execute the query to UPDATE the CAS reason for failed for Unique ID: {unique_id}, Query : {query}"

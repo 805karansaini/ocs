@@ -9,9 +9,9 @@ from com.variables import *
 from com.mysql_io import *
 from com.combination import *
 
+
 # Method to calculate combo positions
 def calculation_combinations_positions():
-
     # local copy of 'unique_id_to_combo_obj'
     local_unique_id_to_combo_obj = variables.unique_id_to_combo_obj
 
@@ -20,11 +20,9 @@ def calculation_combinations_positions():
 
     # Check if datafrmae is empty
     if all_combination_order.empty:
-
         all_account_ids_in_order_book = []
 
     else:
-
         # all account ids in order book
         all_account_ids_in_order_book = all_combination_order["Account ID"].to_list()
 
@@ -49,7 +47,6 @@ def calculation_combinations_positions():
 
     # Calculate positions row wise
     for i, row in all_combination_order.iterrows():
-
         status = row["Status"]
 
         # If status is cancelled continue
@@ -64,17 +61,13 @@ def calculation_combinations_positions():
         # The reason for this try block is when a combo is delete at that time it might happen that cas_legs are available and cas_condition was deleted Or viceaversa
         try:
             if "BUY" in action:
-
                 positions_dict[unique_id][account_id] += combo_qty
             else:
-
                 positions_dict[unique_id][account_id] -= combo_qty
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
-
                 print(e)
                 print(
                     f"positions_dict ; {positions_dict} dont have account id : {account_id}"
@@ -82,9 +75,9 @@ def calculation_combinations_positions():
 
     return positions_dict
 
+
 # Method to insert positions in GUI table
 def insert_combo_positions_in_positions_tab():
-
     # Get calcutaed position
     position_dict = calculation_combinations_positions()
 
@@ -95,7 +88,6 @@ def insert_combo_positions_in_positions_tab():
     unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
 
     for unique_id, combo_object in unique_id_to_combo_obj.items():
-
         informative_string = make_informative_combo_string(combo_object)
         total_legs = len(combo_object.buy_legs) + len(combo_object.sell_legs)
         position = position_dict[unique_id] if (unique_id in position_dict) else 0
@@ -115,9 +107,9 @@ def insert_combo_positions_in_positions_tab():
             value_of_row_in_positions_table
         )
 
+
 # Method to keep updaing positions in GUI table
 def update_combo_positions_in_positions_tab():
-
     # Get calcutaed position
     position_dict = calculation_combinations_positions()
 
@@ -128,10 +120,8 @@ def update_combo_positions_in_positions_tab():
     unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
 
     for unique_id, combo_object in unique_id_to_combo_obj.items():
-
         # Iterate account ids
         for account_id in position_dict[unique_id]:
-
             position = (
                 position_dict[unique_id][account_id]
                 if (

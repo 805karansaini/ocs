@@ -4,14 +4,12 @@ Created on 06-Apr-2023
 @author: Karan
 """
 
-
 from com import *
 from com.variables import *
 
 
 # In recovery mode, getting execution details of all the orders with "executionFilter"
 def get_execution_details(executionFilter):
-
     reqId = variables.nextorderId
     variables.execution_details[reqId] = list([])
     variables.bool_execution_details = False
@@ -32,7 +30,6 @@ def get_execution_details(executionFilter):
             if counter >= 50:
                 return
         else:
-
             if variables.flag_debug_mode:
                 print("Successfully got answer from TWS....", reqId)
             break
@@ -40,7 +37,6 @@ def get_execution_details(executionFilter):
 
 # In recovery mode, After getting the latest order execDetails, This function marks the status = cancelled for all the order which did not get any update
 def mark_order_cancelled(module_start_time):
-
     try:
         # SQL Query to get the all the 'Order Id' which didnot get any update.
         query_to_get_old_order_id = text(

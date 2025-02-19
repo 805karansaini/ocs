@@ -1,15 +1,14 @@
 from com.variables import *
 from com.mysql_io import update_cas_table_combination_data_to_cache_table_db
 
+
 # update values cache DB table
 def update_cache_data_in_db(cas_table_update_values):
-
     # Getting columns of cache data table
     local_cache_data_table_columns = copy.deepcopy(variables.cache_data_table_columns)
 
     # Iterating values
     for values_for_cas_table in cas_table_update_values:
-
         # Create dictionary of columns and values to be updated in the cache table in DB
         dict_of_col_name_and_values_to_be_updated_in_cache_table = {}
 
@@ -20,7 +19,6 @@ def update_cache_data_in_db(cas_table_update_values):
         for col_name_for_cache, cas_table_value in zip(
             local_cache_data_table_columns, values_for_cas_table
         ):
-
             try:
                 # check if values are valid
                 if cas_table_value not in ["N/A", None, "None"]:
@@ -31,7 +29,6 @@ def update_cache_data_in_db(cas_table_update_values):
                     pass
                     # do not update this value in cache table
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print(
@@ -40,7 +37,6 @@ def update_cache_data_in_db(cas_table_update_values):
 
         # Update the Cache in DB
         if len(dict_of_col_name_and_values_to_be_updated_in_cache_table) > 0:
-
             # Run query and update the value in cache_table
             update_cas_table_combination_data_to_cache_table_db(
                 unique_id, dict_of_col_name_and_values_to_be_updated_in_cache_table
@@ -54,11 +50,11 @@ def update_cache_data_in_db(cas_table_update_values):
 
             pass
 
+
 # Replace cached data values for values which are not available
 def process_the_latest_cas_indicator_values_fetched_from_cache_table_db(
     cache_table_values_in_tuples,
 ):
-
     # List of tuple of final values to display in CAS table
     values_to_be_displayed_in_cas_table = []
 
@@ -79,7 +75,6 @@ def process_the_latest_cas_indicator_values_fetched_from_cache_table_db(
         )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -89,18 +84,14 @@ def process_the_latest_cas_indicator_values_fetched_from_cache_table_db(
         return None
 
     try:
-
         # Get row of all values for each unique id from cache DB table
         for cache_table_row in cache_table_values_in_tuples:
-
             # Define tuple for values to be displayed in cas table row
             row_of_values_to_be_added_in_cas_table_values = [cache_table_row[0]]
 
             # Get value for each column from cache table row (started iterating from index 1)
             for cache_table_column_value in cache_table_row[1:]:
-
                 if cache_table_column_value not in ["N/A", None, "None"]:
-
                     # Get list of value and timestamp of cache column
                     cache_column_value_and_timestamp = cache_table_column_value.split(
                         "|"
@@ -136,19 +127,16 @@ def process_the_latest_cas_indicator_values_fetched_from_cache_table_db(
                         difference_between_current_and_lut_for_column_in_minutes
                         <= variables.lookback_period_for_cache
                     ):
-
                         # Add cache column data to be displayed
                         row_of_values_to_be_added_in_cas_table_values.append(
                             cache_column_value
                         )
 
                     else:
-
                         # Add 'N/A' value to be displayed
                         row_of_values_to_be_added_in_cas_table_values.append("N/A")
 
                 else:
-
                     # Add 'CAS column value to be displayed
                     row_of_values_to_be_added_in_cas_table_values.append("N/A")
 
@@ -158,7 +146,6 @@ def process_the_latest_cas_indicator_values_fetched_from_cache_table_db(
             )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -170,11 +157,11 @@ def process_the_latest_cas_indicator_values_fetched_from_cache_table_db(
     # Return list of tuples of CAS table updated values
     return values_to_be_displayed_in_cas_table
 
+
 # Replace null values in cas indicator by cached values
 def replace_null_values_in_cas_table_from_cache_table(
     cas_table_update_values, cache_table_values_in_tuples
 ):
-
     # List of tuple of final values to display in CAS table
     values_to_be_displayed_in_cas_table = []
 
@@ -195,7 +182,6 @@ def replace_null_values_in_cas_table_from_cache_table(
         )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -205,12 +191,10 @@ def replace_null_values_in_cas_table_from_cache_table(
         return cas_table_update_values
 
     try:
-
         # Get row of all values for each unique id from cas table and cache DB table
         for cas_table_row, cache_table_row in zip(
             cas_table_update_values, cache_table_values_in_tuples
         ):
-
             # Define tuple for values to be displayed in cas table row
             row_of_values_to_be_added_in_cas_table_values = [cas_table_row[0]]
 
@@ -218,7 +202,6 @@ def replace_null_values_in_cas_table_from_cache_table(
             for cas_table_column_value, cache_table_column_value in zip(
                 cas_table_row[1:], cache_table_row[1:]
             ):
-
                 # Get value for CAS table column
                 cas_column_value = cas_table_column_value
 
@@ -228,7 +211,6 @@ def replace_null_values_in_cas_table_from_cache_table(
                     None,
                     "None",
                 ] and cache_table_column_value not in ["N/A", None, "None"]:
-
                     # Get list of value and timestamp of cache column
                     cache_column_value_and_timestamp = cache_table_column_value.split(
                         "|"
@@ -264,18 +246,15 @@ def replace_null_values_in_cas_table_from_cache_table(
                         difference_between_current_timestamp_and_timestamp_of_update_for_cache_column_in_minutes
                         <= variables.lookback_period_for_cache
                     ):
-
                         # Add cache column data to be displayed
                         row_of_values_to_be_added_in_cas_table_values += (
                             cache_column_value,
                         )
 
                     else:
-
                         # Add 'N/A' value to be displayed
                         row_of_values_to_be_added_in_cas_table_values.append("N/A")
                 else:
-
                     # Add 'CAS column value to be displayed
                     row_of_values_to_be_added_in_cas_table_values.append(
                         cas_column_value
@@ -287,7 +266,6 @@ def replace_null_values_in_cas_table_from_cache_table(
             )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(

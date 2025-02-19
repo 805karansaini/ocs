@@ -33,7 +33,16 @@ class EWrapper:
         """Marks the ending of the historical bars reception."""
         pass
 
-    def option_contracts_data(self,  request_id: int, underlyingConId: int, exchange: str, trading_class: str, multiplier: int, expirations: set, strikes: set):
+    def option_contracts_data(
+        self,
+        request_id: int,
+        underlyingConId: int,
+        exchange: str,
+        trading_class: str,
+        multiplier: int,
+        expirations: set,
+        strikes: set,
+    ):
         """Returns the requested historical option contracts"""
         pass
 
@@ -66,9 +75,9 @@ class EWrapper:
         vega: float,
         theta: float,
         iv: float,
-        underlying_price: float, 
+        underlying_price: float,
         option_price: float,
-        pvDividend: float
+        pvDividend: float,
     ):
         """Return the requested option computation data.
         (Values are None if not available)"""
@@ -90,11 +99,23 @@ class EWrapper:
         """Marks the ending of contract details data"""
         pass
 
-    def order_status(self, request_id: int, status: str, filled: float, remaining: float, avg_fill_price: float, last_fill_price: float, why_held: str, mkt_cap_price: float):
+    def order_status(
+        self,
+        request_id: int,
+        status: str,
+        filled: float,
+        remaining: float,
+        avg_fill_price: float,
+        last_fill_price: float,
+        why_held: str,
+        mkt_cap_price: float,
+    ):
         """Return the order status data"""
         pass
 
-    def open_order(self, request_id: int, contract: Contract, order: Order, order_state: OrderState):
+    def open_order(
+        self, request_id: int, contract: Contract, order: Order, order_state: OrderState
+    ):
         """Return the open order data"""
         pass
 
@@ -106,7 +127,14 @@ class EWrapper:
         """Marks the ending of executions data"""
         pass
 
-    def positions(self, request_id: int, account: str, contract: Contract, position: float, avg_cost: float):
+    def positions(
+        self,
+        request_id: int,
+        account: str,
+        contract: Contract,
+        position: float,
+        avg_cost: float,
+    ):
         """Return the positions data"""
         pass
 
@@ -130,7 +158,9 @@ class EWrapper:
         """Give intersection of All Accounts and All Active Accounts"""
         pass
 
-    def account_updates(self, request_id: int, key: str, val: str, currency: str, account: str):
+    def account_updates(
+        self, request_id: int, key: str, val: str, currency: str, account: str
+    ):
         """Return the account updates data"""
         pass
 
@@ -138,11 +168,25 @@ class EWrapper:
         """Marks the ending of account updates data"""
         pass
 
-    def pnl(self, request_id: int, daily_pnl: float, unrealized_pnl: float, realized_pnl: float):
+    def pnl(
+        self,
+        request_id: int,
+        daily_pnl: float,
+        unrealized_pnl: float,
+        realized_pnl: float,
+    ):
         """Return the PnL data"""
         pass
 
-    def pnl_single(self, request_id: int, pos: float, daily_pnl: float, unrealized_pnl: float, realized_pnl: float, value: float):
+    def pnl_single(
+        self,
+        request_id: int,
+        pos: float,
+        daily_pnl: float,
+        unrealized_pnl: float,
+        realized_pnl: float,
+        value: float,
+    ):
         """Return the PnL data"""
         pass
 

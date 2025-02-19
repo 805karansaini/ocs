@@ -7,7 +7,10 @@ Created on 13-Apr-2023
 from com import *
 from com.variables import *
 from com.combination_helper import *
-from com.upload_orders_from_csv import make_multiline_mssg_for_gui_popup, is_float_upload_order
+from com.upload_orders_from_csv import (
+    make_multiline_mssg_for_gui_popup,
+    is_float_upload_order,
+)
 
 
 class ScreenPositions(object):
@@ -121,14 +124,15 @@ class ScreenPositions(object):
                 label="Quick Exit All", command=lambda: self.quick_exit_all()
             )
             menu.add_command(label="Edit Position", command=lambda: self.edit_postion())
-            menu.add_command(label="Flip Order", command=lambda: self.quick_exit(flag_flip=True))
+            menu.add_command(
+                label="Flip Order", command=lambda: self.quick_exit(flag_flip=True)
+            )
 
             # display the context menu at the location of the mouse cursor
             menu.post(event.x_root, event.y_root)
 
     # Method to close position across all accounts
     def quick_exit_all(self):
-
         unique_id_account_id_combined = self.positions_table.selection()[
             0
         ]  # get the item ID of the selected row
@@ -142,7 +146,6 @@ class ScreenPositions(object):
 
     # Method to close position of combo for account ID
     def quick_exit(self, flag_flip=False):
-
         unique_id_account_id_combined = self.positions_table.selection()[
             0
         ]  # get the item ID of the selected row
@@ -155,11 +158,10 @@ class ScreenPositions(object):
         # Get account id
         account_id = values[4]
 
-        self.display_quick_exit_order_specs(unique_id, account_id,flag_flip=flag_flip)
+        self.display_quick_exit_order_specs(unique_id, account_id, flag_flip=flag_flip)
 
     # Method to edit position
     def edit_postion(self):
-
         unique_id_account_id_combined = self.positions_table.selection()[
             0
         ]  # get the item ID of the selected row
@@ -180,9 +182,7 @@ class ScreenPositions(object):
 
     # Method to create pop up for edit position
     def edit_postion_pop_up(self, unique_id, account_id=None, existing_position=None):
-
         try:
-
             # Get Ticker String
             # Get combo obj
             local_stored_copy_of_combo_object = variables.unique_id_to_combo_obj[
@@ -194,12 +194,7 @@ class ScreenPositions(object):
                 local_stored_copy_of_combo_object
             )
 
-
-
-
-
         except Exception as e:
-
             # Error pop up
             error_title = f"Could Not get ticker string for unique ID"
             error_string = f"Could Not get ticker string for unique ID "
@@ -223,7 +218,6 @@ class ScreenPositions(object):
             current_price = (current_buy_price + current_sell_price) / 2
 
         except Exception as e:
-
             # Error pop up
             error_title = f"Could Not get current price for unique ID"
             error_string = f"Could Not get current price for unique ID"
@@ -275,7 +269,6 @@ class ScreenPositions(object):
         current_session_accounts_options = variables.current_session_accounts
 
         if account_id != None:
-
             current_session_accounts_options = [account_id]
 
         # Create the combo box
@@ -288,23 +281,17 @@ class ScreenPositions(object):
             style="Custom.TCombobox",
         )
         account_id_combo_box.current(0)
-        account_id_combo_box.grid(
-            column=3, row=3, padx=5, pady=5
-        )
+        account_id_combo_box.grid(column=3, row=3, padx=5, pady=5)
 
         def on_click_proceed_button(existing_position):
-
             # Getting unique id use entered
             target_position = target_position_entry.get()
 
             # get account id
             account_id = account_id_combo_box.get().strip()
 
-
-
             # Check if user entered value is valid integer
             if not is_integer(target_position):
-
                 # Showing error pop up
                 error_title = f"Invalid Target Position Entered"
                 error_string = f"Please Enter Valid Target Position "
@@ -314,30 +301,32 @@ class ScreenPositions(object):
                 return
 
             else:
-
                 # Convert valid value to int
                 target_position = int(target_position)
 
             if existing_position == None:
-
-                existing_position = variables.map_unique_id_to_positions[int(unique_id)][account_id]
+                existing_position = variables.map_unique_id_to_positions[
+                    int(unique_id)
+                ][account_id]
 
             # Checking if format of unique id entered is valid and available in system
             if target_position != existing_position:
-
                 # Get number of lots to trade
                 positions_to_dummy_trade = target_position - existing_position
 
                 # Place dummy order
                 insert_order_when_conditional_add_switch_fails(
-                    account_id, unique_id, positions_to_dummy_trade, ticker_string, entry_price=current_price
+                    account_id,
+                    unique_id,
+                    positions_to_dummy_trade,
+                    ticker_string,
+                    entry_price=current_price,
                 )
 
                 # Destroy pop up
                 enter_target_position_popup.destroy()
 
             elif target_position == existing_position:
-
                 # Show error pop up
                 error_title = f"Target position Must not be equal to existing position"
                 error_string = f"Target position Must not be equal to existing position"
@@ -347,7 +336,9 @@ class ScreenPositions(object):
 
         # Add a button to edit position
         proceed_button = ttk.Button(
-            enter_target_position_frame, text="Proceed", command= lambda :on_click_proceed_button(existing_position)
+            enter_target_position_frame,
+            text="Proceed",
+            command=lambda: on_click_proceed_button(existing_position),
         )
 
         proceed_button.grid(column=4, row=3, padx=5, pady=5)
@@ -357,11 +348,11 @@ class ScreenPositions(object):
         enter_target_position_frame.place(y=30)
 
     # Method to fill details for quick exit order
-    def display_quick_exit_order_specs(self, unique_id, account_id, flag_all=False, flag_flip=False):
-
+    def display_quick_exit_order_specs(
+        self, unique_id, account_id, flag_all=False, flag_flip=False
+    ):
         # check if unique id is in current session accounts
         if account_id not in variables.current_session_accounts and not flag_all:
-
             # Error pop up
             error_title = "Account ID is unavailable in current session."
             error_string = f"Can not trade combo because Account ID: {account_id} \nis unavailable in current session."
@@ -374,7 +365,6 @@ class ScreenPositions(object):
         multi_account_to_position_dict = {}
 
         if not flag_all:
-
             try:
                 current_position = variables.map_unique_id_to_positions[unique_id][
                     account_id
@@ -396,12 +386,9 @@ class ScreenPositions(object):
                 return
 
         else:
-
             # Get all account ids
             for account_id in variables.current_session_accounts:
-
                 try:
-
                     current_position_multi = variables.map_unique_id_to_positions[
                         unique_id
                     ][account_id]
@@ -416,11 +403,9 @@ class ScreenPositions(object):
 
                 # Position is Zero can not place quick exit
                 if current_position_multi != 0:
-
                     multi_account_to_position_dict[account_id] = current_position_multi
 
             try:
-
                 # getting list of account in system and all accounts with positions
                 accounts_in_session_with_positions = list(
                     multi_account_to_position_dict.keys()
@@ -439,7 +424,6 @@ class ScreenPositions(object):
 
                 # Get list of account not in sytem and have non zero positions
                 for account_not_in_system in accounts_not_in_system_with_positions:
-
                     # Check if position is non-zero
                     if (
                         variables.map_unique_id_to_positions[unique_id][
@@ -447,14 +431,11 @@ class ScreenPositions(object):
                         ]
                         != 0
                     ):
-
                         # Concatenate account id in string
                         accounts_not_in_system_string += account_not_in_system + ","
 
             except Exception as e:
-
                 if variables.flag_debug_mode:
-
                     print(
                         f'Inside finding accounts not in system for "quick exit all", Exp: {e}'
                     )
@@ -536,16 +517,12 @@ class ScreenPositions(object):
             "IB Algo Market",
             "Stop Loss",
             "Trailing Stop Loss",
-            "Stop Loss Candle"
-
-
+            "Stop Loss Candle",
         ]
 
         # get combo object
         # Get combo object using unique ids
-        local_unique_id_to_combo_obj = copy.deepcopy(
-            variables.unique_id_to_combo_obj
-        )
+        local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
 
         combo_obj = local_unique_id_to_combo_obj[unique_id]
 
@@ -557,16 +534,15 @@ class ScreenPositions(object):
 
         # check if any leg is OPT or FOP
         for leg_obj in all_legs:
-
-            if leg_obj.sec_type in ['OPT', 'FOP']:
+            if leg_obj.sec_type in ["OPT", "FOP"]:
                 # set value to True
                 flag_premium = True
 
         # if flag is true
         if flag_premium:
-            order_type_options.append('Stop Loss Premium')
+            order_type_options.append("Stop Loss Premium")
 
-            order_type_options.append('Trailing SL Premium')
+            order_type_options.append("Trailing SL Premium")
 
             premium_dict = variables.screen.get_premium_for_orders(all_legs)
 
@@ -635,7 +611,6 @@ class ScreenPositions(object):
 
         # Get atr value
         try:
-
             # Get ATR value
             atr = (
                 "N/A"
@@ -644,13 +619,11 @@ class ScreenPositions(object):
             )
 
         except Exception as e:
-
             # In case of exception set it to N/A
             atr = "N/A"
 
             # Print to console
             if variables.flag_debug_mode:
-
                 print(f"For Unique ID: {unique_id}, Unable to get ATR")
 
         # Insert ATR in entry widget for ATR
@@ -676,10 +649,7 @@ class ScreenPositions(object):
         ).pack(side="right")
 
         def on_click_exit_button():
-
             if not flag_all:
-
-
                 self.add_quick_exit_order(
                     unique_id,
                     quick_exit_spec_popup,
@@ -690,7 +660,6 @@ class ScreenPositions(object):
                 )
 
             else:
-
                 # if string is non empty
                 if accounts_not_in_system_string != "":
                     error_msg = (
@@ -705,7 +674,6 @@ class ScreenPositions(object):
                     )
 
                 for account in multi_account_to_position_dict:
-
                     current_position_multi = multi_account_to_position_dict[account]
 
                     self.add_quick_exit_order(
@@ -722,7 +690,6 @@ class ScreenPositions(object):
             quick_exit_spec_popup.destroy()
 
         def on_order_type_combobox_selected(event=None):
-
             order_type = selected_order_type_option.get()
 
             # [row=1, column=1] => Trigger price field
@@ -730,17 +697,10 @@ class ScreenPositions(object):
             # [row=1, column=3] => ATR multiple field
             # For order type "Market"
             if order_type == "Market":
-
                 # Make entry widget disabled
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
-                    state="normal"
-                )
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="normal")
 
                 # Delete values from fields
                 quick_exit_frame.grid_slaves(row=1, column=1)[0].delete(0, "end")
@@ -768,17 +728,10 @@ class ScreenPositions(object):
             # [row=1, column=3] => ATR multiple field
             # For order type "Stop loss"
             elif order_type == "Stop Loss":
-
                 # Make entry widget disabled
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
-                    state="normal"
-                )
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="normal")
 
                 # Delete values from fields
                 quick_exit_frame.grid_slaves(row=1, column=2)[0].delete(0, "end")
@@ -798,17 +751,10 @@ class ScreenPositions(object):
             # [row=1, column=3] => ATR multiple field
             # For order type "Trailing Stop Loss"
             elif order_type == "Trailing Stop Loss":
-
                 # Make entry widget disabled
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
-                    state="normal"
-                )
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="normal")
 
                 # Delete values from fields
                 quick_exit_frame.grid_slaves(row=1, column=1)[0].delete(0, "end")
@@ -828,17 +774,10 @@ class ScreenPositions(object):
             # [row=1, column=3] => ATR multiple field
             # For order type "IB Algo Market"
             elif order_type == "IB Algo Market":
-
                 # Make entry widget disabled
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
-                    state="normal"
-                )
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="normal")
 
                 # Delete values from fields
                 quick_exit_frame.grid_slaves(row=1, column=1)[0].delete(0, "end")
@@ -861,17 +800,17 @@ class ScreenPositions(object):
                     state="disabled"
                 )
 
-            elif order_type == 'Stop Loss Premium':
-
+            elif order_type == "Stop Loss Premium":
                 if current_position > 0:
                     buy_sell_action = "SELL"
                 else:
                     buy_sell_action = "BUY"
 
                 try:
-
                     # dict for combo prices
-                    local_unique_id_to_prices_dict = copy.deepcopy(variables.unique_id_to_prices_dict)
+                    local_unique_id_to_prices_dict = copy.deepcopy(
+                        variables.unique_id_to_prices_dict
+                    )
 
                     current_buy_price, current_sell_price = (
                         local_unique_id_to_prices_dict[unique_id]["BUY"],
@@ -881,55 +820,47 @@ class ScreenPositions(object):
                     current_price = (current_buy_price + current_sell_price) / 2
 
                 except Exception as e:
-
                     if variables.flag_debug_mode:
+                        print(
+                            f"Exception inside getting current price for stop loss premium, Exp: {e}"
+                        )
 
-                        print(f"Exception inside getting current price for stop loss premium, Exp: {e}")
-
-                    current_price = 'N/A'
+                    current_price = "N/A"
 
                 # Init
-                value_to_prefill = 'None'
+                value_to_prefill = "None"
 
-                net_premium = 'None'
+                net_premium = "None"
 
                 # getting value of trigger price to refill
-                if premium_dict != None and 'Stop Loss Premium' in premium_dict and is_float_upload_order(current_price):
-
-                    net_premium = premium_dict['Stop Loss Premium']
+                if (
+                    premium_dict != None
+                    and "Stop Loss Premium" in premium_dict
+                    and is_float_upload_order(current_price)
+                ):
+                    net_premium = premium_dict["Stop Loss Premium"]
 
                     # check if it is float
                     if is_float_upload_order(net_premium):
-
                         # get trigger price
-                        if buy_sell_action.upper() == 'BUY':
+                        if buy_sell_action.upper() == "BUY":
                             value_to_prefill = current_price + abs(net_premium)
 
                         else:
-
                             value_to_prefill = current_price - abs(net_premium)
 
                         value_to_prefill = round(value_to_prefill, 2)
 
                     else:
-
-                        value_to_prefill = 'N/A'
+                        value_to_prefill = "N/A"
 
                 else:
-
-                    value_to_prefill = 'N/A'
-
+                    value_to_prefill = "N/A"
 
                 # Make entry widget disabled
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
-                    state="normal"
-                )
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="normal")
 
                 # Delete values from fields
                 quick_exit_frame.grid_slaves(row=1, column=2)[0].delete(0, "end")
@@ -938,27 +869,32 @@ class ScreenPositions(object):
                 # Set fields to empty values
                 quick_exit_frame.grid_slaves(row=1, column=2)[0].insert(0, "")
 
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].insert(0, value_to_prefill)
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].insert(
+                    0, value_to_prefill
+                )
 
                 # Make entry widget selectively available
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="readonly")
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
+                    state="readonly"
+                )
                 quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
                     state="disabled"
                 )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="disabled")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
+                    state="disabled"
+                )
 
-
-            elif order_type == 'Trailing SL Premium':
-
+            elif order_type == "Trailing SL Premium":
                 if current_position > 0:
                     buy_sell_action = "SELL"
                 else:
                     buy_sell_action = "BUY"
 
                 try:
-
                     # dict for combo prices
-                    local_unique_id_to_prices_dict = copy.deepcopy(variables.unique_id_to_prices_dict)
+                    local_unique_id_to_prices_dict = copy.deepcopy(
+                        variables.unique_id_to_prices_dict
+                    )
 
                     current_buy_price, current_sell_price = (
                         local_unique_id_to_prices_dict[unique_id]["BUY"],
@@ -968,111 +904,105 @@ class ScreenPositions(object):
                     current_price = (current_buy_price + current_sell_price) / 2
 
                 except Exception as e:
-
                     if variables.flag_debug_mode:
+                        print(
+                            f"Exception inside getting current price for stop loss premium, Exp: {e}"
+                        )
 
-                        print(f"Exception inside getting current price for stop loss premium, Exp: {e}")
-
-                    current_price = 'N/A'
+                    current_price = "N/A"
 
                 # Init
-                value_to_prefill = 'None'
+                value_to_prefill = "None"
 
-                net_premium = 'None'
+                net_premium = "None"
 
                 # getting value of trigger price to refill
-                if premium_dict != None and 'Stop Loss Premium' in premium_dict and is_float_upload_order(current_price):
-
-                    net_premium = premium_dict['Stop Loss Premium']
+                if (
+                    premium_dict != None
+                    and "Stop Loss Premium" in premium_dict
+                    and is_float_upload_order(current_price)
+                ):
+                    net_premium = premium_dict["Stop Loss Premium"]
 
                     # check if it is float
                     if is_float_upload_order(net_premium):
-
-
                         value_to_prefill = abs(net_premium)
 
                         value_to_prefill = round(value_to_prefill, 2)
 
                     else:
-
-                        value_to_prefill = 'N/A'
+                        value_to_prefill = "N/A"
 
                 else:
-
-                    value_to_prefill = 'N/A'
-
+                    value_to_prefill = "N/A"
 
                 # Make entry widget disabled
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
-                    state="normal"
-                )
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="normal")
 
                 # Delete values from fields
                 quick_exit_frame.grid_slaves(row=1, column=1)[0].delete(0, "end")
                 quick_exit_frame.grid_slaves(row=1, column=2)[0].delete(0, "end")
                 # Set fields to empty values
-                quick_exit_frame.grid_slaves(row=1, column=2)[0].insert(0, value_to_prefill)
+                quick_exit_frame.grid_slaves(row=1, column=2)[0].insert(
+                    0, value_to_prefill
+                )
 
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].insert(0, '')
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].insert(0, "")
 
                 # Make entry widget selectively available
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="disabled")
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
+                    state="disabled"
+                )
                 quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
                     state="readonly"
                 )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="disabled")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
+                    state="disabled"
+                )
 
-            elif order_type == 'Stop Loss Candle':
-
+            elif order_type == "Stop Loss Candle":
                 if current_position > 0:
                     buy_sell_action = "SELL"
                 else:
                     buy_sell_action = "BUY"
 
                 # Init
-                value_to_prefill = 'N/A'
+                value_to_prefill = "N/A"
 
                 # get last candle high or low price
                 try:
-
                     # check if action is buy
-                    if buy_sell_action.upper() == 'BUY':
-
-                        value_to_prefill = variables.map_unique_id_to_candle_for_order_values[unique_id][
-                            'High Candle Value']
+                    if buy_sell_action.upper() == "BUY":
+                        value_to_prefill = (
+                            variables.map_unique_id_to_candle_for_order_values[
+                                unique_id
+                            ]["High Candle Value"]
+                        )
 
                     # if action is sell
                     else:
-
-                        value_to_prefill = variables.map_unique_id_to_candle_for_order_values[unique_id][
-                            'Low Candle Value']
+                        value_to_prefill = (
+                            variables.map_unique_id_to_candle_for_order_values[
+                                unique_id
+                            ]["Low Candle Value"]
+                        )
 
                 except Exception as e:
-
                     # Print to console
                     if variables.flag_debug_mode:
-                        print(f"Exception inside getting current price for stop loss premium, Exp: {e}")
+                        print(
+                            f"Exception inside getting current price for stop loss premium, Exp: {e}"
+                        )
 
                     # set value to N/A
-                    value_to_prefill = 'N/A'
-
+                    value_to_prefill = "N/A"
 
                 # Make entry widget disabled
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
-                    state="normal"
-                )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
-                    state="normal"
-                )
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=2)[0].config(state="normal")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="normal")
 
                 # Delete values from fields
                 quick_exit_frame.grid_slaves(row=1, column=2)[0].delete(0, "end")
@@ -1080,14 +1010,20 @@ class ScreenPositions(object):
                 # Set fields to empty values
                 quick_exit_frame.grid_slaves(row=1, column=2)[0].insert(0, "")
 
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].insert(0, value_to_prefill)
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].insert(
+                    0, value_to_prefill
+                )
 
                 # Make entry widget selectively available
-                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(state="readonly")
+                quick_exit_frame.grid_slaves(row=1, column=1)[0].config(
+                    state="readonly"
+                )
                 quick_exit_frame.grid_slaves(row=1, column=2)[0].config(
                     state="disabled"
                 )
-                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(state="disabled")
+                quick_exit_frame.grid_slaves(row=1, column=3)[0].config(
+                    state="disabled"
+                )
 
         # Bind the function to the ComboBoxSelected event
         order_type_options_combo_box.bind(
@@ -1107,7 +1043,6 @@ class ScreenPositions(object):
         current_position,
         account_id,
     ):
-
         # Getting the value out
         order_type = selected_order_type_option.get()
         trigger_price = quick_exit_frame.grid_slaves(row=1, column=1)[0].get().strip()
@@ -1120,11 +1055,9 @@ class ScreenPositions(object):
 
         # get boolean value for execution engine flag
         if execution_engine == "True":
-
             execution_engine = True
 
         else:
-
             execution_engine = False
 
         if current_position > 0:
@@ -1132,15 +1065,14 @@ class ScreenPositions(object):
         else:
             buy_sell_action = "BUY"
 
-        if order_type == 'Stop Loss Premium':
+        if order_type == "Stop Loss Premium":
+            order_type = "Stop Loss"
 
-            order_type = 'Stop Loss'
+        elif order_type == "Trailing SL Premium":
+            order_type = "Trailing Stop Loss"
 
-        elif order_type == 'Trailing SL Premium':
-            order_type = 'Trailing Stop Loss'
-
-        elif order_type == 'Stop Loss Candle':
-            order_type = 'Stop Loss'
+        elif order_type == "Stop Loss Candle":
+            order_type = "Stop Loss"
 
         # Getting Current buy, sell price for the combo
         current_price_unique_id = variables.unique_id_to_prices_dict[unique_id]
@@ -1193,7 +1125,6 @@ class ScreenPositions(object):
 
         # Stop Loss Orders
         if order_type == "Stop Loss":
-
             """try:
                 trigger_price = float(trigger_price)
             except Exception as e:
@@ -1205,7 +1136,6 @@ class ScreenPositions(object):
 
             # Check if both trigger price and atr multiple is filled
             if trigger_price != "" and atr_multiple != "":
-
                 error_title = "Invalid combination of values"
                 error_string = (
                     "Values for both Trigger Price and ATR Multiple must not be filled."
@@ -1216,7 +1146,6 @@ class ScreenPositions(object):
 
             # Check if both trigger price and atr multiple is empty
             elif trigger_price == "" and atr_multiple == "":
-
                 error_title = "Invalid combination of values"
                 error_string = (
                     "Values for both Trigger Price and ATR Multiple must not be empty."
@@ -1245,14 +1174,12 @@ class ScreenPositions(object):
 
             # Check if atr multiple is valid and have valid trigger price value
             elif trigger_price == "" and atr_multiple != "":
-
                 # checking if atr multiple value is valid
                 try:
                     atr_multiple = float(atr_multiple)
 
                     # check if atrr multiple is less than or equal to zero
                     if atr_multiple <= 0:
-
                         raise Exception("Invalid ATR Multiple")
 
                 except Exception as e:
@@ -1287,18 +1214,15 @@ class ScreenPositions(object):
 
                     # When action is BUY
                     if buy_sell_action == "BUY":
-
                         # Get trigger price
                         trigger_price = avg_price_combo + atr_multiple * atr
 
                     # When action is SELL
                     elif buy_sell_action == "SELL":
-
                         # Get trigger price
                         trigger_price = avg_price_combo - atr_multiple * atr
 
                 except Exception as e:
-
                     error_title = "Invalid Trigger Price"
                     error_string = f"Unable to get valid Trigger Price based on ATR Multiple: {atr_multiple}, \nATR: {atr} and Avg Price for Combo: {avg_price_combo} "
 
@@ -1325,10 +1249,8 @@ class ScreenPositions(object):
 
         # Trailing Stop Loss Orders
         elif order_type == "Trailing Stop Loss":
-
             # check if both trail value and atr multiple is filled
             if trail_value != "" and atr_multiple != "":
-
                 error_title = "Invalid combination of values"
                 error_string = (
                     "Values for both Trail Value and ATR Multiple must not be filled."
@@ -1339,7 +1261,6 @@ class ScreenPositions(object):
 
             # Check if both trail value and atr multiple is empty
             elif trail_value == "" and atr_multiple == "":
-
                 error_title = "Invalid combination of values"
                 error_string = (
                     "Values for both Trail Value and ATR Multiple must not be empty."
@@ -1368,14 +1289,12 @@ class ScreenPositions(object):
 
             # Check if atr multiple is valid and get valid trail value
             elif trail_value == "" and atr_multiple != "":
-
                 # checking if atr multiple value is valid
                 try:
                     atr_multiple = float(atr_multiple)
 
                     # check if atr multiple is less than or equal to zero
                     if atr_multiple <= 0:
-
                         raise Exception("Invalid ATR Multiple")
 
                 except Exception as e:
@@ -1402,7 +1321,6 @@ class ScreenPositions(object):
 
                 # checking if trail value calcualtions are valid
                 try:
-
                     # Get trigger price
                     trail_value = atr_multiple * atr
 
@@ -1459,7 +1377,6 @@ class ScreenPositions(object):
 
     # Method to insert rows in positions table
     def insert_positions_in_positions_table(self, value):
-
         # unique_id
         unique_id = value[0]
 
@@ -1499,7 +1416,6 @@ class ScreenPositions(object):
     def update_positions_in_positions_table(
         self, unique_id_account_id_combined, positions
     ):
-
         # Set the value to 1 where id column is 4
         variables.positions_table_dataframe.loc[
             variables.positions_table_dataframe["Account ID Unique ID Combo"]
@@ -1565,7 +1481,6 @@ class ScreenPositions(object):
             str(unique_id_account_id_combined) in unique_id_account_id_combined_in_table
             and positions != 0
         ):
-
             self.positions_table.set(unique_id_account_id_combined, 3, positions)
 
         # Check if row is present in table and position is zero
@@ -1573,7 +1488,6 @@ class ScreenPositions(object):
             str(unique_id_account_id_combined) in unique_id_account_id_combined_in_table
             and positions == 0
         ):
-
             self.positions_table.delete(unique_id_account_id_combined)
 
         # Check if row is not present in table and position is non zero
@@ -1582,12 +1496,10 @@ class ScreenPositions(object):
             and account_id in all_account_ids_in_account_group
             and positions != 0
         ):
-
             self.insert_positions_in_positions_table(row_tuple)
 
     # Method to update position table
     def update_positions_table_watchlist_changed(self):
-
         # All the Unique IDs in the System
         # Get combo details dataframe
         local_positions_details_df = copy.deepcopy(variables.positions_table_dataframe)
@@ -1650,7 +1562,6 @@ class ScreenPositions(object):
         # print(all_account_ids_in_account_group)
         # Update the rows
         for i, row_val in local_positions_details_df.iterrows():
-
             # Unique ID of row val
             unique_id = row_val["Unique ID"]
 
@@ -1668,7 +1579,6 @@ class ScreenPositions(object):
                 and account_id in all_account_ids_in_account_group
                 and net_position != 0
             ):
-
                 # Tuple of vals
                 row_val = tuple(row_val)
 
@@ -1723,7 +1633,6 @@ class ScreenPositions(object):
 
         # Move According to data Color here, Change Color
         for i, row in local_positions_details_df.iterrows():
-
             # Unique_id
             unique_id = str(row["Unique ID"])
 
@@ -1738,12 +1647,10 @@ class ScreenPositions(object):
                 self.positions_table.move(account_id_unique_id_combo, "", counter_row)
 
                 if counter_row % 2 == 0:
-
                     self.positions_table.item(
                         account_id_unique_id_combo, tags="evenrow"
                     )
                 else:
-
                     self.positions_table.item(account_id_unique_id_combo, tags="oddrow")
 
                 # Increase row count

@@ -3,15 +3,15 @@ Created on 15-Mar-2023
 
 @author: Karan
 """
+
 from com.leg import *
 from com.variables import *
 
+
 # Create class
 class Combination(object):
-
     # Initial function of class
     def __init__(self, unique_id, leg_obj_list):
-
         # Init
         self.unique_id = int(unique_id)
         self.buy_legs = []
@@ -19,7 +19,6 @@ class Combination(object):
 
         # Iterate leg objects
         for leg_obj in leg_obj_list:
-
             # if action if buy
             if leg_obj.action == "BUY":
                 self.buy_legs.append(leg_obj)
@@ -27,7 +26,6 @@ class Combination(object):
             elif leg_obj.action == "SELL":
                 self.sell_legs.append(leg_obj)
             else:
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print(
@@ -36,7 +34,6 @@ class Combination(object):
 
     # get str value
     def __str__(self):
-
         # Init
         buy_legs_str = "\n\t".join([str(leg) for leg in self.buy_legs])
         sell_legs_str = "\n\t".join([str(leg) for leg in self.sell_legs])
@@ -47,7 +44,6 @@ class Combination(object):
 
 # Informative String for combination Object, used in Screen Gui, as well as in Price Chart
 def make_informative_combo_string(combination_obj, need_legs_desc=False):
-
     # Ticker 1 (Sec Type 1: Expiry 1 C/P Strike 1) +/- Qty 1,
     # Tickers Informative string
     combo_desc_string = ""
@@ -60,7 +56,6 @@ def make_informative_combo_string(combination_obj, need_legs_desc=False):
 
     # Processing Leg Obj and appending to combo_desc_string
     for leg_no, leg_obj in enumerate(all_leg_objs):
-
         # Symbol and SecType
         combo_desc_string += f"{leg_obj.symbol} ({leg_obj.sec_type}"
 
@@ -75,7 +70,6 @@ def make_informative_combo_string(combination_obj, need_legs_desc=False):
 
         # Buy/Sell +1 or -1
         if leg_obj.action == "BUY":
-
             # check if it is last leg
             if leg_no == len(all_leg_objs) - 1:
                 combo_desc_string += f") +{leg_obj.quantity}"
@@ -95,16 +89,12 @@ def make_informative_combo_string(combination_obj, need_legs_desc=False):
 def get_combination_details_list_for_combination_tab_gui(
     unique_id, cas_condition=False
 ):
-
     try:
-
         # If Incremental legs are needed
         if cas_condition:
-
             # Get CAS Legs Combo Object
             combo_obj = variables.cas_unique_id_to_combo_obj[unique_id]
         else:
-
             # Get Active Combo Object
             combo_obj = variables.unique_id_to_combo_obj[unique_id]
 
@@ -133,7 +123,6 @@ def get_combination_details_list_for_combination_tab_gui(
 
     # Processing legs and getting data for row.
     for leg_obj in all_legs:
-
         # Init
         action = leg_obj.action
         symbol = leg_obj.symbol

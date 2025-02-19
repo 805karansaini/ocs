@@ -20,7 +20,9 @@ class HouseKeepingGUI:
         scanner_inputs_tab_obj,
     ):
         # Get the Instrument from instrument table
-        all_instruments = SqlQueries.select_from_db_table(table_name="instrument_table", columns="*")
+        all_instruments = SqlQueries.select_from_db_table(
+            table_name="instrument_table", columns="*"
+        )
 
         # Insert the preset orders in the preset order tab[table]
         for values_dict in all_instruments:
@@ -34,7 +36,9 @@ class HouseKeepingGUI:
         scanner_combination_tab_obj,
     ):
         # Get the Combintaion from combintation tabl
-        all_combinations = SqlQueries.select_from_db_table(table_name="combination_table", columns="*")
+        all_combinations = SqlQueries.select_from_db_table(
+            table_name="combination_table", columns="*"
+        )
 
         # Get the Combintaion Leg from legs table
         all_legs = SqlQueries.select_from_db_table(table_name="legs_table", columns="*")
@@ -55,7 +59,6 @@ class HouseKeepingGUI:
 
         # Iterating over all the combinations
         for combination in all_combinations:
-            
             try:
                 combo_id = int(combination["combo_id"])
                 legs = int(combination["number_of_legs"])
@@ -75,7 +78,9 @@ class HouseKeepingGUI:
                 scanner_combination_object = ScannerCombination(combination)
 
                 # Insert the Scanner combination in GUI
-                scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
+                scanner_combination_tab_obj.insert_combination_in_scanner_combination_table_gui(
+                    scanner_combination_object
+                )
             except Exception as e:
                 print(e)
 
@@ -84,10 +89,11 @@ class HouseKeepingGUI:
         scanner_indicator_tab_obj,
     ):
         # Get the Indicators from Indicator table
-        all_indicator = SqlQueries.select_from_db_table(table_name="indicator_table", columns="*")
+        all_indicator = SqlQueries.select_from_db_table(
+            table_name="indicator_table", columns="*"
+        )
 
         for values_dict in all_indicator:
-
             indicator_obj = Indicator(values_dict)  # Mapping
 
             ### Add in the Indicator table
@@ -98,13 +104,16 @@ class HouseKeepingGUI:
         scanner_inputs_tab_obj=None,
     ):
         # Get the config from Config Table
-        all_config = SqlQueries.select_from_db_table(table_name="config_table", columns="*")
+        all_config = SqlQueries.select_from_db_table(
+            table_name="config_table", columns="*"
+        )
 
         # Get the config leg wise from Config Legs table
-        all_legs_config = SqlQueries.select_from_db_table(table_name="config_legs_table", columns="*")
+        all_legs_config = SqlQueries.select_from_db_table(
+            table_name="config_legs_table", columns="*"
+        )
 
         for config_dict in all_config:
-
             list_of_config_leg_object = []
             # Insert the preset orders in the preset order tab[table]
             for config_leg_dict in all_legs_config:

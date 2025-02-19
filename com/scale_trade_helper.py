@@ -19,14 +19,12 @@ def is_float(value):
         return True
 
     except Exception as e:
-
         # Return false if value cannot be converted to float
         return False
 
 
 # Fill scale trade table in GUI at start of app
 def insert_all_scale_trades_in_scale_trader_table():
-
     try:
         # Get all ladder rows from DB
         variables.scale_trade_table_dataframe = get_primary_vars_db(
@@ -35,7 +33,6 @@ def insert_all_scale_trades_in_scale_trader_table():
 
         # check if dataframe is empty
         if variables.scale_trade_table_dataframe.empty:
-
             # Return if dataframe is empty
             return
 
@@ -44,25 +41,20 @@ def insert_all_scale_trades_in_scale_trader_table():
 
         # Fill scale trade GUI table in scale trade tab
         for row_values in all_row_values:
-
             # Add row in scale trade table
             variables.screen.screen_scale_trader_obj.insert_scale_trade_in_scale_trader_table(
                 row_values
             )
 
     except Exception as e:
-
         # Print to Console
         if variables.flag_debug_mode:
-
             print(f"Could not filled scale trader GUI table")
 
 
 # Method to get ladder objects from DB -
 def get_ladder_id_ladder_obj_dict(ladder_id_to_sequence_obj_dict):
-
     try:
-
         # Get dataframe from ladder table
         ladder_table_dataframe = get_primary_vars_db(variables.sql_table_ladder)
 
@@ -71,14 +63,12 @@ def get_ladder_id_ladder_obj_dict(ladder_id_to_sequence_obj_dict):
 
         # Iterating all rows in ladder table as list
         for ladder_table_row in ladder_table_rows_list:
-
             # Getting values for ladder id and unique id
             ladder_id = int(float(ladder_table_row[0]))
             unique_id = int(float(ladder_table_row[1]))
 
             # Check if the key unique id exists in the dictionary
             if not unique_id in variables.map_unique_id_to_ladder_ids_list:
-
                 variables.map_unique_id_to_ladder_ids_list[unique_id] = []
 
             # Map unique id to ladder
@@ -97,18 +87,14 @@ def get_ladder_id_ladder_obj_dict(ladder_id_to_sequence_obj_dict):
             variables.map_ladder_id_to_ladder_obj[ladder_id] = ladder_obj
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(f"Exception inside 'get_ladder_id_ladder_obj_dict', Exp: {e}")
 
 
 # Method to get sequence objects from DB
 def get_sequence_obj_dict():
-
     try:
-
         # Get dataframe from sequence table
         sequence_table_dataframe = get_primary_vars_db(variables.sql_table_sequence)
 
@@ -120,7 +106,6 @@ def get_sequence_obj_dict():
 
         # Iterating all rows in sequence table as list
         for sequence_table_row in sequence_table_rows_list:
-
             # Getting values for ladder id, sequence id and sequence type
             ladder_id = int(float(sequence_table_row[2]))
             sequence_id = int(float(sequence_table_row[0]))
@@ -128,7 +113,6 @@ def get_sequence_obj_dict():
 
             # Check if ladder id is not in dictionary
             if ladder_id not in sequence_obj_dict:
-
                 # Put ladder id in dict as key
                 sequence_obj_dict[ladder_id] = []
 
@@ -141,10 +125,8 @@ def get_sequence_obj_dict():
         return sequence_obj_dict
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(f"Exception inside 'get_sequence_obj_dict', Exp: {e}")
 
 
@@ -162,7 +144,6 @@ def cancel_all_orders_from_scale_trade_after_restart():
 
         # If dataframe is empty
         if local_orders_book_table_dataframe.empty:
-
             # Then initialize with columns
             local_orders_book_table_dataframe = pd.DataFrame(
                 columns=variables.order_book_table_columns
@@ -176,18 +157,14 @@ def cancel_all_orders_from_scale_trade_after_restart():
 
         # Iterate order row values
         for [order_time, status, ladder_id, sequence_id] in order_row_values:
-
             # check if status is pending
             if status == "Pending":
-
                 # Cancel order
                 variables.screen.cancel_order(order_time)
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f"Exception inside 'cancel_all_orders_from_scale_trade_after_restart', Exp: {e}"
             )
@@ -195,7 +172,6 @@ def cancel_all_orders_from_scale_trade_after_restart():
 
 # Method to cancel orders based on ladder id
 def cancel_orders_of_ladder_id_or_sequence_id(ladder_id=None, sequence_id=None):
-
     try:
         # Get all orders dataframe
         local_orders_book_table_dataframe = get_primary_vars_db(
@@ -204,7 +180,6 @@ def cancel_orders_of_ladder_id_or_sequence_id(ladder_id=None, sequence_id=None):
 
         # If dataframe is empty
         if local_orders_book_table_dataframe.empty:
-
             # Then initialize with columns
             local_orders_book_table_dataframe = pd.DataFrame(
                 columns=variables.order_book_table_columns
@@ -212,11 +187,10 @@ def cancel_orders_of_ladder_id_or_sequence_id(ladder_id=None, sequence_id=None):
 
         # Check if ladder id is not none
         if ladder_id != None:
-
             # convert ladder id column to string format
-            local_orders_book_table_dataframe[
-                "Ladder ID"
-            ] = local_orders_book_table_dataframe["Ladder ID"].astype(str)
+            local_orders_book_table_dataframe["Ladder ID"] = (
+                local_orders_book_table_dataframe["Ladder ID"].astype(str)
+            )
 
             # Filter the rows for 'ladder id' and get the value of 'order time' column
             order_time_status_values = local_orders_book_table_dataframe.loc[
@@ -226,11 +200,10 @@ def cancel_orders_of_ladder_id_or_sequence_id(ladder_id=None, sequence_id=None):
 
         # Check if sequence id is not none
         if sequence_id != None:
-
             # convert ladder id column to string format
-            local_orders_book_table_dataframe[
-                "Sequence ID"
-            ] = local_orders_book_table_dataframe["Sequence ID"].astype(str)
+            local_orders_book_table_dataframe["Sequence ID"] = (
+                local_orders_book_table_dataframe["Sequence ID"].astype(str)
+            )
 
             # Filter the rows for 'ladder id' and get the value of 'order time' column
             order_time_status_values = local_orders_book_table_dataframe.loc[
@@ -240,22 +213,18 @@ def cancel_orders_of_ladder_id_or_sequence_id(ladder_id=None, sequence_id=None):
 
         # Iterate order time and status values
         for order_time_and_status in order_time_status_values:
-
             # Get order time and status
             order_time = order_time_and_status[0]
             status = order_time_and_status[1]
 
             # check if status is pending
             if status == "Pending":
-
                 # Cancel order
                 variables.screen.cancel_order(order_time)
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(f"Exception inside 'cancel_orders_of_ladder_id', Exp: {e}")
 
 
@@ -273,13 +242,11 @@ def pause_all_active_ladders_after_restart():
 
     # Iterate each ladder id
     for ladder_id in all_ladder_ids_in_system:
-
         # Get ladder obj
         ladder_obj = local_map_ladder_id_to_ladder_obj[ladder_id]
 
         # Check if ladder pbject's status is active
         if ladder_obj.status == "Active":
-
             # Update status of ladder
             variables.screen.screen_scale_trader_obj.update_ladder_status(
                 ladder_id, "Paused"
@@ -288,7 +255,6 @@ def pause_all_active_ladders_after_restart():
 
 # Method to update order status for scale trade
 def update_order_status_for_scale_trade():
-
     # Get all the sequence Number which are Active.
     # Get all the orders from db table which corresponds to seqID
 
@@ -330,7 +296,6 @@ def update_order_status_for_scale_trade():
 
         # Check if Sent order is filled.
         for _, row in all_orders_for_active_sequence.iterrows():
-
             # print("Sequence ID", row['Sequence ID'] , row['Status'] )
 
             if row["Status"] == "Filled":
@@ -339,7 +304,6 @@ def update_order_status_for_scale_trade():
 
                 # Check if order is originated from scale trade
                 if ladder_id != "None":
-
                     # Method to update scale trade after order filled for scale trade
                     # Send order in a separate thread
                     """rm_check_thread = threading.Thread(
@@ -373,7 +337,7 @@ def create_ladder_and_sequences(
     account_id,
     bypass_rm_check,
     flag_use_execution_engine=False,
-        schedule_data = None,
+    schedule_data=None,
 ):
     try:
         # Initializing dictionary to map all column names in DB to its values
@@ -418,7 +382,6 @@ def create_ladder_and_sequences(
         for column_name, column_value in zip(
             scale_trader_table_columns, scale_trade_values_list
         ):
-
             scale_trade_values_dict[column_name] = column_value
 
         # Add scale trade instance and values
@@ -443,7 +406,6 @@ def create_ladder_and_sequences(
 
         # Checking if list of sequences is None
         if list_of_sequences == None:
-
             # Show an error popup unable to create a scale trader.
             error_title, error_string = "Error, Could not get sequences"
 
@@ -465,7 +427,6 @@ def create_ladder_and_sequences(
 
         # Iterating sequences
         for sequence in list_of_sequences:
-
             # Create sequence object
             sequence_obj = Sequence(*sequence)
 
@@ -517,7 +478,6 @@ def create_ladder_and_sequences(
 
         # Check if the key unique id exists in the dictionary
         if not unique_id in variables.map_unique_id_to_ladder_ids_list:
-
             variables.map_unique_id_to_ladder_ids_list[unique_id] = []
 
         # Map unique id to ladder
@@ -560,9 +520,7 @@ def create_ladder_and_sequences(
         )
 
     except Exception as e:
-
         if variables.flag_debug_mode:
-
             print(f"Exception inside 'create_ladder_and_sequences', Exp: {e}")
 
         return None
@@ -581,9 +539,8 @@ def create_entry_sequences_for_scale_trade(
     initial_entry_price,
     delta_price,
     price_movement,
-schedule_data=None,
+    schedule_data=None,
 ):
-
     # Create list of sequences
     sequences_for_scale_trade = []
 
@@ -603,32 +560,30 @@ schedule_data=None,
     filled_quantity = 0
     sequence_status = "Active"
 
-    percentage_list = ['None']
+    percentage_list = ["None"]
 
     if schedule_data != None:
-
-
         # get df
-        pair_df = schedule_data['Percentage Lots Pair']
+        pair_df = schedule_data["Percentage Lots Pair"]
 
         # sorrt df based on action and price movement
-        if action == 'BUY' and price_movement == 'Better':
+        if action == "BUY" and price_movement == "Better":
             # Sorting the DataFrame based on column in reverse order
-            pair_df = pair_df.sort_values(by='Percentage', ascending=False)
+            pair_df = pair_df.sort_values(by="Percentage", ascending=False)
 
-        elif action == 'BUY' and price_movement == 'Worse':
+        elif action == "BUY" and price_movement == "Worse":
             # Sorting the DataFrame based on column in reverse order
-            pair_df = pair_df.sort_values(by='Percentage', ascending=True)
+            pair_df = pair_df.sort_values(by="Percentage", ascending=True)
 
-        elif action == 'SELL' and price_movement == 'Better':
+        elif action == "SELL" and price_movement == "Better":
             # Sorting the DataFrame based on column in reverse order
-            pair_df = pair_df.sort_values(by='Percentage', ascending=True)
+            pair_df = pair_df.sort_values(by="Percentage", ascending=True)
 
         else:
             # Sorting the DataFrame based on column in reverse order
-            pair_df = pair_df.sort_values(by='Percentage', ascending=False)
+            pair_df = pair_df.sort_values(by="Percentage", ascending=False)
 
-        percentage_list = pair_df['Percentage'].to_list()
+        percentage_list = pair_df["Percentage"].to_list()
 
     # Append initial entry order to list
     initial_entry_sequence = [
@@ -651,7 +606,6 @@ schedule_data=None,
     sequences_for_scale_trade.append(initial_entry_sequence)
 
     try:
-
         # Get total quantity remained to trade
         total_quantity_remaining = total_quantity - initial_quantity
 
@@ -660,12 +614,9 @@ schedule_data=None,
 
         # If number of buckets is not none
         if number_of_buckets != "None":
-
             # Get subsequent qauntity for each bucket
             for bucket_number in range(2, number_of_buckets + 1):
-
                 if bucket_number != number_of_buckets:
-
                     # Get round value of subsequent qauntity in case for number of buckets value is not None
                     round_subsequent_quantity_for_sequences = round(
                         total_quantity_remaining
@@ -681,7 +632,6 @@ schedule_data=None,
                     total_quantity_remaining -= round_subsequent_quantity_for_sequences
 
                 elif total_quantity_remaining != 0:
-
                     # Sort list
                     subsequent_quantitities_list.sort(reverse=True)
 
@@ -690,7 +640,6 @@ schedule_data=None,
 
         # If subsequent_quantity is not none
         elif subsequent_quantity != "None":
-
             # Getting subsequent quantities for sequences after initial sequence and before last sequence in case of number of buckets is not none
             subsequent_quantitities_list = [subsequent_quantity] * (
                 total_quantity_remaining // (subsequent_quantity)
@@ -698,7 +647,6 @@ schedule_data=None,
 
             # If there is no remaining quantity to trade
             if total_quantity_remaining % subsequent_quantity != 0:
-
                 # Getting subsequent quantity for last sequence in case of number of buckets is not none
                 subsequent_quantitities_list.append(
                     (total_quantity_remaining % (subsequent_quantity))
@@ -706,25 +654,20 @@ schedule_data=None,
 
         # If None values for both subsequent quantity and number of buckets
         else:
-
             return None
 
         # Check if price movement is better
-        if price_movement == "Better" and delta_price not in ['None', None]:
-
+        if price_movement == "Better" and delta_price not in ["None", None]:
             # Check if action is BUY
             if action == "BUY":
-
                 delta_price *= -1
             else:
                 delta_price = delta_price
 
         # Check if price movement is worse
-        elif price_movement == "Worse" and delta_price not in ['None', None]:
-
+        elif price_movement == "Worse" and delta_price not in ["None", None]:
             # Check if action is SELL
             if action == "SELL":
-
                 delta_price *= -1
             else:
                 delta_price = delta_price
@@ -735,24 +678,24 @@ schedule_data=None,
         # Init
         price_list = subsequent_quantitities_list
 
-        percentage_list = ['None'] * len(subsequent_quantitities_list)
+        percentage_list = ["None"] * len(subsequent_quantitities_list)
 
         if schedule_data != None:
-
-            percentage_list = pair_df['Percentage'].to_list()[1:]
+            percentage_list = pair_df["Percentage"].to_list()[1:]
 
             # get lots for subsequent orders and prices
-            subsequent_quantitities_list = pair_df['#Lots'].to_list()[1:]
-            price_list = pair_df['Price'].to_list()[1:]
-
+            subsequent_quantitities_list = pair_df["#Lots"].to_list()[1:]
+            price_list = pair_df["Price"].to_list()[1:]
 
         # Get subsequent sequences obj for scale trade and Multiplier for delta price
-        for multiplier_for_delta_price, (current_subsequent_quantity, price_for_seq, percentage) in enumerate(
+        for multiplier_for_delta_price, (
+            current_subsequent_quantity,
+            price_for_seq,
+            percentage,
+        ) in enumerate(
             zip(subsequent_quantitities_list, price_list, percentage_list), start=1
         ):
-
             if current_subsequent_quantity == 0:
-
                 continue
 
             # Get max sequence_id present
@@ -763,7 +706,6 @@ schedule_data=None,
 
             # insert sequence for other order than reange schedule orders
             if schedule_data == None:
-
                 # Create subsequent sequences
                 subsequent_entry_sequence = [
                     sequence_id,
@@ -778,7 +720,7 @@ schedule_data=None,
                     last_update_time,
                     filled_quantity,
                     sequence_status,
-                    percentage
+                    percentage,
                 ]
 
             else:
@@ -796,9 +738,8 @@ schedule_data=None,
                     last_update_time,
                     filled_quantity,
                     sequence_status,
-                    percentage
+                    percentage,
                 ]
-
 
             # Append to list
             sequences_for_scale_trade.append(subsequent_entry_sequence)
@@ -807,6 +748,5 @@ schedule_data=None,
         return sequences_for_scale_trade
 
     except Exception as e:
-
         # Return None id exception occurs
         return None

@@ -1,8 +1,8 @@
 from com.variables import *
 
+
 # Creating class for sequence objects
 class Sequence(object):
-
     # Defining constructor -
     def __init__(
         self,
@@ -20,7 +20,6 @@ class Sequence(object):
         status=None,
         percentage=None,
     ):
-
         # Setting attributes for sequence object
         self.sequence_id = sequence_id
         self.sequence_type = sequence_type
@@ -44,7 +43,6 @@ class Sequence(object):
 
     # Get all atributes in list format
     def get_list_of_sequence_values(self):
-
         return [
             self.sequence_id,
             self.sequence_type,
@@ -58,5 +56,5 @@ class Sequence(object):
             self.last_update_time,
             self.filled_quantity,
             self.status,
-            self.percentage
+            self.percentage,
         ]

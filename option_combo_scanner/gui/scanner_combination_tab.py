@@ -16,9 +16,13 @@ from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
 from option_combo_scanner.gui.utils import Utils
-from option_combo_scanner.indicators_calculator.market_data_fetcher import MarketDataFetcher
+from option_combo_scanner.indicators_calculator.market_data_fetcher import (
+    MarketDataFetcher,
+)
 from option_combo_scanner.strategy.scanner import Scanner
-from option_combo_scanner.strategy.scanner_combination import get_scanner_combination_details_column_and_data_from_combo_object
+from option_combo_scanner.strategy.scanner_combination import (
+    get_scanner_combination_details_column_and_data_from_combo_object,
+)
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
 logger = CustomLogger.logger
@@ -60,13 +64,14 @@ class ScannerCombinationTab:
         Utils.scanner_combination_tab_object = self
 
     def create_scanner_combination_tab(self):
-
         # Create Treeview Frame for active Filter DropDown
         scanner_filter_frame = ttk.Frame(self.scanner_combination_tab_frame, padding=20)
         scanner_filter_frame.pack(pady=20)
 
         # Label for filter used in max profit
-        filter_label_max_profit = ttk.Label(scanner_filter_frame, text="Filter Max Profit", anchor="center", width=14)
+        filter_label_max_profit = ttk.Label(
+            scanner_filter_frame, text="Filter Max Profit", anchor="center", width=14
+        )
         filter_label_max_profit.grid(column=0, row=0, padx=5, pady=(0, 5), sticky="n")
 
         # Filter Dropdown for Max Profit
@@ -81,10 +86,14 @@ class ScannerCombinationTab:
         self.filter_dropdown_max_profit.grid(column=0, row=1, padx=5, pady=5)
 
         # Bind Filter function Based on MAx Profit
-        self.filter_dropdown_max_profit.bind("<<ComboboxSelected>>", self.filter_combo_based_on_max_loss_and_max_profit)
+        self.filter_dropdown_max_profit.bind(
+            "<<ComboboxSelected>>", self.filter_combo_based_on_max_loss_and_max_profit
+        )
 
         # Label for filter used in max loss
-        filter_label_max_loss = ttk.Label(scanner_filter_frame, text="Filter Max Loss", anchor="center", width=13)
+        filter_label_max_loss = ttk.Label(
+            scanner_filter_frame, text="Filter Max Loss", anchor="center", width=13
+        )
         filter_label_max_loss.grid(column=1, row=0, padx=5, pady=(0, 5), sticky="n")
 
         # Filter Dropdown for Max Loss
@@ -99,14 +108,18 @@ class ScannerCombinationTab:
         self.filter_dropdown_max_loss.grid(column=1, row=1, padx=5, pady=5)
 
         # Bind Filter function Based on MAx Loss
-        self.filter_dropdown_max_loss.bind("<<ComboboxSelected>>", self.filter_combo_based_on_max_loss_and_max_profit)
+        self.filter_dropdown_max_loss.bind(
+            "<<ComboboxSelected>>", self.filter_combo_based_on_max_loss_and_max_profit
+        )
 
         # Place in center for filter frame
         scanner_filter_frame.place(relx=0.5, anchor=tk.CENTER)
         scanner_filter_frame.place(y=30)
 
         # Create Treeview Frame for active combo table
-        scanner_combination_table_frame = ttk.Frame(self.scanner_combination_tab_frame, padding=20)
+        scanner_combination_table_frame = ttk.Frame(
+            self.scanner_combination_tab_frame, padding=20
+        )
         scanner_combination_table_frame.pack(pady=20)
 
         # Place in center
@@ -136,7 +149,9 @@ class ScannerCombinationTab:
         tree_scroll_x.config(command=self.scanner_combination_table.xview)
 
         # Column in Combination table
-        self.scanner_combination_table["columns"] = [_[0] for _ in scanner_combination_table_columns_width]
+        self.scanner_combination_table["columns"] = [
+            _[0] for _ in scanner_combination_table_columns_width
+        ]
 
         # Creating Columns
         self.scanner_combination_table.column("#0", width=0, stretch="no")
@@ -151,13 +166,17 @@ class ScannerCombinationTab:
                 minwidth=col_width,
                 stretch=False,
             )
-            self.scanner_combination_table.heading(col_name, text=col_heading, anchor="center")
+            self.scanner_combination_table.heading(
+                col_name, text=col_heading, anchor="center"
+            )
 
         # Back ground
         self.scanner_combination_table.tag_configure("oddrow", background="white")
         self.scanner_combination_table.tag_configure("evenrow", background="lightblue")
 
-        self.scanner_combination_table.bind("<Button-3>", self.scanner_combination_table_right_click_menu)
+        self.scanner_combination_table.bind(
+            "<Button-3>", self.scanner_combination_table_right_click_menu
+        )
 
         # Bind the sort_treeview function to the TreeviewColumnHeader event for each column
         for column in self.scanner_combination_table["columns"]:
@@ -173,17 +192,23 @@ class ScannerCombinationTab:
         # Get the selected value from the dropdown
         max_profit_selected_option = self.filter_max_profit_var.get().upper()
 
-        local_scanner_combo_table_df = copy.deepcopy(StrategyVariables.scanner_combo_table_df)
+        local_scanner_combo_table_df = copy.deepcopy(
+            StrategyVariables.scanner_combo_table_df
+        )
 
         # print(f"\nRaw")
         # print(local_scanner_combo_table_df.to_string())
         # Filter dataframe here
         if max_profit_selected_option == "UNLIMITED":
             # Filter for cases where max loss is within the specified range
-            local_scanner_combo_table_df = local_scanner_combo_table_df[local_scanner_combo_table_df["Max Profit"] == float("inf")]
+            local_scanner_combo_table_df = local_scanner_combo_table_df[
+                local_scanner_combo_table_df["Max Profit"] == float("inf")
+            ]
         elif max_profit_selected_option == "LIMITED":
             # Filter for cases where max loss is within the specified range
-            local_scanner_combo_table_df = local_scanner_combo_table_df[local_scanner_combo_table_df["Max Profit"] != float("inf")]
+            local_scanner_combo_table_df = local_scanner_combo_table_df[
+                local_scanner_combo_table_df["Max Profit"] != float("inf")
+            ]
         else:
             pass
         # print(f"\nMax Profit")
@@ -192,10 +217,14 @@ class ScannerCombinationTab:
         # Filter dataframe here
         if max_loss_selected_option == "UNLIMITED":
             # Filter for cases where max loss is within the specified range
-            local_scanner_combo_table_df = local_scanner_combo_table_df[local_scanner_combo_table_df["Max Loss"] == float("-inf")]
+            local_scanner_combo_table_df = local_scanner_combo_table_df[
+                local_scanner_combo_table_df["Max Loss"] == float("-inf")
+            ]
         elif max_loss_selected_option == "LIMITED":
             # Filter for cases where max loss is within the specified range
-            local_scanner_combo_table_df = local_scanner_combo_table_df[local_scanner_combo_table_df["Max Loss"] != float("-inf")]
+            local_scanner_combo_table_df = local_scanner_combo_table_df[
+                local_scanner_combo_table_df["Max Loss"] != float("-inf")
+            ]
         else:
             pass
 
@@ -203,15 +232,23 @@ class ScannerCombinationTab:
         # print(local_scanner_combo_table_df.to_string())
 
         # Clear table
-        self.scanner_combination_table.delete(*self.scanner_combination_table.get_children())
+        self.scanner_combination_table.delete(
+            *self.scanner_combination_table.get_children()
+        )
 
-        list_of_all_filtered_combo_ids = local_scanner_combo_table_df["Combo ID"].to_list()
+        list_of_all_filtered_combo_ids = local_scanner_combo_table_df[
+            "Combo ID"
+        ].to_list()
 
         # Sort the dataframe according to the header
         for combo_id in list_of_all_filtered_combo_ids:
             combo_id = int(combo_id)
-            scanner_combination_object = StrategyVariables.map_combo_id_to_scanner_combination_object[combo_id]
-            self.insert_combination_in_scanner_combination_table_gui(scanner_combination_object)
+            scanner_combination_object = (
+                StrategyVariables.map_combo_id_to_scanner_combination_object[combo_id]
+            )
+            self.insert_combination_in_scanner_combination_table_gui(
+                scanner_combination_object
+            )
 
     # def clear_order_book_table(self):
     #     # Set FlagPurged = 1 for all Filled or Cancelled orders
@@ -219,7 +256,9 @@ class ScannerCombinationTab:
     #     where_clause = "WHERE OrderStatus = 'Filled' OR OrderStatus = 'Cancelled' OR OrderStatus = 'Inactive'"
     #     SqlQueries.update_orders(data, where_clause=where_clause)
 
-    def insert_combination_in_scanner_combination_table_gui(self, scanner_combination_object):
+    def insert_combination_in_scanner_combination_table_gui(
+        self, scanner_combination_object
+    ):
         """
         # Name, Width, Heading
         scanner_combination_table_columns_width = [
@@ -278,12 +317,19 @@ class ScannerCombinationTab:
             )
 
     def remove_row_from_scanner_combination_table(self, list_of_combo_ids):
-        combo_ids_in_scanner_combination_table = self.scanner_combination_table.get_children()
+        combo_ids_in_scanner_combination_table = (
+            self.scanner_combination_table.get_children()
+        )
 
         for combo_id in list_of_combo_ids:
             # Remove the scanned combination from system
-            if int(combo_id) in StrategyVariables.map_combo_id_to_scanner_combination_object:
-                StrategyVariables.map_combo_id_to_scanner_combination_object[int(combo_id)].remove_scanned_combo_from_system()
+            if (
+                int(combo_id)
+                in StrategyVariables.map_combo_id_to_scanner_combination_object
+            ):
+                StrategyVariables.map_combo_id_to_scanner_combination_object[
+                    int(combo_id)
+                ].remove_scanned_combo_from_system()
 
             combo_id = str(combo_id)
             if combo_id in combo_ids_in_scanner_combination_table:
@@ -337,7 +383,9 @@ class ScannerCombinationTab:
             (
                 columns,
                 row_data_list,
-            ) = get_scanner_combination_details_column_and_data_from_combo_object(combo_id)
+            ) = get_scanner_combination_details_column_and_data_from_combo_object(
+                combo_id
+            )
 
             # selected_item = self.scanner_combination_table.selection()[0]
             # details = self.scanner_combination_table.item(selected_item)
@@ -363,12 +411,15 @@ class ScannerCombinationTab:
 
         try:
             # Get the scanner_combination_object
-            res = StrategyVariables.map_combo_id_to_scanner_combination_object[combo_id].dispaly_combination_impact()
+            res = StrategyVariables.map_combo_id_to_scanner_combination_object[
+                combo_id
+            ].dispaly_combination_impact()
             if res:
                 return
         except Exception as e:
-
-            print(f"Inside GUI:create_and_display_impact_popup Could not get the combo_id value: {combo_id} {e} \n {traceback.print_exc()}")
+            print(
+                f"Inside GUI:create_and_display_impact_popup Could not get the combo_id value: {combo_id} {e} \n {traceback.print_exc()}"
+            )
 
         # Error Popup
         # Utils.display_message_popup(
@@ -380,7 +431,6 @@ class ScannerCombinationTab:
     def display_scanner_combination_details(
         self,
     ):
-
         try:
             # Get the combo_id from table
             combo_id = self.scanner_combination_table.selection()[0]
@@ -408,8 +458,10 @@ class ScannerCombinationTab:
 
     # Function to sort the scanner combo table
     def sort_scanner_combination_table(self, column, reverse):
-
-        data = [(self.scanner_combination_table.set(child, column), child) for child in self.scanner_combination_table.get_children("")]
+        data = [
+            (self.scanner_combination_table.set(child, column), child)
+            for child in self.scanner_combination_table.get_children("")
+        ]
         data = sorted(data, key=lambda val: Utils.custom_sort(val[0]), reverse=reverse)
 
         for counter_row, (_, unique_id) in enumerate(data):
@@ -430,7 +482,6 @@ class ScannerCombinationTab:
         StrategyVariables.scanner_combination_table_sort_by_column = {column: reverse}
 
     def create_csv_structure_for_main_app(self, legs_list, combo_id):
-
         headers = [
             "Type",
             "Action",
@@ -454,12 +505,26 @@ class ScannerCombinationTab:
         # filename = f'combo_csv_for_combo_id_{combo_id}.csv'
 
         # Prepare the data rows for the CSV
-        data_rows = [["#SOC", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]]
+        data_rows = [
+            ["#SOC", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+        ]
         for leg in legs_list:
             # Extract details from each leg
-            action, symbol, sectype, exchange, currency, lots, expiry, strike, right, multiplier, conid, primaryexchange, trading_class = (
-                leg
-            )
+            (
+                action,
+                symbol,
+                sectype,
+                exchange,
+                currency,
+                lots,
+                expiry,
+                strike,
+                right,
+                multiplier,
+                conid,
+                primaryexchange,
+                trading_class,
+            ) = leg
 
             # Create a row with placeholders for missing values and the '#LEG' indicator in the 'Type' column
             leg_row = [
@@ -481,7 +546,9 @@ class ScannerCombinationTab:
                 expiry,
             ]
             data_rows.append(leg_row)
-        data_rows.append(["#EOC", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""])
+        data_rows.append(
+            ["#EOC", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+        )
 
         combo_df = pd.DataFrame(data_rows)
         combo_df.columns = headers

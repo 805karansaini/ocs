@@ -105,7 +105,6 @@ class ScreenGUI(threading.Thread):
 
     # Method to dispaly error pop up
     def display_error_popup(self, error_title, error_string):
-
         # Create a error popup window
         error_popup = tk.Toplevel()
         error_popup.title(error_title)

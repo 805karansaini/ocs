@@ -20,7 +20,6 @@ from com.variables import variables
 
 
 class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
-
     def __init__(
         self,
         data_server_host,
@@ -48,7 +47,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
 
     async def setup_api_connection(self):
         try:
-
             await self.connect(
                 self.data_server_host,
                 self.data_server_port,
@@ -142,7 +140,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
         bar_volume = historical_bars["volume"]
 
         try:
-
             # Formatting bar_date and converting to users target_timezone
             utc_timezone = pytz.utc
 
@@ -180,7 +177,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
 
         # While Using Price Chart Making a dataframe
         if request_id in variables.map_req_id_to_historical_data_dataframe:
-
             # Add Row to dataframe (concat)
             variables.map_req_id_to_historical_data_dataframe[request_id] = pd.concat(
                 [variables.map_req_id_to_historical_data_dataframe[request_id], row],
@@ -208,7 +204,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
 
     # Callback for req_market_snapshot
     def tick_price(self, request_id: int, tick_type: str, price: float):
-
         if variables.flag_debug_mode:
             print(
                 "TickPrice. TickerId:",
@@ -233,7 +228,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
 
     # Callback for req_market_snapshot
     def tick_size(self, request_id: int, tick_type: str, size: float):
-
         if variables.flag_debug_mode:
             print(
                 "TickSize. TickerId:",
@@ -323,7 +317,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
 
     # Callback for req_market_snapshot
     def market_snapshot_end(self, request_id: int):
-
         # Indicates that the market_snapshot response has ended
         variables.req_mkt_data_end[request_id] = True
 
@@ -342,7 +335,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
         expirations: set,
         strikes: set,
     ):
-
         if variables.flag_debug_mode:
             print(
                 "SecurityDefinitionOptionParameter.",
@@ -388,7 +380,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
 
     # Callback for req_contract_details
     def contract_details(self, request_id: int, contract_details: AOContractDetails):
-
         # Record in class variable
         variables.contract_details[request_id] = contract_details
 
@@ -396,9 +387,9 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
         variables.all_conid_from_con_details[request_id].append(
             contract_details.contract.conId
         )
-        variables.map_expiry_to_conid[request_id][
-            contract_details.contract.expiry
-        ] = contract_details.contract.conId
+        variables.map_expiry_to_conid[request_id][contract_details.contract.expiry] = (
+            contract_details.contract.conId
+        )
 
         # Print to console
         if variables.flag_debug_mode:
@@ -425,7 +416,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
 
         # get market rules for each rule id
         for rule_ids in list_of_all_rules:
-
             # This is only used for API bridge
             request_id = variables.nextorderId
             variables.nextorderId += 1
@@ -440,7 +430,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
 
     # Callback for req_contract_details
     def contract_details_end(self, request_id: int):
-
         # Indicates that the req_contract_details response has ended
         variables.contract_details_end[request_id] = True
 
@@ -449,7 +438,6 @@ class AlgoOneAPI(AlgoEclient, AlgoEWrapper):
             print("contract_details_end. request_id:", request_id)
 
     def market_rule(self, request_id: int, market_rule_id: int, price_increments: list):
-
         if variables.flag_debug_mode:
             print(
                 "Market Rule. ReqId:",

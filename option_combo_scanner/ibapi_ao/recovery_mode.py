@@ -14,7 +14,9 @@ from option_combo_scanner.ibapi_ao.variables import Variables as variables
 config = configparser.ConfigParser()
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
-option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..",  "..", "option_scanner_user_inputs.ini")
+option_scanner_user_inputs_ini_file_path = os.path.join(
+    script_dir, "..", "..", "option_scanner_user_inputs.ini"
+)
 
 config.read(option_scanner_user_inputs_ini_file_path)
 

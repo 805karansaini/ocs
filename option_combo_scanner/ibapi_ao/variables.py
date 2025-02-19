@@ -8,7 +8,9 @@ import pytz
 config = configparser.ConfigParser()
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
-option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..",  "..", "option_scanner_user_inputs.ini")
+option_scanner_user_inputs_ini_file_path = os.path.join(
+    script_dir, "..", "..", "option_scanner_user_inputs.ini"
+)
 
 config.read(option_scanner_user_inputs_ini_file_path)
 
@@ -97,17 +99,11 @@ class Variables(object):
 
     req_error = {}  # dict used to check if error received for the request
 
-    contract_details = (
-        {}
-    )  # Contract details will be stored here using reqId as a dictionary key
+    contract_details = {}  # Contract details will be stored here using reqId as a dictionary key
     req_mkt_data_end = {}  # dict to store whether reqMktData response has ended
-    contract_details_end = (
-        {}
-    )  # dict to store whether reqContractDetails response has ended
+    contract_details_end = {}  # dict to store whether reqContractDetails response has ended
 
-    req_sec_def_end = (
-        {}
-    )  # dict to store whether SecurityDefinitionOptionParameter response has ended
+    req_sec_def_end = {}  # dict to store whether SecurityDefinitionOptionParameter response has ended
 
     bool_account_value_available = (
         False  # Do We have Account Value Available? (NetLiquidationByCurrency)

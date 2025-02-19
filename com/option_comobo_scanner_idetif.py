@@ -11,11 +11,16 @@ from com.contracts import *
 from com.prices import *
 from com.greeks import *
 
+
 # Compares the 'target date(expiry)' with all expiries and returns the closest available expiry from them.
 def get_closest_exp_from_expiries_given_target_date(
-    symbol, target_date_str, expiry_dates_ticker, today_str, low_range_date_str=None, high_range_date_str=None,
+    symbol,
+    target_date_str,
+    expiry_dates_ticker,
+    today_str,
+    low_range_date_str=None,
+    high_range_date_str=None,
 ):
-
     # Print to console
     if variables.flag_debug_mode:
         print(
@@ -34,9 +39,9 @@ def get_closest_exp_from_expiries_given_target_date(
         datetime.datetime.strptime(target_date_str, "%Y%m%d")
     )
     if low_range_date_str is None:
-        low_range_date_str = '19000101'
+        low_range_date_str = "19000101"
     if high_range_date_str is None:
-        high_range_date_str = '99991230'
+        high_range_date_str = "99991230"
     # print(low_range_date_str, high_range_date_str)
     low_range_date_obj = variables.target_timezone_obj.localize(
         datetime.datetime.strptime(low_range_date_str, "%Y%m%d")
@@ -51,10 +56,12 @@ def get_closest_exp_from_expiries_given_target_date(
     expiries_in_range = []
 
     # For each date in expiry_dates_ticker' checking the difference and updating the closest_expiry(date)
-    
+
     for row, d in enumerate(expiry_dates_ticker):
-        expiry_date_obj = variables.target_timezone_obj.localize(datetime.datetime.strptime(d, "%Y%m%d"))
-        
+        expiry_date_obj = variables.target_timezone_obj.localize(
+            datetime.datetime.strptime(d, "%Y%m%d")
+        )
+
         # print(low_range_date_obj, high_range_date_obj, expiry_date_obj)
         # Difference between the dates
         if low_range_date_obj <= expiry_date_obj <= high_range_date_obj:
@@ -141,7 +148,6 @@ def get_all_strikes_for_fop_given_expiry_date(
     multiplier,
     trading_class,
 ):
-
     # Print to console
     if variables.flag_debug_mode:
         print(
@@ -199,7 +205,6 @@ def get_all_strikes_for_fop_given_expiry_date(
 
     # Processing all FUT expiry, want to get all expiries for FUT such that the Trading class is same as user provided
     for expiry_date_ith in all_fut_expiries:
-
         # Getting Conid for Underlying FUT
         contract = get_contract(
             symbol,
@@ -256,7 +261,6 @@ def find_nearest_expiry_for_future_given_fut_dte(
     only_want_all_expiries=False,
     specific_target_date=False,
 ):
-
     # Print to console
     if variables.flag_debug_mode:
         print(
@@ -325,7 +329,6 @@ def find_nearest_expiry_for_future_given_fut_dte(
 
     # When only needs all the Expiries for FOP
     if only_want_all_expiries == True:
-
         # Trim expiry to right
         right_index = bisect.bisect_right(all_expiry_dates_ticker, target_date_str)
         all_expiry_dates_ticker = all_expiry_dates_ticker[:right_index]
@@ -350,7 +353,6 @@ def find_nearest_expiry_for_future_given_fut_dte(
 def get_list_of_strikes_and_expiries(
     ticker, conid, futFopExchange, underlying_sec_type, fop_trading_class, reqId=None
 ):
-
     # Get reqId
     if reqId == None:
         reqId = variables.nextorderId
@@ -399,7 +401,6 @@ def get_list_of_strikes_and_expiries(
 
     # Wait for response from TWS
     while True:
-
         # Received Response, or request ended
         if (
             (
@@ -409,7 +410,6 @@ def get_list_of_strikes_and_expiries(
             or (variables.req_sec_def_end[reqId] == True)
             or (variables.req_error[reqId] == True)
         ):
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -420,10 +420,8 @@ def get_list_of_strikes_and_expiries(
             return (variables.expiry_dates[reqId], variables.strike_prices[reqId])
 
         else:
-
             # Timeout of 11 secs
             if counter >= int(11 / variables.sleep_time_waiting_for_tws_response):
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print(
@@ -449,7 +447,6 @@ def get_list_of_strikes_and_expiries(
 async def get_list_of_strikes_and_expiries_async(
     ticker, conid, futFopExchange, underlying_sec_type, fop_trading_class, reqId=None
 ):
-
     # Get reqId
     if reqId == None:
         reqId = variables.nextorderId
@@ -498,7 +495,6 @@ async def get_list_of_strikes_and_expiries_async(
 
     # Wait for response from TWS
     while True:
-
         # Received Response, or request ended
         if (
             (
@@ -508,7 +504,6 @@ async def get_list_of_strikes_and_expiries_async(
             or (variables.req_sec_def_end[reqId] == True)
             or (variables.req_error[reqId] == True)
         ):
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -519,10 +514,8 @@ async def get_list_of_strikes_and_expiries_async(
             return (variables.expiry_dates[reqId], variables.strike_prices[reqId])
 
         else:
-
             # Timeout of 11 secs
             if counter >= int(11 / variables.sleep_time_waiting_for_tws_response):
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print(
@@ -556,7 +549,6 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
     low_range_date_str=None,
     high_range_date_str=None,
 ):
-
     # Print to console
     if variables.flag_debug_mode:
         print(
@@ -603,8 +595,8 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
     # (for STK we are using "" and the callback of reqsecdef is handles such we get the 'SMART' values or The futFopExchange values).
     futFopExchange = ""
     conid = contract_details.contract.conId
-    underlying_conid  = int(conid)
-    
+    underlying_conid = int(conid)
+
     # Getting Expiry dates and Strike prices for a ticker
     all_expiry_dates_ticker, strike_prices_ticker = get_list_of_strikes_and_expiries(
         ticker, conid, futFopExchange, underlying_sec_type, fop_trading_class
@@ -625,7 +617,12 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
     # Return multiexpiries from here # TODO Point 2
     closest_expiry_date, expiry_date_in_range = (
         get_closest_exp_from_expiries_given_target_date(
-            ticker, target_date_str, all_expiry_dates_ticker, today_str, low_range_date_str, high_range_date_str,
+            ticker,
+            target_date_str,
+            all_expiry_dates_ticker,
+            today_str,
+            low_range_date_str,
+            high_range_date_str,
         )
     )
 
@@ -634,7 +631,13 @@ def find_nearest_expiry_and_all_strikes_for_stk_given_dte(
         print(f"Expiry Dates: {all_expiry_dates_ticker}")
         print(f"Available Strike Prices: {strike_prices_ticker}")
 
-    return all_expiry_dates_ticker, strike_prices_ticker, closest_expiry_date, underlying_conid, expiry_date_in_range
+    return (
+        all_expiry_dates_ticker,
+        strike_prices_ticker,
+        closest_expiry_date,
+        underlying_conid,
+        expiry_date_in_range,
+    )
 
 
 # Find closest expiry for FOP, with user provided DTE, trading class
@@ -650,7 +653,6 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
     low_range_date_str=None,
     high_range_date_str=None,
 ):
-
     # Print to console
     if variables.flag_debug_mode:
         print(
@@ -676,11 +678,10 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
     all_expiries_with_user_provided_trading_class = set()
 
     # Map the fop expiry to fut conid TODO ARYAN
-    map_fop_expiry_to_fut_conid = {}   
+    map_fop_expiry_to_fut_conid = {}
 
     # Processing all FUT expiry, want to get all expiries for FUT such that the Trading class is same as user provided
     for expiry_date_ith in all_fut_expiries:
-
         # Getting Conid for Underlying FUT
         contract = get_contract(
             symbol,
@@ -713,7 +714,6 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
 
                 # if all_expiry is not none
                 if all_strike != None:
-
                     # Creating a list, if not already
                     if __expiry_date in map_expiry_to_all_strikes:
                         pass
@@ -722,7 +722,7 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
 
                     for __strike in all_strike[1:-1].split(","):
                         map_expiry_to_all_strikes[__expiry_date].append(float(__strike))
-                        
+
     # Creating sorted list
     all_expiries_with_user_provided_trading_class = sorted(
         list(all_expiries_with_user_provided_trading_class)
@@ -739,16 +739,17 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
         return None, None, None, None
 
     # Getting Closest Expiry for FOP if length 'all_expiries_with_user_provided_trading_class' > 0
-    closest_expiry_date, expiry_date_in_range = get_closest_exp_from_expiries_given_target_date(
-        symbol,
-        target_date_str,
-        all_expiries_with_user_provided_trading_class,
-        today_str,
-        low_range_date_str,
-        high_range_date_str,
+    closest_expiry_date, expiry_date_in_range = (
+        get_closest_exp_from_expiries_given_target_date(
+            symbol,
+            target_date_str,
+            all_expiries_with_user_provided_trading_class,
+            today_str,
+            low_range_date_str,
+            high_range_date_str,
+        )
     )
-    
-    
+
     # Creating 'closest_expiry_date' str again
     closest_expiry_date = str(closest_expiry_date)
 
@@ -758,7 +759,7 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
             f"Got the closest expiry for FOP {symbol=} given {dte=} {trading_class=} {closest_expiry_date=}"
         )
 
-    # Look up the 
+    # Look up the
     underlying_conid = map_fop_expiry_to_fut_conid[int(closest_expiry_date)]
 
     # Creating sorted list of strike with unique values
@@ -770,7 +771,13 @@ def find_closest_expiry_for_fop_given_fut_expiries_and_trading_class(
             f"All The strikes for FOP {symbol=} given {dte=} {trading_class=} {all_strike_prices=}"
         )
 
-    return all_strike_prices, closest_expiry_date, underlying_conid, expiry_date_in_range
+    return (
+        all_strike_prices,
+        closest_expiry_date,
+        underlying_conid,
+        expiry_date_in_range,
+    )
+
 
 # Method to find nearest strike prices
 async def find_nearest_strike_delta_diff_min_async(
@@ -810,7 +817,6 @@ async def find_nearest_strike_delta_diff_min_async(
 
     # We will check for delta for buckets_size = 10, if no delta is found then check for delta in buxket size of 20, if still not found check all strikes
     while True:
-
         # Checking 10 strikes
 
         ### This is the part of algorithm in which we are concerned with getting the range of strike where given delta is present ####
@@ -859,7 +865,6 @@ async def find_nearest_strike_delta_diff_min_async(
 
         # If all deltas are None
         if (None in counter) and (counter[None] == len(opt_deltas_level_1)):
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -916,7 +921,6 @@ async def find_nearest_strike_delta_diff_min_async(
 
         # If all deltas are None
         if (None in counter) and (counter[None] == len(opt_deltas_level_1)):
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -934,7 +938,6 @@ async def find_nearest_strike_delta_diff_min_async(
 
     # Higher Delta
     for strike_val, delta_val in zip(strikes_level_1, opt_deltas_level_1):
-
         # if delta is None: Continue
         if delta_val is None:
             continue
@@ -948,14 +951,12 @@ async def find_nearest_strike_delta_diff_min_async(
 
     # Lower Delta
     for strike_val, delta_val in zip(strikes_level_1, opt_deltas_level_1):
-
         # if delta is None Continue
         if delta_val is None:
             continue
 
         # if delta < given delta break
         if delta_val < delta:
-
             # Keep the strike such that delta value is greater
             strike_price_such_that_delta_lower_than_target_delta = strike_val
             break
@@ -1035,10 +1036,8 @@ async def find_nearest_strike_delta_diff_min_async(
     for strike_price, delta_opt in zip(
         strike_prices_ticker[index_left:index_right], opt_deltas_level_2
     ):
-
         # if value of delta_opt is 'None'
         if delta_opt is None:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -1048,7 +1047,6 @@ async def find_nearest_strike_delta_diff_min_async(
 
         # Updating the 'nearest_strike' if (it is None) OR (a closer delta has been identified)
         if (nearest_strike is None) or (abs(delta - delta_opt) < min_delta_difference):
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -1070,7 +1068,6 @@ async def find_nearest_strike_delta_diff_min_async(
 
     # Could not find nearest strike
     if nearest_strike is None:
-
         return None
 
     # Converting dict to pandas df and adding the * to selected row
@@ -1105,7 +1102,6 @@ async def resolve_leg(
     dte,
     delta,
 ):
-
     # Init
     all_strike_prices = None
     # The way reqSecurityDefinitionOptionParameter works its important to have string in this form.
@@ -1114,10 +1110,8 @@ async def resolve_leg(
 
     # For Futures get the nearest 'fut_expiry_date' date given 'DTE (FUT)'
     if (sec_type in ["FUT"]) and (expiry_date == None):
-
         # cheange under asset sec type for rty
         if symbol in ["RTY", "rty"]:
-
             underlying_sec_type = "IND"
 
         # Get closest fut_expiry_date
@@ -1130,12 +1124,10 @@ async def resolve_leg(
             return None
 
     if (sec_type == "OPT") and (expiry_date == None):
-
         # Underlying SecType for FUT & OPT
         underlying_sec_type = "STK"
 
         if symbol in ["SPX", "spx"]:
-
             underlying_sec_type = "IND"
 
         if symbol in ["NDX", "ndx"]:
@@ -1171,7 +1163,6 @@ async def resolve_leg(
             )
 
     elif (sec_type == "FOP") and (expiry_date == None):
-
         # Get all the future expiries
         underlying_sec_type = "FUT"
         all_fut_expiries = find_nearest_expiry_for_future_given_fut_dte(
@@ -1211,13 +1202,11 @@ async def resolve_leg(
     if sec_type in ["OPT", "FOP"] and (
         strike_price == None and all_strike_prices == None
     ):
-
         # Init
         underlying_sec_type = "STK" if sec_type == "OPT" else "FUT"
         futFopExchange = "" if exchange == "SMART" else exchange
 
         if sec_type == "OPT":
-
             # Underlying contract to get conid
             contract = get_contract(
                 symbol,
@@ -1231,7 +1220,6 @@ async def resolve_leg(
             )
             contract_details = get_contract_details(contract)
             if contract_details == None:
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print(
@@ -1266,10 +1254,8 @@ async def resolve_leg(
     # Now we have OPT/FOP Expiry, search for strike if not provided by user
     # For OPT and FOP, find nearest 'strike', given 'delta'
     if (sec_type in ["OPT", "FOP"]) and (strike_price == None):
-
         # if we dont have strike return error, can not search for strikes, given delta
         if all_strike_prices == None:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -1294,7 +1280,6 @@ async def resolve_leg(
         # print(strike_price)
         # Return None if strike not found, it will throw error
         if strike_price == None:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -1334,7 +1319,6 @@ async def resolve_leg(
 
 # Runs resolve_leg for all the legs that needed to be resolved.
 async def run_tasks(legs_needs_to_be_solved):
-
     # Now resolve all the legs that needed to be resolved. (In separate threads for each leg)
     # tasks = [
     #     asyncio.to_thread(

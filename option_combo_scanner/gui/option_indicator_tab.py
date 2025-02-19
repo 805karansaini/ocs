@@ -10,11 +10,15 @@ from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.house_keeping import HouseKeepingGUI
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.contracts import (
-    get_contract, get_contract_details_async)
-from option_combo_scanner.indicators_calculator.historical_volatility import \
-    HistoricalVolatility
-from option_combo_scanner.indicators_calculator.implied_volatility import \
-    ImpliedVolatility
+    get_contract,
+    get_contract_details_async,
+)
+from option_combo_scanner.indicators_calculator.historical_volatility import (
+    HistoricalVolatility,
+)
+from option_combo_scanner.indicators_calculator.implied_volatility import (
+    ImpliedVolatility,
+)
 from option_combo_scanner.indicators_calculator.put_call_vol import PutCallVol
 from option_combo_scanner.strategy.indicator import Indicator
 
@@ -38,46 +42,131 @@ option_indicator_table_columns_width = [
     ("symbol", 165, "Symbol"),
     ("sec_type", 165, "Sec Type"),
     ("expiry", 165, "Expiry"),
-
-    ("current_underlying_hv_value", 165, f"HV({StrategyVariables.user_input_lookback_days_historical_volatility})"),
-    ("average_underlying_hv_over_n_days", 165, f"Avg(HV({StrategyVariables.user_input_lookback_days_historical_volatility}),{StrategyVariables.user_input_average_historical_volatility_days})"),
-    ("absoulte_change_in_underlying_over_n_days", 165, f"Chg(Und,{StrategyVariables.user_input_average_historical_volatility_days})"),
-    ("percentage_change_in_underlying_over_n_days", 165, f"%Chg(Und,{StrategyVariables.user_input_average_historical_volatility_days})"),
-    ("current_hv_minus_iv", 165, f"HV({StrategyVariables.user_input_lookback_days_historical_volatility}) - IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input})"),
+    (
+        "current_underlying_hv_value",
+        165,
+        f"HV({StrategyVariables.user_input_lookback_days_historical_volatility})",
+    ),
+    (
+        "average_underlying_hv_over_n_days",
+        165,
+        f"Avg(HV({StrategyVariables.user_input_lookback_days_historical_volatility}),{StrategyVariables.user_input_average_historical_volatility_days})",
+    ),
+    (
+        "absoulte_change_in_underlying_over_n_days",
+        165,
+        f"Chg(Und,{StrategyVariables.user_input_average_historical_volatility_days})",
+    ),
+    (
+        "percentage_change_in_underlying_over_n_days",
+        165,
+        f"%Chg(Und,{StrategyVariables.user_input_average_historical_volatility_days})",
+    ),
+    (
+        "current_hv_minus_iv",
+        165,
+        f"HV({StrategyVariables.user_input_lookback_days_historical_volatility}) - IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input})",
+    ),
     ("current_iv_d1", 165, f"IV({StrategyVariables.delta_d1_indicator_input})"),
     ("current_iv_d2", 165, f"IV({StrategyVariables.delta_d2_indicator_input})"),
-    ("current_avg_iv", 165, f"IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input})"),
-    ("absolute_change_in_avg_iv_since_yesterday", 165, f"Chg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_change_in_avg_iv_since_yesterday})"),
-    ("percentage_change_in_avg_iv_since_yesterday", 165, f"%Chg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_change_in_avg_iv_since_yesterday})"),
-    
-    ("avg_iv_over_n_days", 165, f"Avg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.avg_iv_lookback_days})"),
+    (
+        "current_avg_iv",
+        165,
+        f"IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input})",
+    ),
+    (
+        "absolute_change_in_avg_iv_since_yesterday",
+        165,
+        f"Chg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_change_in_avg_iv_since_yesterday})",
+    ),
+    (
+        "percentage_change_in_avg_iv_since_yesterday",
+        165,
+        f"%Chg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_change_in_avg_iv_since_yesterday})",
+    ),
+    (
+        "avg_iv_over_n_days",
+        165,
+        f"Avg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.avg_iv_lookback_days})",
+    ),
     ("current_rr_d1", 165, f"RR({StrategyVariables.delta_d1_indicator_input})"),
     ("current_rr_d2", 165, f"RR({StrategyVariables.delta_d2_indicator_input})"),
-    ("percentage_change_in_rr_since_yesterday_d1", 165, f"Chg(RR({StrategyVariables.delta_d1_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_since_yesterday})"),
-    ("percentage_change_in_rr_since_yesterday_d2", 165, f"Chg(RR({StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_since_yesterday})"),
-    ("percentage_change_in_rr_since_14_day_d1", 165, f"Chg(RR({StrategyVariables.delta_d1_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_over_n_days})"),
-    ("percentage_change_in_rr_since_14_day_d2", 165, f"Chg(RR({StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_over_n_days})"),
+    (
+        "percentage_change_in_rr_since_yesterday_d1",
+        165,
+        f"Chg(RR({StrategyVariables.delta_d1_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_since_yesterday})",
+    ),
+    (
+        "percentage_change_in_rr_since_yesterday_d2",
+        165,
+        f"Chg(RR({StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_since_yesterday})",
+    ),
+    (
+        "percentage_change_in_rr_since_14_day_d1",
+        165,
+        f"Chg(RR({StrategyVariables.delta_d1_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_over_n_days})",
+    ),
+    (
+        "percentage_change_in_rr_since_14_day_d2",
+        165,
+        f"Chg(RR({StrategyVariables.delta_d2_indicator_input}),{StrategyVariables.lookback_input_for_rr_change_over_n_days})",
+    ),
     ("max_pain_strike", 165, "Max Pain"),
     ("min_pain_strike", 165, "Min Pain"),
     ("oi_support_strike", 165, "OI Support"),
     ("oi_resistance_strike", 165, "OI Resistance"),
-    
     ("put_call_volume_ratio_current_day", 165, "PCR"),
-    ("put_call_volume_ratio_average_over_n_days", 165, f"Avg(PCR,{StrategyVariables.user_input_lookback_days_for_pcr})"),
+    (
+        "put_call_volume_ratio_average_over_n_days",
+        165,
+        f"Avg(PCR,{StrategyVariables.user_input_lookback_days_for_pcr})",
+    ),
     ("absolute_pc_change_since_yesterday", 165, "Chg(PCR,1)"),
-    
-    ("pc_change_iv_change", 165, f"Chg(PCR,1) / Chg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),1)"),
-
-    ("chg_in_underl_call_opt_price_since_yesterday_d1", 165, f"Chg(Und,1) / Chg(OPT(C,{StrategyVariables.delta_d1_indicator_input}),1)"),
-    ("chg_in_underl_call_opt_price_since_yesterday_d2", 165, f"Chg(Und,1) / Chg(OPT(C,{StrategyVariables.delta_d2_indicator_input}),1)"),
-    ("chg_in_underl_put_opt_price_since_yesterday_d1", 165, f"Chg(Und,1) / Chg(OPT(P,{StrategyVariables.delta_d1_indicator_input}),1)"),
-    ("chg_in_underl_put_opt_price_since_yesterday_d2", 165, f"Chg(Und,1) / Chg(OPT(P,{StrategyVariables.delta_d2_indicator_input}),1)"),
-
-    ("chg_in_underl_call_opt_price_since_nth_day_d1", 165, f"Chg(Und,14) / Chg(OPT(C,{StrategyVariables.delta_d1_indicator_input}),14)"),
-    ("chg_in_underl_call_opt_price_since_nth_day_d2", 165, f"Chg(Und,14) / Chg(OPT(C,{StrategyVariables.delta_d2_indicator_input}),14)"),
-    ("chg_in_underl_put_opt_price_since_nth_day_d1", 165, f"Chg(Und,14) / Chg(OPT(P,{StrategyVariables.delta_d1_indicator_input}),14)"),
-    ("chg_in_underl_put_opt_price_since_nth_day_d2", 165, f"Chg(Und,14) / Chg(OPT(P,{StrategyVariables.delta_d2_indicator_input}),14)"),
-    
+    (
+        "pc_change_iv_change",
+        165,
+        f"Chg(PCR,1) / Chg(IV({StrategyVariables.delta_d1_indicator_input},{StrategyVariables.delta_d2_indicator_input}),1)",
+    ),
+    (
+        "chg_in_underl_call_opt_price_since_yesterday_d1",
+        165,
+        f"Chg(Und,1) / Chg(OPT(C,{StrategyVariables.delta_d1_indicator_input}),1)",
+    ),
+    (
+        "chg_in_underl_call_opt_price_since_yesterday_d2",
+        165,
+        f"Chg(Und,1) / Chg(OPT(C,{StrategyVariables.delta_d2_indicator_input}),1)",
+    ),
+    (
+        "chg_in_underl_put_opt_price_since_yesterday_d1",
+        165,
+        f"Chg(Und,1) / Chg(OPT(P,{StrategyVariables.delta_d1_indicator_input}),1)",
+    ),
+    (
+        "chg_in_underl_put_opt_price_since_yesterday_d2",
+        165,
+        f"Chg(Und,1) / Chg(OPT(P,{StrategyVariables.delta_d2_indicator_input}),1)",
+    ),
+    (
+        "chg_in_underl_call_opt_price_since_nth_day_d1",
+        165,
+        f"Chg(Und,14) / Chg(OPT(C,{StrategyVariables.delta_d1_indicator_input}),14)",
+    ),
+    (
+        "chg_in_underl_call_opt_price_since_nth_day_d2",
+        165,
+        f"Chg(Und,14) / Chg(OPT(C,{StrategyVariables.delta_d2_indicator_input}),14)",
+    ),
+    (
+        "chg_in_underl_put_opt_price_since_nth_day_d1",
+        165,
+        f"Chg(Und,14) / Chg(OPT(P,{StrategyVariables.delta_d1_indicator_input}),14)",
+    ),
+    (
+        "chg_in_underl_put_opt_price_since_nth_day_d2",
+        165,
+        f"Chg(Und,14) / Chg(OPT(P,{StrategyVariables.delta_d2_indicator_input}),14)",
+    ),
 ]
 
 
@@ -106,7 +195,6 @@ class OptionIndicator:
     # Creating Tab for Option Indicator
 
     def create_option_indicator_tab(self):
-
         # Create a frame for the user input fields
         input_frame = ttk.Frame(self.option_indicator_tab, padding=20)
         input_frame.pack(fill="both", expand=True)
@@ -164,7 +252,9 @@ class OptionIndicator:
         tree_scroll_x.config(command=self.option_indicator_table.xview)
 
         # Define Columns
-        self.option_indicator_table["columns"] = [_[0] for _ in option_indicator_table_columns_width]
+        self.option_indicator_table["columns"] = [
+            _[0] for _ in option_indicator_table_columns_width
+        ]
         self.option_indicator_table.column("#0", width=0, stretch="no")
 
         for col_name, col_width, col_heading in option_indicator_table_columns_width:
@@ -177,7 +267,9 @@ class OptionIndicator:
                 minwidth=col_width,
                 stretch=False,
             )
-            self.option_indicator_table.heading(col_name, text=col_heading, anchor="center")
+            self.option_indicator_table.heading(
+                col_name, text=col_heading, anchor="center"
+            )
         self.option_indicator_table.tag_configure("oddrow", background="white")
         self.option_indicator_table.tag_configure("evenrow", background="lightblue")
 
@@ -228,7 +320,6 @@ class OptionIndicator:
             )
 
     def update_into_indicator_table(self, indicator_df):
-
         indicator_id_in_indicator_table = self.option_indicator_table.get_children()
 
         for index, rows in indicator_df.iterrows():

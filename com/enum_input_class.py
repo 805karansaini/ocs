@@ -1,11 +1,13 @@
 import enum
 
+
 # Enums the hv_methods(historical volatility)
 class HVMethod(enum.Enum):
     STANDARD_DEVIATION = 1
     PARKINSON_WITH_GAP = 2
     PARKINSON_WITHOUT_GAP = 3
     NATR = 4
+
 
 # Enum to map candle size to values
 class CandleSize(enum.Enum):

@@ -13,7 +13,6 @@ from ibapi.order_state import OrderState as IbapiOrderState
 
 
 class IBkrAlgoOneAdapter:
-
     @staticmethod
     def duration(duration_string: str):
         """
@@ -67,7 +66,6 @@ class IBkrAlgoOneAdapter:
 
     @staticmethod
     def bar_type(what_to_show):
-
         what_to_show = what_to_show.upper()
         bar_type = BarType(what_to_show)
 
@@ -75,7 +73,6 @@ class IBkrAlgoOneAdapter:
 
     @staticmethod
     def right(right):
-
         if "P" in right.upper():
             right = OptionRightType.PUT
         elif "C" in right.upper():
@@ -87,7 +84,6 @@ class IBkrAlgoOneAdapter:
 
     @staticmethod
     def contract(contract_object):
-
         ticker = contract_object.symbol
         contract_type = ContractType(contract_object.secType)
         exchange = contract_object.exchange
@@ -116,31 +112,27 @@ class IBkrAlgoOneAdapter:
 
     @staticmethod
     def convert_ibapi_to_ao_contract(ibapi_contract: IbapiContract) -> Contract:
-
         contract = Contract(
             contract_type=ContractType(ibapi_contract.secType),
             ticker=ibapi_contract.symbol,
-
-            conId = ibapi_contract.conId,
-            right = IBkrAlgoOneAdapter.right(ibapi_contract.right),
-            expiry = ibapi_contract.lastTradeDateOrContractMonth,
-            strike = ibapi_contract.strike,
-            currency = ibapi_contract.currency,
-            trading_class = ibapi_contract.tradingClass,
-            exchange = ibapi_contract.exchange,
-
-            primaryExchange = ibapi_contract.primaryExchange,
-            localSymbol = ibapi_contract.localSymbol,
-            includeExpired = ibapi_contract.includeExpired,
-            secIdType = ibapi_contract.secIdType,
-            secId = ibapi_contract.secId,
-            description = ibapi_contract.description,
-            issuerId = ibapi_contract.issuerId,
-
+            conId=ibapi_contract.conId,
+            right=IBkrAlgoOneAdapter.right(ibapi_contract.right),
+            expiry=ibapi_contract.lastTradeDateOrContractMonth,
+            strike=ibapi_contract.strike,
+            currency=ibapi_contract.currency,
+            trading_class=ibapi_contract.tradingClass,
+            exchange=ibapi_contract.exchange,
+            primaryExchange=ibapi_contract.primaryExchange,
+            localSymbol=ibapi_contract.localSymbol,
+            includeExpired=ibapi_contract.includeExpired,
+            secIdType=ibapi_contract.secIdType,
+            secId=ibapi_contract.secId,
+            description=ibapi_contract.description,
+            issuerId=ibapi_contract.issuerId,
             # combos
-            comboLegsDescrip = ibapi_contract.comboLegsDescrip,
-            comboLegs = ibapi_contract.comboLegs,
-            deltaNeutralContract = ibapi_contract.deltaNeutralContract,
+            comboLegsDescrip=ibapi_contract.comboLegsDescrip,
+            comboLegs=ibapi_contract.comboLegs,
+            deltaNeutralContract=ibapi_contract.deltaNeutralContract,
         )
 
         # # TODO: check if multiplier should be int
@@ -154,7 +146,6 @@ class IBkrAlgoOneAdapter:
 
     @staticmethod
     def convert_ibapi_to_ao_order(order: IbapiOrder) -> Order:
-
         return Order(
             action=OrderAction(order.action),
             totalQuantity=(
@@ -181,8 +172,17 @@ class IBkrAlgoOneAdapter:
             outsideRth=order.outsideRth,
             triggerMethod=order.triggerMethod,
             algoStrategy=order.algoStrategy,
-            algoParams=[TagValue(tag=param.tag, value=param.value) for param in order.algoParams] if order.algoParams else [],  # type: ignore
-            smartComboRoutingParams=[TagValue(tag=param.tag, value=param.value) for param in order.smartComboRoutingParams] if order.smartComboRoutingParams else [],  # type: ignore
+            algoParams=[
+                TagValue(tag=param.tag, value=param.value) for param in order.algoParams
+            ]
+            if order.algoParams
+            else [],  # type: ignore
+            smartComboRoutingParams=[
+                TagValue(tag=param.tag, value=param.value)
+                for param in order.smartComboRoutingParams
+            ]
+            if order.smartComboRoutingParams
+            else [],  # type: ignore
             algoId=order.algoId,
             whatIf=order.whatIf,
             cashQty=float(order.cashQty) if order.cashQty != UNSET_DECIMAL else 0.0,
@@ -282,7 +282,6 @@ class IBkrAlgoOneAdapter:
     def convert_ao_to_ibapi_contract(
         contract: Contract,
     ) -> IbapiContract:
-
         ibapi_contract = IbapiContract()
         ibapi_contract.secType = contract.contract_type.value
         ibapi_contract.symbol = contract.ticker
@@ -311,7 +310,6 @@ class IBkrAlgoOneAdapter:
     def convert_ibapi_to_ao_contract_details(
         contract_details: ContractDetails,
     ) -> AOContractDetails:
-
         contract_details_dict = contract_details.__dict__.copy()
 
         # Convert nested Contract object
@@ -321,9 +319,12 @@ class IBkrAlgoOneAdapter:
 
         # Convert secIdList to list of TagValue if it exists
         if contract_details_dict.get("secIdList"):
-            contract_details_dict["secIdList"] = [TagValue(tag=sec_id.tag, value=sec_id.value) for sec_id in contract_details.secIdList]  # type: ignore
+            contract_details_dict["secIdList"] = [
+                TagValue(tag=sec_id.tag, value=sec_id.value)
+                for sec_id in contract_details.secIdList
+            ]  # type: ignore
         else:
-            contract_details_dict["secIdList"] = [] 
+            contract_details_dict["secIdList"] = []
 
         # Handle UNSET_DECIMAL conversion
         for key in ["minSize", "sizeIncrement", "suggestedSizeIncrement"]:
@@ -333,7 +334,9 @@ class IBkrAlgoOneAdapter:
         return AOContractDetails(**contract_details_dict)
 
     @staticmethod
-    def convert_ibapi_to_ao_price_increment(price_increment: PriceIncrement) -> AOPriceIncrement:
+    def convert_ibapi_to_ao_price_increment(
+        price_increment: PriceIncrement,
+    ) -> AOPriceIncrement:
         return AOPriceIncrement(
             lowEdge=price_increment.lowEdge,
             increment=price_increment.increment,

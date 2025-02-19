@@ -12,39 +12,27 @@ from com.enum_input_class import *
 
 # Method to map candle size to candle size string
 def get_candle_size(size_string):
-
     if "ONE_MIN" in size_string:
-
         return CandleSize.ONE_MIN
     elif "TWO_MIN" in size_string:
-
         return CandleSize.TWO_MIN
     elif "THREE_MIN" in size_string:
-
         return CandleSize.THREE_MIN
     elif "FIVE_MIN" in size_string:
-
         return CandleSize.FIVE_MIN
     elif "TEN_MIN" in size_string:
-
         return CandleSize.TEN_MIN
     elif "FIFTEEN_MIN" in size_string:
-
         return CandleSize.FIFTEEN_MIN
     elif "TWENTY_MIN" in size_string:
-
         return CandleSize.TWENTY_MIN
     elif "THIRTY_MIN" in size_string:
-
         return CandleSize.THIRTY_MIN
     elif "ONE_HOUR" in size_string:
-
         return CandleSize.ONE_HOUR
     elif "TWO_HOUR" in size_string:
-
         return CandleSize.TWO_HOUR
     elif "THREE_HOUR" in size_string:
-
         return CandleSize.THREE_HOUR
 
     else:
@@ -53,28 +41,25 @@ def get_candle_size(size_string):
 
 # Map HV method to HV method string
 def get_hv_method(method_str):
-
     if method_str == "STANDARD_DEVIATION":
-
         return HVMethod.STANDARD_DEVIATION
 
     elif method_str == "PARKINSON_WITH_GAP":
-
         return HVMethod.PARKINSON_WITH_GAP
 
     elif method_str == "PARKINSON_WITHOUT_GAP":
-
         return HVMethod.PARKINSON_WITHOUT_GAP
 
     else:
-
         return HVMethod.NATR
 
 
 class UserInputs(object):
     # Get the directory of the current script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..", "option_scanner_user_inputs.ini")
+    option_scanner_user_inputs_ini_file_path = os.path.join(
+        script_dir, "..", "option_scanner_user_inputs.ini"
+    )
 
     parser = configparser.ConfigParser()
     parser.read(option_scanner_user_inputs_ini_file_path)
@@ -83,10 +68,16 @@ class UserInputs(object):
     target_timezone = parser.get("TimeZone", "target_timezone")
 
     # IBKR TWS params
-    ibkr_tws_host = parser.get("USER INPUTS", "ibkr_tws_host")  # Karan-Office PC "25.15.182.17"
-    ibkr_tws_port = parser.getint("USER INPUTS", "ibkr_tws_port")  # Value: Live A/C -> 7496, Paper A/C -> 7497
+    ibkr_tws_host = parser.get(
+        "USER INPUTS", "ibkr_tws_host"
+    )  # Karan-Office PC "25.15.182.17"
+    ibkr_tws_port = parser.getint(
+        "USER INPUTS", "ibkr_tws_port"
+    )  # Value: Live A/C -> 7496, Paper A/C -> 7497
     ibkr_tws_connection_id = parser.getint("USER INPUTS", "ibkr_tws_connection_id")
-    ibkr_tws_connection_id_for_cas = parser.getint("USER INPUTS", "ibkr_tws_connection_id_for_cas")
+    ibkr_tws_connection_id_for_cas = parser.getint(
+        "USER INPUTS", "ibkr_tws_connection_id_for_cas"
+    )
     ibkr_account_number = parser.get("USER INPUTS", "ibkr_account_number")
 
     # Historical Volatility Method
@@ -110,7 +101,7 @@ class UserInputs(object):
     ind_opt_currency = parser.get("USER INPUTS", "ind_opt_currency")
     ind_opt_exchange = parser.get("USER INPUTS", "ind_opt_exchange")
     ind_opt_lot_size = parser.getint("USER INPUTS", "ind_opt_lot_size")
-    
+
     ######################
     # Bottom Variables as not used in option combo scanner
     # DO NOT CHANGE ANY THING Below it
@@ -270,11 +261,15 @@ class UserInputs(object):
 
     # Active database
     active_sql_db_name = "option_combo_scanner_db"
-    active_sql_connection_string = "mysql+pymysql://" + sql_user + "@" + sql_host + "/" + active_sql_db_name
+    active_sql_connection_string = (
+        "mysql+pymysql://" + sql_user + "@" + sql_host + "/" + active_sql_db_name
+    )
 
     # Archive databse
     archive_sql_db_name = "archive_multileg_strat"
-    archive_sql_connection_string = "mysql+pymysql://" + sql_user + "@" + sql_host + "/" + archive_sql_db_name
+    archive_sql_connection_string = (
+        "mysql+pymysql://" + sql_user + "@" + sql_host + "/" + archive_sql_db_name
+    )
     ######################
     # Bottom Variables as not used in option combo scanner
     # DO NOT CHANGE ANY THING Below it

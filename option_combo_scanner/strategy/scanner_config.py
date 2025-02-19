@@ -3,7 +3,9 @@ from pprint import pprint
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import (
+    StrategyVariables as strategy_variables,
+)
 
 logger = CustomLogger.logger
 
@@ -20,7 +22,6 @@ class Config:
         self.map_config_id_to_config_object()
 
     def map_config_id_to_config_object(self):
-
         # Assigning the current object to the 'config_object' variable within the 'strategy_variables'
         strategy_variables.map_config_id_to_config_object[self.config_id] = self
 
@@ -28,7 +29,6 @@ class Config:
         strategy_variables.primary_min_heap_config.push((-1, self.config_id))
 
     def __str__(self) -> str:
-
         return f"Config:\n{pprint(vars(self))}"
 
     def get_config_tuple_for_gui(

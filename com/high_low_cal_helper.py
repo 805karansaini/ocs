@@ -27,6 +27,7 @@ from com.combination_helper import create_combination
 # ###
 # Update the table in gui in correct order. resturc df.
 
+
 # Method to fetch historical data
 def get_historical_data_for_price_based_relative_indicators(
     cas_coinds_for_fetching_historical_data,
@@ -34,7 +35,6 @@ def get_historical_data_for_price_based_relative_indicators(
     bar_size,
     flag_both_bid_ask=False,
 ):
-
     # Map of [conid][action] = req_id
     map_conid_action_to_req_id = {}
 
@@ -51,9 +51,7 @@ def get_historical_data_for_price_based_relative_indicators(
 
         # Iterate actions an sub values
         for action, sub_values in sub_info_dict.items():
-
             if not flag_both_bid_ask:
-
                 # Create dict with conid as key
                 if action not in map_conid_action_to_req_id[conid]:
                     map_conid_action_to_req_id[conid][action] = None
@@ -84,7 +82,6 @@ def get_historical_data_for_price_based_relative_indicators(
                 )
 
             else:
-
                 # Init
                 map_conid_action_to_req_id[conid]["BUY"] = None
                 map_conid_action_to_req_id[conid]["SELL"] = None
@@ -141,7 +138,6 @@ def get_historical_data_for_price_based_relative_indicators(
     while variables.cas_wait_time_for_historical_data > (
         counter * variables.sleep_time_waiting_for_tws_response
     ):
-
         """dict_mkt_end = variables.req_mkt_data_end
         dicterr_msg = variables.req_error
 
@@ -175,9 +171,9 @@ def get_historical_data_for_price_based_relative_indicators(
 
     return map_conid_action_to_req_id
 
+
 # Method to get merged df to get combo price from leg prices
 def merge_dataframe_inner_join_with_combo_price_calculation(combo_obj, all_data_frames):
-
     # All legs in combo
     all_legs = combo_obj.buy_legs + combo_obj.sell_legs
 
@@ -187,7 +183,7 @@ def merge_dataframe_inner_join_with_combo_price_calculation(combo_obj, all_data_
     # Merging all data frames such that Time is available in all data frames
     for i, df_ith in enumerate(all_data_frames[1:]):
         merged_df = pd.merge(
-            merged_df, df_ith, on="Time", how="inner", suffixes=(f"", f" {i+1}")
+            merged_df, df_ith, on="Time", how="inner", suffixes=(f"", f" {i + 1}")
         )
 
     # Dropping nan values, if any
@@ -198,9 +194,9 @@ def merge_dataframe_inner_join_with_combo_price_calculation(combo_obj, all_data_
 
     # Open and Close with leg
     for i in range(len(all_data_frames)):
-        merged_df_columns.append(f"Open {i+1}")
-        merged_df_columns.append(f"Close {i+1}")
-        merged_df_columns.append(f"Volume {i+1}")
+        merged_df_columns.append(f"Open {i + 1}")
+        merged_df_columns.append(f"Close {i + 1}")
+        merged_df_columns.append(f"Volume {i + 1}")
 
     # Setting columns in merged_df
     merged_df.columns = merged_df_columns
@@ -210,7 +206,6 @@ def merge_dataframe_inner_join_with_combo_price_calculation(combo_obj, all_data_
 
     # Calculating Factor ( mulitplier * leg_qty * (+1 if buy else -1) )
     for leg_obj in all_legs:
-
         # Init
         quantity = int(leg_obj.quantity)
         multiplier = leg_obj.multiplier
@@ -246,6 +241,7 @@ def merge_dataframe_inner_join_with_combo_price_calculation(combo_obj, all_data_
 
     return merged_df
 
+
 # Method to merge dataframe to get combination volume
 def merge_dataframe_inner_join_with_bid_ask_calculation(
     combo_obj, ask_data_frames, bid_data_frames
@@ -266,7 +262,6 @@ def merge_dataframe_inner_join_with_bid_ask_calculation(
     for i, (df_ith, df_ith_bid) in enumerate(
         zip(ask_data_frames, bid_data_frames), start=0
     ):
-
         # Drop columns
         df_ith = df_ith.drop(["Volume"], axis=1)
         df_ith_bid = df_ith_bid.drop(["Volume"], axis=1)
@@ -348,6 +343,7 @@ def merge_dataframe_inner_join_with_bid_ask_calculation(
 
     return merged_df
 
+
 # Method to calculate average of absolute difference over lookback period
 def calculate_avg_of_abs_change_in_price_for_the_same_time_period(
     unique_id,
@@ -355,14 +351,14 @@ def calculate_avg_of_abs_change_in_price_for_the_same_time_period(
     date_time_start,
     date_time_close,
     flag_last_n_minute_field=False,
-    local_unique_id_to_combo_obj=None
+    local_unique_id_to_combo_obj=None,
 ):
-
     # Get combo obj
     try:
-
         if local_unique_id_to_combo_obj is None:
-            local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
+            local_unique_id_to_combo_obj = copy.deepcopy(
+                variables.unique_id_to_combo_obj
+            )
 
         combo_obj = local_unique_id_to_combo_obj[unique_id]
     except Exception as e:
@@ -395,7 +391,6 @@ def calculate_avg_of_abs_change_in_price_for_the_same_time_period(
     calculated_change_in_for_look_back_days = []
 
     for date_ith in all_date_values:
-
         # Filtering the dataframe for the 'date_ith'
         date_specific_dataframe_for_change_in_price = (
             filtered_historical_data_dataframe[
@@ -405,7 +400,6 @@ def calculate_avg_of_abs_change_in_price_for_the_same_time_period(
 
         # Save DF to CSV File (HV) Export data-frame to csv file
         if (variables.flag_store_cas_tab_csv_files) and not flag_last_n_minute_field:
-
             file_path = rf"{variables.cas_tab_csv_file_path}\Support Resistance And Relative Fields\RelativeChange"
 
             if not os.path.exists(file_path):
@@ -418,7 +412,6 @@ def calculate_avg_of_abs_change_in_price_for_the_same_time_period(
 
         # Save DF to CSV File (HV) Export data-frame to csv file
         elif (variables.flag_store_cas_tab_csv_files) and flag_last_n_minute_field:
-
             file_path = rf"{variables.cas_tab_csv_file_path}\Last N Minutes Fields\RelativeChange"
 
             if not os.path.exists(file_path):
@@ -454,7 +447,6 @@ def calculate_avg_of_abs_change_in_price_for_the_same_time_period(
             )
 
         else:
-
             # Calcualte log function change in price
             change_from_open_value = math.log(
                 abs(most_recent_values_for_day_row["Combination Close"]) + 1
@@ -462,27 +454,21 @@ def calculate_avg_of_abs_change_in_price_for_the_same_time_period(
                 1, most_recent_values_for_day_row["Combination Close"]
             ) - math.log(
                 abs(day_start_values_for_day_row["Combination Close"]) + 1
-            ) * math.copysign(
-                1, day_start_values_for_day_row["Combination Close"]
-            )
+            ) * math.copysign(1, day_start_values_for_day_row["Combination Close"])
 
         # Appending values in list
         calculated_change_in_for_look_back_days.append(abs(change_from_open_value))
 
     try:
-
         # Check if list is empty
         if calculated_change_in_for_look_back_days == []:
-
             avg_of_change_in_prices_over_lookback = "N/A"
         else:
-
             # Get mean value of values
             avg_of_change_in_prices_over_lookback = np.mean(
                 calculated_change_in_for_look_back_days
             )
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -492,11 +478,11 @@ def calculate_avg_of_abs_change_in_price_for_the_same_time_period(
 
     return avg_of_change_in_prices_over_lookback
 
+
 # Method to Calculate volume magnet indicator
 def calculate_volume_magnet_indicators(
     local_unique_id_to_combo_obj, map_conid_action_to_req_id
 ):
-
     # Init dict
     local_map_unique_id_to_volume_magnet_fields = {}
 
@@ -505,9 +491,7 @@ def calculate_volume_magnet_indicators(
 
     # Iterate all combos
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
         try:
-
             # Define default values
             local_map_unique_id_to_volume_magnet_fields[unique_id] = {
                 "Volume Magnet": "N/A"
@@ -553,7 +537,6 @@ def calculate_volume_magnet_indicators(
 
             # Check if data frame is empty
             if is_data_frame_empty:
-
                 # Define default values
                 local_map_unique_id_to_volume_magnet_fields[unique_id] = {
                     "Volume Magnet": "N/A"
@@ -568,7 +551,6 @@ def calculate_volume_magnet_indicators(
 
             # Save DF to CSV File
             if variables.flag_store_cas_tab_csv_files:
-
                 file_path = rf"{variables.cas_tab_csv_file_path}\Volume Magnet\Prices"
                 file_path += rf"\Unique_id_{unique_id}"
 
@@ -590,7 +572,6 @@ def calculate_volume_magnet_indicators(
 
             # Check if value is valid
             if timestamp_for_price not in ["N/A", None, "None"]:
-
                 # Filter the DataFrame where 'Time' is 'B' and get the 'combination close' value
                 volume_timestamp_price = combination_price_df.loc[
                     combination_price_df["Time"] == timestamp_for_price,
@@ -598,7 +579,6 @@ def calculate_volume_magnet_indicators(
                 ].values[0]
 
             else:
-
                 volume_timestamp_price = "N/A"
 
             # Make it available in variables
@@ -613,7 +593,6 @@ def calculate_volume_magnet_indicators(
                 None,
                 "None",
             ] and volume_timestamp_price not in ["N/A", None, "None"]:
-
                 # Calculate volume magnet
                 volume_magnet = curretn_combo_price - volume_timestamp_price
 
@@ -623,34 +602,30 @@ def calculate_volume_magnet_indicators(
             }
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
-
                 print(f"Expection inside getting volumne magnet, Exp:{e}")
 
     return local_map_unique_id_to_volume_magnet_fields
 
-# Method to calcualte high low price for range order
-def calculate_prices_for_range_order(local_unique_id_to_combo_obj,
-    map_conid_action_to_req_id,):
 
+# Method to calcualte high low price for range order
+def calculate_prices_for_range_order(
+    local_unique_id_to_combo_obj,
+    map_conid_action_to_req_id,
+):
     #  Init Dict
     local_map_unique_id_to_price_for_range_order = {}
 
     # Local copy of live price
     local_unique_id_to_prices_dict = copy.deepcopy(variables.unique_id_to_prices_dict)
 
-
     # Iterate all combos
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
-
         # Define default values
         local_map_unique_id_to_price_for_range_order[unique_id] = {
             "Highest Price": "N/A",
             "Lowest Price": "N/A",
-
         }
 
         # Get all legs
@@ -674,18 +649,15 @@ def calculate_prices_for_range_order(local_unique_id_to_combo_obj,
             for req_id in req_id_list
         ]
 
-
-
-
         # Data not found for any leg
         is_data_frame_empty = False
 
         # If data is not present
         for i, historical_dataframe in enumerate(all_data_frames):
             if (
-                    historical_dataframe is None
-                    or len(historical_dataframe.index) == 0
-                    or historical_dataframe.empty
+                historical_dataframe is None
+                or len(historical_dataframe.index) == 0
+                or historical_dataframe.empty
             ):
                 is_data_frame_empty = True
                 # Print to console
@@ -699,7 +671,6 @@ def calculate_prices_for_range_order(local_unique_id_to_combo_obj,
             local_map_unique_id_to_price_for_range_order[unique_id] = {
                 "Highest Price": "N/A",
                 "Lowest Price": "N/A",
-
             }
 
             continue
@@ -710,17 +681,17 @@ def calculate_prices_for_range_order(local_unique_id_to_combo_obj,
         )
 
         # get max and min value
-        highest_value = merged_df['Combination Close'].max()
-        lowest_value = merged_df['Combination Close'].min()
+        highest_value = merged_df["Combination Close"].max()
+        lowest_value = merged_df["Combination Close"].min()
 
         # Define default values
         local_map_unique_id_to_price_for_range_order[unique_id] = {
             "Highest Price": highest_value,
             "Lowest Price": lowest_value,
-
         }
 
     return local_map_unique_id_to_price_for_range_order
+
 
 # Method to calculate price based relative indicator
 def calculate_all_the_price_based_relative_indicators(
@@ -728,17 +699,14 @@ def calculate_all_the_price_based_relative_indicators(
     map_conid_action_to_req_id,
     last_n_minutes_lookback=None,
 ):
-
     # Check if last n minutes inout are none
     if last_n_minutes_lookback == None:
-
         # Init dict
         local_map_unique_id_to_support_resistance_and_relative_fields = {}
         prices_df_dict = {}
 
     # If input for last n minutes are available
     elif last_n_minutes_lookback != None:
-
         #  Init Dict
         local_map_unique_id_to_avg_abs_changes_last_n_minutes = {}
 
@@ -746,10 +714,8 @@ def calculate_all_the_price_based_relative_indicators(
     local_unique_id_to_prices_dict = copy.deepcopy(variables.unique_id_to_prices_dict)
 
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
         # Check if last n minutes inout are none
         if last_n_minutes_lookback == None:
-
             # Define default values
             local_map_unique_id_to_support_resistance_and_relative_fields[unique_id] = {
                 "Resistance": "N/A",
@@ -773,7 +739,6 @@ def calculate_all_the_price_based_relative_indicators(
 
         # If input for last n minutes are available
         elif last_n_minutes_lookback != None:
-
             # Define default values
             local_map_unique_id_to_avg_abs_changes_last_n_minutes[unique_id] = {
                 "Relative Change Last N Minutes": "N/A"
@@ -796,7 +761,6 @@ def calculate_all_the_price_based_relative_indicators(
 
         # Merge Data
         for leg in all_legs:
-
             action = leg.action
             con_id = leg.con_id
             req_id = map_conid_action_to_req_id[con_id][action]
@@ -810,9 +774,7 @@ def calculate_all_the_price_based_relative_indicators(
 
         # Save DF to CSV File
         if variables.flag_store_cas_tab_csv_files and last_n_minutes_lookback == None:
-
             for i, df_intraday_legwise in enumerate(all_data_frames):
-
                 # prepare file path
                 file_path = rf"{variables.cas_tab_csv_file_path}\Support Resistance And Relative Fields\LegWise"
                 file_path += rf"\Unique_id_{unique_id}"
@@ -822,14 +784,12 @@ def calculate_all_the_price_based_relative_indicators(
 
                 # Save dataframe in csv file
                 df_intraday_legwise.to_csv(
-                    rf"{file_path}\Leg_{i+1}_support_resistance_and_relative_fields.csv",
+                    rf"{file_path}\Leg_{i + 1}_support_resistance_and_relative_fields.csv",
                     index=False,
                 )
         # Save DF to CSV File
         elif variables.flag_store_cas_tab_csv_files and last_n_minutes_lookback != None:
-
             for i, df_intraday_legwise in enumerate(all_data_frames):
-
                 file_path = rf"{variables.cas_tab_csv_file_path}\Last N Minutes Fields\LegWise Prices"
                 file_path += rf"\Unique_id_{unique_id}"
 
@@ -837,7 +797,7 @@ def calculate_all_the_price_based_relative_indicators(
                     os.makedirs(file_path)
 
                 df_intraday_legwise.to_csv(
-                    rf"{file_path}\Leg_{i+1}_Relative_Columns_last_n_minutes.csv",
+                    rf"{file_path}\Leg_{i + 1}_Relative_Columns_last_n_minutes.csv",
                     index=False,
                 )
 
@@ -859,10 +819,8 @@ def calculate_all_the_price_based_relative_indicators(
 
         # Check if data frame is empty
         if is_data_frame_empty:
-
             # Check if last n minutes inout are none
             if last_n_minutes_lookback == None:
-
                 # Define default values
                 local_map_unique_id_to_support_resistance_and_relative_fields[
                     unique_id
@@ -888,7 +846,6 @@ def calculate_all_the_price_based_relative_indicators(
                 }
 
             elif last_n_minutes_lookback != None:
-
                 # Define default values
                 local_map_unique_id_to_avg_abs_changes_last_n_minutes[unique_id] = {
                     "Relative Change Last N Minutes": "N/A"
@@ -902,7 +859,6 @@ def calculate_all_the_price_based_relative_indicators(
 
         # Save DF to CSV File
         if variables.flag_store_cas_tab_csv_files and last_n_minutes_lookback == None:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\Support Resistance And Relative Fields\Merged"
 
@@ -915,7 +871,6 @@ def calculate_all_the_price_based_relative_indicators(
             )
 
         elif variables.flag_store_cas_tab_csv_files and last_n_minutes_lookback != None:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\Last N Minutes Fields\Merged Prices"
 
@@ -936,7 +891,6 @@ def calculate_all_the_price_based_relative_indicators(
         combination_price_dataframe_with_legwise_columns = merged_df.copy()
 
         try:
-
             # Create a new dataframe having the latest day available values, and reset index
             latest_available_date = combination_price_dataframe.iloc[-1]["Time"].date()
             latest_day_dataframe = combination_price_dataframe[
@@ -969,7 +923,6 @@ def calculate_all_the_price_based_relative_indicators(
 
             # Check if last n minutes input are not none
             if last_n_minutes_lookback != None:
-
                 # Create a new dataframe having the previous day available values, and reset index
                 previous_available_date = (
                     historical_data_except_current_day_dataframe.iloc[-1]["Time"].date()
@@ -1042,19 +995,15 @@ def calculate_all_the_price_based_relative_indicators(
 
                     # Update From Open if the flag_weighted_change_in_price is False
                     if not variables.flag_weighted_change_in_price:
-
                         # Change from open percent
                         rel_chg_last_n_minutes = math.log(
                             abs(recent_price_in_previous_day) + 1
                         ) * math.copysign(1, recent_price_in_previous_day) - math.log(
                             abs(past_n_minute_price_in_previous_day) + 1
-                        ) * math.copysign(
-                            1, past_n_minute_price_in_previous_day
-                        )
+                        ) * math.copysign(1, past_n_minute_price_in_previous_day)
 
                     # Update From Open if the flag_weighted_change_in_price is True
                     if variables.flag_weighted_change_in_price:
-
                         # Get day open prices for each leg
                         previous_day_last_n_minute_price_for_legs_list = (
                             get_values_for_each_leg(previous_day_dataframe, combo_obj)
@@ -1088,13 +1037,11 @@ def calculate_all_the_price_based_relative_indicators(
                     }
 
                 except Exception as e:
-
                     # Set to N/A
                     avg_of_abs_changes_in_prices_for_lookback = "N/A"
 
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"Exception in calculation of Average abs change in price, Exp: {e}"
                         )
@@ -1121,14 +1068,13 @@ def calculate_all_the_price_based_relative_indicators(
                 )
 
                 try:
-
                     # get copy og dataframe
                     latest_day_dataframe_copy = latest_day_dataframe.copy()
 
                     # Create a new column 'Previous Close' with the previous row's value from column 'Combination Close'
-                    latest_day_dataframe_copy[
-                        "Previous Close"
-                    ] = latest_day_dataframe_copy["Combination Close"].shift(1)
+                    latest_day_dataframe_copy["Previous Close"] = (
+                        latest_day_dataframe_copy["Combination Close"].shift(1)
+                    )
 
                     historical_data_except_current_day_dataframe_copy = (
                         historical_data_except_current_day_dataframe.copy()
@@ -1139,9 +1085,7 @@ def calculate_all_the_price_based_relative_indicators(
                         "Previous Close"
                     ] = historical_data_except_current_day_dataframe_copy[
                         "Combination Close"
-                    ].shift(
-                        1
-                    )
+                    ].shift(1)
 
                     # Get filterd latest day dataframe
                     latest_day_positive_candles_df = latest_day_dataframe_copy[
@@ -1177,7 +1121,6 @@ def calculate_all_the_price_based_relative_indicators(
 
                     # Save DF to CSV File
                     if variables.flag_store_cas_tab_csv_files:
-
                         # Saving dataframe to csv
                         file_path = rf"{variables.cas_tab_csv_file_path}\Support Resistance And Relative Fields\Current Day Positive_Negative Candles"
 
@@ -1199,7 +1142,6 @@ def calculate_all_the_price_based_relative_indicators(
 
                         if not os.path.exists(file_path):
                             os.makedirs(file_path)
-
 
                         historical_data_except_current_day_dataframe_positive_candles_df.to_csv(
                             rf"{file_path}\Unique_Id_{unique_id}_prices__positive_candles.csv",
@@ -1232,27 +1174,24 @@ def calculate_all_the_price_based_relative_indicators(
                     )
 
                 except Exception as e:
-
                     # Set to N/A
                     relative_atr_positive_candles = "N/A"
                     relative_atr_negative_candles = "N/A"
 
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"Exception in getting positive and negative candles dataframe for ATR, Exp: {e}"
                         )
 
                 # Code to calculate rleative ATR for lowest range
                 try:
-
                     latest_day_dataframe_copy = latest_day_dataframe.copy()
 
                     # Create a new column 'Previous Close' with the previous row's value from column 'Combination Close'
-                    latest_day_dataframe_copy[
-                        "Previous Close"
-                    ] = latest_day_dataframe_copy["Combination Close"].shift(1)
+                    latest_day_dataframe_copy["Previous Close"] = (
+                        latest_day_dataframe_copy["Combination Close"].shift(1)
+                    )
 
                     historical_data_except_current_day_dataframe_copy = (
                         historical_data_except_current_day_dataframe.copy()
@@ -1263,9 +1202,7 @@ def calculate_all_the_price_based_relative_indicators(
                         "Previous Close"
                     ] = historical_data_except_current_day_dataframe_copy[
                         "Combination Close"
-                    ].shift(
-                        1
-                    )
+                    ].shift(1)
 
                     # Get the minimum and maximum values of column 'Combination Close'
                     min_value = combination_price_dataframe["Combination Close"].min()
@@ -1273,7 +1210,6 @@ def calculate_all_the_price_based_relative_indicators(
 
                     # check if number of buckets is 0
                     if variables.relative_atr_in_range_number_of_buckets == 0:
-
                         raise Exception("Number of buckets is 0")
 
                     # get size of bucket
@@ -1289,7 +1225,6 @@ def calculate_all_the_price_based_relative_indicators(
 
                     # check if flag is close in rnage
                     if variables.flag_relative_atr_in_range == "Close In Range":
-
                         # Get filterd latest day dataframe
                         latest_day_lower_range_df = latest_day_dataframe_copy[
                             (
@@ -1348,7 +1283,6 @@ def calculate_all_the_price_based_relative_indicators(
 
                     # check if flag is open in rnage
                     elif variables.flag_relative_atr_in_range == "Open In Range":
-
                         # Get filterd latest day dataframe
                         latest_day_lower_range_df = latest_day_dataframe_copy[
                             (
@@ -1406,7 +1340,6 @@ def calculate_all_the_price_based_relative_indicators(
                         )
 
                     else:
-
                         # Get filterd latest day dataframe
                         latest_day_lower_range_df = latest_day_dataframe_copy[
                             (
@@ -1457,7 +1390,6 @@ def calculate_all_the_price_based_relative_indicators(
 
                     # Save DF to CSV File
                     if variables.flag_store_cas_tab_csv_files:
-
                         # Saving dataframe to csv
                         file_path = rf"{variables.cas_tab_csv_file_path}\Relative Fields in Range\Current Day Lower Higher Range Prices"
 
@@ -1514,23 +1446,18 @@ def calculate_all_the_price_based_relative_indicators(
                     # print([relative_atr_lower_range, relative_atr_higher_range])
 
                 except Exception as e:
-
                     relative_atr_lower_range = "N/A"
                     relative_atr_higher_range = "N/A"
 
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"Exception in getting positive and negative candles dataframe for ATR, Exp: {e}"
                         )
 
                 try:
                     # Check flag indicating which candles to use either since start of day or current candle
-                    if (
-                        not variables.flag_since_start_of_day_candles_for_relative_fields
-                    ):
-
+                    if not variables.flag_since_start_of_day_candles_for_relative_fields:
                         # Rel ATR - ATR for a particular period of time in the day / Avg ATR for the same time period averaged over the look back
                         relative_atr_current = atr_div_by_atr_avg(
                             unique_id,
@@ -1553,19 +1480,16 @@ def calculate_all_the_price_based_relative_indicators(
                             drop=True
                         )
                 except Exception as e:
-
                     # Set to N/A
                     start_time_of_time_slot = "N/A"
 
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"Exception inside getting time slots for relative ATR, Exp: {e}"
                         )
 
                 try:
-
                     # Rel ATR - ATR for a particular period of time in the day / Avg ATR for the same time period averaged over the look back
                     relative_atr = atr_div_by_atr_avg(
                         unique_id,
@@ -1585,24 +1509,19 @@ def calculate_all_the_price_based_relative_indicators(
                     )
 
                     # Check flag indicating which candles to use either since start of day or current candle
-                    if (
-                        not variables.flag_since_start_of_day_candles_for_relative_fields
-                    ):
-
+                    if not variables.flag_since_start_of_day_candles_for_relative_fields:
                         # calcualte rlative ATR derivative
                         relative_atr_derivative = (
                             relative_atr_current / relative_atr_n_mins_back
                         )
 
                     else:
-
                         # calcualte rlative ATR derivative
                         relative_atr_derivative = (
                             relative_atr / relative_atr_n_mins_back
                         )
 
                 except Exception as e:
-
                     # Set to N/A
                     relative_atr = "N/A"
 
@@ -1612,7 +1531,6 @@ def calculate_all_the_price_based_relative_indicators(
 
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(f"Exception in calculation of relative ATR, Exp: {e}")
 
                 # Support resisatance, counts
@@ -1629,7 +1547,6 @@ def calculate_all_the_price_based_relative_indicators(
 
                 # Check if combo is actual combo not leg
                 if unique_id > 0:
-
                     # Calculate significant levels
                     (
                         significant_level_in_range,
@@ -1639,13 +1556,15 @@ def calculate_all_the_price_based_relative_indicators(
                     )
 
                 else:
-
                     # Calculate significant levels
                     (
                         significant_level_in_range,
                         significant_level_count_values_in_range,
                     ) = calc_signficant_levels(
-                        list_of_candles, flag_in_range=True, unique_id=unique_id, combo_obj=combo_obj
+                        list_of_candles,
+                        flag_in_range=True,
+                        unique_id=unique_id,
+                        combo_obj=combo_obj,
                     )
 
                 # Defining resistance and support variables
@@ -1661,20 +1580,16 @@ def calculate_all_the_price_based_relative_indicators(
                 resistane_count_in_range, support_count_in_range = "N/A", "N/A"
 
                 try:
-
                     # Init
                     resistance, support = "N/A", "N/A"
                     resistance_count, support_count = "N/A", "N/A"
 
                     # GEt cuurent price
                     if unique_id in local_unique_id_to_prices_dict:
-
                         current_buy_price, current_sell_price = (
                             local_unique_id_to_prices_dict[unique_id]["BUY"],
                             local_unique_id_to_prices_dict[unique_id]["SELL"],
                         )
-
-
 
                         # Calculating the Resistance, Support
                         (
@@ -1698,18 +1613,18 @@ def calculate_all_the_price_based_relative_indicators(
                             support_count = "N/A"
 
                     else:
-
                         # check if it is leg value calcualtions
                         if len(all_legs) > 1:
-                            current_buy_price, current_sell_price = 'N/A', 'N/A'
+                            current_buy_price, current_sell_price = "N/A", "N/A"
 
                         # Get current price for legs
                         for leg_obj in all_legs:
                             req_id = variables.con_id_to_req_id_dict[leg_obj.con_id]
-                            bid, ask = variables.bid_price[req_id], variables.ask_price[req_id]
+                            bid, ask = (
+                                variables.bid_price[req_id],
+                                variables.ask_price[req_id],
+                            )
                             current_buy_price, current_sell_price = ask, bid
-
-
 
                         # Calculating the Resistance, Support
                         (
@@ -1732,10 +1647,7 @@ def calculate_all_the_price_based_relative_indicators(
                         else:
                             support_count = "N/A"
 
-
-
                 except Exception as e:
-
                     # Set to N/S
                     resistance, support = "N/A", "N/A"
                     resistance_count, support_count = "N/A", "N/A"
@@ -1747,13 +1659,11 @@ def calculate_all_the_price_based_relative_indicators(
                         )
 
                 try:
-
                     # Init
                     resistance_in_range, support_in_range = "N/A", "N/A"
 
                     # Get curerent price of combo
                     if unique_id in local_unique_id_to_prices_dict:
-
                         current_buy_price, current_sell_price = (
                             local_unique_id_to_prices_dict[unique_id]["BUY"],
                             local_unique_id_to_prices_dict[unique_id]["SELL"],
@@ -1781,11 +1691,9 @@ def calculate_all_the_price_based_relative_indicators(
                             None,
                             "None",
                         ] and support_in_range not in ["N/A", None, "None"]:
-
                             support_in_range = support_in_range - avg_price_combo
 
                         else:
-
                             support_in_range = "N/A"
 
                         # Check if values are valid
@@ -1794,11 +1702,9 @@ def calculate_all_the_price_based_relative_indicators(
                             None,
                             "None",
                         ] and resistance_in_range not in ["N/A", None, "None"]:
-
                             resistance_in_range = resistance_in_range - avg_price_combo
 
                         else:
-
                             resistance_in_range = "N/A"
 
                         # Calculating the Resistance count, Support count
@@ -1813,15 +1719,17 @@ def calculate_all_the_price_based_relative_indicators(
                             support_count_in_range = 'N/A""" ""
 
                     else:
-
                         # checking of its leg cmbo
                         if len(all_legs) > 1:
-                            current_buy_price, current_sell_price = 'N/A', 'N/A'
+                            current_buy_price, current_sell_price = "N/A", "N/A"
 
                         # Get current price for leg
                         for leg_obj in all_legs:
                             req_id = variables.con_id_to_req_id_dict[leg_obj.con_id]
-                            bid, ask = variables.bid_price[req_id], variables.ask_price[req_id]
+                            bid, ask = (
+                                variables.bid_price[req_id],
+                                variables.ask_price[req_id],
+                            )
                             current_buy_price, current_sell_price = ask, bid
 
                         # Calculating the Resistance, Support
@@ -1835,10 +1743,7 @@ def calculate_all_the_price_based_relative_indicators(
                         )
 
                         # get average combo price
-                        avg_price_combo = (
-                                                  current_buy_price
-                                                  + current_sell_price
-                                          ) / 2
+                        avg_price_combo = (current_buy_price + current_sell_price) / 2
 
                         # Check if values are valid
                         if avg_price_combo not in [
@@ -1846,11 +1751,9 @@ def calculate_all_the_price_based_relative_indicators(
                             None,
                             "None",
                         ] and support_in_range not in ["N/A", None, "None"]:
-
                             support_in_range = support_in_range - avg_price_combo
 
                         else:
-
                             support_in_range = "N/A"
 
                         # Check if values are valid
@@ -1859,17 +1762,13 @@ def calculate_all_the_price_based_relative_indicators(
                             None,
                             "None",
                         ] and resistance_in_range not in ["N/A", None, "None"]:
-
                             resistance_in_range = resistance_in_range - avg_price_combo
 
                         else:
-
                             resistance_in_range = "N/A"
-
 
                         # resistance_count_in_range, support_count_in_range = 'N/A', 'N/A'
                 except Exception as e:
-
                     # Set to N/A
                     resistance_in_range, support_in_range = "N/A", "N/A"
                     # resistance_count_in_range, support_count_in_range = 'N/A', 'N/A'
@@ -1879,7 +1778,6 @@ def calculate_all_the_price_based_relative_indicators(
                         print(
                             f"Exception Occured For calculating intraday resistance and support in range, error is {e}"
                         )
-
 
                 # Assign calcualted values
                 local_map_unique_id_to_support_resistance_and_relative_fields[
@@ -1899,11 +1797,11 @@ def calculate_all_the_price_based_relative_indicators(
                     "Relative ATR Lower": relative_atr_lower_range,
                     "Relative ATR Higher": relative_atr_higher_range,
                 }
-                '''if unique_id < 0:
+                """if unique_id < 0:
 
                     print(local_map_unique_id_to_support_resistance_and_relative_fields[
                     unique_id
-                    ])'''
+                    ])"""
 
                 # Assign df in dict
                 prices_df_dict[unique_id] = {
@@ -1916,7 +1814,6 @@ def calculate_all_the_price_based_relative_indicators(
                 }
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -1925,7 +1822,6 @@ def calculate_all_the_price_based_relative_indicators(
 
     # Check if last n minutes inout are none
     if last_n_minutes_lookback == None:
-
         return (
             local_map_unique_id_to_support_resistance_and_relative_fields,
             prices_df_dict,
@@ -1933,21 +1829,19 @@ def calculate_all_the_price_based_relative_indicators(
 
     # If input for last n minutes are available
     elif last_n_minutes_lookback != None:
-
         return local_map_unique_id_to_avg_abs_changes_last_n_minutes
+
 
 # Method to calcuulate bid ask related indicators
 def calculate_bid_ask_indicators(
     local_unique_id_to_combo_obj, map_conid_action_to_req_id, prices_df_dict
 ):
-
     # Init dict
     local_map_unique_id_tobid_ask_relative_fields = {}
 
     local_unique_id_to_prices_dict = copy.deepcopy(variables.unique_id_to_prices_dict)
 
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
         # Define default values
         local_map_unique_id_tobid_ask_relative_fields[unique_id] = {
             "Average Bid Ask": "N/A",
@@ -2012,7 +1906,6 @@ def calculate_bid_ask_indicators(
 
         # Check if data frame is empty
         if is_data_frame_empty:
-
             # Define default values
             local_map_unique_id_tobid_ask_relative_fields[unique_id] = {
                 "Average Bid Ask": "N/A",
@@ -2042,7 +1935,6 @@ def calculate_bid_ask_indicators(
 
         # Save DF to CSV File (HV) Export data-frame to csv file
         if variables.flag_store_cas_tab_csv_files:
-
             file_path = rf"{variables.cas_tab_csv_file_path}\Bid Ask Related Columns\Average Bid Ask Prices"
 
             if not os.path.exists(file_path):
@@ -2054,19 +1946,16 @@ def calculate_bid_ask_indicators(
             )
 
         try:
-
             # Calcualte avg bid ask spread since day start
             avg_bid_ask_spread_latest_day = combination_bid_ask_df[
                 "Combination Bid Ask Spread"
             ].mean()
 
         except Exception as e:
-
             # set value to N/A
             avg_bid_ask_spread_latest_day = "N/A"
 
             if variables.flag_debug_mode:
-
                 print(f"Exception calcualting average bid ask spread, Exp: {e}")
 
         # Assign value in dict
@@ -2076,11 +1965,11 @@ def calculate_bid_ask_indicators(
 
     return local_map_unique_id_tobid_ask_relative_fields
 
+
 # Method to fetch historical volume
 def get_historical_volume_for_all_combinations(
     cas_coinds_for_fetching_historical_data, duration_size, bar_size
 ):
-
     # Map of [conid][action] = req_id
     map_conid_to_req_id = {}
 
@@ -2120,7 +2009,6 @@ def get_historical_volume_for_all_combinations(
     while variables.cas_wait_time_for_historical_data > (
         counter * variables.sleep_time_waiting_for_tws_response
     ):
-
         """dict_mkt_end = variables.req_mkt_data_end
         dicterr_msg = variables.req_error
 
@@ -2154,6 +2042,7 @@ def get_historical_volume_for_all_combinations(
 
     return map_conid_to_req_id
 
+
 # Method to calcualte net volume
 def formula_to_calculate_net_volume_for_historical_data(
     row, volume, all_data_frames, factors
@@ -2163,20 +2052,17 @@ def formula_to_calculate_net_volume_for_historical_data(
 
     # Iterate all dfs
     for leg_no in range(len(all_data_frames)):
-
         column_name = f"{volume} {leg_no + 1}"
 
         # Get combo volume
         effective_volume_for_legs_list.append(float(row[column_name]) / factors[leg_no])
 
     try:
-
         # Calculate net volume
         net_volume = sum(effective_volume_for_legs_list) / len(
             effective_volume_for_legs_list
         )
     except Exception as e:
-
         # Default Val
         net_volume = "N/A"
 
@@ -2188,11 +2074,11 @@ def formula_to_calculate_net_volume_for_historical_data(
 
     return net_volume
 
+
 # Merge dataframe for combnation volume calcualtion
 def merge_dataframe_inner_join_with_combo_net_volume_calculation(
     combo_obj, all_data_frames
 ):
-
     # All legs in combo
     all_legs = combo_obj.buy_legs + combo_obj.sell_legs
 
@@ -2208,7 +2094,7 @@ def merge_dataframe_inner_join_with_combo_net_volume_calculation(
     # Merging all data frames such that Time is available in all data frames
     for i, df_ith in enumerate(all_data_frames[1:]):
         merged_df = pd.merge(
-            merged_df, df_ith, on="Time", how="inner", suffixes=(f"", f" {i+1}")
+            merged_df, df_ith, on="Time", how="inner", suffixes=(f"", f" {i + 1}")
         )
 
     # Dropping nan values, if any
@@ -2219,7 +2105,7 @@ def merge_dataframe_inner_join_with_combo_net_volume_calculation(
 
     # Open and Close with leg
     for i in range(len(all_data_frames)):
-        merged_df_columns.append(f"Volume {i+1}")
+        merged_df_columns.append(f"Volume {i + 1}")
 
     # Setting columns in merged_df
     merged_df.columns = merged_df_columns
@@ -2254,12 +2140,9 @@ def merge_dataframe_inner_join_with_combo_net_volume_calculation(
 
 # Calculate average of combinational volume for given dataframe
 def calculate_avg_volume_for_dataframe(combinational_volume_dataframe):
-
     try:
-
         # Check if df is empty
         if combinational_volume_dataframe.empty:
-
             return "N/A"
 
         # Calculate mean of combinational volume column
@@ -2280,7 +2163,6 @@ def calculate_relative_volume(
     date_time_close,
     flag_last_n_minute_field=False,
 ):
-
     # Convert the 'Time' column to datetime type if it's not already
     historical_data_except_current_day_dataframe["Time"] = pd.to_datetime(
         historical_data_except_current_day_dataframe["Time"]
@@ -2313,7 +2195,6 @@ def calculate_relative_volume(
     calculated_volume_for_look_back_days = []
 
     for date_ith in all_date_values:
-
         # Filtering the dataframe for the 'date_ith'
         date_specific_dataframe_for_volume = filtered_historical_data_dataframe[
             filtered_historical_data_dataframe["Time"].dt.date == date_ith
@@ -2321,7 +2202,6 @@ def calculate_relative_volume(
 
         # Save DF to CSV File (HV) Export data-frame to csv file
         if (variables.flag_store_cas_tab_csv_files) and not flag_last_n_minute_field:
-
             file_path = (
                 rf"{variables.cas_tab_csv_file_path}\Relative Volume\RelativeVolume"
             )
@@ -2336,7 +2216,6 @@ def calculate_relative_volume(
 
         # Save DF to CSV File (HV) Export data-frame to csv file
         if (variables.flag_store_cas_tab_csv_files) and flag_last_n_minute_field:
-
             file_path = rf"{variables.cas_tab_csv_file_path}\Last N Minutes Fields\RelativeVolume"
 
             if not os.path.exists(file_path):
@@ -2367,17 +2246,14 @@ def calculate_relative_volume(
 
         # check if value is valid for dividation
         if volume_avg_over_lookback_period not in [0, "N/A", None, "None"]:
-
             # calculate Volume since start of the day / Average Volume for the same time-period averaged over the look back
             relative_volume = round(
                 volume_since_start_of_day / volume_avg_over_lookback_period, 2
             )
 
         else:
-
             relative_volume = "N/A"
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -2388,6 +2264,7 @@ def calculate_relative_volume(
 
     return relative_volume
 
+
 # Calcualte volume related fields
 def calculate_volume_related_fields(
     local_unique_id_to_combo_obj,
@@ -2395,16 +2272,13 @@ def calculate_volume_related_fields(
     last_n_minutes_lookback=None,
     prices_df_dict=None,
 ):
-
     # Check if last n minutes parameter is None
     if last_n_minutes_lookback == None:
-
         # Dict
         local_map_unique_id_to_relative_volume_field = {}
 
     # check if last n minutes parameter is available
     else:
-
         # Dict
         local_map_unique_id_to_last_n_minutes_field = {}
 
@@ -2412,10 +2286,8 @@ def calculate_volume_related_fields(
     local_unique_id_to_prices_dict = copy.deepcopy(variables.unique_id_to_prices_dict)
 
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
         # Check if last n minutes parameter is None
         if last_n_minutes_lookback == None:
-
             # Dict
             local_map_unique_id_to_relative_volume_field[unique_id] = {
                 "Relative Volume": "N/A",
@@ -2428,7 +2300,6 @@ def calculate_volume_related_fields(
 
         # check if last n minutes parameter is available
         else:
-
             # Dict
             local_map_unique_id_to_last_n_minutes_field[unique_id] = {
                 "Relative Volume Last N Minutes": "N/A"
@@ -2444,7 +2315,6 @@ def calculate_volume_related_fields(
 
         # Getting all the reqId for which the historical data was requested
         for leg in all_legs:
-
             con_id = leg.con_id
             req_id = map_conid_to_req_id[con_id]
             req_id_list.append(req_id)
@@ -2457,9 +2327,7 @@ def calculate_volume_related_fields(
 
         # Save DF to CSV File
         if variables.flag_store_cas_tab_csv_files and last_n_minutes_lookback == None:
-
             for i, df_xxx in enumerate(all_data_frames):
-
                 file_path = (
                     rf"{variables.cas_tab_csv_file_path}\Relative Volume\Legwise"
                 )
@@ -2469,13 +2337,11 @@ def calculate_volume_related_fields(
                     os.makedirs(file_path)
 
                 df_xxx.to_csv(
-                    rf"{file_path}\Leg_{i+1}_Relative_Volume.csv", index=False
+                    rf"{file_path}\Leg_{i + 1}_Relative_Volume.csv", index=False
                 )
 
         elif variables.flag_store_cas_tab_csv_files and last_n_minutes_lookback != None:
-
             for i, df_xxx in enumerate(all_data_frames):
-
                 file_path = rf"{variables.cas_tab_csv_file_path}\Last N Minutes Fields\Legwise Volume"
                 file_path += rf"\Leg_Wise\Unique_id_{unique_id}"
 
@@ -2483,7 +2349,7 @@ def calculate_volume_related_fields(
                     os.makedirs(file_path)
 
                 df_xxx.to_csv(
-                    rf"{file_path}\Leg_{i+1}_Relative_Volume.csv", index=False
+                    rf"{file_path}\Leg_{i + 1}_Relative_Volume.csv", index=False
                 )
 
         # Data not found for any leg
@@ -2505,7 +2371,6 @@ def calculate_volume_related_fields(
         # If any dataframe is empty can not compute the values
         if is_data_frame_empty:
             if last_n_minutes_lookback == None:
-
                 # Dict
                 local_map_unique_id_to_relative_volume_field[unique_id] = {
                     "Relative Volume": "N/A",
@@ -2517,7 +2382,6 @@ def calculate_volume_related_fields(
                 }
 
             else:
-
                 # Dict
                 local_map_unique_id_to_last_n_minutes_field[unique_id] = {
                     "Relative Volume Last N Minutes": "N/A"
@@ -2532,7 +2396,6 @@ def calculate_volume_related_fields(
 
         # Save DF to CSV File
         if variables.flag_store_cas_tab_csv_files and last_n_minutes_lookback == None:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\Relative Volume\Merged"
 
@@ -2545,7 +2408,6 @@ def calculate_volume_related_fields(
             )
 
         elif variables.flag_store_cas_tab_csv_files and last_n_minutes_lookback != None:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\Last N Minutes Fields\Merged Volume"
 
@@ -2590,7 +2452,6 @@ def calculate_volume_related_fields(
 
             # Checking if last n minute parameter is available
             if last_n_minutes_lookback != None:
-
                 # Create a new dataframe having the latest day available values, and reset index
                 previous_available_date = (
                     historical_data_except_current_day_dataframe.iloc[-1]["Time"].date()
@@ -2621,7 +2482,6 @@ def calculate_volume_related_fields(
                 ]
 
                 try:
-
                     # Calculate relative volume
                     relative_volume = calculate_relative_volume(
                         unique_id,
@@ -2638,12 +2498,10 @@ def calculate_volume_related_fields(
                     }
 
                 except Exception as e:
-
                     relative_volume = "N/A"
 
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(f"Exception in calculation of relative_volume, Exp: {e}")
             else:
                 # Number of Candles in Latest Day Dataframe
@@ -2673,7 +2531,6 @@ def calculate_volume_related_fields(
                 )
 
                 try:
-
                     # pd.options.mode.chained_assignment = None  # default='warn'
                     latest_day_dataframe_prices = prices_df_dict[unique_id][
                         "Latest Day"
@@ -2758,7 +2615,6 @@ def calculate_volume_related_fields(
 
                     # Save DF to CSV File
                     if variables.flag_store_cas_tab_csv_files:
-
                         # Saving dataframe to csv
                         file_path = rf"{variables.cas_tab_csv_file_path}\Support Resistance And Relative Fields\Current Day Positive_Negative Candles Volume"
 
@@ -2792,7 +2648,6 @@ def calculate_volume_related_fields(
                         )
 
                 except Exception as e:
-
                     # Set to N/A
                     relative_volume_on_positive_candles = "N/A"
                     relative_volume_on_negative_candles = "N/A"
@@ -2804,7 +2659,6 @@ def calculate_volume_related_fields(
                         )
 
                 try:
-
                     # get lower and higher range df for prices
                     latest_day_lower_range_df_prices = prices_df_dict[unique_id][
                         "Latest Day Lower Range"
@@ -2814,14 +2668,10 @@ def calculate_volume_related_fields(
                     ]
                     historical_data_except_current_day_dataframe_lower_range_df_prices = prices_df_dict[
                         unique_id
-                    ][
-                        "Historic Data Except Current Day Lower Range"
-                    ]
+                    ]["Historic Data Except Current Day Lower Range"]
                     historical_data_except_current_day_dataframe_higher_range_df_prices = prices_df_dict[
                         unique_id
-                    ][
-                        "Historic Data Except Current Day Higher Range"
-                    ]
+                    ]["Historic Data Except Current Day Higher Range"]
 
                     # reset index
                     latest_day_lower_range_df_prices = (
@@ -2902,7 +2752,6 @@ def calculate_volume_related_fields(
                     # print([relative_volume_on_lower_range,relative_volume_on_higher_range])
                     # Save DF to CSV File
                     if variables.flag_store_cas_tab_csv_files:
-
                         # Saving dataframe to csv
                         file_path = rf"{variables.cas_tab_csv_file_path}\Relative Fields in Range\Current Day Lower Higher Range Volume"
 
@@ -2936,7 +2785,6 @@ def calculate_volume_related_fields(
                         )
 
                 except Exception as e:
-
                     relative_volume_on_lower_range = "N/A"
                     relative_volume_on_higher_range = "N/A"
 
@@ -2948,7 +2796,6 @@ def calculate_volume_related_fields(
 
                 # Check flag indicating which candles to use either since start of day or current candle
                 if not variables.flag_since_start_of_day_candles_for_relative_fields:
-
                     # Calculate relative volume
                     relative_volume_current = calculate_relative_volume(
                         unique_id,
@@ -2977,12 +2824,8 @@ def calculate_volume_related_fields(
                 relative_volume_derivative = "N/A"
 
                 try:
-
                     # Check flag indicating which candles to use either since start of day or current candle
-                    if (
-                        not variables.flag_since_start_of_day_candles_for_relative_fields
-                    ):
-
+                    if not variables.flag_since_start_of_day_candles_for_relative_fields:
                         # calcualte relative volume derivative
                         relative_volume_derivative = (
                             relative_volume_current / relative_volume_n_mins_back
@@ -2994,7 +2837,6 @@ def calculate_volume_related_fields(
                         )
 
                     else:
-
                         # calcualte relative volume derivative
                         relative_volume_derivative = (
                             relative_volume / relative_volume_n_mins_back
@@ -3006,12 +2848,10 @@ def calculate_volume_related_fields(
                         )
 
                 except Exception as e:
-
                     relative_volume_derivative = "N/A"
 
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"Exception inside calculating relative volume derivative, Exp: {e}"
                         )
@@ -3027,7 +2867,6 @@ def calculate_volume_related_fields(
                 }
 
         except Exception as e:
-
             # Print to console:
             if variables.flag_debug_mode:
                 print(f"Could not compute the Relative volume. Exception {e}")
@@ -3036,13 +2875,12 @@ def calculate_volume_related_fields(
 
     # When last n minutes parameted not available
     if last_n_minutes_lookback == None:
-
         return local_map_unique_id_to_relative_volume_field
 
     # When last n minutes parameter is available
     elif last_n_minutes_lookback != None:
-
         return local_map_unique_id_to_last_n_minutes_field
+
 
 # Method to manage all calculate indicator values
 def update_price_based_relative_indicators_values(
@@ -3085,9 +2923,11 @@ def update_price_based_relative_indicators_values(
 
     # Iterate all combos
     for unique_id_combo in local_unique_id_to_combo_obj_loop_copy:
-
         # Init
-        variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {'Leg Unique Ids': [], 'Combo Obj List': []}
+        variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {
+            "Leg Unique Ids": [],
+            "Combo Obj List": [],
+        }
 
         # Get combo obj
         combo_obj = local_unique_id_to_combo_obj[unique_id_combo]
@@ -3099,12 +2939,26 @@ def update_price_based_relative_indicators_values(
         for leg_obj in all_legs:
             max_id += 1
 
-            list_of_tuple_of_values = [(max_id, leg_obj.action, leg_obj.sec_type, leg_obj.symbol, 'None', 'None',
-                                        leg_obj.right, leg_obj.quantity,
-                                        leg_obj.multiplier, leg_obj.exchange,
-                                        leg_obj.trading_class, leg_obj.currency, leg_obj.con_id,
-                                        leg_obj.primary_exchange, leg_obj.strike_price,
-                                        leg_obj.expiry_date,)]
+            list_of_tuple_of_values = [
+                (
+                    max_id,
+                    leg_obj.action,
+                    leg_obj.sec_type,
+                    leg_obj.symbol,
+                    "None",
+                    "None",
+                    leg_obj.right,
+                    leg_obj.quantity,
+                    leg_obj.multiplier,
+                    leg_obj.exchange,
+                    leg_obj.trading_class,
+                    leg_obj.currency,
+                    leg_obj.con_id,
+                    leg_obj.primary_exchange,
+                    leg_obj.strike_price,
+                    leg_obj.expiry_date,
+                )
+            ]
 
             # Create combination and check if there is any error
             combination_obj = create_combination(
@@ -3114,9 +2968,13 @@ def update_price_based_relative_indicators_values(
             )
 
             # Append value
-            variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Leg Unique Ids'].append(max_id * -1)
+            variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                "Leg Unique Ids"
+            ].append(max_id * -1)
 
-            variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Combo Obj List'].append(combination_obj)
+            variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                "Combo Obj List"
+            ].append(combination_obj)
 
             # Assign combo obj for leg values calcualtion
             local_unique_id_to_combo_obj[max_id * -1] = combination_obj
@@ -3199,12 +3057,10 @@ def update_price_based_relative_indicators_values(
 
     # Get candle size in float format
     if candle_size_split[1] in ["mins", "min"]:
-
         # Get past n minutes lookback in integer format
         last_n_minutes_fields_lookback_mins = int(float(candle_size_split[0]))
 
     else:
-
         # Get past n minutes lookback in integer format
         last_n_minutes_fields_lookback_mins = int(60 * float(candle_size_split[0]))
 
@@ -3271,9 +3127,9 @@ def update_price_based_relative_indicators_values(
             map_unique_id_to_volume_magnet_indicators[unique_id]
         )
 
-        variables.map_unique_id_to_support_resistance_and_relative_fields[
-            unique_id
-        ] = local_map_unique_id_to_price_and_volume_based_indicators[unique_id]
+        variables.map_unique_id_to_support_resistance_and_relative_fields[unique_id] = (
+            local_map_unique_id_to_price_and_volume_based_indicators[unique_id]
+        )
 
     # Print to console
     if variables.flag_debug_mode:

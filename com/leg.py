@@ -3,6 +3,7 @@ Created on 15-Mar-2023
 
 @author: Karan
 """
+
 from com.contracts import *
 from com.variables import *
 

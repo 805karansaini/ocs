@@ -14,14 +14,16 @@ from com.contracts import get_contract
 from com.variables import variables
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.utils import Utils
-from option_combo_scanner.indicators_calculator.helper_binary_search_for_delta_iv import \
-    BinarySearchDeltaIV
-from option_combo_scanner.indicators_calculator.helper_indicator import \
-    IndicatorHelper
-from option_combo_scanner.indicators_calculator.historical_data_fetcher import \
-    HistoricalDataFetcher
-from option_combo_scanner.indicators_calculator.market_data_fetcher import \
-    MarketDataFetcher
+from option_combo_scanner.indicators_calculator.helper_binary_search_for_delta_iv import (
+    BinarySearchDeltaIV,
+)
+from option_combo_scanner.indicators_calculator.helper_indicator import IndicatorHelper
+from option_combo_scanner.indicators_calculator.historical_data_fetcher import (
+    HistoricalDataFetcher,
+)
+from option_combo_scanner.indicators_calculator.market_data_fetcher import (
+    MarketDataFetcher,
+)
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 from option_combo_scanner.strategy.utilities import StrategyUtils
 
@@ -41,7 +43,13 @@ class ImpliedVolatility:
     #     return annualized_value
 
     @staticmethod
-    def calculate_risk_reversal_for_target_delta(df_call, df_put, iv_column_name: str, delta_column_name: str, target_delta: float):
+    def calculate_risk_reversal_for_target_delta(
+        df_call,
+        df_put,
+        iv_column_name: str,
+        delta_column_name: str,
+        target_delta: float,
+    ):
         """
         Calculate risk reversal based on the nearest call and put deltas to the target delta.
         """
@@ -54,16 +62,28 @@ class ImpliedVolatility:
 
         # Print Here Target Delta Strike, Dlta, IV
         if StrategyVariables.flag_test_print:
-            print(f"Risk Reversal:  target_Delta: {target_delta}, IV: {nearest_call_data[iv_column_name]}  \nCall Nearest Data: \n{nearest_call_data.to_string()} ")
-            print(f"Risk Reversal:  target_Delta: {target_delta}, IV: {nearest_put_data[iv_column_name]}   \nPut Nearest Data: \n{nearest_put_data.to_string()}")
+            print(
+                f"Risk Reversal:  target_Delta: {target_delta}, IV: {nearest_call_data[iv_column_name]}  \nCall Nearest Data: \n{nearest_call_data.to_string()} "
+            )
+            print(
+                f"Risk Reversal:  target_Delta: {target_delta}, IV: {nearest_put_data[iv_column_name]}   \nPut Nearest Data: \n{nearest_put_data.to_string()}"
+            )
 
         # Calculate risk reversal based on the nearest call and put deltas to the target delta.
-        risk_reversal = nearest_call_data[iv_column_name] - nearest_put_data[iv_column_name]
+        risk_reversal = (
+            nearest_call_data[iv_column_name] - nearest_put_data[iv_column_name]
+        )
 
         return risk_reversal
 
     @staticmethod
-    def calculate_iv_for_target_delta(df_call, df_put, iv_column_name: str, delta_column_name: str, target_delta: float):
+    def calculate_iv_for_target_delta(
+        df_call,
+        df_put,
+        iv_column_name: str,
+        delta_column_name: str,
+        target_delta: float,
+    ):
         """
         Calculate implied volatility based on the nearest call and put deltas to the target delta.
         """
@@ -76,7 +96,9 @@ class ImpliedVolatility:
         nearest_call_data = df_call.loc[nearest_call_index]
         nearest_put_data = df_put.loc[nearest_put_index]
 
-        implied_volatility = (nearest_call_data[iv_column_name] + nearest_put_data[iv_column_name]) / 2
+        implied_volatility = (
+            nearest_call_data[iv_column_name] + nearest_put_data[iv_column_name]
+        ) / 2
 
         return implied_volatility
 
@@ -90,10 +112,12 @@ class ImpliedVolatility:
         put_option_subset = df_put[["Strike", "PutOI"]]
 
         # Merging the two dataframes on the "Strike" column
-        merged_df = pd.merge(call_option_subset, put_option_subset, on="Strike", how="outer")
+        merged_df = pd.merge(
+            call_option_subset, put_option_subset, on="Strike", how="outer"
+        )
 
         if StrategyVariables.flag_drop_empty_oi_rows:
-            merged_df.dropna(subset=['CallOI', 'PutOI'], inplace=True)
+            merged_df.dropna(subset=["CallOI", "PutOI"], inplace=True)
 
         # If you want to fill NaN values with 0
         merged_df.fillna(0, inplace=True)
@@ -112,23 +136,33 @@ class ImpliedVolatility:
             call_loss_value_at_strike = 0
             put_loss_value_at_strike = 0
 
-            for _strike, _call_oi, _put_oi in zip(list_of_strike, list_of_call_oi, list_of_put_oi):
+            for _strike, _call_oi, _put_oi in zip(
+                list_of_strike, list_of_call_oi, list_of_put_oi
+            ):
                 strike_diff = abs(_strike - strike)
-                call_loss_value_at_strike += 0 if strike < _strike else (_call_oi * strike_diff)
-                put_loss_value_at_strike += 0 if strike >= _strike else (_put_oi * strike_diff)
+                call_loss_value_at_strike += (
+                    0 if strike < _strike else (_call_oi * strike_diff)
+                )
+                put_loss_value_at_strike += (
+                    0 if strike >= _strike else (_put_oi * strike_diff)
+                )
 
             merged_df.at[indx, "Loss Value of Calls"] = call_loss_value_at_strike
             merged_df.at[indx, "Loss Value of Puts"] = put_loss_value_at_strike
 
         # Calculate total loss for each strike
-        merged_df["Total Loss Value"] = merged_df["Loss Value of Calls"] + merged_df["Loss Value of Puts"]
+        merged_df["Total Loss Value"] = (
+            merged_df["Loss Value of Calls"] + merged_df["Loss Value of Puts"]
+        )
 
         # If flag is True store CSV Files
 
         if StrategyVariables.flag_store_csv_files:
             folder_name = "MinMaxPain"
             file_name = rf"{indicator_id}_MinMaxPain"
-            StrategyUtils.save_option_combo_scanner_csv_file(merged_df, folder_name, file_name)
+            StrategyUtils.save_option_combo_scanner_csv_file(
+                merged_df, folder_name, file_name
+            )
 
         if not merged_df.empty:  # Check again if the DataFrame is not empty
             min_loss_index = merged_df["Total Loss Value"].idxmin()
@@ -142,8 +176,11 @@ class ImpliedVolatility:
 
         # Return None if DataFrame is empty
         return None, None
+
     @staticmethod
-    def calculate_oi_support_resistance_strikes(df_call, df_put, current_underlying_price, indicator_id):
+    def calculate_oi_support_resistance_strikes(
+        df_call, df_put, current_underlying_price, indicator_id
+    ):
         """
         Calculate Min And Max Pain
         """
@@ -179,10 +216,14 @@ class ImpliedVolatility:
         if StrategyVariables.flag_store_csv_files:
             folder_name = "OpenInterest"
             file_name = rf"{indicator_id}_Call_OI"
-            StrategyUtils.save_option_combo_scanner_csv_file(df_call, folder_name, file_name)
+            StrategyUtils.save_option_combo_scanner_csv_file(
+                df_call, folder_name, file_name
+            )
 
             file_name = rf"{indicator_id}_Put_OI"
-            StrategyUtils.save_option_combo_scanner_csv_file(df_put, folder_name, file_name)
+            StrategyUtils.save_option_combo_scanner_csv_file(
+                df_put, folder_name, file_name
+            )
 
         return support_strike, resistance_strike
 
@@ -243,22 +284,32 @@ class ImpliedVolatility:
         instrument_id = indicator_object.instrument_id
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
 
         # Get the current date
         current_date_for_dte = datetime.datetime.today().strftime("%Y%m%d")
-        current_date_obj_for_dte = datetime.datetime.strptime(current_date_for_dte, "%Y%m%d")
+        current_date_obj_for_dte = datetime.datetime.strptime(
+            current_date_for_dte, "%Y%m%d"
+        )
         expiry_date_obj_for_dte = datetime.datetime.strptime(expiry, "%Y%m%d")
         dte = abs(current_date_obj_for_dte - expiry_date_obj_for_dte).days
         # underlying_contract.conId = 265598
 
         # Get Underlying Price
-        underlying_bid, underlying_ask, last_price = asyncio.run(MarketDataFetcher.get_current_price_for_contract(underlying_contract))
+        underlying_bid, underlying_ask, last_price = asyncio.run(
+            MarketDataFetcher.get_current_price_for_contract(underlying_contract)
+        )
 
         if StrategyVariables.flag_test_print:
-            print(f"Indicator ID: {indicator_id}, Underlying Contract: {underlying_contract}")
-            print(f"Indicator ID: {indicator_id}, Underlying Bid: {underlying_bid}, Underlying Ask: {underlying_ask} Last Price: {last_price}")
+            print(
+                f"Indicator ID: {indicator_id}, Underlying Contract: {underlying_contract}"
+            )
+            print(
+                f"Indicator ID: {indicator_id}, Underlying Bid: {underlying_bid}, Underlying Ask: {underlying_ask} Last Price: {last_price}"
+            )
             # time.sleep(100)
 
         # Current underlying price is last_price in case of INDEX
@@ -281,12 +332,16 @@ class ImpliedVolatility:
                 current_underlying_price = (underlying_bid + underlying_ask) / 2
 
         if StrategyVariables.flag_test_print:
-            print(f"Indicator ID: {indicator_id}, Current Underlying Price: {current_underlying_price}")
+            print(
+                f"Indicator ID: {indicator_id}, Current Underlying Price: {current_underlying_price}"
+            )
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
-        
+
         # Getting the underlying_contarct, and all the call and put option contracts
         (
             list_of_all_call_option_contracts,
@@ -305,9 +360,11 @@ class ImpliedVolatility:
         )
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
-        
+
         generic_tick_list = "101"  # "101, 100"
         snapshot = False
 
@@ -316,13 +373,19 @@ class ImpliedVolatility:
             call_option_mkt_data_df,
             put_option_mkt_data_df,
         ) = IndicatorHelper.get_mkt_data_df_for_call_and_put_options(
-            list_of_all_call_option_contracts, list_of_all_put_option_contracts, snapshot=snapshot, generic_tick_list=generic_tick_list, instrument_id=instrument_id, indicator_id=indicator_id
+            list_of_all_call_option_contracts,
+            list_of_all_put_option_contracts,
+            snapshot=snapshot,
+            generic_tick_list=generic_tick_list,
+            instrument_id=instrument_id,
+            indicator_id=indicator_id,
         )
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
-        
 
         # Print to console
         if StrategyVariables.flag_test_print:
@@ -352,23 +415,32 @@ class ImpliedVolatility:
         if StrategyVariables.flag_store_csv_files:
             folder_name = "CurrentMktData"
             file_name = rf"{indicator_id}_Call"
-            StrategyUtils.save_option_combo_scanner_csv_file(call_option_mkt_data_df, folder_name, file_name)
+            StrategyUtils.save_option_combo_scanner_csv_file(
+                call_option_mkt_data_df, folder_name, file_name
+            )
 
             file_name = rf"{indicator_id}_Put"
-            StrategyUtils.save_option_combo_scanner_csv_file(put_option_mkt_data_df, folder_name, file_name)
+            StrategyUtils.save_option_combo_scanner_csv_file(
+                put_option_mkt_data_df, folder_name, file_name
+            )
 
         # Traget Delta D1 and D2
         delta_d1 = StrategyVariables.delta_d1_indicator_input
         delta_d2 = StrategyVariables.delta_d2_indicator_input
         # Target Deltas
-        list_of_target_deltas = [StrategyVariables.delta_d1_indicator_input, StrategyVariables.delta_d2_indicator_input]
+        list_of_target_deltas = [
+            StrategyVariables.delta_d1_indicator_input,
+            StrategyVariables.delta_d2_indicator_input,
+        ]
         iv_column_name = "AskIV"
         delta_column_name = "Delta"
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
-        
+
         ##############################################
         # Calculating Current IV and RR
         ##############################################
@@ -392,8 +464,12 @@ class ImpliedVolatility:
             current_rr_d2 = None
         else:
             # Calculating current iv values for D1 and D2
-            current_iv_d1 = ImpliedVolatility.calculate_iv_for_target_delta(df_call, df_put, iv_column_name, delta_column_name, delta_d1)
-            current_iv_d2 = ImpliedVolatility.calculate_iv_for_target_delta(df_call, df_put, iv_column_name, delta_column_name, delta_d2)
+            current_iv_d1 = ImpliedVolatility.calculate_iv_for_target_delta(
+                df_call, df_put, iv_column_name, delta_column_name, delta_d1
+            )
+            current_iv_d2 = ImpliedVolatility.calculate_iv_for_target_delta(
+                df_call, df_put, iv_column_name, delta_column_name, delta_d2
+            )
 
             # Calculating current RR values for D1 and D2
             current_rr_d1 = ImpliedVolatility.calculate_risk_reversal_for_target_delta(
@@ -413,25 +489,35 @@ class ImpliedVolatility:
             max_pain_strike, min_pain_strike = None, None
         else:
             # Filling OI Values with 0 where not available in the method below
-            max_pain_strike, min_pain_strike = ImpliedVolatility.calculate_min_max_pain_strikes(df_call, df_put, indicator_id)
+            max_pain_strike, min_pain_strike = (
+                ImpliedVolatility.calculate_min_max_pain_strikes(
+                    df_call, df_put, indicator_id
+                )
+            )
 
-        # Remove rows with OI 
+        # Remove rows with OI
         df_call.dropna(subset=["CallOI"], inplace=True)
         df_put.dropna(subset=["PutOI"], inplace=True)
 
         if df_call.empty or df_put.empty:
             support_strike, resistance_strike = None, None
         else:
-            support_strike, resistance_strike = ImpliedVolatility.calculate_oi_support_resistance_strikes(
-                df_call,
-                df_put,
-                current_underlying_price,
-                indicator_id,
+            support_strike, resistance_strike = (
+                ImpliedVolatility.calculate_oi_support_resistance_strikes(
+                    df_call,
+                    df_put,
+                    current_underlying_price,
+                    indicator_id,
+                )
             )
 
         # Current Avg IV Calculate
-        current_avg_iv = (current_iv_d1 + current_iv_d2) / 2 if current_iv_d1 and current_iv_d2 else None
-        
+        current_avg_iv = (
+            (current_iv_d1 + current_iv_d2) / 2
+            if current_iv_d1 and current_iv_d2
+            else None
+        )
+
         # Print to console
         if StrategyVariables.flag_test_print:
             print(f"Indicaor ID: {indicator_object.indicator_id}")
@@ -441,30 +527,54 @@ class ImpliedVolatility:
 
         # Update these values here
         values_dict = {
-            "current_iv_d1": round(current_iv_d1 * 100, 2) if current_iv_d1 else current_iv_d1,
-            "current_iv_d2": round(current_iv_d2 * 100, 2) if current_iv_d2 else current_iv_d2,
-            "current_avg_iv": round(current_avg_iv * 100, 2) if current_avg_iv else current_avg_iv,
-            "current_rr_d1": round(current_rr_d1 * 100, 2) if current_rr_d1 else current_rr_d1,
-            "current_rr_d2": round(current_rr_d2 * 100, 2) if current_rr_d2 else current_rr_d2,
-            "max_pain_strike": round(max_pain_strike, 2) if max_pain_strike else max_pain_strike,
-            "min_pain_strike": round(min_pain_strike, 2) if min_pain_strike else min_pain_strike,
-            "oi_support_strike": round(support_strike, 2) if support_strike else support_strike,
-            "oi_resistance_strike": round(resistance_strike, 2) if resistance_strike else resistance_strike,
+            "current_iv_d1": round(current_iv_d1 * 100, 2)
+            if current_iv_d1
+            else current_iv_d1,
+            "current_iv_d2": round(current_iv_d2 * 100, 2)
+            if current_iv_d2
+            else current_iv_d2,
+            "current_avg_iv": round(current_avg_iv * 100, 2)
+            if current_avg_iv
+            else current_avg_iv,
+            "current_rr_d1": round(current_rr_d1 * 100, 2)
+            if current_rr_d1
+            else current_rr_d1,
+            "current_rr_d2": round(current_rr_d2 * 100, 2)
+            if current_rr_d2
+            else current_rr_d2,
+            "max_pain_strike": round(max_pain_strike, 2)
+            if max_pain_strike
+            else max_pain_strike,
+            "min_pain_strike": round(min_pain_strike, 2)
+            if min_pain_strike
+            else min_pain_strike,
+            "oi_support_strike": round(support_strike, 2)
+            if support_strike
+            else support_strike,
+            "oi_resistance_strike": round(resistance_strike, 2)
+            if resistance_strike
+            else resistance_strike,
         }
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
-        
+
         # Update value in DB, Object & GUI
-        IndicatorHelper.update_indicator_values_for_indcator_id(indicator_id=indicator_object.indicator_id, values_dict=values_dict)
+        IndicatorHelper.update_indicator_values_for_indcator_id(
+            indicator_id=indicator_object.indicator_id, values_dict=values_dict
+        )
 
         ##############################################
         # Calculating Avg. IV overn N-Days
         ##############################################
         # Map
         map_ith_day_to_ith_day_avg_iv = {}
-        map_ith_day_to_ith_day_avg_iv[f"0D-AvgIV"] = current_avg_iv if current_avg_iv else 0
+        map_ith_day_to_ith_day_avg_iv[f"0D-AvgIV"] = (
+            current_avg_iv if current_avg_iv else 0
+        )
 
         # [(1D, 0.25)] = IV for 1D delta 0.25
         map_ith_day_and_target_delta_d_to_call_iv_value = {}  # key: (day, targetdelta) = iv
@@ -475,7 +585,6 @@ class ImpliedVolatility:
 
         map_ith_day_and_target_delta_d_to_call_delta_value = {}  # key: (day, targetdelta) = iv
         map_ith_day_and_target_delta_d_to_put_delta_value = {}  # key: (day, targetdelta) = iv
-        
 
         # Inputs for Fetching Data
         n_th_day: int = StrategyVariables.avg_iv_lookback_days
@@ -484,16 +593,25 @@ class ImpliedVolatility:
         what_to_show_price = "BID"
 
         # Get Historical Data for Underlying
-        list_of_underlying_reqid_price = HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
-            [underlying_contract], bar_size_price, [duration_size_price], what_to_show_price
+        list_of_underlying_reqid_price = (
+            HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
+                [underlying_contract],
+                bar_size_price,
+                [duration_size_price],
+                what_to_show_price,
+            )
         )
         underlying_reqid_price = list_of_underlying_reqid_price[0]
-        underlying_df = variables.map_req_id_to_historical_data_dataframe[underlying_reqid_price]
+        underlying_df = variables.map_req_id_to_historical_data_dataframe[
+            underlying_reqid_price
+        ]
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
-        
+
         # Get the Sorted Date Set, In Latest to Oldest Value manner
         if underlying_df.empty:
             print(
@@ -505,18 +623,19 @@ class ImpliedVolatility:
                 print(f"Indicator ID: {indicator_id}, Underlying DataFrame")
                 print(underlying_df.to_string())
 
-        # Get all the dates from historical underlying data 
+        # Get all the dates from historical underlying data
         all_the_dates_in_underlying_data = []  # LIST of DATE OBJ (pd.dt.date)
         temp_underlying_df = underlying_df.copy()
         # Extract date component from the "Time" column
         dates = pd.to_datetime(temp_underlying_df["Time"]).dt.date.tolist()
         all_the_dates_in_underlying_data.extend(dates)
         # Remove duplicates * Sort
-        all_the_dates_in_underlying_data = sorted(list(set(all_the_dates_in_underlying_data)))
+        all_the_dates_in_underlying_data = sorted(
+            list(set(all_the_dates_in_underlying_data))
+        )
 
         # We want to compute 1D-AvgIV to 13D-AvgIV
         for right in ["Call", "Put"]:
-            
             if right == "Call":
                 list_of_all_option_contracts = list_of_all_call_option_contracts
             elif right == "Put":
@@ -530,21 +649,26 @@ class ImpliedVolatility:
                 start_time = time.perf_counter()
 
                 # Get the Data in one go and store in the DataStore
-                BinarySearchDeltaIV.get_historical_data_for_list_of_contracts_and_store_in_data_store(list_of_all_option_contracts)
-                
+                BinarySearchDeltaIV.get_historical_data_for_list_of_contracts_and_store_in_data_store(
+                    list_of_all_option_contracts
+                )
+
                 flag_binnary_serach = True
                 # print(f"Total Time Took: {time.perf_counter() - start_time}")
 
             # Print to Console
             if StrategyVariables.flag_test_print:
-                print(f"OPT Contract: {list_of_all_option_contracts[0]},  SecType: {sec_type}, Use BS: {flag_binnary_serach}")
+                print(
+                    f"OPT Contract: {list_of_all_option_contracts[0]},  SecType: {sec_type}, Use BS: {flag_binnary_serach}"
+                )
 
             for ith_day in range(1, n_th_day):
-
                 # Check for early termination
-                if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+                if Utils.flag_check_early_termination_of_indicator(
+                    indicator_id=indicator_id, instrument_id=instrument_id
+                ):
                     return None, None
-            
+
                 if len(all_the_dates_in_underlying_data) > ith_day:
                     ith_days_old_date = all_the_dates_in_underlying_data[-(ith_day + 1)]
                 else:
@@ -553,7 +677,9 @@ class ImpliedVolatility:
 
                 # Date Time object i days ago date
                 ith_days_old_date_str = ith_days_old_date.strftime("%Y%m%d")
-                i_day_ago_date_obj = datetime.datetime.strptime(ith_days_old_date_str, "%Y%m%d")
+                i_day_ago_date_obj = datetime.datetime.strptime(
+                    ith_days_old_date_str, "%Y%m%d"
+                )
 
                 # OPT Expiry Date
                 expiry_date_obj = datetime.datetime.strptime(expiry, "%Y%m%d")
@@ -561,51 +687,87 @@ class ImpliedVolatility:
                 time_to_expiration = (time_to_expiration) / 365
 
                 # Get underlying price for the date
-                underlying_close_price_for_ith_day = ImpliedVolatility.get_underlying_close_price_for_ith_day(ith_day, underlying_df)
+                underlying_close_price_for_ith_day = (
+                    ImpliedVolatility.get_underlying_close_price_for_ith_day(
+                        ith_day, underlying_df
+                    )
+                )
                 if StrategyVariables.flag_test_print:
-                    print(f"Right: {right} Day Ago: {ith_day} UnderPrice: {underlying_close_price_for_ith_day} TTE: {time_to_expiration} Old Date: {ith_days_old_date} Expiry: {expiry_date_obj}")
+                    print(
+                        f"Right: {right} Day Ago: {ith_day} UnderPrice: {underlying_close_price_for_ith_day} TTE: {time_to_expiration} Old Date: {ith_days_old_date} Expiry: {expiry_date_obj}"
+                    )
 
-                    
                 # Get the strike along with delta & iv value, such that the target delta is nearest
                 # For getting these values we can compute the IV_D1 and IV_D2 and AvgIV for ith_day
                 # [Tar.DeltaD1: (Strike, Delta, IV,), Tar.DeltaD2: (Strike, Delta, IV,)]
-                list_of_strike_delta_iv_tuple = BinarySearchDeltaIV.find_the_strike_delta_iv_tuple(
-                    underlying_close_price_for_ith_day,
-                    right,
-                    time_to_expiration,
-                    list_of_all_option_contracts,  # Right C / P only
-                    list_of_target_deltas,
-                    target_date=ith_days_old_date,
+                list_of_strike_delta_iv_tuple = (
+                    BinarySearchDeltaIV.find_the_strike_delta_iv_tuple(
+                        underlying_close_price_for_ith_day,
+                        right,
+                        time_to_expiration,
+                        list_of_all_option_contracts,  # Right C / P only
+                        list_of_target_deltas,
+                        target_date=ith_days_old_date,
+                    )
                 )
                 if StrategyVariables.flag_test_print:
-                    print(f"Result BS Search for ith day {ith_day} {list_of_strike_delta_iv_tuple}")
+                    print(
+                        f"Result BS Search for ith day {ith_day} {list_of_strike_delta_iv_tuple}"
+                    )
 
-                for target_delta, (strikeee, _, iv_at_target_delta) in zip(list_of_target_deltas, list_of_strike_delta_iv_tuple):
+                for target_delta, (strikeee, _, iv_at_target_delta) in zip(
+                    list_of_target_deltas, list_of_strike_delta_iv_tuple
+                ):
                     if right == "Call":
-                        map_ith_day_and_target_delta_d_to_call_iv_value[(ith_day, target_delta)] = iv_at_target_delta
-                        map_ith_day_and_target_delta_d_to_call_strike[(ith_day, target_delta)] = None if strikeee is None else float(strikeee)  
-                        map_ith_day_and_target_delta_d_to_call_delta_value[(ith_day, target_delta)] = _
+                        map_ith_day_and_target_delta_d_to_call_iv_value[
+                            (ith_day, target_delta)
+                        ] = iv_at_target_delta
+                        map_ith_day_and_target_delta_d_to_call_strike[
+                            (ith_day, target_delta)
+                        ] = None if strikeee is None else float(strikeee)
+                        map_ith_day_and_target_delta_d_to_call_delta_value[
+                            (ith_day, target_delta)
+                        ] = _
                     else:
-                        map_ith_day_and_target_delta_d_to_put_iv_value[(ith_day, target_delta)] = iv_at_target_delta
-                        map_ith_day_and_target_delta_d_to_put_strike[(ith_day, target_delta)] = None if strikeee is None else float(strikeee) 
-                        map_ith_day_and_target_delta_d_to_put_delta_value[(ith_day, target_delta)] = _
+                        map_ith_day_and_target_delta_d_to_put_iv_value[
+                            (ith_day, target_delta)
+                        ] = iv_at_target_delta
+                        map_ith_day_and_target_delta_d_to_put_strike[
+                            (ith_day, target_delta)
+                        ] = None if strikeee is None else float(strikeee)
+                        map_ith_day_and_target_delta_d_to_put_delta_value[
+                            (ith_day, target_delta)
+                        ] = _
 
         for ith_day in range(1, n_th_day):
+            __call_iv_value_ith_day_delta_d1 = (
+                map_ith_day_and_target_delta_d_to_call_iv_value.get((ith_day, delta_d1))
+            )
+            __call_iv_value_ith_day_delta_d2 = (
+                map_ith_day_and_target_delta_d_to_call_iv_value.get((ith_day, delta_d2))
+            )
+            __put_iv_value_ith_day_delta_d1 = (
+                map_ith_day_and_target_delta_d_to_put_iv_value.get((ith_day, delta_d1))
+            )
+            __put_iv_value_ith_day_delta_d2 = (
+                map_ith_day_and_target_delta_d_to_put_iv_value.get((ith_day, delta_d2))
+            )
 
-            __call_iv_value_ith_day_delta_d1 = map_ith_day_and_target_delta_d_to_call_iv_value.get((ith_day, delta_d1))
-            __call_iv_value_ith_day_delta_d2 = map_ith_day_and_target_delta_d_to_call_iv_value.get((ith_day, delta_d2))
-            __put_iv_value_ith_day_delta_d1 = map_ith_day_and_target_delta_d_to_put_iv_value.get((ith_day, delta_d1))
-            __put_iv_value_ith_day_delta_d2 = map_ith_day_and_target_delta_d_to_put_iv_value.get((ith_day, delta_d2))
-
-            if (__call_iv_value_ith_day_delta_d1 is not None and __call_iv_value_ith_day_delta_d2 is not None and
-                __put_iv_value_ith_day_delta_d1 is not None and __put_iv_value_ith_day_delta_d2 is not None):
-
+            if (
+                __call_iv_value_ith_day_delta_d1 is not None
+                and __call_iv_value_ith_day_delta_d2 is not None
+                and __put_iv_value_ith_day_delta_d1 is not None
+                and __put_iv_value_ith_day_delta_d2 is not None
+            ):
                 map_ith_day_to_ith_day_avg_iv[f"{ith_day}D-AvgIV"] = (
-                __call_iv_value_ith_day_delta_d1 + __call_iv_value_ith_day_delta_d2 + __put_iv_value_ith_day_delta_d1 + __put_iv_value_ith_day_delta_d2
+                    __call_iv_value_ith_day_delta_d1
+                    + __call_iv_value_ith_day_delta_d2
+                    + __put_iv_value_ith_day_delta_d1
+                    + __put_iv_value_ith_day_delta_d2
                 ) / 4
             else:
                 map_ith_day_to_ith_day_avg_iv[f"{ith_day}D-AvgIV"] = None
-        
+
         # # Calculate the sum and count of non-None values
         # _iv_non_none_values_sum = sum(value for value in map_ith_day_to_ith_day_avg_iv.values() if value is not None)
         # _iv_non_none_values_count = sum(1 for value in map_ith_day_to_ith_day_avg_iv.values() if value is not None)
@@ -614,35 +776,49 @@ class ImpliedVolatility:
         # avg_iv_over_n_days = _iv_non_none_values_sum / _iv_non_none_values_count if _iv_non_none_values_count > 0 else None
 
         # Calculate the sum and count of non-None values
-        _iv_non_none_values_sum = sum(value for value in map_ith_day_to_ith_day_avg_iv.values() if value is not None)
-        _iv_non_none_values_count = sum(1 for value in map_ith_day_to_ith_day_avg_iv.values() if value is not None)
+        _iv_non_none_values_sum = sum(
+            value
+            for value in map_ith_day_to_ith_day_avg_iv.values()
+            if value is not None
+        )
+        _iv_non_none_values_count = sum(
+            1 for value in map_ith_day_to_ith_day_avg_iv.values() if value is not None
+        )
 
         # Calculate the average IV over n days
         if _iv_non_none_values_count != 0:
-            avg_iv_over_n_days = _iv_non_none_values_sum / _iv_non_none_values_count 
+            avg_iv_over_n_days = _iv_non_none_values_sum / _iv_non_none_values_count
         else:
             avg_iv_over_n_days = None
-        
+
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
 
         # Calcualte AbsoluteChange & PercentageChange Since Yesterday
         yesterday_avg_iv = map_ith_day_to_ith_day_avg_iv[f"1D-AvgIV"]
 
         if yesterday_avg_iv and current_avg_iv:
-            absolute_change_in_avg_iv_since_yesterday = current_avg_iv - yesterday_avg_iv
-            percentage_change_in_avg_iv_since_yesterday = ((current_avg_iv - yesterday_avg_iv) / yesterday_avg_iv) * 100
+            absolute_change_in_avg_iv_since_yesterday = (
+                current_avg_iv - yesterday_avg_iv
+            )
+            percentage_change_in_avg_iv_since_yesterday = (
+                (current_avg_iv - yesterday_avg_iv) / yesterday_avg_iv
+            ) * 100
         else:
             absolute_change_in_avg_iv_since_yesterday = None
             percentage_change_in_avg_iv_since_yesterday = None
 
         # DeltaD1, DeltaD2:  RR(Chg-1D), RR(Chg-14D), ,
         # Getting Call & Put IV for Yesterday and LastDay at DeltaD1 and DeltaD2
-        n_th_day_last = n_th_day - 1  # the oldest day for which we are calculating the IV and Delta
+        n_th_day_last = (
+            n_th_day - 1
+        )  # the oldest day for which we are calculating the IV and Delta
 
         # map_ith_day_and_target_delta_d_to_put_iv_value[(ith_day, target_delta)] = iv_at_target_delta
-        # map_ith_day_and_target_delta_d_to_put_strike[(ith_day, target_delta)] = None if strikeee is None else float(strikeee) 
+        # map_ith_day_and_target_delta_d_to_put_strike[(ith_day, target_delta)] = None if strikeee is None else float(strikeee)
 
         # yesterday_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(1, delta_d1)]
         # yesterday_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value[(1, delta_d2)]
@@ -653,42 +829,79 @@ class ImpliedVolatility:
         # n_th_day_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(n_th_day_last, delta_d1)]
         # n_th_day_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value[(n_th_day_last, delta_d2)]
 
-        yesterday_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get((1, delta_d1), None)
-        yesterday_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get((1, delta_d2), None)
-        yesterday_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get((1, delta_d1), None)
-        yesterday_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get((1, delta_d2), None)
-        n_th_day_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get((n_th_day_last, delta_d1), None)
-        n_th_day_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get((n_th_day_last, delta_d2), None)
-        n_th_day_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get((n_th_day_last, delta_d1), None)
-        n_th_day_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get((n_th_day_last, delta_d2), None)
+        yesterday_delta_d1_call_iv = (
+            map_ith_day_and_target_delta_d_to_call_iv_value.get((1, delta_d1), None)
+        )
+        yesterday_delta_d2_call_iv = (
+            map_ith_day_and_target_delta_d_to_call_iv_value.get((1, delta_d2), None)
+        )
+        yesterday_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get(
+            (1, delta_d1), None
+        )
+        yesterday_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get(
+            (1, delta_d2), None
+        )
+        n_th_day_delta_d1_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get(
+            (n_th_day_last, delta_d1), None
+        )
+        n_th_day_delta_d2_call_iv = map_ith_day_and_target_delta_d_to_call_iv_value.get(
+            (n_th_day_last, delta_d2), None
+        )
+        n_th_day_delta_d1_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get(
+            (n_th_day_last, delta_d1), None
+        )
+        n_th_day_delta_d2_put_iv = map_ith_day_and_target_delta_d_to_put_iv_value.get(
+            (n_th_day_last, delta_d2), None
+        )
 
         # Calculating the RR for Yesterday & LastDay at DeltaD1 and DeltaD2
 
-        if (yesterday_delta_d1_call_iv is not None and yesterday_delta_d1_put_iv is not None):
-            yesterday_delta_d1_risk_reveral = (yesterday_delta_d1_call_iv - yesterday_delta_d1_put_iv)
+        if (
+            yesterday_delta_d1_call_iv is not None
+            and yesterday_delta_d1_put_iv is not None
+        ):
+            yesterday_delta_d1_risk_reveral = (
+                yesterday_delta_d1_call_iv - yesterday_delta_d1_put_iv
+            )
         else:
             yesterday_delta_d1_risk_reveral = None
 
-        if (yesterday_delta_d2_call_iv is not None and yesterday_delta_d2_put_iv is not None):
-            yesterday_delta_d2_risk_reveral = (yesterday_delta_d2_call_iv - yesterday_delta_d2_put_iv)
+        if (
+            yesterday_delta_d2_call_iv is not None
+            and yesterday_delta_d2_put_iv is not None
+        ):
+            yesterday_delta_d2_risk_reveral = (
+                yesterday_delta_d2_call_iv - yesterday_delta_d2_put_iv
+            )
         else:
             yesterday_delta_d2_risk_reveral = None
 
-        if (n_th_day_delta_d1_call_iv is not None and n_th_day_delta_d1_put_iv is not None):
-            n_th_day_delta_d1_risk_reveral = (n_th_day_delta_d1_call_iv - n_th_day_delta_d1_put_iv)
+        if (
+            n_th_day_delta_d1_call_iv is not None
+            and n_th_day_delta_d1_put_iv is not None
+        ):
+            n_th_day_delta_d1_risk_reveral = (
+                n_th_day_delta_d1_call_iv - n_th_day_delta_d1_put_iv
+            )
         else:
             n_th_day_delta_d1_risk_reveral = None
 
-        if (n_th_day_delta_d2_call_iv is not None and n_th_day_delta_d2_put_iv is not None):
-            n_th_day_delta_d2_risk_reveral = (n_th_day_delta_d2_call_iv - n_th_day_delta_d2_put_iv)
+        if (
+            n_th_day_delta_d2_call_iv is not None
+            and n_th_day_delta_d2_put_iv is not None
+        ):
+            n_th_day_delta_d2_risk_reveral = (
+                n_th_day_delta_d2_call_iv - n_th_day_delta_d2_put_iv
+            )
         else:
             n_th_day_delta_d2_risk_reveral = None
 
         # print(f"Indicaor ID: {indicator_object.indicator_id}")
         # Calculating the PercentangeInRR since Yesterday & LastDay at DeltaD1 and DeltaD2
         if current_rr_d1 and yesterday_delta_d1_risk_reveral:
-            
-            percentage_change_in_rr_since_yesterday_d1 = (current_rr_d1 - yesterday_delta_d1_risk_reveral)
+            percentage_change_in_rr_since_yesterday_d1 = (
+                current_rr_d1 - yesterday_delta_d1_risk_reveral
+            )
             if StrategyVariables.flag_test_print:
                 print(
                     f"Current RR D1: {current_rr_d1}, Yesterday RR D1: {yesterday_delta_d1_risk_reveral}, Change: {percentage_change_in_rr_since_yesterday_d1}"
@@ -697,8 +910,9 @@ class ImpliedVolatility:
             percentage_change_in_rr_since_yesterday_d1 = None
 
         if current_rr_d2 and yesterday_delta_d2_risk_reveral:
-            
-            percentage_change_in_rr_since_yesterday_d2 = (current_rr_d2 - yesterday_delta_d2_risk_reveral)
+            percentage_change_in_rr_since_yesterday_d2 = (
+                current_rr_d2 - yesterday_delta_d2_risk_reveral
+            )
             if StrategyVariables.flag_test_print:
                 print(
                     f"Current RR D2: {current_rr_d2}, Yesterday RR D2: {yesterday_delta_d2_risk_reveral}, Change: {percentage_change_in_rr_since_yesterday_d2}"
@@ -707,7 +921,9 @@ class ImpliedVolatility:
             percentage_change_in_rr_since_yesterday_d2 = None
 
         if current_rr_d1 and n_th_day_delta_d1_risk_reveral:
-            percentage_change_in_rr_since_14_day_d1 = (current_rr_d1 - n_th_day_delta_d1_risk_reveral) 
+            percentage_change_in_rr_since_14_day_d1 = (
+                current_rr_d1 - n_th_day_delta_d1_risk_reveral
+            )
             if StrategyVariables.flag_test_print:
                 print(
                     f"Current RR D1: {current_rr_d1}, 14 Day Ago RR D1: {n_th_day_delta_d1_risk_reveral}, Change: {percentage_change_in_rr_since_14_day_d1}"
@@ -716,7 +932,9 @@ class ImpliedVolatility:
             percentage_change_in_rr_since_14_day_d1 = None
 
         if current_rr_d2 and n_th_day_delta_d2_risk_reveral:
-            percentage_change_in_rr_since_14_day_d2 = (current_rr_d2 - n_th_day_delta_d2_risk_reveral)
+            percentage_change_in_rr_since_14_day_d2 = (
+                current_rr_d2 - n_th_day_delta_d2_risk_reveral
+            )
             if StrategyVariables.flag_test_print:
                 print(
                     f"Current RR D2: {current_rr_d2}, 14 Day Ago RR D2: {n_th_day_delta_d2_risk_reveral}, Change: {percentage_change_in_rr_since_14_day_d2}"
@@ -725,11 +943,15 @@ class ImpliedVolatility:
             percentage_change_in_rr_since_14_day_d2 = None
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
 
         values_dict = {
-            "avg_iv_over_n_days": round(avg_iv_over_n_days * 100, 2) if avg_iv_over_n_days else avg_iv_over_n_days,
+            "avg_iv_over_n_days": round(avg_iv_over_n_days * 100, 2)
+            if avg_iv_over_n_days
+            else avg_iv_over_n_days,
             "absolute_change_in_avg_iv_since_yesterday": (
                 round(absolute_change_in_avg_iv_since_yesterday * 100, 2)
                 if absolute_change_in_avg_iv_since_yesterday
@@ -763,11 +985,15 @@ class ImpliedVolatility:
         }
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
 
         # Update value in DB, Object & GUI
-        IndicatorHelper.update_indicator_values_for_indcator_id(indicator_id=indicator_object.indicator_id, values_dict=values_dict)
+        IndicatorHelper.update_indicator_values_for_indcator_id(
+            indicator_id=indicator_object.indicator_id, values_dict=values_dict
+        )
 
         # print("Map (ith Day, Target Delta) to Put Strike:")
         # pprint.pprint(map_ith_day_and_target_delta_d_to_put_strike)
@@ -786,36 +1012,41 @@ class ImpliedVolatility:
         df_put["Delta"] = df_put["Delta"].abs()
 
         #  ChangeInOptionPriceSince{Yesterday/NthDay}{DeltaD1/DeltaD2}
-        map_var_to_change_in_option_price_value = ImpliedVolatility.compute_change_in_option_price(
-            indicator_object,
-            symbol,
-            expiry,
-            sec_type,
-            underlying_sec_type,
-            exchange,
-            currency,
-            multiplier,
-            trading_class,
-            underlying_contract,
-            df_call,
-            df_put,
-            map_ith_day_and_target_delta_d_to_call_strike,
-            map_ith_day_and_target_delta_d_to_put_strike,
-            delta_d1,
-            delta_d2,
-            n_th_day,
+        map_var_to_change_in_option_price_value = (
+            ImpliedVolatility.compute_change_in_option_price(
+                indicator_object,
+                symbol,
+                expiry,
+                sec_type,
+                underlying_sec_type,
+                exchange,
+                currency,
+                multiplier,
+                trading_class,
+                underlying_contract,
+                df_call,
+                df_put,
+                map_ith_day_and_target_delta_d_to_call_strike,
+                map_ith_day_and_target_delta_d_to_put_strike,
+                delta_d1,
+                delta_d2,
+                n_th_day,
+            )
         )
         if StrategyVariables.flag_test_print:
             print("Map Change in option Price")
             pprint.pprint(map_var_to_change_in_option_price_value)
 
         # Check for early termination
-        if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+        if Utils.flag_check_early_termination_of_indicator(
+            indicator_id=indicator_id, instrument_id=instrument_id
+        ):
             return None, None
-        
+
         # Update value in DB, Object & GUI
         IndicatorHelper.update_indicator_values_for_indcator_id(
-            indicator_id=indicator_object.indicator_id, values_dict=map_var_to_change_in_option_price_value
+            indicator_id=indicator_object.indicator_id,
+            values_dict=map_var_to_change_in_option_price_value,
         )
 
         # Flag is off then get the strike and reutrn Values
@@ -838,19 +1069,27 @@ class ImpliedVolatility:
                 if df_call.empty or df_put.empty:
                     return None, None
 
-                list_of_call_strike, list_of_put_strikes = ImpliedVolatility.get_call_strike_and_put_strike_for_target_delta(
-                    df_call, df_put, delta_column_name, delta_d1, delta_d2
+                list_of_call_strike, list_of_put_strikes = (
+                    ImpliedVolatility.get_call_strike_and_put_strike_for_target_delta(
+                        df_call, df_put, delta_column_name, delta_d1, delta_d2
+                    )
                 )
                 return list_of_call_strike, list_of_put_strikes
 
             except Exception as e:
-                print(f"In ImpliedVolatility.compute() Exception: {e} TraceBack: {traceback.format_exc()}")
+                print(
+                    f"In ImpliedVolatility.compute() Exception: {e} TraceBack: {traceback.format_exc()}"
+                )
 
         return None, None
 
     @staticmethod
     def get_call_strike_and_put_strike_for_target_delta(
-        df_call, df_put, delta_column_name: str, target_delta_d1: float, target_delta_d2: float
+        df_call,
+        df_put,
+        delta_column_name: str,
+        target_delta_d1: float,
+        target_delta_d2: float,
     ):
         """
         Get the strike for the call and put options for the target delta
@@ -859,8 +1098,12 @@ class ImpliedVolatility:
         list_of_put_strike = []
 
         for target_delta in [target_delta_d1, target_delta_d2]:
-            nearest_call_index = (df_call[delta_column_name] - target_delta).abs().idxmin()
-            nearest_put_index = (df_put[delta_column_name] - target_delta).abs().idxmin()
+            nearest_call_index = (
+                (df_call[delta_column_name] - target_delta).abs().idxmin()
+            )
+            nearest_put_index = (
+                (df_put[delta_column_name] - target_delta).abs().idxmin()
+            )
 
             # Retrieve the nearest call and put data
             nearest_call_data = df_call.loc[nearest_call_index]
@@ -898,7 +1141,7 @@ class ImpliedVolatility:
         """
         indicator_id = indicator_object.indicator_id
         instrument_id = indicator_object.instrument_id
-        
+
         n_th_day = n_th_day - 1
         map_var_to_change_in_option_price_value = {}
 
@@ -912,15 +1155,31 @@ class ImpliedVolatility:
         # n_th_day_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike[(n_th_day, delta_d1)]
         # n_th_day_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike[(n_th_day, delta_d2)]
 
-        yesterday_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike.get((1, delta_d1), None)
-        yesterday_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike.get((1, delta_d2), None)
-        yesterday_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike.get((1, delta_d1), None)
-        yesterday_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike.get((1, delta_d2), None)
+        yesterday_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike.get(
+            (1, delta_d1), None
+        )
+        yesterday_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike.get(
+            (1, delta_d2), None
+        )
+        yesterday_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike.get(
+            (1, delta_d1), None
+        )
+        yesterday_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike.get(
+            (1, delta_d2), None
+        )
 
-        n_th_day_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike.get((n_th_day, delta_d1), None)
-        n_th_day_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike.get((n_th_day, delta_d2), None)
-        n_th_day_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike.get((n_th_day, delta_d1), None)
-        n_th_day_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike.get((n_th_day, delta_d2), None)
+        n_th_day_call_strike_d1 = map_ith_day_and_target_delta_d_to_call_strike.get(
+            (n_th_day, delta_d1), None
+        )
+        n_th_day_call_strike_d2 = map_ith_day_and_target_delta_d_to_call_strike.get(
+            (n_th_day, delta_d2), None
+        )
+        n_th_day_put_strike_d1 = map_ith_day_and_target_delta_d_to_put_strike.get(
+            (n_th_day, delta_d1), None
+        )
+        n_th_day_put_strike_d2 = map_ith_day_and_target_delta_d_to_put_strike.get(
+            (n_th_day, delta_d2), None
+        )
 
         list_of_strikes = [
             yesterday_call_strike_d1,
@@ -935,7 +1194,7 @@ class ImpliedVolatility:
 
         list_of_contracts = []
 
-        # List of rights for getting option price 
+        # List of rights for getting option price
         list_of_rights = ["Call", "Call", "Put", "Put"] * 2
 
         for strike, right in zip(list_of_strikes, list_of_rights):
@@ -958,18 +1217,28 @@ class ImpliedVolatility:
 
         # Getting the Setting
         bar_size = StrategyVariables.historical_price_data_bar_size
-        list_of_req_id_for_historical_data = HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
-            list_of_contracts, bar_size, list_of_duration_size_for_fetcher, what_to_show
+        list_of_req_id_for_historical_data = (
+            HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
+                list_of_contracts,
+                bar_size,
+                list_of_duration_size_for_fetcher,
+                what_to_show,
+            )
         )
         # Historical Data for N-Days now we can need to create daily candles
         for indx, (req_id, duration, contract) in enumerate(
-            zip(list_of_req_id_for_historical_data, list_of_duration_size, list_of_contracts)
+            zip(
+                list_of_req_id_for_historical_data,
+                list_of_duration_size,
+                list_of_contracts,
+            )
         ):
-            
             # Check for early termination
-            if Utils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            if Utils.flag_check_early_termination_of_indicator(
+                indicator_id=indicator_id, instrument_id=instrument_id
+            ):
                 return map_var_to_change_in_option_price_value
-        
+
             chng_opt_price = None
             # Retrieve historical data dataframe for the current contract
             df = variables.map_req_id_to_historical_data_dataframe[req_id]
@@ -998,8 +1267,10 @@ class ImpliedVolatility:
                 if StrategyVariables.flag_store_csv_files:
                     folder_name = "ChangeInOptionPrice"
                     file_name = rf"{indicator_object.indicator_id}_{contract.right}_{day_}_{t_delta}_{contract.strike}"
-                    StrategyUtils.save_option_combo_scanner_csv_file(df, folder_name, file_name)
-                
+                    StrategyUtils.save_option_combo_scanner_csv_file(
+                        df, folder_name, file_name
+                    )
+
                 # Convert "Time" column to datetime and extract date
                 df["Date"] = pd.to_datetime(df["Time"]).dt.date
 
@@ -1009,19 +1280,23 @@ class ImpliedVolatility:
                 if len(sorted_dates) >= duration:
                     target_date = sorted_dates[-duration]
                     target_df = df[df["Date"] == target_date]
-                    old_close_price = target_df["Close"].iloc[-1] if not target_df.empty else None
+                    old_close_price = (
+                        target_df["Close"].iloc[-1] if not target_df.empty else None
+                    )
                 else:
                     old_close_price = None
 
-                 # Calculate current price using ImpliedVolatility module
+                # Calculate current price using ImpliedVolatility module
                 current_price = ImpliedVolatility.calcluate_current_price(
                     current_df, delta_column_name="Delta", target_delta=target_delta_ith
                 )
 
-                 # Calculate change in option price in percentage if flag is set
+                # Calculate change in option price in percentage if flag is set
                 if StrategyVariables.flag_chng_in_opt_price_in_percentage:
                     if current_price and old_close_price and old_close_price != 0:
-                        chng_opt_price = ((current_price - old_close_price) / old_close_price) * 100
+                        chng_opt_price = (
+                            (current_price - old_close_price) / old_close_price
+                        ) * 100
                     else:
                         chng_opt_price = None
                 else:
@@ -1031,26 +1306,30 @@ class ImpliedVolatility:
                         chng_opt_price = None
                     if StrategyVariables.flag_test_print:
                         print(
-                            f"chg_in_{contract.right}_opt_price_since{day_}{t_delta}", f"{current_price=}  {old_close_price=} {chng_opt_price=}"
+                            f"chg_in_{contract.right}_opt_price_since{day_}{t_delta}",
+                            f"{current_price=}  {old_close_price=} {chng_opt_price=}",
                         )
-                        
+
             # Construct variable name and store the change in option price value
             var_name = f"chg_in_{contract.right}_opt_price_since{day_}{t_delta}".lower()
-            map_var_to_change_in_option_price_value[var_name] = round(chng_opt_price, 2) if chng_opt_price else chng_opt_price
+            map_var_to_change_in_option_price_value[var_name] = (
+                round(chng_opt_price, 2) if chng_opt_price else chng_opt_price
+            )
 
         return map_var_to_change_in_option_price_value
 
-    def get_historical_price_data_for_ith_day_back(indicator_id, right, ith_day, list_of_reqid_price, list_of_all_option_contracts):
-
+    def get_historical_price_data_for_ith_day_back(
+        indicator_id, right, ith_day, list_of_reqid_price, list_of_all_option_contracts
+    ):
         # Get the Sorted Date Set, In Latest to Oldest Value manner
         list_of_daily_volume_data_df_of_combined_call_and_put = [
-            variables.map_req_id_to_historical_data_dataframe[req_id] for req_id in list_of_reqid_price
+            variables.map_req_id_to_historical_data_dataframe[req_id]
+            for req_id in list_of_reqid_price
         ]
         dates_list = []
 
         # Iterate over each DataFrame in the list
         for df in list_of_daily_volume_data_df_of_combined_call_and_put:
-
             if df.empty:
                 continue
 
@@ -1080,17 +1359,21 @@ class ImpliedVolatility:
 
             # If Df is empty can not compute the values
             if df.empty:
-                print(f"Unable to get the historical data for day: {ith_day} and Contract: {contract} ")
+                print(
+                    f"Unable to get the historical data for day: {ith_day} and Contract: {contract} "
+                )
                 continue
 
             # Convert the "Time" column to datetime format if it's not already in datetime format
             df["Date"] = pd.to_datetime(df["Time"]).dt.date
 
             # print(f"Target Date: {target_date} (Type: {type(target_date)}) and DataFrame Date: {df['Date']} (Type: {type(df['Date'])})")
-            
+
             if target_date in df["Date"].unique():
                 target_df = df[df["Date"] == target_date]
-                take_last_close = target_df["Close"].iloc[-1] if not target_df.empty else None
+                take_last_close = (
+                    target_df["Close"].iloc[-1] if not target_df.empty else None
+                )
             else:
                 take_last_close = None
 
@@ -1108,7 +1391,9 @@ class ImpliedVolatility:
         if StrategyVariables.flag_store_csv_files:
             folder_name = rf"HistoricalPriceOPT\{indicator_id}\{right}"
             file_name = rf"{ith_day}_ith_day"
-            StrategyUtils.save_option_combo_scanner_csv_file(dataframe_with_historical_price_data_for_ith_day, folder_name, file_name)
+            StrategyUtils.save_option_combo_scanner_csv_file(
+                dataframe_with_historical_price_data_for_ith_day, folder_name, file_name
+            )
 
         return dataframe_with_historical_price_data_for_ith_day
 
@@ -1138,7 +1423,9 @@ class ImpliedVolatility:
 
         if target_date in underlying_df["Date"].unique():
             target_df = underlying_df[underlying_df["Date"] == target_date]
-            take_last_close = target_df["Close"].iloc[-1] if not target_df.empty else None
+            take_last_close = (
+                target_df["Close"].iloc[-1] if not target_df.empty else None
+            )
         else:
             take_last_close = None
         return take_last_close

@@ -1,8 +1,8 @@
 from com.variables import *
 
+
 # Class for ladder objects -  ask karan about structure of sequences attribute & entry order filled & exit order filled
 class Ladder(object):
-
     # Defining constructor
     def __init__(
         self,
@@ -27,7 +27,6 @@ class Ladder(object):
         execution_engine=None,
         sequence_obj_list=None,
     ):
-
         # Setting attributes for ladder object
         self.ladder_id = int(ladder_id)
         self.unique_id = int(unique_id)
@@ -55,33 +54,26 @@ class Ladder(object):
 
         # Check if sequence object is not None
         if sequence_obj_list != None:
-
             # Iterating sequence objects
             for sequence_obj in sequence_obj_list:
-
                 # Checking if sequence type of sequence object is entry or exit
                 if sequence_obj.sequence_type == "Entry":
-
                     # Appending entry sequence objects to list for entry sequences
                     self.entry_sequences.append(sequence_obj)
 
                 elif sequence_obj.sequence_type == "Exit":
-
                     # Appending exit sequence objects to list for exit sequences
                     self.exit_sequences.append(sequence_obj)
 
                 else:
-
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"Ladder ID = {ladder_id}, Wrong Value for sequence type (Entry/Exit) {sequence_obj.sequence_type=}"
                         )
 
     # Get all attributes of ladder object
     def _str_(self):
-
         # Getting all sequences in string format
         entry_sequences_str = "\n\t".join(
             [str(sequence) for sequence in self.entry_sequences]
@@ -98,17 +90,12 @@ class Ladder(object):
 
     # Get sequence object
     def get_sequence_obj(self, sequence_id):
-
         # Searching sequence obj in entry sequences
         for sequence_obj in self.entry_sequences:
-
             if sequence_obj.sequence_id == sequence_id:
-
                 return sequence_obj
 
         # Searching sequence obj in exit sequences
         for sequence_obj in self.exit_sequences:
-
             if sequence_obj.sequence_id == sequence_id:
-
                 return sequence_obj

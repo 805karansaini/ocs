@@ -9,6 +9,7 @@ from com.cas_pop_up_window_related_columns import *
 from com.calc_weighted_change import *
 from com.high_low_cal_helper import *
 
+
 # Merge dataframe for volume calculation in trade level RM check
 def merge_dataframe_for_volume_trade_rm_check(combo_obj, all_data_frames):
     # All legs in combo
@@ -65,9 +66,7 @@ def merge_dataframe_for_volume_trade_rm_check(combo_obj, all_data_frames):
 
     # Iterate volumen columns
     for indx, column_name in enumerate(merged_df_columns[1:]):
-
         try:
-
             # Divide it by factor
             merged_df[column_name] = merged_df[column_name].apply(
                 lambda x: float(x) / factors[indx]
@@ -77,23 +76,20 @@ def merge_dataframe_for_volume_trade_rm_check(combo_obj, all_data_frames):
             list_of_sum_of_volume.append(merged_df[column_name].sum())
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
-
                 print(f"Inside getting total volume for leg, Exp: {e}")
 
     return list_of_sum_of_volume
 
+
 # Method to validate volume related condition
 def evaluate_volume_related_check(local_unique_id_to_combo_obj, map_conid_to_req_id):
-
     # Dict
     local_map_unique_id_to_volume_check = {}
 
     # Iterate unique ids
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
         # Dict
         local_map_unique_id_to_volume_check[unique_id] = {"Volume Check": True}
 
@@ -107,7 +103,6 @@ def evaluate_volume_related_check(local_unique_id_to_combo_obj, map_conid_to_req
 
         # Getting all the reqId for which the historical data was requested
         for leg in all_legs:
-
             # getting conid
             con_id = leg.con_id
             req_id = map_conid_to_req_id[con_id]
@@ -121,9 +116,7 @@ def evaluate_volume_related_check(local_unique_id_to_combo_obj, map_conid_to_req
 
         # Save DF to CSV File
         if variables.flag_store_cas_tab_csv_files:
-
             for i, df_xxx in enumerate(all_data_frames):
-
                 file_path = (
                     rf"{variables.cas_tab_csv_file_path}\Trade RM Check Volume\Legwise"
                 )
@@ -155,7 +148,6 @@ def evaluate_volume_related_check(local_unique_id_to_combo_obj, map_conid_to_req
                 # If any dataframe is empty can not compute the values
 
         if is_data_frame_empty:
-
             local_map_unique_id_to_volume_check[unique_id] = {"Volume Check": False}
 
         # Merging the data frame, inner join on time
@@ -176,17 +168,15 @@ def evaluate_volume_related_check(local_unique_id_to_combo_obj, map_conid_to_req
 
     return local_map_unique_id_to_volume_check
 
+
 # Method to validate bid ask spread condition
 def evaualte_bid_ask_spread_rm_check(local_unique_id_to_combo_obj):
-
     # Dict
     local_map_unique_id_to_bid_ask_spread_check = {}
 
     # Iterate unique ids
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
         try:
-
             # Init
             local_map_unique_id_to_bid_ask_spread_check[unique_id] = {
                 "Bid Ask Spread Check": False
@@ -201,7 +191,6 @@ def evaualte_bid_ask_spread_rm_check(local_unique_id_to_combo_obj):
 
             # Processing "Buy" Legs to calculate prices
             for leg_obj in buy_legs:
-
                 # Get con id
                 con_id = leg_obj.con_id
 
@@ -221,7 +210,6 @@ def evaualte_bid_ask_spread_rm_check(local_unique_id_to_combo_obj):
 
             # Processing "Buy" Legs to calculate prices
             for leg_obj in sell_legs:
-
                 # Get con id
                 con_id = leg_obj.con_id
 
@@ -251,7 +239,6 @@ def evaualte_bid_ask_spread_rm_check(local_unique_id_to_combo_obj):
             }
 
         except Exception as e:
-
             # assign value n dict
             local_map_unique_id_to_bid_ask_spread_check[unique_id] = {
                 "Bid Ask Spread Check": False
@@ -259,16 +246,14 @@ def evaualte_bid_ask_spread_rm_check(local_unique_id_to_combo_obj):
 
     return local_map_unique_id_to_bid_ask_spread_check
 
+
 # Method to calculate bid ask size condition
 def evaluate_bid_ask_qty_rm_check_for_all_combinations(local_unique_id_to_combo_obj):
-
     # Init dict
     local_map_unique_id_to_bid_ask_qty_check = {}
 
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
         try:
-
             # Init
             local_map_unique_id_to_bid_ask_qty_check[unique_id] = {
                 "Bid Ask Qty Check": False
@@ -283,7 +268,6 @@ def evaluate_bid_ask_qty_rm_check_for_all_combinations(local_unique_id_to_combo_
 
             # Processing "Buy" Legs to calculate qty
             for leg_obj in buy_legs:
-
                 # get conid
                 con_id = leg_obj.con_id
 
@@ -294,7 +278,6 @@ def evaluate_bid_ask_qty_rm_check_for_all_combinations(local_unique_id_to_combo_
                 ask_size = variables.ask_size[req_id]
 
                 if leg_obj.sec_type == "STK":
-
                     ask_size *= 100
 
                 # append qty to list
@@ -302,7 +285,6 @@ def evaluate_bid_ask_qty_rm_check_for_all_combinations(local_unique_id_to_combo_
 
             # Processing "Buy" Legs to calculate prices
             for leg_obj in sell_legs:
-
                 # get conid
                 con_id = leg_obj.con_id
 
@@ -313,7 +295,6 @@ def evaluate_bid_ask_qty_rm_check_for_all_combinations(local_unique_id_to_combo_
                 bid_size = variables.bid_size[req_id]
 
                 if leg_obj.sec_type == "STK":
-
                     bid_size *= 100
 
                 bid_ask_qty_list.append(bid_size)
@@ -330,7 +311,6 @@ def evaluate_bid_ask_qty_rm_check_for_all_combinations(local_unique_id_to_combo_
             }
 
         except Exception as e:
-
             # assign value n dict
             local_map_unique_id_to_bid_ask_qty_check[unique_id] = {
                 "Bid Ask Qty Check": False
@@ -338,9 +318,9 @@ def evaluate_bid_ask_qty_rm_check_for_all_combinations(local_unique_id_to_combo_
 
     return local_map_unique_id_to_bid_ask_qty_check
 
+
 # Method to validate combine result of all conditions in trade level RM check
 def trade_level_rm_check_func():
-
     # local copy of 'unique_id_to_combo_obj'
     local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
 
@@ -383,38 +363,36 @@ def trade_level_rm_check_func():
 
     # Iterate unique ids
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
         try:
             # check if user input is AND
             if variables.flag_rm_checks_trade_volume_and_or == "AND":
-
-                map_unique_id_to_rm_check_value[
-                    unique_id
-                ] = map_unique_id_to_bid_ask_spread_rm_check[unique_id][
-                    "Bid Ask Spread Check"
-                ] and (
-                    map_unique_id_to_volume_rm_check[unique_id]["Volume Check"]
-                    and map_unique_id_to_bid_ask_qty_check[unique_id][
-                        "Bid Ask Qty Check"
+                map_unique_id_to_rm_check_value[unique_id] = (
+                    map_unique_id_to_bid_ask_spread_rm_check[unique_id][
+                        "Bid Ask Spread Check"
                     ]
+                    and (
+                        map_unique_id_to_volume_rm_check[unique_id]["Volume Check"]
+                        and map_unique_id_to_bid_ask_qty_check[unique_id][
+                            "Bid Ask Qty Check"
+                        ]
+                    )
                 )
 
             # check if user input is OR
             elif variables.flag_rm_checks_trade_volume_and_or == "OR":
-
-                map_unique_id_to_rm_check_value[
-                    unique_id
-                ] = map_unique_id_to_bid_ask_spread_rm_check[unique_id][
-                    "Bid Ask Spread Check"
-                ] and (
-                    map_unique_id_to_volume_rm_check[unique_id]["Volume Check"]
-                    or map_unique_id_to_bid_ask_qty_check[unique_id][
-                        "Bid Ask Qty Check"
+                map_unique_id_to_rm_check_value[unique_id] = (
+                    map_unique_id_to_bid_ask_spread_rm_check[unique_id][
+                        "Bid Ask Spread Check"
                     ]
+                    and (
+                        map_unique_id_to_volume_rm_check[unique_id]["Volume Check"]
+                        or map_unique_id_to_bid_ask_qty_check[unique_id][
+                            "Bid Ask Qty Check"
+                        ]
+                    )
                 )
 
             else:
-
                 # set value to false
                 map_unique_id_to_rm_check_value[unique_id] = False
 
@@ -432,13 +410,11 @@ def trade_level_rm_check_func():
             }
 
         except Exception as e:
-
             # set value to false
             map_unique_id_to_rm_check_value[unique_id] = False
 
             # Print to console
             if variables.flag_debug_mode:
-
                 print(f"Inside evaluating trade level RM check, Exp: {e}")
 
     variables.flag_trade_level_rm_checks = map_unique_id_to_rm_check_value

@@ -3,6 +3,7 @@ Created on 15-Mar-2023
 
 @author: Karan
 """
+
 import math
 
 import numpy as np
@@ -20,7 +21,6 @@ from com.screen_accounts_tab import *
 
 # get tick size for contract
 def get_tick_size_for_contract(all_leg_objs):
-
     for leg_obj in all_leg_objs:
         mycontract = Contract()
 
@@ -46,7 +46,6 @@ def get_tick_size_for_contract(all_leg_objs):
 
 # Get bid and ask for contract, snapshot = False, Uses reqMktData
 def get_market_data_for_contract(unique_id, contract, snapshot=True):
-
     # Print to console
     if variables.flag_debug_mode:
         # Getting req_id
@@ -58,7 +57,6 @@ def get_market_data_for_contract(unique_id, contract, snapshot=True):
     variables.nextorderId += 1
 
     if contract.conId in variables.con_id_to_req_id_dict:
-
         return
 
     # Init variables
@@ -88,7 +86,6 @@ def get_market_data_for_contract(unique_id, contract, snapshot=True):
 
     # Error checking loop - breaks from loop once MktData is obtained
     for err_check in range(2):
-
         if variables.ask_price[reqId] == None or variables.bid_price[reqId] == None:
             time.sleep(variables.sleep_time_waiting_for_tws_response)
         else:
@@ -109,15 +106,14 @@ def get_market_data_for_contract(unique_id, contract, snapshot=True):
             )
         return (variables.ask_price[reqId], variables.bid_price[reqId])  # (None, None)
 
+
 # Method to update prices in market watch
 def update_prices_in_market_watch___reference_price_in_db_and_order_book__cas_table():
-
     # Get latest combo prices
     prices_unique_id = calculate_combo_prices()
 
     if variables.screen:
         try:
-
             variables.screen.update_prices_market_watch(prices_unique_id)
             # variables.screen.update_orders_book_table_watchlist_changed()
 
@@ -137,10 +133,8 @@ def update_prices_in_market_watch___reference_price_in_db_and_order_book__cas_ta
 
 # Method to get updated account alues
 def get_updated_account_values():
-
     # Get all account ids
     for account_id in variables.current_session_accounts:
-
         # Get reqID
         req_id = variables.nextorderId
         variables.nextorderId += 1
@@ -177,7 +171,6 @@ def get_updated_account_values():
 
         # Wait while app get data
         while counter < 4 and variables.flag_account_update_ended[account_id] == False:
-
             # Sleep timer
             time.sleep(0.5)
 
@@ -192,18 +185,14 @@ def get_updated_account_values():
 
     # Get all account ids
     for account_id in variables.current_session_accounts:
-
         from com.screen_accounts_tab import run_risk_management_checks
 
         # run risk management checks
         run_risk_management_checks(account_id, flag_liquidation_check=True)
 
 
-
-
 # Calculates the prices of all the combos, and returns them in a dict {unique_id : {BUY: , SELL, total_spread:}
 def calculate_combo_prices():
-
     # conid_mktdata_subscription_dict = {}
     # con_id_to_req_id_dict = {}
     # unique_id_to_combo_obj = {}
@@ -218,7 +207,6 @@ def calculate_combo_prices():
 
     # Process each combo_obj one by one.
     for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
         # Buy legs and Sell legs
         buy_legs = combo_obj.buy_legs
         sell_legs = combo_obj.sell_legs
@@ -234,7 +222,6 @@ def calculate_combo_prices():
 
         # Processing "Buy" Legs to calculate prices
         for leg_obj in buy_legs:
-
             quantity = int(leg_obj.quantity)
             con_id = leg_obj.con_id
 
@@ -261,7 +248,6 @@ def calculate_combo_prices():
                     ask = float(ask)
 
             except Exception as e:
-
                 # Print to console:
                 if variables.flag_debug_mode:
                     print(f"Exception in Price {e}")
@@ -280,7 +266,6 @@ def calculate_combo_prices():
 
         # Processing "Sell" Legs to calculate prices
         for leg_obj in sell_legs:
-
             quantity = int(leg_obj.quantity)
             con_id = leg_obj.con_id
 
@@ -308,7 +293,6 @@ def calculate_combo_prices():
                     ask = float(ask)
 
             except Exception as e:
-
                 # Print to console:
                 if variables.flag_debug_mode:
                     print(f"Exception in Price {e}")
@@ -350,16 +334,13 @@ def calculate_combo_prices():
             buy_sell_csv = pd.read_csv(variables.buy_sell_csv)
 
             for _, row in buy_sell_csv.iterrows():
-
                 try:
-
                     if unique_id == int(row["Unique ID"]):
                         price_of_buying = float(row["BUY"])
                         price_of_selling = float(row["SELL"])
                         ba_spread = abs(price_of_buying - price_of_selling)
 
                 except Exception as e:
-
                     price_of_buying = None
                     price_of_selling = None
                     ba_spread = None
@@ -386,11 +367,11 @@ def calculate_combo_prices():
     # print(prices_dict)
     return prices_dict
 
+
 # Method to request historical data
 def request_historical_price_data_for_contract(
     contract, bar_size, duration_size, what_to_show, req_id=None, cas_app=False
 ):
-
     # If req_id was not provided, getting request ID
     if req_id == None:
         # Getting req_id
@@ -420,7 +401,6 @@ def request_historical_price_data_for_contract(
 
     # Which TWS API app to use?
     if cas_app:
-
         # Send request via CAS APP
         variables.cas_app.reqHistoricalData(
             reqId,
@@ -435,7 +415,6 @@ def request_historical_price_data_for_contract(
             [],
         )
     else:
-
         # Send request Via Main App
         variables.app.reqHistoricalData(
             reqId,
@@ -450,11 +429,11 @@ def request_historical_price_data_for_contract(
             [],
         )
 
+
 # Method to request historical data for price chart
 def request_historical_price_data_of_combination_for_chart(
     unique_id, bar_size, chart_size
 ):
-
     # Combination Object for unique ID
     conbination_object = variables.unique_id_to_combo_obj[unique_id]
 
@@ -474,7 +453,6 @@ def request_historical_price_data_of_combination_for_chart(
     # Fetch ask for legs we're buying
     # Fetch bid for legs we're selling
     for leg_obj in all_legs:
-
         # Getting req_id
         reqId = variables.nextorderId
         variables.nextorderId += 1
@@ -502,7 +480,6 @@ def request_historical_price_data_of_combination_for_chart(
         )
         >= 1
     ):
-
         # If reqHistorical Data ended for all the reqId
         if all([variables.req_mkt_data_end[req_id] for req_id in req_id_list]) or any(
             [variables.req_error[req_id] for req_id in req_id_list]
@@ -533,7 +510,7 @@ def request_historical_price_data_of_combination_for_chart(
     merged_df = all_data_frames[0]
     for i, df in enumerate(all_data_frames[1:]):
         merged_df = pd.merge(
-            merged_df, df, on="Time", how="inner", suffixes=(f"", f" {i+1}")
+            merged_df, df, on="Time", how="inner", suffixes=(f"", f" {i + 1}")
         )
 
         # file_name = f"0Merged {i}.csv"
@@ -545,9 +522,9 @@ def request_historical_price_data_of_combination_for_chart(
     # Creating Columns for new merged dataframe
     merged_df_columns = ["Time"]
     for i in range(len(all_data_frames)):
-        merged_df_columns.append(f"Open {i+1}")
-        merged_df_columns.append(f"Close {i+1}")
-        merged_df_columns.append(f"Volume {i+1}")
+        merged_df_columns.append(f"Open {i + 1}")
+        merged_df_columns.append(f"Close {i + 1}")
+        merged_df_columns.append(f"Volume {i + 1}")
 
     # Setting columns in merged_df
     merged_df.columns = merged_df_columns
@@ -622,15 +599,14 @@ def request_historical_price_data_of_combination_for_chart(
 
     return ohlc_df
 
+
 # Method to calculate combo prices
 def formula_to_calculate_price_for_historical_data(
     row, open_or_close, all_data_frames, factors
 ):
-
     value = 0
 
     for leg_no in range(len(all_data_frames)):
-
         column_name = f"{open_or_close} {leg_no + 1}"
 
         value += float(row[column_name]) * factors[leg_no]
@@ -639,7 +615,6 @@ def formula_to_calculate_price_for_historical_data(
 
 # Calulates latest Values and update the CAS table
 def calculate_values_and_update_cas_table(prices_unique_id):
-
     # List of update values
     cas_table_update_values = []
     cas_condition_table_update_values = []
@@ -647,13 +622,11 @@ def calculate_values_and_update_cas_table(prices_unique_id):
     # N days High And Low
     long_term_high_low = copy.deepcopy(variables.map_unique_id_to_long_term_high_low)
 
-
     # HV Related Column
     hv_related_values = copy.deepcopy(variables.map_unique_id_to_hv_related_values)
 
     # Days Open, High Low
     intraday_open_high_low = copy.deepcopy(variables.map_unique_id_to_intraday_high_low)
-
 
     # Volume Related columns
     volume_related_column_values = copy.deepcopy(
@@ -665,10 +638,10 @@ def calculate_values_and_update_cas_table(prices_unique_id):
         variables.map_unique_id_to_support_resistance_and_relative_fields
     )
 
-    '''for ind in hv_related_values:
+    """for ind in hv_related_values:
 
         print(long_term_high_low[ind])
-    print('*'*100)'''
+    print('*'*100)"""
 
     if variables.flag_debug_mode:
         print(f"\n\nInside update cas table(Long Term): {long_term_high_low}")
@@ -685,12 +658,9 @@ def calculate_values_and_update_cas_table(prices_unique_id):
 
     try:
         for unique_id, prices in prices_unique_id.items():
-
             try:
-
                 # N-Day High Low
                 if unique_id in long_term_high_low:
-
                     n_day_high = (
                         None
                         if long_term_high_low[unique_id]["N-Day High"] == "N/A"
@@ -754,9 +724,7 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                     avg_chg_in_price_for_n_days = None
 
             except Exception as e:
-
                 if variables.flag_debug_mode:
-
                     print(f"Exception in getting long term values, Exp: {e}")
 
                 (
@@ -771,7 +739,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 avg_chg_in_price_for_n_days = None
 
             try:
-
                 # Current Day Open High Low
                 if unique_id in intraday_open_high_low:
                     day_open = (
@@ -938,7 +905,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                         resistance_price_ration_in_range_intraday,
                     ) = ("N/A", "N/A", "N/A")
             except Exception as e:
-
                 if variables.flag_debug_mode:
                     print(f"Exception in getting long term values, Exp: {e}")
 
@@ -973,7 +939,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
             try:
                 # HV Related Coulmns
                 if unique_id in hv_related_values:
-
                     # HV Val for the unique ID
                     data = hv_related_values[unique_id]
                     hv_value = (
@@ -991,14 +956,12 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                     )
 
                 else:
-
                     (hv_value, candle_volatility_val, hv_value_without_annualized) = (
                         "N/A",
                         "N/A",
                         "N/A",
                     )
             except Exception as e:
-
                 (hv_value, candle_volatility_val, hv_value_without_annualized) = (
                     "N/A",
                     "N/A",
@@ -1006,13 +969,11 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 )
 
                 if variables.flag_debug_mode:
-
                     print(e)
 
             try:
                 # Volume Related Coulmns
                 if unique_id in volume_related_column_values:
-
                     # Volume Related Values for the unique ID
                     data = volume_related_column_values[unique_id]
 
@@ -1061,10 +1022,8 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 ) = ("N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
 
             try:
-
                 # Both price and Volume Related Coulmns
                 if unique_id in support_resistance_and_relative_fields_values:
-
                     # Both price and Volume Related value for the unique ID
                     data = support_resistance_and_relative_fields_values[unique_id]
 
@@ -1181,7 +1140,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                     )
 
                 else:
-
                     (
                         resistance,
                         support,
@@ -1227,7 +1185,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
 
             except Exception as e:
                 if variables.flag_debug_mode:
-
                     print(e)
 
                 (
@@ -1291,7 +1248,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 # Calculate bid ask spread
                 bid_ask_spread = prices["BUY"] - prices["SELL"]
             except Exception as e:
-
                 # set value to none
                 avg_price_combo = None
                 bid_ask_spread = None
@@ -1304,27 +1260,23 @@ def calculate_values_and_update_cas_table(prices_unique_id):
 
             # Calcualte bid ask related columns
             try:
-
                 # check if values are valid
                 if avg_chg_in_price_for_n_days not in [
                     0,
                     None,
                     "N/A",
                 ] and avg_bid_ask_spread not in [None, "N/A"]:
-
                     avg_bid_ask_div_by_avg_chg = (
                         avg_bid_ask_spread / avg_chg_in_price_for_n_days
                     )
 
                     # check if value is valid and if yes then format it
                     if avg_bid_ask_div_by_avg_chg not in [None, "N/A", "None"]:
-
                         avg_bid_ask_div_by_avg_chg = (
                             f"{avg_bid_ask_div_by_avg_chg:,.2f}"
                         )
 
                 else:
-
                     # Set value to N/A
                     avg_bid_ask_div_by_avg_chg = "N/A"
 
@@ -1334,14 +1286,12 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                     None,
                     "N/A",
                 ] and bid_ask_spread not in [None, "N/A"]:
-
                     bid_ask_div_by_avg_chg = (
                         bid_ask_spread / avg_chg_in_price_for_n_days
                     )
 
                     # check if value is valid and if yes then format it
                     if bid_ask_div_by_avg_chg not in [None, "N/A", "None"]:
-
                         bid_ask_div_by_avg_chg = f"{bid_ask_div_by_avg_chg:,.2f}"
 
                 else:
@@ -1349,7 +1299,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                     bid_ask_div_by_avg_chg = "N/A"
 
             except Exception as e:
-
                 # Set value to N/A
                 avg_bid_ask_div_by_avg_chg = "N/A"
                 bid_ask_div_by_avg_chg = "N/A"
@@ -1360,17 +1309,14 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 None,
                 "None",
             ]:
-
                 # Calcualtion for change open dollar value
                 chg_open = avg_price_combo - day_open
 
                 # check value is valid
                 if chg_open not in ["N/A", None, "None"]:
-
                     chg_open = f"{chg_open:,.2f}"
 
             else:
-
                 chg_open = "N/A"
 
             # Calculate change close dollar value
@@ -1379,17 +1325,14 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 None,
                 "None",
             ] and avg_price_combo not in ["N/A", None, "None"]:
-
                 # Calcualtion for change close dollar value
                 chg_close = avg_price_combo - last_close_price
 
                 # check value is valid
                 if chg_close not in ["N/A", None, "None"]:
-
                     chg_close = f"{chg_close:,.2f}"
 
             else:
-
                 chg_close = "N/A"
 
             # Calculate Relative volume div by relative cange for last n minutes in lookback days
@@ -1397,7 +1340,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 relative_volume_last_n_minutes != "N/A"
                 and relative_change_last_n_minutes not in ["N/A", 0]
             ):
-
                 # Relative volume div by relative cange for last n minutes in lookback days
                 rel_volume_div_by_rel_chg_last_n_minutes = (
                     relative_volume_last_n_minutes / relative_change_last_n_minutes
@@ -1409,7 +1351,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 )
 
             else:
-
                 # set value to N/A
                 rel_volume_div_by_rel_chg_last_n_minutes = "N/A"
 
@@ -1430,22 +1371,18 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 and (day_open != None)
                 and not variables.flag_weighted_change_in_price
             ):
-
                 # Change from open percent
                 change_from_open_percent = math.log(
                     abs(avg_price_combo) + 1
                 ) * math.copysign(1, avg_price_combo) - math.log(
                     abs(day_open) + 1
-                ) * math.copysign(
-                    1, day_open
-                )
+                ) * math.copysign(1, day_open)
 
             # Update From Open if the flag_weighted_change_in_price is True
             if (
                 current_day_open_for_legs_list != "N/A"
                 and variables.flag_weighted_change_in_price
             ):
-
                 # print(f"Unique ID: {unique_id} Change From Open")
                 change_from_open_percent = calc_weighted_change_legs_based(
                     local_unique_id_to_combo_obj[unique_id],
@@ -1458,22 +1395,18 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 and (day_open != None)
                 and not variables.flag_weighted_change_in_price
             ):
-
                 # Change from open percent
                 change_from_open_for_rel_chg = math.log(
                     abs(avg_price_combo) + 1
                 ) * math.copysign(1, avg_price_combo) - math.log(
                     abs(day_open_or_current_candle_price) + 1
-                ) * math.copysign(
-                    1, day_open_or_current_candle_price
-                )
+                ) * math.copysign(1, day_open_or_current_candle_price)
 
             # Update From Open if the flag_weighted_change_in_price is True
             if (
                 current_day_open_for_legs_list not in ["N/A", "None", None]
                 and variables.flag_weighted_change_in_price
             ):
-
                 # print(f"Unique ID: {unique_id} Change From Open")
                 change_from_open_for_rel_chg = calc_weighted_change_legs_based(
                     local_unique_id_to_combo_obj[unique_id],
@@ -1486,7 +1419,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 "None",
                 None,
             ]:
-
                 # Get value of change from high percent
                 change_from_high_percent = calc_weighted_change_legs_based(
                     local_unique_id_to_combo_obj[unique_id],
@@ -1495,7 +1427,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 )
 
                 if change_from_high_percent not in ["N/A", "None", None]:
-
                     # Format value of change from highest price percent
                     change_from_high_percent = f"{change_from_high_percent * 100:,.2f}%"
 
@@ -1505,7 +1436,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 "None",
                 None,
             ]:
-
                 # Get value of change from low percent
                 change_from_low_percent = calc_weighted_change_legs_based(
                     local_unique_id_to_combo_obj[unique_id],
@@ -1514,7 +1444,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 )
 
                 if change_from_low_percent not in ["N/A", "None", None]:
-
                     # Format value of change from lowest price percent
                     change_from_low_percent = f"{change_from_low_percent * 100:,.2f}%"
 
@@ -1562,14 +1491,12 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                     )
 
             try:
-
                 # print(f"{avg_of_abs_changes_in_prices_for_lookback=}{change_from_open_percent=}")
                 if avg_of_abs_changes_in_prices_for_lookback not in [
                     0,
                     "N/A",
                     None,
                 ] and change_from_open_for_rel_chg not in ["N/A", None]:
-
                     # Calculating Relative Change
                     relative_change_in_price = (
                         abs(change_from_open_for_rel_chg)
@@ -1648,7 +1575,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 and (relative_atr != "N/A")
                 and (relative_atr != 0)
             ):
-
                 relative_volume_div_by_relative_atr = relative_volume / relative_atr
 
                 relative_volume_div_by_relative_atr = (
@@ -1664,7 +1590,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 and (avg_price_combo != None)
                 and (day_high != None)
             ):
-
                 try:
                     atr_div_by_total_abs_cost_div_by_point_from_highest_price = (
                         atr / total_abs_cost_value
@@ -1691,7 +1616,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 and last_close_price != None
                 and not variables.flag_weighted_change_in_price
             ):
-
                 size_of_opening_gap_value = math.log(abs(day_open) + 1) * math.copysign(
                     1, day_open
                 ) - math.log(abs(last_close_price) + 1) * math.copysign(
@@ -1699,17 +1623,14 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 )
 
                 if size_of_opening_gap_value not in ["N/A", "None", None]:
-
                     size_of_opening_gap_value = (
                         f"{(size_of_opening_gap_value * 100):,.2f}%"
                     )
 
                 else:
-
                     size_of_opening_gap_value = "N/A"
 
             elif variables.flag_weighted_change_in_price:
-
                 size_of_opening_gap_value = calc_weighted_change_legs_based(
                     local_unique_id_to_combo_obj[unique_id],
                     last_day_close_price_for_leg_list,
@@ -1717,7 +1638,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 )
 
                 if size_of_opening_gap_value not in ["N/A", "None", None]:
-
                     # check if values are vlaid
                     if size_of_opening_gap_value not in [
                         0,
@@ -1725,7 +1645,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                         "None",
                         None,
                     ] and relative_volume not in ["N/A", "None", None]:
-
                         # calculate indicator value
                         rel_vol_div_by_opening_gap = (
                             relative_volume / size_of_opening_gap_value
@@ -1733,19 +1652,16 @@ def calculate_values_and_update_cas_table(prices_unique_id):
 
                         # check if values are valid
                         if rel_vol_div_by_opening_gap not in ["N/A", "None", None]:
-
                             # Format value
                             rel_vol_div_by_opening_gap = (
                                 f"{(rel_vol_div_by_opening_gap):,.2f}"
                             )
 
                         else:
-
                             # set value to N/A
                             rel_vol_div_by_opening_gap = "N/A"
 
                     else:
-
                         # set value to N/A
                         rel_vol_div_by_opening_gap = "N/A"
 
@@ -1753,7 +1669,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                         f"{(size_of_opening_gap_value * 100):,.2f}%"
                     )
             else:
-
                 size_of_opening_gap_value = "N/A"
 
             # Formatting relative_change_in_price
@@ -1770,7 +1685,7 @@ def calculate_values_and_update_cas_table(prices_unique_id):
 
             # Formatting relative_atr
             if relative_atr != "N/A":
-                relative_atr = f"{(relative_atr ):,.2f}"
+                relative_atr = f"{(relative_atr):,.2f}"
             else:
                 relative_atr = "N/A"
 
@@ -1786,7 +1701,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 and (n_day_low != None)
                 and (n_day_high != None)
             ):
-
                 # To Avoid by Zero error
                 try:
                     # HL range N-Days
@@ -1795,7 +1709,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                     )
                     hl_range_n_day_percent = f"{(hl_range_n_day_percent * 100):,.2f}%"
                 except Exception as e:
-
                     # Print to console
                     if variables.flag_debug_mode:
                         print(
@@ -1809,8 +1722,8 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 abs_hl_n_day = int(abs(n_day_high - n_day_low) * 100) / 100
 
                 # Format the Value
-                n_day_high = f"{(int(n_day_high * 100)/100):,.2f}"
-                n_day_low = f"{(int(n_day_low * 100)/100):,.2f}"
+                n_day_high = f"{(int(n_day_high * 100) / 100):,.2f}"
+                n_day_low = f"{(int(n_day_low * 100) / 100):,.2f}"
                 abs_hl_n_day = f"{abs_hl_n_day:,.2f}"
             else:
                 n_day_low = "N/A"
@@ -1820,7 +1733,7 @@ def calculate_values_and_update_cas_table(prices_unique_id):
 
             # ATR
             if atr != None:
-                atr = f"{(int(atr * 100)/100):,.2f}"
+                atr = f"{(int(atr * 100) / 100):,.2f}"
             else:
                 atr = "N/A"
 
@@ -1833,14 +1746,11 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 and (last_close_price != None)
                 and not variables.flag_weighted_change_in_price
             ):
-
                 change_from_close_percent = math.log(
                     abs(avg_price_combo) + 1
                 ) * math.copysign(1, avg_price_combo) - math.log(
                     abs(last_close_price) + 1
-                ) * math.copysign(
-                    1, last_close_price
-                )
+                ) * math.copysign(1, last_close_price)
 
                 # Format the Value
                 if not isinstance(change_from_close_percent, str):
@@ -1852,7 +1762,6 @@ def calculate_values_and_update_cas_table(prices_unique_id):
             if (
                 last_day_close_price_for_leg_list != "N/A"
             ) and variables.flag_weighted_change_in_price:
-
                 # print(f"Unique ID: {unique_id} Change From Close")
                 change_from_close_percent = calc_weighted_change_legs_based(
                     local_unique_id_to_combo_obj[unique_id],
@@ -1868,19 +1777,18 @@ def calculate_values_and_update_cas_table(prices_unique_id):
 
             # Last Close Price
             if last_close_price != None:
-                last_close_price = f"{(int(last_close_price * 100)/100):,.2f}"
+                last_close_price = f"{(int(last_close_price * 100) / 100):,.2f}"
             else:
                 last_close_price = "N/A"
 
             # Correlation
             if correlation != None:
-                correlation = f"{(int(correlation * 10000)/10000):,.4f}"
+                correlation = f"{(int(correlation * 10000) / 10000):,.4f}"
             else:
                 correlation = "N/A"
 
             # Update High Low Range 1 %
             if (avg_price_combo != None) and (day_low != None) and (day_high != None):
-
                 # To Avoid by Zero error
                 try:
                     # HL range N-Days
@@ -1904,9 +1812,9 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                 abs_hl_current_day = int(abs(day_high - day_low) * 100) / 100
 
                 # Format the Value
-                abs_hl_current_day = f"{(int(abs_hl_current_day * 100)/100):,.2f}"
-                day_high = f"{(int(day_high * 100)/100):,.2f}"
-                day_low = f"{(int(day_low * 100)/100):,.2f}"
+                abs_hl_current_day = f"{(int(abs_hl_current_day * 100) / 100):,.2f}"
+                day_high = f"{(int(day_high * 100) / 100):,.2f}"
+                day_low = f"{(int(day_low * 100) / 100):,.2f}"
             else:
                 day_high = "N/A"
                 day_low = "N/A"
@@ -2008,7 +1916,10 @@ def calculate_values_and_update_cas_table(prices_unique_id):
                         minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
                     )
                 ):
-                    (hv_value, candle_volatility_val,) = (
+                    (
+                        hv_value,
+                        candle_volatility_val,
+                    ) = (
                         "N/A",
                         "N/A",
                     )
@@ -2165,14 +2076,12 @@ def calculate_values_and_update_cas_table(prices_unique_id):
             cas_condition_table_update_values.append(unique_id_correlation)
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print("Error in updating cas Values and price", e)
 
     # If Caching is enabled
     if variables.flag_cache_data:
-
         # Update values in DB cache table
         update_cache_data_in_db(cas_table_update_values)
 
@@ -2233,9 +2142,7 @@ def calculate_values_and_update_cas_table(prices_unique_id):
             "Unique ID"
         ].map(corr_dict)
     except Exception as e:
-
         if variables.flag_debug_mode:
-
             print(f"Error Price 724 ", e)
 
     # Make the dataframe available to class

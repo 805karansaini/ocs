@@ -3,7 +3,6 @@ Copyright (C) 2019 Interactive Brokers LLC. All rights reserved. This code is su
  and conditions of the IB API Non-Commercial License or the IB API Commercial License, as applicable.
 """
 
-
 """
 This is the interface that will need to be overloaded by the customer so
 that his/her code can receive info from the TWS/IBGW.
@@ -423,7 +422,6 @@ class EWrapper:
         wap: Decimal,
         count: int,
     ):
-
         """Updates the real time 5 seconds bars
 
         reqId - the request's identifier
@@ -505,15 +503,12 @@ class EWrapper:
         self.logAnswer(current_fn_name(), vars())
 
     def verifyCompleted(self, isSuccessful: bool, errorText: str):
-
         self.logAnswer(current_fn_name(), vars())
 
     def verifyAndAuthMessageAPI(self, apiData: str, xyzChallange: str):
-
         self.logAnswer(current_fn_name(), vars())
 
     def verifyAndAuthCompleted(self, isSuccessful: bool, errorText: str):
-
         self.logAnswer(current_fn_name(), vars())
 
     def displayGroupList(self, reqId: int, groups: str):

@@ -11,31 +11,50 @@ from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
 class CalcluateGreeks:
     def compute_all_greeks(combination, list_of_config_leg_object):
-
         # Default dict with value as 0
         net_greeks = defaultdict(float)
 
         # Loop over the leg tuple of each combination
         for leg_tuple, config_leg_object in zip(combination, list_of_config_leg_object):
-            
             # Mulitplier
             # InstrumentID, and InstrumentObject for multiplier
             instrument_id = config_leg_object.instrument_id
-            if instrument_id not in StrategyVariables.map_instrument_id_to_instrument_object:
+            if (
+                instrument_id
+                not in StrategyVariables.map_instrument_id_to_instrument_object
+            ):
                 multiplier = 100
                 # print("compute_all_greeks: Not Found", multiplier)
             else:
-                multiplier = copy.deepcopy(StrategyVariables.map_instrument_id_to_instrument_object[instrument_id].multiplier)
+                multiplier = copy.deepcopy(
+                    StrategyVariables.map_instrument_id_to_instrument_object[
+                        instrument_id
+                    ].multiplier
+                )
                 multiplier = int(float(multiplier))
                 # print("compute_all_greeks: Found", multiplier)
 
             # print(f"Leg Tuple: {leg_tuple}")
 
             # Unpack the values stored in tuple
-            _, strike, _, _, expiry, bid, ask, _, _, vega, theta, gamma, underlying_price = leg_tuple
+            (
+                _,
+                strike,
+                _,
+                _,
+                expiry,
+                bid,
+                ask,
+                _,
+                _,
+                vega,
+                theta,
+                gamma,
+                underlying_price,
+            ) = leg_tuple
             options_prem = (bid + ask) / 2
             quantity = int(config_leg_object.quantity)
-             
+
             # Calcluate the time to expiration for the greeks
             current_date = datetime.datetime.today().strftime("%Y%m%d")
             current_date_obj = datetime.datetime.strptime(current_date, "%Y%m%d")
@@ -61,42 +80,83 @@ class CalcluateGreeks:
 
             # Calcluate Vanna greeks for each leg_tuple
             vanna = CalcluateGreeks.calculate_vanna(
-                float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0
+                float(underlying_price),
+                strike,
+                time_to_expiration,
+                StrategyVariables.riskfree_rate1,
+                sigma,
+                0,
             )
 
             # Calcluate Zomma greeks for each leg_tuple
             zomma = CalcluateGreeks.calculate_zomma(
-                float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0
+                float(underlying_price),
+                strike,
+                time_to_expiration,
+                StrategyVariables.riskfree_rate1,
+                sigma,
+                0,
             )
 
             # Calcluate Vomma greeks for each leg_tuple
             vomma = CalcluateGreeks.calculate_vomma(
-                float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0
+                float(underlying_price),
+                strike,
+                time_to_expiration,
+                StrategyVariables.riskfree_rate1,
+                sigma,
+                0,
             )
 
             # Calcluate Charm greeks for each leg_tuple
             charm = CalcluateGreeks.calculate_charm(
-                float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0, config_leg_object.right
+                float(underlying_price),
+                strike,
+                time_to_expiration,
+                StrategyVariables.riskfree_rate1,
+                sigma,
+                0,
+                config_leg_object.right,
             )
 
             # Calcluate speed greeks for each leg_tuple
             speed = CalcluateGreeks.calculate_speed(
-                float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0
+                float(underlying_price),
+                strike,
+                time_to_expiration,
+                StrategyVariables.riskfree_rate1,
+                sigma,
+                0,
             )
 
             # Calcluate color greeks for each leg_tuple
             color = CalcluateGreeks.calculate_color(
-                float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0
+                float(underlying_price),
+                strike,
+                time_to_expiration,
+                StrategyVariables.riskfree_rate1,
+                sigma,
+                0,
             )
 
             # Calcluate veta greeks for each leg_tuple
             veta = CalcluateGreeks.calculate_veta(
-                float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0
+                float(underlying_price),
+                strike,
+                time_to_expiration,
+                StrategyVariables.riskfree_rate1,
+                sigma,
+                0,
             )
 
             # Calcluate ultima greeks for each leg_tuple
             ultima = CalcluateGreeks.calculate_ultima(
-                float(underlying_price), strike, time_to_expiration, StrategyVariables.riskfree_rate1, sigma, 0
+                float(underlying_price),
+                strike,
+                time_to_expiration,
+                StrategyVariables.riskfree_rate1,
+                sigma,
+                0,
             )
 
             # Store the greeks in dictionary for each leg tuple
@@ -158,7 +218,9 @@ class CalcluateGreeks:
         d2 = d1 - sigma_t
 
         # Calculate Vomma
-        vomma_num = S * math.exp(-q * t) * scipy.stats.norm.pdf(d1) * math.sqrt(t) * (d1 * d2)
+        vomma_num = (
+            S * math.exp(-q * t) * scipy.stats.norm.pdf(d1) * math.sqrt(t) * (d1 * d2)
+        )
         vomma_deno = sigma
         vomma = vomma_num / vomma_deno
 
@@ -178,12 +240,15 @@ class CalcluateGreeks:
 
         # Calculate the charm based on option type
         if opt_type.upper() == "CALL":
-
-            charm_num = q * e_qt * cdf_d1 - e_qt * pdf_d1 * (2 * (r - q) * T - d2 * sigma * math.sqrt(T))
+            charm_num = q * e_qt * cdf_d1 - e_qt * pdf_d1 * (
+                2 * (r - q) * T - d2 * sigma * math.sqrt(T)
+            )
             charm_deno = 2 * T * sigma * math.sqrt(T)
 
         elif opt_type.upper() == "PUT":
-            charm_num = -q * e_qt * cdf_minus_d1 - e_qt * pdf_d1 * (2 * (r - q) * T - d2 * sigma * math.sqrt(T))
+            charm_num = -q * e_qt * cdf_minus_d1 - e_qt * pdf_d1 * (
+                2 * (r - q) * T - d2 * sigma * math.sqrt(T)
+            )
             charm_deno = 2 * T * sigma * math.sqrt(T)
 
         else:
@@ -217,7 +282,9 @@ class CalcluateGreeks:
         pdf_d1 = scipy.stats.norm.pdf(d1)
 
         # Calculate Veta
-        last_term = q + (((r - q) * d1) / (sigma * math.sqrt(T))) - ((1 + d1 * d2) / (2 * T))
+        last_term = (
+            q + (((r - q) * d1) / (sigma * math.sqrt(T))) - ((1 + d1 * d2) / (2 * T))
+        )
         veta = -S * math.exp(-q * T) * pdf_d1 * math.sqrt(T) * last_term
 
         return veta

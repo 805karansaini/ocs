@@ -15,7 +15,6 @@ class PriceChart(tk.Toplevel):
     """
 
     def __init__(self, unique_id):
-
         # Create a popup window
         self.chart_window_master = tk.Toplevel()
         self.chart_window_master.title(f"Price Chart, Unique ID: {unique_id}")
@@ -188,7 +187,6 @@ class PriceChart(tk.Toplevel):
         chart_duration_combo_box,
         update_frequency_entry,
     ):
-
         # User Given Values
         bar_size = bar_size_combo_box.get().strip()
         chart_size = chart_duration_combo_box.get().strip()
@@ -216,7 +214,6 @@ class PriceChart(tk.Toplevel):
             flag_keep_updating = False
 
         while not self.window_closed:
-
             # Request Historical Data for the unique Id
             ohlc_data = request_historical_price_data_of_combination_for_chart(
                 unique_id, bar_size, chart_size

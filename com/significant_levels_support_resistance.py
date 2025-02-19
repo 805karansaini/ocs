@@ -16,14 +16,12 @@ from com.variables import *
 def get_support_and_resitance_from_significant_levels(
     significant_lvl_dict, current_buy_price, current_sell_price
 ):
-
     # significant_lvl_dict consists of all signifact levels sorted in highest hit percentage to lowest hit percentage
     support = "N/A"
     resistance = "N/A"
 
     # Iterate over the significant_lvl_dict and find support and resistance.
     for price_lvl, hit_percent in significant_lvl_dict.items():
-
         # Resistance with highest hit percentage
         if (
             (current_buy_price != None)
@@ -47,6 +45,7 @@ def get_support_and_resitance_from_significant_levels(
     # If no such key exists, return None.
     return (resistance, support)
 
+
 # Method to calculate support and resistance in rnage
 def get_support_and_resitance_in_range_from_significant_levels(
     significant_lvl_dict, current_buy_price, current_sell_price
@@ -57,7 +56,6 @@ def get_support_and_resitance_in_range_from_significant_levels(
 
     # Iterate over the significant_lvl_dict and find support and resistance.
     for price_lvl, hit_percent in significant_lvl_dict.items():
-
         # Resistance with highest hit percentage
         if (
             (current_buy_price != None)
@@ -84,7 +82,6 @@ def get_support_and_resitance_in_range_from_significant_levels(
 
 # Function to calculate significance levels
 def calc_signficant_levels_v1(candles, offset_percent, number_of_levels):
-
     # Finding total no of candles
     num_candles = len(candles[1])
 
@@ -126,7 +123,6 @@ def calc_signficant_levels_v1(candles, offset_percent, number_of_levels):
 
     # Iterating over the price, and the computing the levels that are hit by the price and increasing the hit counter of the level
     for price in all_candle_prices_set:
-
         # Defining range for value level
         min_allowed_price_for_level = price - offset
         max_allowed_price_for_level = price + offset
@@ -159,12 +155,15 @@ def calc_signficant_levels_v1(candles, offset_percent, number_of_levels):
 
 # Function to calculate significance levels
 def calc_signficant_levels(
-    candles, number_of_levels=99, flag_in_range=False, unique_id=None, combo_obj = None,
+    candles,
+    number_of_levels=99,
+    flag_in_range=False,
+    unique_id=None,
+    combo_obj=None,
 ):
     # Candles = [], [] list of open and close
 
     try:
-
         # Finding total no of candles
         num_candles = len(candles[1])
 
@@ -176,11 +175,8 @@ def calc_signficant_levels(
 
         # Check if flag is true
         if flag_in_range:
-
             try:
-
                 if unique_id > 0:
-
                     # Make it available in variables
                     avg_price_combo = (
                         variables.unique_id_to_prices_dict[unique_id]["BUY"]
@@ -188,21 +184,18 @@ def calc_signficant_levels(
                     ) / 2
 
                 else:
-
                     avg_price_combo = None
 
                     if combo_obj is not None:
-
                         all_legs = combo_obj.buy_legs + combo_obj.sell_legs
 
                         for leg_obj in all_legs:
                             req_id = variables.con_id_to_req_id_dict[leg_obj.con_id]
-                            bid, ask = variables.bid_price[req_id], variables.ask_price[req_id]
+                            bid, ask = (
+                                variables.bid_price[req_id],
+                                variables.ask_price[req_id],
+                            )
                             avg_price_combo = (ask + bid) / 2
-
-
-
-
 
                 min_price = avg_price_combo * (
                     1 - variables.support_resistance_range_percent
@@ -213,7 +206,6 @@ def calc_signficant_levels(
                 )
 
             except Exception as e:
-
                 min_price = "N/A"
                 max_price = "N/A"
 
@@ -246,7 +238,6 @@ def calc_signficant_levels(
 
         # Iterating over the price, and the computing the levels that are hit by the price and increasing the hit counter of the level
         for price in all_candle_prices_set:
-
             # Defining range for value level
             min_allowed_price_for_level = price - offset
             max_allowed_price_for_level = price + offset
@@ -285,5 +276,4 @@ def calc_signficant_levels(
         return dict_percentage_for_value_levels, dict_value_levels
 
     except Exception as e:
-
         return None, None

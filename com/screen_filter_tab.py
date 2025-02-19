@@ -3,6 +3,7 @@ import time
 from com.variables import *
 from com.mysql_io_filter_tab import *
 
+
 # Class for accounts tab
 class ScreenFilter(object):
     def __init__(self, master_notebook):
@@ -20,7 +21,6 @@ class ScreenFilter(object):
 
     # Method to create GUI for filter tab
     def create_filter_tab(self):
-
         # Create Treeview Frame for filter instances
         filter_table_frame = ttk.Frame(self.filter_tab, padding=10)
         filter_table_frame.pack(pady=10)
@@ -106,17 +106,14 @@ class ScreenFilter(object):
 
     # Method to toggle state of filter condition
     def activate_deactivated_filter_condition(self):
-
         # Check if value is true
         if variables.flag_enable_filter_condition:
-
             # Set value to false
             variables.flag_enable_filter_condition = False
 
             self.activate_deactivate_button.config(text="Activate Filter")
 
         else:
-
             # Set value to True
             variables.flag_enable_filter_condition = True
 
@@ -127,7 +124,6 @@ class ScreenFilter(object):
 
     # Method to define filter table right click options
     def filter_table_right_click(self, event):
-
         # get the Treeview row that was clicked
         row = self.filter_table.identify_row(event.y)
 
@@ -154,7 +150,6 @@ class ScreenFilter(object):
 
     # Method to activate filter condition
     def activate_filter_condition(self):
-
         # get selected row
         selected_item = self.filter_table.selection()[
             0
@@ -172,7 +167,6 @@ class ScreenFilter(object):
 
         # check if filter is already active
         if active_val == "Yes":
-
             return
 
         # create dict to update values
@@ -189,7 +183,6 @@ class ScreenFilter(object):
 
     # Method to deactivate filter condition
     def deactivate_filter_condition(self):
-
         # get selected row
         selected_item = self.filter_table.selection()[
             0
@@ -207,7 +200,6 @@ class ScreenFilter(object):
 
         # check if filter is already not active
         if active_val == "No":
-
             return
 
         # create dict to uppdate values
@@ -224,7 +216,6 @@ class ScreenFilter(object):
 
     # Method to delete filter condition
     def delete_filter_condition(self):
-
         # get selected row
         selected_item = self.filter_table.selection()[
             0
@@ -248,7 +239,6 @@ class ScreenFilter(object):
 
     # Method to update filter table
     def update_filter_table(self, flag_init=False):
-
         # Get all conditions in db table
         filter_table_df = get_all_filter_conditions()
 
@@ -261,7 +251,6 @@ class ScreenFilter(object):
 
         # Check if df is empty
         if filter_table_df.empty:
-
             return
 
         # Init
@@ -269,7 +258,6 @@ class ScreenFilter(object):
 
         # Iterate rowws in df
         for indx, row in filter_table_df.iterrows():
-
             # get condition name
             condition_name = row["Condition Name"]
 
@@ -278,7 +266,6 @@ class ScreenFilter(object):
 
             # add rows
             if counter % 2 == 1:
-
                 self.filter_table.insert(
                     "",
                     "end",
@@ -289,7 +276,6 @@ class ScreenFilter(object):
                 )
 
             else:
-
                 self.filter_table.insert(
                     "",
                     "end",
@@ -303,13 +289,11 @@ class ScreenFilter(object):
 
         # check it is not at time of  initializing screen
         if not flag_init:
-
             # set very big value
             variables.counter_filter_condition = 10**10
 
     # Method to add filter condition
     def add_filter_condition(self):
-
         # title for pop up
         title_string = f"Add Filter Condition"
 
@@ -343,7 +327,6 @@ class ScreenFilter(object):
         filter_condition_button_frame = ttk.Frame(input_frame, padding=10)
 
         def get_input_from_popup():
-
             # condition attribute's values dict
             condition_data_dict = {}
 
@@ -352,7 +335,6 @@ class ScreenFilter(object):
 
             # check if input is empty
             if condition_name_input == "":
-
                 # show error pop up
                 error_title = error_string = "Condition name is empty"
 
@@ -365,10 +347,8 @@ class ScreenFilter(object):
 
             # check if dataframe is empty
             if filter_table_df.empty:
-
                 condition_names = []
             else:
-
                 # get existing condition names
                 condition_names = filter_table_df["Condition Name"].to_list()
 
@@ -377,7 +357,6 @@ class ScreenFilter(object):
 
             # check if condition anme is already present
             if condition_name_input in condition_names:
-
                 # show error pop up
                 error_title = error_string = "Condition name already present"
 

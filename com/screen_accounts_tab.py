@@ -14,6 +14,7 @@ from com.mysql_io_account_group import *
 import re
 from com.utilities import *
 
+
 # Class for accounts tab
 class ScreenAccounts(object):
     def __init__(self, master_notebook):
@@ -31,7 +32,6 @@ class ScreenAccounts(object):
 
     # Method to create GUI for account tab
     def create_accounts_tab(self):
-
         # Create Treeview Frame for accounts instances
         accounts_table_frame = ttk.Frame(self.accounts_tab, padding=10)
         accounts_table_frame.pack(pady=10)
@@ -69,7 +69,6 @@ class ScreenAccounts(object):
 
         # Creating columns for scale trader table
         for column_name in accounts_table_columns:
-
             self.accounts_table.column(column_name, anchor="center", width=222)
 
         # Create Heading
@@ -77,7 +76,6 @@ class ScreenAccounts(object):
 
         # Create headings for accounts table
         for column_name in accounts_table_columns:
-
             self.accounts_table.heading(column_name, text=column_name, anchor="center")
 
         # Back ground for rows in table
@@ -88,7 +86,6 @@ class ScreenAccounts(object):
 
     # Method to create account  condition table
     def create_account_conditions_table(self):
-
         # Get frame for button to add custom columns
         account_condition_button_frame = ttk.Frame(self.accounts_tab, padding=10)
         account_condition_button_frame.pack(pady=10)
@@ -158,21 +155,17 @@ class ScreenAccounts(object):
 
         # Creating columns for scale trader table
         for column_name in accounts_conditions_table_columns:
-
             if column_name == "Table ID":
-
                 self.accounts_conditions_table.column(
                     column_name, anchor="center", width=0, stretch="no"
                 )
 
             elif column_name == "Account ID":
-
                 self.accounts_conditions_table.column(
                     column_name, anchor="center", width=258
                 )
 
             else:
-
                 self.accounts_conditions_table.column(
                     column_name, anchor="center", width=1290
                 )
@@ -182,7 +175,6 @@ class ScreenAccounts(object):
 
         # Create headings for accounts table
         for column_name in accounts_conditions_table_columns:
-
             self.accounts_conditions_table.heading(
                 column_name, text=column_name, anchor="center"
             )
@@ -193,7 +185,6 @@ class ScreenAccounts(object):
 
     # Method to delete account conditions
     def delete_selected_condition(self):
-
         # Get selected row
         condition_account_id_combined_selected = (
             self.accounts_conditions_table.selection()
@@ -201,7 +192,6 @@ class ScreenAccounts(object):
 
         # Iterate slected rows
         for condition_account_id_combined in condition_account_id_combined_selected:
-
             # get values of selected row
             values = self.accounts_conditions_table.item(
                 condition_account_id_combined, "values"
@@ -230,7 +220,6 @@ class ScreenAccounts(object):
 
     # Method to update account condition table
     def update_account_conditions_table(self):
-
         # Get df fof all values
         account_condition_table_df = get_all_conditions_from_db()
 
@@ -238,7 +227,6 @@ class ScreenAccounts(object):
 
         # Iterate rows of df
         for indx, row in account_condition_table_df.iterrows():
-
             # Get combination of account and condition
             account_condition_combined = row["Account ID"] + "_" + row["Condition"]
 
@@ -253,14 +241,12 @@ class ScreenAccounts(object):
 
             # Check if it is already in table
             if account_condition_combined in table_ids_in_table:
-
                 # Update the row at once.
                 self.accounts_conditions_table.item(
                     account_condition_combined, values=row
                 )
 
             else:
-
                 # Insert it in the table
                 self.accounts_conditions_table.insert(
                     "",
@@ -276,7 +262,6 @@ class ScreenAccounts(object):
 
         # Move According to data Color here, Change Color
         for i, row in account_condition_table_df.iterrows():
-
             account_condition_combined = row["Account ID"] + "_" + row["Condition"]
 
             # If table id in table
@@ -289,12 +274,10 @@ class ScreenAccounts(object):
                 )
 
                 if counter_row % 2 == 0:
-
                     self.accounts_conditions_table.item(
                         account_condition_combined, tags="evenrow"
                     )
                 else:
-
                     self.accounts_conditions_table.item(
                         account_condition_combined, tags="oddrow"
                     )
@@ -304,7 +287,6 @@ class ScreenAccounts(object):
 
     # Method to update table
     def update_accounts_table(self):
-
         # Get local copy of account table df
         local_accounts_table_dataframe = copy.deepcopy(
             variables.accounts_table_dataframe
@@ -315,7 +297,6 @@ class ScreenAccounts(object):
 
         # Iterate rows in df
         for indx, row in local_accounts_table_dataframe.iterrows():
-
             # Get account id
             account_id = row["Account ID"]
 
@@ -360,12 +341,10 @@ class ScreenAccounts(object):
 
             # Check account id present in table
             if account_id in account_ids_in_table:
-
                 # Update the row at once.
                 self.accounts_table.item(account_id, values=tuple(row))
 
             else:
-
                 # Insert it in the table
                 self.accounts_table.insert(
                     "",
@@ -384,7 +363,6 @@ class ScreenAccounts(object):
 
         # Move According to data Color here, Change Color
         for i, row in local_accounts_table_dataframe.iterrows():
-
             # account id
             account_id = str(row["Account ID"])
 
@@ -393,10 +371,8 @@ class ScreenAccounts(object):
                 self.accounts_table.move(account_id, "", counter_row)
 
                 if counter_row % 2 == 0:
-
                     self.accounts_table.item(account_id, tags="evenrow")
                 else:
-
                     self.accounts_table.item(account_id, tags="oddrow")
 
                 # Increase row count
@@ -404,7 +380,6 @@ class ScreenAccounts(object):
 
     # Method to select accounts
     def get_accounts_for_condition(self, user_entered_condition):
-
         # Create a enter unique id popup window
         enter_account_id_popup = tk.Toplevel()
 
@@ -463,7 +438,6 @@ class ScreenAccounts(object):
         # Inserting the listbox items
         # Get all account ids
         for indx, account_id in enumerate(variables.current_session_accounts, start=1):
-
             listbox.insert(indx, "Account: " + account_id)
 
             listbox_index = indx
@@ -473,31 +447,26 @@ class ScreenAccounts(object):
         for indx, account_id in enumerate(
             account_group_df["Group Name"].to_list(), start=1
         ):
-
             listbox.insert(listbox_index + indx, "Group: " + account_id)
 
         listbox.pack()
 
         # On click method for button
         def add_account_ids():
-
             # Init
             account_id_list = []
 
             # Get list of selections
             for i in listbox.curselection():
-
                 # Split item in listbox
                 accounts_type = listbox.get(i).split(":")[0]
 
                 # Check if its account
                 if accounts_type == "Account":
-
                     # Append account id in list
                     account_id_list.append(listbox.get(i)[8:].strip())
 
                 else:
-
                     # Get account ids in group
                     accounts_in_group = get_accounts_in_account_group_from_db(
                         listbox.get(i)[6:].strip()
@@ -505,19 +474,15 @@ class ScreenAccounts(object):
 
                     # Check if account group is 'all'
                     if accounts_in_group == "ALL":
-
                         # Set value of list to list of all account in current session
                         account_id_list = variables.current_session_accounts
                         break
 
                     else:
-
                         # Append account in account group on by one
                         for account in accounts_in_group.split(","):
-
                             # check if unique id is in current session accounts
                             if account not in variables.current_session_accounts:
-
                                 # Error pop up
                                 error_title = f"For Account ID: {account}, Account ID is unavailable in current session."
                                 error_string = f"For Account ID: {account}, Can not trade combo\nbecause Account ID is unavailable in current session."
@@ -535,7 +500,6 @@ class ScreenAccounts(object):
 
             # check if list is empty
             if account_id_list == []:
-
                 # Error pop up
                 error_title = f"No Account IDs Selected."
                 error_string = f"No Account IDs Selected."
@@ -549,12 +513,10 @@ class ScreenAccounts(object):
 
             # Iterate every account user selected
             for account in account_id_list:
-
                 # Table ID
                 table_id = account + "_" + user_entered_condition
 
                 if table_id not in table_ids_in_table:
-
                     # Insert in db
                     insert_account_condition_in_db(account, user_entered_condition)
 
@@ -570,13 +532,11 @@ class ScreenAccounts(object):
 
 # run Rm check twice for order placements
 def rm_check_for_order(account_id):
-
     # Run RM checks
     rm_check_result = run_risk_management_checks(account_id)
 
     # If RM check failed
     if not rm_check_result:
-
         # sleep
         time.sleep(variables.rm_checks_interval_if_failed)
 
@@ -585,7 +545,6 @@ def rm_check_for_order(account_id):
 
         # If RM checks failed again
         if not rm_check_result:
-
             # Error pop up
             """error_title = f"For Account ID: {account_id}, RM checks failed"
             error_string = f"For Account ID: {account_id}, RM checks failed"
@@ -594,26 +553,21 @@ def rm_check_for_order(account_id):
             return False
 
         else:
-
             return True
 
     else:
-
         return True
 
 
 # Method to run Rm checks
 def run_risk_management_checks(account_id, flag_liquidation_check=False):
-
     # Get value dataframe for account id
     conditions_df = get_account_conditions_from_db(account_id)
 
     # check if df is empty
     if conditions_df.empty:
-
         # If flag for liquidation check is true
         if flag_liquidation_check:
-
             # set value to false
             variables.flag_account_liquidation_mode[account_id] = False
 
@@ -624,7 +578,6 @@ def run_risk_management_checks(account_id, flag_liquidation_check=False):
 
     # Iterate conditions
     for condition in conditions_list:
-
         # Relace % term by value / 100
         def replace_percent(match):
             number = int(match.group(1)) / 100
@@ -636,13 +589,10 @@ def run_risk_management_checks(account_id, flag_liquidation_check=False):
 
         # check if tickers PNL is in condition
         if "Tickers PNL" in condition:
-
             value_for_row = True
 
             for con_id in variables.map_account_id_and_con_id_to_pnl[account_id]:
-
                 try:
-
                     # Get row for account id
                     account_row = variables.accounts_table_dataframe.loc[
                         variables.accounts_table_dataframe["Account ID"] == account_id
@@ -652,9 +602,9 @@ def run_risk_management_checks(account_id, flag_liquidation_check=False):
                     account_row = account_row.iloc[0]
 
                     # Add an extra column 'New Column' with a value
-                    account_row[
-                        "Tickers PNL"
-                    ] = variables.map_account_id_and_con_id_to_pnl[account_id][con_id]
+                    account_row["Tickers PNL"] = (
+                        variables.map_account_id_and_con_id_to_pnl[account_id][con_id]
+                    )
 
                     # Get Expression and flag for valid results to eval further
                     _, condition = evaluate_condition(
@@ -672,7 +622,6 @@ def run_risk_management_checks(account_id, flag_liquidation_check=False):
                     value_for_row = bool(expression_value)
 
                 except Exception as e:
-
                     # Set value to true
                     value_for_row = False
 
@@ -684,7 +633,6 @@ def run_risk_management_checks(account_id, flag_liquidation_check=False):
 
                 # check if value is false
                 if not value_for_row:
-
                     # If flag for liquidation check is true
                     if flag_liquidation_check:
                         # set value to True
@@ -696,7 +644,6 @@ def run_risk_management_checks(account_id, flag_liquidation_check=False):
 
         else:
             try:
-
                 # Get row for account id
                 account_row = variables.accounts_table_dataframe.loc[
                     variables.accounts_table_dataframe["Account ID"] == account_id
@@ -724,23 +671,19 @@ def run_risk_management_checks(account_id, flag_liquidation_check=False):
                 value_for_row = bool(expression_value)
 
             except Exception as e:
-
                 # Set value to true
                 value_for_row = False
 
                 # Print  to console
                 if variables.flag_debug_mode:
-
                     print(
                         f"Exception while calculating values of account conditions, Exp: {e}"
                     )
 
         # check if value is false
         if not value_for_row:
-
             # If flag for liquidation check is true
             if flag_liquidation_check:
-
                 # set value to True
                 variables.flag_account_liquidation_mode[account_id] = True
 
@@ -750,7 +693,6 @@ def run_risk_management_checks(account_id, flag_liquidation_check=False):
 
     # If flag for liquidation check is true
     if flag_liquidation_check:
-
         # set value to True
         variables.flag_account_liquidation_mode[account_id] = False
 

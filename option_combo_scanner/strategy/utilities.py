@@ -8,7 +8,9 @@ import pytz
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import (
+    StrategyVariables as strategy_variables,
+)
 
 logger = CustomLogger.logger
 
@@ -21,7 +23,9 @@ class StrategyUtils:
     def calculate_entry_qty_and_risk_dollar(risk_percent, current_ba_mid, sl1_price):
         entry_qty, risk_dollar = None, None
         try:
-            account_nlv = copy.deepcopy(variables.map_account_id_to_nlv[variables.account_id])
+            account_nlv = copy.deepcopy(
+                variables.map_account_id_to_nlv[variables.account_id]
+            )
             risk_dollar = int((account_nlv * risk_percent) / 100)
 
             loss_per_share = abs(current_ba_mid - sl1_price)
@@ -45,7 +49,9 @@ class StrategyUtils:
 
     @staticmethod
     def get_account_nlv():
-        account_nlv = copy.deepcopy(variables.map_account_id_to_nlv[variables.account_id])
+        account_nlv = copy.deepcopy(
+            variables.map_account_id_to_nlv[variables.account_id]
+        )
 
         if account_nlv is not None:
             account_nlv = int(account_nlv)
@@ -57,7 +63,9 @@ class StrategyUtils:
         # Check if the order is already pending
         if variables.map_unique_id_to_order_preset[unique_id].status == "Pending":
             # Update the order status
-            variables.map_unique_id_to_order_preset[unique_id].change_value("status", "Cancelled")
+            variables.map_unique_id_to_order_preset[unique_id].change_value(
+                "status", "Cancelled"
+            )
 
             values_dict = {"Status": "Cancelled"}
             where_clause = f"WHERE UniqueID={unique_id}"
@@ -104,7 +112,9 @@ class StrategyUtils:
             for unique_id, group in grouped_orders_df:
                 try:
                     unique_id = int(unique_id[0])
-                    order_preset_obj = variables.map_unique_id_to_order_preset[unique_id]
+                    order_preset_obj = variables.map_unique_id_to_order_preset[
+                        unique_id
+                    ]
                     flag_exit_order_sent = order_preset_obj.flag_exit_order_sent
                     status = order_preset_obj.status
                     if status not in ["Live"]:
@@ -125,12 +135,22 @@ class StrategyUtils:
                         filled_quantity = row["FilledQuantity"]
                         average_fill_price = row["AverageFillPrice"]
 
-                        if order_type == "MKT" and action == "BUY" and order_status == "Filled":
+                        if (
+                            order_type == "MKT"
+                            and action == "BUY"
+                            and order_status == "Filled"
+                        ):
                             entry_quantity_filled = float(filled_quantity)
                             average_entry_price = float(average_fill_price)
-                        elif (order_type == "LMT" or order_type == "STP") and action == "SELL" and order_status == "Filled":
+                        elif (
+                            (order_type == "LMT" or order_type == "STP")
+                            and action == "SELL"
+                            and order_status == "Filled"
+                        ):
                             exit_quantity_filled += float(filled_quantity)
-                            average_exit_price += float(filled_quantity) * float(average_fill_price)
+                            average_exit_price += float(filled_quantity) * float(
+                                average_fill_price
+                            )
 
                         if flag_exit_order_sent and order_status in [
                             "Cancelled",
@@ -158,16 +178,22 @@ class StrategyUtils:
                         values_dict["Status"] = order_preset_status
 
                     where_clause = f" WHERE UniqueID={unique_id}"
-                    SqlQueries.update_preset_order(values_dict, where_clause=where_clause)
+                    SqlQueries.update_preset_order(
+                        values_dict, where_clause=where_clause
+                    )
 
                     unique_id = int(unique_id)
 
                     # Update the values in the order preset objects
                     if unique_id in variables.map_unique_id_to_order_preset:
-                        order_preset = variables.map_unique_id_to_order_preset[unique_id]
+                        order_preset = variables.map_unique_id_to_order_preset[
+                            unique_id
+                        ]
 
                         for key, value in values_dict.items():
-                            converted_key = "".join(["_" + c.lower() if c.isupper() else c for c in key])
+                            converted_key = "".join(
+                                ["_" + c.lower() if c.isupper() else c for c in key]
+                            )
                             converted_key = converted_key.lstrip("_")
 
                             order_preset.change_value(converted_key, value)
@@ -188,20 +214,30 @@ class StrategyUtils:
 
             # Timezone object for the target time zone
             target_timezone_object = pytz.timezone(target_time_zone)
-            current_time_in_target_time_zone = datetime.datetime.now(target_timezone_object)
+            current_time_in_target_time_zone = datetime.datetime.now(
+                target_timezone_object
+            )
 
             # Get today's date in the target time zone
             today_date = datetime.datetime.now(target_timezone_object).date()
 
             # Parse the start and end times and combine with today's date
             start_time_in_target_time_zone = target_timezone_object.localize(
-                datetime.datetime.strptime(str(today_date) + " " + trade_start_time, "%Y-%m-%d %H:%M:%S")
+                datetime.datetime.strptime(
+                    str(today_date) + " " + trade_start_time, "%Y-%m-%d %H:%M:%S"
+                )
             )
             end_time_in_target_time_zone = target_timezone_object.localize(
-                datetime.datetime.strptime(str(today_date) + " " + trade_end_time, "%Y-%m-%d %H:%M:%S")
+                datetime.datetime.strptime(
+                    str(today_date) + " " + trade_end_time, "%Y-%m-%d %H:%M:%S"
+                )
             )
 
-            if start_time_in_target_time_zone <= current_time_in_target_time_zone <= end_time_in_target_time_zone:
+            if (
+                start_time_in_target_time_zone
+                <= current_time_in_target_time_zone
+                <= end_time_in_target_time_zone
+            ):
                 return True
 
         except Exception as e:
@@ -211,7 +247,6 @@ class StrategyUtils:
 
     @staticmethod
     def save_option_combo_scanner_csv_file(dataframe, folder_name, file_name):
-
         file_path = rf"{strategy_variables.o_c_s_folder_path}\{folder_name}"
 
         if not os.path.exists(file_path):

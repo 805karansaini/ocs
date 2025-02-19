@@ -3,7 +3,6 @@ Copyright (C) 2019 Interactive Brokers LLC. All rights reserved. This code is su
  and conditions of the IB API Non-Commercial License or the IB API Commercial License, as applicable.
 """
 
-
 """
 The main class to use from API user's point of view.
 It takes care of almost everything:
@@ -93,7 +92,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 2
 
             msg = (
@@ -389,7 +387,6 @@ class EClient(object):
                 return
 
         try:
-
             VERSION = 11
 
             # send req mkt data msg
@@ -560,7 +557,6 @@ class EClient(object):
             return
 
         try:
-
             msg = (
                 make_field(OUT.REQ_SMART_COMPONENTS)
                 + make_field(reqId)
@@ -625,7 +621,6 @@ class EClient(object):
             return
 
         try:
-
             msg = (
                 make_field(OUT.REQ_TICK_BY_TICK_DATA)
                 + make_field(reqId)
@@ -719,7 +714,6 @@ class EClient(object):
                 return
 
         try:
-
             VERSION = 3
 
             # send req mkt data msg
@@ -836,7 +830,6 @@ class EClient(object):
                 return
 
         try:
-
             VERSION = 3
 
             # send req mkt data msg
@@ -952,7 +945,6 @@ class EClient(object):
                 return
 
         try:
-
             VERSION = 2
 
             # send req mkt data msg
@@ -1398,7 +1390,6 @@ class EClient(object):
                 return
 
         try:
-
             VERSION = 27 if (self.serverVersion() < MIN_SERVER_VER_NOT_HELD) else 45
 
             # send place order msg
@@ -1640,7 +1631,6 @@ class EClient(object):
                 and order.scalePriceIncrement != UNSET_DOUBLE
                 and order.scalePriceIncrement > 0.0
             ):
-
                 flds += [
                     make_field_handle_empty(order.scalePriceAdjustValue),
                     make_field_handle_empty(order.scalePriceAdjustInterval),
@@ -2004,7 +1994,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 2
 
             flds = []
@@ -2085,7 +2074,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 1
 
             msg = (
@@ -2189,7 +2177,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 1
 
             msg = (
@@ -2207,7 +2194,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def cancelPositionsMulti(self, reqId: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -2253,7 +2239,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 1
 
             msg = (
@@ -2272,7 +2257,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def cancelAccountUpdatesMulti(self, reqId: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -2302,7 +2286,6 @@ class EClient(object):
     #########################################################################
 
     def reqPnL(self, reqId: int, account: str, modelCode: str):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -2318,7 +2301,6 @@ class EClient(object):
             return
 
         try:
-
             msg = (
                 make_field(OUT.REQ_PNL)
                 + make_field(reqId)
@@ -2333,7 +2315,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def cancelPnL(self, reqId: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -2353,7 +2334,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def reqPnLSingle(self, reqId: int, account: str, modelCode: str, conid: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -2369,7 +2349,6 @@ class EClient(object):
             return
 
         try:
-
             msg = (
                 make_field(OUT.REQ_PNL_SINGLE)
                 + make_field(reqId)
@@ -2385,7 +2364,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def cancelPnLSingle(self, reqId: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -2430,7 +2408,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 3
 
             # send req open orders msg
@@ -2522,7 +2499,6 @@ class EClient(object):
                 return
 
         try:
-
             VERSION = 8
 
             # send req mkt data msg
@@ -2592,7 +2568,6 @@ class EClient(object):
     #########################################################################
 
     def reqMktDepthExchanges(self):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -2676,7 +2651,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 5
 
             # send req mkt depth msg
@@ -3000,7 +2974,6 @@ class EClient(object):
                 return
 
         try:
-
             VERSION = 6
 
             # send req mkt data msg
@@ -3119,7 +3092,6 @@ class EClient(object):
         useRTH: int,
         formatDate: int,
     ):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -3135,7 +3107,6 @@ class EClient(object):
             return
 
         try:
-
             flds = []
             flds += [
                 make_field(OUT.REQ_HEAD_TIMESTAMP),
@@ -3167,7 +3138,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def cancelHeadTimeStamp(self, reqId: TickerId):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -3191,7 +3161,6 @@ class EClient(object):
     def reqHistogramData(
         self, tickerId: int, contract: Contract, useRTH: bool, timePeriod: str
     ):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -3207,7 +3176,6 @@ class EClient(object):
             return
 
         try:
-
             flds = []
             flds += [
                 make_field(OUT.REQ_HISTOGRAM_DATA),
@@ -3238,7 +3206,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def cancelHistogramData(self, tickerId: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -3269,7 +3236,6 @@ class EClient(object):
         ignoreSize: bool,
         miscOptions: TagValueList,
     ):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -3285,7 +3251,6 @@ class EClient(object):
             return
 
         try:
-
             flds = []
             flds += [
                 make_field(OUT.REQ_HISTORICAL_TICKS),
@@ -3378,7 +3343,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 4
 
             flds = []
@@ -3514,7 +3478,6 @@ class EClient(object):
                 return
 
         try:
-
             VERSION = 3
 
             flds = []
@@ -3628,7 +3591,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 2
 
             if self.serverVersion() < MIN_SERVER_VER_FUNDAMENTAL_DATA:
@@ -3723,7 +3685,6 @@ class EClient(object):
     #########################################################################
 
     def reqNewsProviders(self):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -3749,7 +3710,6 @@ class EClient(object):
         articleId: str,
         newsArticleOptions: TagValueList,
     ):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -3765,7 +3725,6 @@ class EClient(object):
             return
 
         try:
-
             flds = []
 
             flds += [
@@ -3803,7 +3762,6 @@ class EClient(object):
         totalResults: int,
         historicalNewsOptions: TagValueList,
     ):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -3819,7 +3777,6 @@ class EClient(object):
             return
 
         try:
-
             flds = []
 
             flds += [
@@ -3941,7 +3898,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 1
 
             msg = (
@@ -4013,7 +3969,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 1
 
             msg = (
@@ -4048,7 +4003,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 1
 
             msg = (
@@ -4091,7 +4045,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 1
 
             msg = (
@@ -4127,7 +4080,6 @@ class EClient(object):
             return
 
         try:
-
             VERSION = 1
 
             msg = (
@@ -4175,7 +4127,6 @@ class EClient(object):
             return
 
         try:
-
             flds = []
             flds += [
                 make_field(OUT.REQ_SEC_DEF_OPT_PARAMS),
@@ -4210,7 +4161,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def reqFamilyCodes(self):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -4230,7 +4180,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def reqMatchingSymbols(self, reqId: int, pattern: str):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -4246,7 +4195,6 @@ class EClient(object):
             return
 
         try:
-
             msg = (
                 make_field(OUT.REQ_MATCHING_SYMBOLS)
                 + make_field(reqId)
@@ -4276,7 +4224,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def reqWshMetaData(self, reqId: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -4292,7 +4239,6 @@ class EClient(object):
             return
 
         try:
-
             msg = make_field(OUT.REQ_WSH_META_DATA) + make_field(reqId)
 
         except ClientException as ex:
@@ -4302,7 +4248,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def cancelWshMetaData(self, reqId: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -4322,7 +4267,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def reqWshEventData(self, reqId: int, wshEventData: WshEventData):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -4391,7 +4335,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def cancelWshEventData(self, reqId: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():
@@ -4411,7 +4354,6 @@ class EClient(object):
         self.sendMsg(msg)
 
     def reqUserInfo(self, reqId: int):
-
         self.logRequest(current_fn_name(), vars())
 
         if not self.isConnected():

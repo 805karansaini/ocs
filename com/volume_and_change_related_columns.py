@@ -4,7 +4,6 @@ Created on 08-Jun-2023
 @author: ashish
 """
 
-
 from com.variables import *
 from com.high_low_price_calculator import *
 from com.prices import *
@@ -24,7 +23,6 @@ class VolumeRelated:
         duration_size="1 D",
         bar_size="1 min",
     ):
-
         # Map of [conid][action] = req_id
         map_conid_to_req_id = {}
 
@@ -67,7 +65,6 @@ class VolumeRelated:
         while variables.cas_wait_time_for_historical_data > (
             counter * variables.sleep_time_waiting_for_tws_response
         ):
-
             """dict_mkt_end = variables.req_mkt_data_end
             dicterr_msg = variables.req_error
 
@@ -108,7 +105,6 @@ class VolumeRelated:
         value = 0
 
         for leg_no in range(len(all_data_frames)):
-
             column_name = f"{volume} {leg_no + 1}"
 
             value += float(row[column_name]) / factors[leg_no]
@@ -118,7 +114,6 @@ class VolumeRelated:
     def calculate_mean_and_std_for_combination_volume(
         self, combination_volume_dataframe
     ):
-
         mean_for_net_volume = combination_volume_dataframe["Combination Volume"].mean()
         standard_deviation_for_net_volume = combination_volume_dataframe[
             "Combination Volume"
@@ -142,7 +137,6 @@ class VolumeRelated:
 
     # Calculate average of combinational volume for given dataframe
     def calculate_sum_volume_for_dataframe(self, combinational_volume_dataframe):
-
         try:
             # Calculate mean of combinational volume column
             average_volume_for_dataframe_value = combinational_volume_dataframe[
@@ -161,7 +155,6 @@ class VolumeRelated:
         date_time_start,
         date_time_close,
     ):
-
         # Convert the 'Time' column to datetime type if it's not already
         historical_data_except_current_day_dataframe["Time"] = pd.to_datetime(
             historical_data_except_current_day_dataframe["Time"]
@@ -198,7 +191,6 @@ class VolumeRelated:
         calculated_volume_for_look_back_days = []
 
         for date_ith in all_date_values:
-
             # Filtering the dataframe for the 'date_ith'
             date_specific_dataframe_for_volume = filtered_historical_data_dataframe[
                 filtered_historical_data_dataframe["Time"].dt.date == date_ith
@@ -206,7 +198,6 @@ class VolumeRelated:
 
             # Save DF to CSV File (HV) Export data-frame to csv file
             if variables.flag_store_cas_tab_csv_files:
-
                 file_path = rf"{variables.cas_tab_csv_file_path}\Volume\RelativeVolume"
 
                 if not os.path.exists(file_path):
@@ -235,7 +226,6 @@ class VolumeRelated:
                 volume_since_start_of_day / volume_avg_over_lookback_period, 2
             )
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -250,7 +240,6 @@ class VolumeRelated:
     def merge_dataframe_inner_join_with_combo_net_volume_calculation(
         self, combo_obj, all_data_frames
     ):
-
         # All legs  in combo
         all_legs = combo_obj.buy_legs + combo_obj.sell_legs
 
@@ -266,7 +255,7 @@ class VolumeRelated:
         # Merging all data frames such that Time is available in all data frames
         for i, df_ith in enumerate(all_data_frames[1:]):
             merged_df = pd.merge(
-                merged_df, df_ith, on="Time", how="inner", suffixes=(f"", f" {i+1}")
+                merged_df, df_ith, on="Time", how="inner", suffixes=(f"", f" {i + 1}")
             )
 
         # Dropping nan values, if any
@@ -277,7 +266,7 @@ class VolumeRelated:
 
         # Open and Close with leg
         for i in range(len(all_data_frames)):
-            merged_df_columns.append(f"Volume {i+1}")
+            merged_df_columns.append(f"Volume {i + 1}")
 
         # Setting columns in merged_df
         merged_df.columns = merged_df_columns
@@ -313,13 +302,11 @@ class VolumeRelated:
     def calculate_volume_related_fields(
         self, local_unique_id_to_combo_obj, map_conid_to_req_id
     ):
-
         # Dict
         local_map_unique_id_to_volume_related_fields = {}
         current_volume = {}
 
         for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
             local_map_unique_id_to_volume_related_fields[unique_id] = {
                 "Mean of Net Volume": "N/A",
                 "STD +1": "N/A",
@@ -341,7 +328,6 @@ class VolumeRelated:
 
             # Getting all the reqId for which the historical data was requested
             for leg in all_legs:
-
                 con_id = leg.con_id
                 req_id = map_conid_to_req_id[con_id]
                 req_id_list.append(req_id)
@@ -354,16 +340,14 @@ class VolumeRelated:
 
             # Save DF to CSV File
             if variables.flag_store_cas_tab_csv_files:
-
                 for i, df_xxx in enumerate(all_data_frames):
-
                     file_path = rf"{variables.cas_tab_csv_file_path}\Volume"
                     file_path += rf"\Leg_Wise\Unique_id_{unique_id}"
 
                     if not os.path.exists(file_path):
                         os.makedirs(file_path)
 
-                    df_xxx.to_csv(rf"{file_path}\Leg_{i+1}_Volume.csv", index=False)
+                    df_xxx.to_csv(rf"{file_path}\Leg_{i + 1}_Volume.csv", index=False)
 
             # Data not found for any leg
             is_data_frame_empty = False
@@ -405,7 +389,6 @@ class VolumeRelated:
 
             # Save DF to CSV File
             if variables.flag_store_cas_tab_csv_files:
-
                 # Saving dataframe to csv
                 file_path = rf"{variables.cas_tab_csv_file_path}\Volume\Merged"
 
@@ -426,7 +409,6 @@ class VolumeRelated:
             ].copy()
 
             try:
-
                 # get current volume
                 current_volume_val = combination_net_volume_dataframe[
                     "Combination Volume"
@@ -459,9 +441,9 @@ class VolumeRelated:
                 }
 
                 # Making it available via class variable
-                variables.map_unique_id_to_volume_related_fields[
-                    unique_id
-                ] = local_map_unique_id_to_volume_related_fields[unique_id]
+                variables.map_unique_id_to_volume_related_fields[unique_id] = (
+                    local_map_unique_id_to_volume_related_fields[unique_id]
+                )
 
             except Exception as e:
                 print(f"Error inside of assigning Volume Related columns values: {e}")
@@ -473,7 +455,6 @@ class VolumeRelated:
 
     # Method to manage volume related values
     def update_volume_related_fields(self, conid_list=None, unique_id_added=None):
-
         # Getting lookback days and candle size for historical data related to volume (Formatting the lookback)
         duration_size = f"{variables.volume_related_fileds_look_back_days} D"
         bar_size = f"{variables.volume_related_fileds_candle_size.value}"
@@ -487,7 +468,6 @@ class VolumeRelated:
         )
 
         if conid_list != None:
-
             # Create a filtered dictionary using a dictionary comprehension
             cas_coinds_for_fetching_historical_data = {
                 key: cas_coinds_for_fetching_historical_data[key] for key in conid_list
@@ -500,11 +480,15 @@ class VolumeRelated:
 
         max_id = 0
 
-        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(local_unique_id_to_combo_obj)
+        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(
+            local_unique_id_to_combo_obj
+        )
 
         for unique_id_combo in local_unique_id_to_combo_obj_loop_copy:
-
-            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {'Leg Unique Ids': [], 'Combo Obj List': []}
+            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {
+                "Leg Unique Ids": [],
+                "Combo Obj List": [],
+            }
 
             combo_obj = local_unique_id_to_combo_obj[unique_id_combo]
 
@@ -513,12 +497,26 @@ class VolumeRelated:
             for leg_obj in all_legs:
                 max_id += 1
 
-                list_of_tuple_of_values = [(max_id, leg_obj.action, leg_obj.sec_type, leg_obj.symbol, 'None', 'None',
-                                            leg_obj.right, leg_obj.quantity,
-                                            leg_obj.multiplier, leg_obj.exchange,
-                                            leg_obj.trading_class, leg_obj.currency, leg_obj.con_id,
-                                            leg_obj.primary_exchange, leg_obj.strike_price,
-                                            leg_obj.expiry_date,)]
+                list_of_tuple_of_values = [
+                    (
+                        max_id,
+                        leg_obj.action,
+                        leg_obj.sec_type,
+                        leg_obj.symbol,
+                        "None",
+                        "None",
+                        leg_obj.right,
+                        leg_obj.quantity,
+                        leg_obj.multiplier,
+                        leg_obj.exchange,
+                        leg_obj.trading_class,
+                        leg_obj.currency,
+                        leg_obj.con_id,
+                        leg_obj.primary_exchange,
+                        leg_obj.strike_price,
+                        leg_obj.expiry_date,
+                    )
+                ]
 
                 # Create combination and check if there is any error
                 combination_obj = create_combination(
@@ -527,9 +525,13 @@ class VolumeRelated:
                     input_from_cas_tab=True,
                 )
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Leg Unique Ids'].append(max_id * -1)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Leg Unique Ids"
+                ].append(max_id * -1)
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Combo Obj List'].append(combination_obj)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Combo Obj List"
+                ].append(combination_obj)
 
                 local_unique_id_to_combo_obj[max_id * -1] = combination_obj
 
@@ -552,7 +554,6 @@ class VolumeRelated:
 
     # Method to get volume magnet timestamp
     def get_volume_magnet_tiestamps(self, conid_list=None, unique_id_added=None):
-
         # Get all the Active Combinations ( unique, combo_ob), local copy of 'unique_id_to_combo_obj'
         local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
 
@@ -574,11 +575,15 @@ class VolumeRelated:
 
         max_id = 0
 
-        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(local_unique_id_to_combo_obj)
+        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(
+            local_unique_id_to_combo_obj
+        )
 
         for unique_id_combo in local_unique_id_to_combo_obj_loop_copy:
-
-            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {'Leg Unique Ids': [], 'Combo Obj List': []}
+            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {
+                "Leg Unique Ids": [],
+                "Combo Obj List": [],
+            }
 
             combo_obj = local_unique_id_to_combo_obj[unique_id_combo]
 
@@ -587,12 +592,26 @@ class VolumeRelated:
             for leg_obj in all_legs:
                 max_id += 1
 
-                list_of_tuple_of_values = [(max_id, leg_obj.action, leg_obj.sec_type, leg_obj.symbol, 'None', 'None',
-                                            leg_obj.right, leg_obj.quantity,
-                                            leg_obj.multiplier, leg_obj.exchange,
-                                            leg_obj.trading_class, leg_obj.currency, leg_obj.con_id,
-                                            leg_obj.primary_exchange, leg_obj.strike_price,
-                                            leg_obj.expiry_date,)]
+                list_of_tuple_of_values = [
+                    (
+                        max_id,
+                        leg_obj.action,
+                        leg_obj.sec_type,
+                        leg_obj.symbol,
+                        "None",
+                        "None",
+                        leg_obj.right,
+                        leg_obj.quantity,
+                        leg_obj.multiplier,
+                        leg_obj.exchange,
+                        leg_obj.trading_class,
+                        leg_obj.currency,
+                        leg_obj.con_id,
+                        leg_obj.primary_exchange,
+                        leg_obj.strike_price,
+                        leg_obj.expiry_date,
+                    )
+                ]
 
                 # Create combination and check if there is any error
                 combination_obj = create_combination(
@@ -601,9 +620,13 @@ class VolumeRelated:
                     input_from_cas_tab=True,
                 )
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Leg Unique Ids'].append(max_id * -1)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Leg Unique Ids"
+                ].append(max_id * -1)
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Combo Obj List'].append(combination_obj)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Combo Obj List"
+                ].append(combination_obj)
 
                 local_unique_id_to_combo_obj[max_id * -1] = combination_obj
 
@@ -615,7 +638,6 @@ class VolumeRelated:
 
         # Continue loop till we get all volume magnet
         while not flag_volume_level_found:
-
             # add lookback days
             volume_magnet_lookback_days += 5
 
@@ -641,16 +663,13 @@ class VolumeRelated:
             )
 
             try:
-
                 # set flag to true
                 flag_volume_level_found = True
 
                 # Check flag for eah unique id
                 for unique_id in flag_volume_level_found_dict:
-
                     # if flag for unique id is false
                     if not flag_volume_level_found_dict[unique_id]:
-
                         # set value to false
                         flag_volume_level_found = False
 
@@ -658,7 +677,6 @@ class VolumeRelated:
 
             except Exception as e:
                 if variables.flag_debug_mode:
-
                     print(e)
                 # Print to console
                 if variables.flag_debug_mode:
@@ -666,13 +684,11 @@ class VolumeRelated:
 
     # Method to check volume occurence in past data
     def check_volume_occurence(self, local_unique_id_to_combo_obj, map_conid_to_req_id):
-
         # Init dict
         flag_is_volume_greater_or_equal_to = {}
 
         # Iterate uique ids
         for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
             # Get all legs
             buy_legs = combo_obj.buy_legs
             sell_legs = combo_obj.sell_legs
@@ -701,13 +717,11 @@ class VolumeRelated:
 
             # If data is not present
             for i, historical_dataframe in enumerate(all_data_frames):
-
                 if (
                     historical_dataframe is None
                     or len(historical_dataframe.index) == 0
                     or historical_dataframe.empty
                 ):
-
                     is_data_frame_empty = True
                     # Print to console
                     if variables.flag_debug_mode:
@@ -715,7 +729,6 @@ class VolumeRelated:
                     break
             # check if df is empty
             if is_data_frame_empty:
-
                 continue
 
             # Merging the data frame, inner join on time
@@ -726,13 +739,11 @@ class VolumeRelated:
             )
 
             try:
-
                 # get current volume value
                 current_volume_val = float(merged_df["Combination Volume"].iloc[-1])
 
             except Exception as e:
-
-                current_volume_val = 'N/A'
+                current_volume_val = "N/A"
 
             """list_of_volumes = []
 
@@ -767,7 +778,6 @@ class VolumeRelated:
 
             # Save DF to CSV File
             if variables.flag_store_cas_tab_csv_files:
-
                 file_path = rf"{variables.cas_tab_csv_file_path}\Volume Magnet\Volume"
                 file_path += rf"\Unique_id_{unique_id}"
 
@@ -792,7 +802,6 @@ class VolumeRelated:
 
             # check if there is volume greater or equal to current
             if flag_is_volume_greater_or_equal_to[unique_id]:
-
                 # Get the most recent timestamp where combo volume is greater than current volume
                 most_recent_timestamp = merged_df.loc[
                     merged_df["Combination Volume"] >= current_volume_val, "Time"

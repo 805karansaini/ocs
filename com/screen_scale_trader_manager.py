@@ -17,6 +17,7 @@ from com.mysql_io_account_group import *
 from com.trade_rm_check_result_module import *
 from com.high_low_cal_helper import *
 
+
 # Class for scale trader tab
 class ScreenScaleTrader(object):
     def __init__(self, master_notebook):
@@ -34,9 +35,6 @@ class ScreenScaleTrader(object):
 
     # Method to create GUI for scale trader tab
     def create_scale_trader_tab(self):
-
-
-
         # Get frame for button to delete multiple scale trader instances
         delete_scale_trader_instances_button_frame = ttk.Frame(
             self.scale_trader_tab, padding=10
@@ -65,7 +63,6 @@ class ScreenScaleTrader(object):
 
         # Place in center
         scale_trader_table_frame.place(relx=0.5, anchor=tk.N, width=1600, y=50)
-
 
         # Treeview Scrollbar
         tree_scroll = Scrollbar(scale_trader_table_frame)
@@ -107,7 +104,6 @@ class ScreenScaleTrader(object):
             column_name,
             column_heading,
         ) in variables.scale_trader_table_columns_name_heading:
-
             self.scale_trader_table.column(column_name, anchor="center", width=112)
 
         # Create Heading
@@ -118,7 +114,6 @@ class ScreenScaleTrader(object):
             column_name,
             column_heading,
         ) in variables.scale_trader_table_columns_name_heading:
-
             self.scale_trader_table.heading(
                 column_name, text=column_heading, anchor="center"
             )
@@ -132,7 +127,6 @@ class ScreenScaleTrader(object):
 
     # Method to set up right click option for table rows
     def scale_trader_table_right_click(self, event):
-
         try:
             # Get the treeview table row that was clicked
             row = self.scale_trader_table.identify_row(event.y)
@@ -156,16 +150,13 @@ class ScreenScaleTrader(object):
                 # display the context menu at the location of the mouse cursor
                 menu.post(event.x_root, event.y_root)
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Excpetion inside 'scale_trader_table_right_click', Exp: {e}")
 
     # Method to delete multiple scale trades
     def delete_scale_trader_instances(
         self, delete_scale_trader_instances_button, selected_items=None
     ):
-
         try:
             # Get values of selected rows
             selected_items = self.scale_trader_table.selection()
@@ -186,14 +177,11 @@ class ScreenScaleTrader(object):
 
             delete_scale_trader_instances_button.config(state="normal")
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Excpetion inside 'delete_scale_trader_instances', Exp: {e}")
 
     # Method to remove ladder id from system
     def delete_ladder(self, ladder_id):
-
         try:
             # get the values of the selected row
             values = self.scale_trader_table.item(ladder_id, "values")
@@ -203,7 +191,6 @@ class ScreenScaleTrader(object):
 
             # Check if ladder is terminated
             if status in ["Terminated", "Completed"]:
-
                 # move to be deleted ladders and sequence to archive
                 move_deleted_ladder_and_sequence_to_archive(ladder_id)
 
@@ -232,7 +219,6 @@ class ScreenScaleTrader(object):
                 self.update_scale_trader_table()
 
             else:
-
                 # Show error pop up
                 error_title = (
                     "Error, Only terminated and completed ladder can be deleted."
@@ -243,14 +229,11 @@ class ScreenScaleTrader(object):
                 variables.screen.display_error_popup(error_title, error_string)
 
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Excpetion inside 'delete_ladder', Exp: {e}")
 
     # Terminate all scale trade for unique id
     def terminate_all_scale_trade_for_unique_id(self, unique_id):
-
         try:
             # Get all ladder ids for uniqque id
             ladder_ids_in_unique_id = variables.map_unique_id_to_ladder_ids_list[
@@ -259,25 +242,20 @@ class ScreenScaleTrader(object):
 
             # For each ladder, terminate ladder and delete it
             for ladder_id in ladder_ids_in_unique_id:
-
                 self.terminate_scale_trade(str(ladder_id))
 
                 self.delete_ladder(ladder_id)
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(
                     f"Excpetion inside 'terminate_all_scale_trade_for_unique_id', Exp: {e}"
                 )
 
     # Method to make scale trade completed
     def mark_scale_trade_as_completed(self, selected_item=None):
-
         try:
             # Check if selected item is None
             if selected_item == None:
-
                 # get Ladder ID of selected row
                 selected_item = self.scale_trader_table.selection()[
                     0
@@ -296,18 +274,14 @@ class ScreenScaleTrader(object):
             # Update ladder status
             self.update_ladder_status(ladder_id, "Completed")
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Excpetion inside 'mark_scale_trade_as_completed', Exp: {e}")
 
     # Method to pause scale trade
     def pause_scale_trade(self, selected_item=None):
-
         try:
             # Check if selected item is None
             if selected_item == None:
-
                 # get Ladder ID of selected row
                 selected_item = self.scale_trader_table.selection()[
                     0
@@ -322,7 +296,6 @@ class ScreenScaleTrader(object):
 
             # Check if ladder has active or terminated status
             if status in ["Paused", "Terminated", "Completed"]:
-
                 return
 
             # Get ladder id
@@ -334,18 +307,14 @@ class ScreenScaleTrader(object):
             # Update ladder status
             self.update_ladder_status(ladder_id, "Paused")
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Excpetion inside 'pause_scale_trade', Exp: {e}")
 
     # Method to terminate scale trade
     def terminate_scale_trade(self, selected_item=None):
-
         try:
             # Check if selected item is None
             if selected_item == None:
-
                 # get Ladder ID of selected row
                 selected_item = self.scale_trader_table.selection()[
                     0
@@ -360,7 +329,6 @@ class ScreenScaleTrader(object):
 
             # Check if ladder has active or terminated status
             if status in ["Terminated", "Completed"]:
-
                 return
 
             # Get ladder id
@@ -372,18 +340,14 @@ class ScreenScaleTrader(object):
             # Update ladder status
             self.update_ladder_status(ladder_id, "Terminated")
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Exception inside 'terminate_scale_trade', Exp: {e}")
 
     # Method to resume sclae trade instance
     def resume_scale_trade(self, selected_item=None):
-
         try:
             # Check if selected item is None
             if selected_item == None:
-
                 # get Ladder ID of selected row
                 selected_item = self.scale_trader_table.selection()[
                     0
@@ -398,7 +362,6 @@ class ScreenScaleTrader(object):
 
             # Check if ladder has active or terminated status
             if status in ["Active", "Terminated", "Completed"]:
-
                 return
 
             # Get ladder id
@@ -417,7 +380,6 @@ class ScreenScaleTrader(object):
 
             # If dataframe is empty
             if local_orders_book_table_dataframe.empty:
-
                 # Then initialize with columns
                 local_orders_book_table_dataframe = pd.DataFrame(
                     columns=variables.order_book_table_columns
@@ -445,16 +407,13 @@ class ScreenScaleTrader(object):
 
             # set boolean value for flag for execution engine
             if flag_use_execution_engine == "True":
-
                 flag_use_execution_engine = True
 
             else:
-
                 flag_use_execution_engine = False
 
             # check if unique id is in current session accounts
             if ladder_account_id not in variables.current_session_accounts:
-
                 # Error pop up
                 error_title = "Account ID is unavailable in current session."
                 error_string = "Can not trade combo because Account ID \nis unavailable in current session."
@@ -464,14 +423,12 @@ class ScreenScaleTrader(object):
                 return
 
             def rm_check_resume_for_scale_trade():
-
                 # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
                 if (
                     bypass_rm_check == "False"
                     and variables.flag_enable_rm_account_rules
                     and variables.flag_account_liquidation_mode[ladder_account_id]
                 ):
-
                     time.sleep(variables.rm_checks_interval_if_failed)
 
                     # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -480,7 +437,6 @@ class ScreenScaleTrader(object):
                         and variables.flag_enable_rm_account_rules
                         and variables.flag_account_liquidation_mode[ladder_account_id]
                     ):
-
                         # Error pop up
                         error_title = f"For Account ID: {ladder_account_id}, Scale Trade cannot be active, \naccount is in liquidation mode"
                         error_string = f"For Account ID: {ladder_account_id}, Scale Trade cannot be active, \naccount is in liquidation mode"
@@ -489,7 +445,6 @@ class ScreenScaleTrader(object):
                         return
 
                 if not trade_level_rm_check_result(bypass_rm_check, unique_id):
-
                     time.sleep(variables.rm_checks_interval_if_failed)
 
                     if not trade_level_rm_check_result(bypass_rm_check, unique_id):
@@ -508,7 +463,6 @@ class ScreenScaleTrader(object):
                 # Sending Entry Sequence Order, with status as Active
                 # Check if index of sequence to activate is not None
                 if index_of_active_entry_sequence != None:
-
                     # Get object of active entry sequence
                     entry_sequence_object = ladder_obj.entry_sequences[
                         index_of_active_entry_sequence
@@ -526,7 +480,6 @@ class ScreenScaleTrader(object):
 
                     # Check if sequence has sent or filled order
                     if not ("Sent" in status_values or "Filled" in status_values):
-
                         # Place order for active sequence
                         self.place_order_for_sequence(
                             entry_sequence_object,
@@ -549,7 +502,6 @@ class ScreenScaleTrader(object):
 
                 # Check if index of sequence to activate is not None
                 if index_of_exit_sequence_to_activate != None:
-
                     # Get object of active exit sequence
                     exit_sequence_object = ladder_obj.exit_sequences[
                         index_of_exit_sequence_to_activate
@@ -570,7 +522,6 @@ class ScreenScaleTrader(object):
                         not ("Sent" in status_values or "Filled" in status_values)
                         or local_orders_book_table_dataframe.empty
                     ):
-
                         # Place order for active sequence
                         self.place_order_for_sequence(
                             exit_sequence_object,
@@ -596,9 +547,7 @@ class ScreenScaleTrader(object):
             )
             rm_check_thread.start()
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Exception inside 'resume_scale_trade', Exp: {e}")
 
     # Method to place order for scale trader
@@ -613,11 +562,9 @@ class ScreenScaleTrader(object):
         bypass_rm_check,
         execution_engine=False,
     ):
-
         try:
             # Check if index of active sequence is not None
             if active_sequence_obj != None and sequence_type == "Entry":
-
                 # Values of sequence to activate
                 attribute_values_of_sequences_obj = (
                     active_sequence_obj.get_list_of_sequence_values()
@@ -625,7 +572,6 @@ class ScreenScaleTrader(object):
 
             # Check if index of active sequence is not None
             if active_sequence_obj != None and sequence_type == "Exit":
-
                 # Values of sequence to activate
                 attribute_values_of_sequences_obj = (
                     active_sequence_obj.get_list_of_sequence_values()
@@ -665,14 +611,11 @@ class ScreenScaleTrader(object):
             send_order_thread.start()
 
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Exception inside 'place_order_for_sequence', Exp: {e}")
 
     # Method to update status of ladder
     def update_ladder_status(self, ladder_id, status):
-
         try:
             # Get ladder id in intger format
             ladder_id = int(float(ladder_id))
@@ -696,18 +639,14 @@ class ScreenScaleTrader(object):
             self.update_scale_trader_table()
 
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Exception inside 'update_ladder_status', Exp: {e}")
 
     # Method to choose sequence to activate
     def get_active_sequence(self, ladder_sequences):
-
         try:
             # Iterate sequence objects
             for indx, sequence in enumerate(ladder_sequences):
-
                 # Get values for attributes of sequence object
                 sequence_obj_values = sequence.get_list_of_sequence_values()
 
@@ -716,39 +655,30 @@ class ScreenScaleTrader(object):
 
                 # Check which sequence is active and return it
                 if status_of_sequence == "Active":
-
                     return indx
             else:
-
                 # No entry sequence is active [indicating all must have filled]
                 return None
 
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Exception inside 'get_active_sequence', Exp: {e}")
 
             return None
 
-
     # Method to get highest and lowest price for range orders
     def get_range_order_data(self, unique_id, flag_range=False, flag_hide_pop_up=False):
-
         if not flag_hide_pop_up:
-
             # set text to display
             if flag_range:
-
-                msg_text = 'Range Orders is Waiting for Historical Data'
+                msg_text = "Range Orders is Waiting for Historical Data"
 
             else:
-
-                msg_text = 'Range Schedule Orders is Waiting for Historical Data'
+                msg_text = "Range Schedule Orders is Waiting for Historical Data"
 
             # Create a waiting popup window
             waiting_pop_up = tk.Toplevel()
-            waiting_pop_up.title('Waiting For Historical Data')
+            waiting_pop_up.title("Waiting For Historical Data")
 
             waiting_pop_up.geometry("400x100")
 
@@ -762,23 +692,19 @@ class ScreenScaleTrader(object):
             )
             waiting_label.place(relx=0.5, rely=0.5, anchor="center")
 
-
         lookback_days = 0
         candle_size = 0
 
         # check for lookback days flag
-        if variables.flag_range_order == 'Intraday':
-
+        if variables.flag_range_order == "Intraday":
             lookback_days = 1
             candle_size = CandleSize.ONE_MIN
 
-        elif variables.flag_range_order == 'Week':
-
+        elif variables.flag_range_order == "Week":
             lookback_days = 5
             candle_size = CandleSize.ONE_HOUR
 
         else:
-
             lookback_days = 22
             candle_size = CandleSize.ONE_HOUR
 
@@ -788,9 +714,7 @@ class ScreenScaleTrader(object):
         local_map_unique_id_to_price_and_volume_based_indicators = {}
 
         # Init
-        duration_size = (
-            f"{lookback_days} D"
-        )
+        duration_size = f"{lookback_days} D"
         bar_size = candle_size.value
 
         # Create a local copy of 'cas_map_con_id_to_action_type_and_combo_type'
@@ -831,18 +755,14 @@ class ScreenScaleTrader(object):
             local_unique_id_to_combo_obj, map_conid_action_bar_size_to_req_id
         )
 
-
         try:
-
             # get price for UID
             range_prices_dict = dict[unique_id]
 
         except:
-
-            range_prices_dict = 'None'
+            range_prices_dict = "None"
 
         if not flag_hide_pop_up:
-
             # destroy pop up
             waiting_pop_up.destroy()
 
@@ -850,17 +770,16 @@ class ScreenScaleTrader(object):
 
     # Method to get inputs for range order
     def get_range_order_prior_input(self, unique_id, flag_multi=False):
-
         # Init
-        range_prices_dict = 'None'
+        range_prices_dict = "None"
 
         # Start the web socket in a thread
         range_prices_dict = self.get_range_order_data(unique_id, flag_range=True)
 
         try:
             # get highest and lowest price
-            highest_price_val = range_prices_dict['Highest Price']
-            lowest_price_val = range_prices_dict['Lowest Price']
+            highest_price_val = range_prices_dict["Highest Price"]
+            lowest_price_val = range_prices_dict["Lowest Price"]
 
             # convert prices to float
             highest_price_val = round(float(highest_price_val), 2)
@@ -868,24 +787,19 @@ class ScreenScaleTrader(object):
             lowest_price_val = round(float(lowest_price_val), 2)
 
         except:
-
-            highest_price_val = 'None'
-            lowest_price_val = 'None'
+            highest_price_val = "None"
+            lowest_price_val = "None"
 
         # Create popup window
         percentage_qnty_pair_popup = tk.Toplevel()
 
         # set title
-        percentage_qnty_pair_popup.title(
-            f"Range Order, Unique ID: {unique_id}"
-        )
+        percentage_qnty_pair_popup.title(f"Range Order, Unique ID: {unique_id}")
 
         if not flag_multi:
-
             custom_height = 250
 
         else:
-
             custom_height = 270
 
         # set dimensions
@@ -934,7 +848,6 @@ class ScreenScaleTrader(object):
         )
 
         if not flag_multi:
-
             # Add a label
             ttk.Label(percentage_qnty_pair_frame, text="Total Quantity").grid(
                 column=0, row=2, padx=5, pady=5
@@ -942,10 +855,10 @@ class ScreenScaleTrader(object):
 
         else:
             # Add a label
-            ttk.Label(percentage_qnty_pair_frame, text=f"Total Quantity\n(x % * {variables.account_parameter_for_order_quantity}) / Price").grid(
-                column=0, row=2, padx=5, pady=5
-            )
-
+            ttk.Label(
+                percentage_qnty_pair_frame,
+                text=f"Total Quantity\n(x % * {variables.account_parameter_for_order_quantity}) / Price",
+            ).grid(column=0, row=2, padx=5, pady=5)
 
         # Add a label
         ttk.Label(percentage_qnty_pair_frame, text="Number of Buckets").grid(
@@ -966,13 +879,13 @@ class ScreenScaleTrader(object):
         highest_price = ttk.Entry(percentage_qnty_pair_frame)
         highest_price.grid(column=0, row=1, padx=5, pady=5, sticky="n")
         highest_price.insert(0, highest_price_val)
-        highest_price.config(state='readonly')
+        highest_price.config(state="readonly")
 
         # Entry to evaluation unique id
         lowest_price = ttk.Entry(percentage_qnty_pair_frame)
         lowest_price.grid(column=1, row=1, padx=5, pady=5)
         lowest_price.insert(0, lowest_price_val)
-        lowest_price.config(state='readonly')
+        lowest_price.config(state="readonly")
 
         # Entry to unique id
         percnt_entry = ttk.Entry(percentage_qnty_pair_frame)
@@ -981,8 +894,6 @@ class ScreenScaleTrader(object):
         # Entry to evaluation unique id
         lots_entry = ttk.Entry(percentage_qnty_pair_frame)
         lots_entry.grid(column=1, row=3, padx=5, pady=(5, 5))
-
-
 
         # Values to be included in acton drop down
         action_type_options = ["BUY", "SELL"]
@@ -1009,9 +920,6 @@ class ScreenScaleTrader(object):
         action_combo_box.current(0)
         action_combo_box.grid(column=0, row=5, padx=5, pady=5)
 
-
-
-
         # Values to be included in price movement drop down
         price_movement_options = ["Better", "Worse"]
 
@@ -1024,22 +932,16 @@ class ScreenScaleTrader(object):
             style="Custom.TCombobox",
         )
         price_movement_combo_box.current(0)
-        price_movement_combo_box.grid(
-            column=1, row=5, padx=5, pady=5
-        )
+        price_movement_combo_box.grid(column=1, row=5, padx=5, pady=5)
 
         # Text we want to show for the button
         add_pair_button_text = "Proceed"
-
-
 
         # Create the "Add pair " button
         add_pair_button = ttk.Button(
             percentage_qnty_pair_frame,
             text=add_pair_button_text,
-            command=lambda: proceed()
-
-            ,
+            command=lambda: proceed(),
         )
         add_pair_button.grid(row=6, column=0, pady=(15, 10), columnspan=2)
 
@@ -1055,62 +957,77 @@ class ScreenScaleTrader(object):
             foreground=[("disabled", "black")],
         )
 
-
-
         def proceed():
-
             total_quantity = percnt_entry.get().strip()
 
             number_of_buckets = lots_entry.get().strip()
 
             # check if ap have valid highest price and lowest price values
             if not is_float(highest_price_val) or not is_float(lowest_price_val):
-                variables.screen.display_error_popup('Highest or lowest price not available',
-                                                     'Highest or lowest price not available')
+                variables.screen.display_error_popup(
+                    "Highest or lowest price not available",
+                    "Highest or lowest price not available",
+                )
                 return
 
             # check if ap have valid highest price and lowest price values
-            if total_quantity in ['']:
-                variables.screen.display_error_popup('Total quantity should be present',
-                                                     'Total quantity should be present')
+            if total_quantity in [""]:
+                variables.screen.display_error_popup(
+                    "Total quantity should be present",
+                    "Total quantity should be present",
+                )
                 return
 
             # check if ap have valid highest price and lowest price values
-            if number_of_buckets in ['']:
-                variables.screen.display_error_popup('Number of buckets should be present',
-                                                     'Number of buckets should be present')
+            if number_of_buckets in [""]:
+                variables.screen.display_error_popup(
+                    "Number of buckets should be present",
+                    "Number of buckets should be present",
+                )
                 return
 
             # check if ap have valid highest price and lowest price values
             if not flag_multi and not total_quantity.isnumeric():
-                variables.screen.display_error_popup('Total quantity should be numeric number',
-                                                     'Total quantity should be numeric number')
+                variables.screen.display_error_popup(
+                    "Total quantity should be numeric number",
+                    "Total quantity should be numeric number",
+                )
                 return
 
             # check if ap have valid highest price and lowest price values
             elif flag_multi and not is_float(total_quantity):
-                variables.screen.display_error_popup('Total quantity should be decimal number',
-                                                     'Total quantity should be decimal number')
+                variables.screen.display_error_popup(
+                    "Total quantity should be decimal number",
+                    "Total quantity should be decimal number",
+                )
                 return
 
             # check if ap have valid highest price and lowest price values
             if not number_of_buckets.isnumeric():
-                variables.screen.display_error_popup('Number of buckets should be numeric number',
-                                                     'Number of buckets should be numeric number')
+                variables.screen.display_error_popup(
+                    "Number of buckets should be numeric number",
+                    "Number of buckets should be numeric number",
+                )
                 return
 
             if not flag_multi and int(total_quantity) < 2:
-                variables.screen.display_error_popup('Total quantity should be at least 2',
-                                                     'Total quantity should be at least 2')
+                variables.screen.display_error_popup(
+                    "Total quantity should be at least 2",
+                    "Total quantity should be at least 2",
+                )
                 return
             elif flag_multi and float(total_quantity) <= 0:
-                variables.screen.display_error_popup('Total quantity should be greater than 0',
-                                                     'Total quantity should be reater than 0')
+                variables.screen.display_error_popup(
+                    "Total quantity should be greater than 0",
+                    "Total quantity should be reater than 0",
+                )
                 return
 
             if int(number_of_buckets) < 2:
-                variables.screen.display_error_popup('Number of Buckets should be at least 2',
-                                                     'Number of Buckets should be at least 2')
+                variables.screen.display_error_popup(
+                    "Number of Buckets should be at least 2",
+                    "Number of Buckets should be at least 2",
+                )
                 return
 
             action = action_combo_box.get().strip()
@@ -1119,35 +1036,39 @@ class ScreenScaleTrader(object):
 
             # columns list
 
-            schedule_data = {'Highest Price': highest_price_val, 'Lowest Price': lowest_price_val, 'Total Quantity': float(total_quantity),
-                             'Number of Buckets': int(number_of_buckets), 'Action': action, 'Price Movement': price_movement}
+            schedule_data = {
+                "Highest Price": highest_price_val,
+                "Lowest Price": lowest_price_val,
+                "Total Quantity": float(total_quantity),
+                "Number of Buckets": int(number_of_buckets),
+                "Action": action,
+                "Price Movement": price_movement,
+            }
 
             percentage_qnty_pair_popup.destroy()
 
             # open scale trade iput pop up
-            self.add_scale_trade_instance_pop_up(unique_id, flag_multi=flag_multi, range_data=schedule_data, flag_range=True)
-
-
-
-
-
-
-
+            self.add_scale_trade_instance_pop_up(
+                unique_id,
+                flag_multi=flag_multi,
+                range_data=schedule_data,
+                flag_range=True,
+            )
 
     # Method to add range chedule order inputs
     def get_percentage_qnty_pair(self, unique_id, flag_multi=False):
-
         # Init
-        range_prices_dict = 'None'
-
+        range_prices_dict = "None"
 
         # Start the web socket in a thread
-        range_prices_dict = self.get_range_order_data(unique_id,)
+        range_prices_dict = self.get_range_order_data(
+            unique_id,
+        )
 
         try:
             # get highest and lowest price
-            highest_price_val = range_prices_dict['Highest Price']
-            lowest_price_val = range_prices_dict['Lowest Price']
+            highest_price_val = range_prices_dict["Highest Price"]
+            lowest_price_val = range_prices_dict["Lowest Price"]
 
             # convert prices to float
             highest_price_val = float(highest_price_val)
@@ -1155,9 +1076,8 @@ class ScreenScaleTrader(object):
             lowest_price_val = float(lowest_price_val)
 
         except:
-
-            highest_price_val = 'None'
-            lowest_price_val = 'None'
+            highest_price_val = "None"
+            lowest_price_val = "None"
 
         # Create popup window
         percentage_qnty_pair_popup = tk.Toplevel()
@@ -1204,9 +1124,6 @@ class ScreenScaleTrader(object):
         )
         add_percentage_qnty_pair_button_frame.pack(side=BOTTOM)
 
-
-
-
         # Add a label
         ttk.Label(percentage_qnty_pair_frame, text="Highest Price").grid(
             column=0, row=0, padx=5, pady=5
@@ -1227,19 +1144,17 @@ class ScreenScaleTrader(object):
             column=1, row=2, padx=5, pady=5
         )
 
-
-
         # Entry to unique id
         highest_price = ttk.Entry(percentage_qnty_pair_frame)
         highest_price.grid(column=0, row=1, padx=5, pady=5, sticky="n")
-        highest_price.insert(0,highest_price_val)
-        highest_price.config(state='readonly')
+        highest_price.insert(0, highest_price_val)
+        highest_price.config(state="readonly")
 
         # Entry to evaluation unique id
         lowest_price = ttk.Entry(percentage_qnty_pair_frame)
         lowest_price.grid(column=1, row=1, padx=5, pady=5)
-        lowest_price.insert(0,lowest_price_val)
-        lowest_price.config(state='readonly')
+        lowest_price.insert(0, lowest_price_val)
+        lowest_price.config(state="readonly")
 
         # Entry to unique id
         percnt_entry = ttk.Entry(percentage_qnty_pair_frame)
@@ -1253,7 +1168,6 @@ class ScreenScaleTrader(object):
         add_pair_button_text = "Add Scale Trade"
 
         def add_pair():
-
             # get values of input
             prcnt_val = percnt_entry.get().strip()
 
@@ -1265,63 +1179,64 @@ class ScreenScaleTrader(object):
 
             # check if float price is valid
             if not is_float(prcnt_val):
-
-                variables.screen.display_error_popup('Percent value should be decimal number', 'Percent value should be decimal number')
+                variables.screen.display_error_popup(
+                    "Percent value should be decimal number",
+                    "Percent value should be decimal number",
+                )
 
                 return
 
             # check if quanitity is valid
             if not qnty_val.isnumeric():
-                variables.screen.display_error_popup('Quantity value should be numeric',
-                                                    'Quantity value should be numeric')
+                variables.screen.display_error_popup(
+                    "Quantity value should be numeric",
+                    "Quantity value should be numeric",
+                )
 
                 return
 
             if int(qnty_val) < 1:
-                variables.screen.display_error_popup('Quantity value should be at least 1',
-                                                     'Quantity value should be at least 1')
+                variables.screen.display_error_popup(
+                    "Quantity value should be at least 1",
+                    "Quantity value should be at least 1",
+                )
 
                 return
 
             prcnt_val = round(float(prcnt_val), 2)
 
             if prcnt_val in table_ids:
-                variables.screen.display_error_popup('Percent value already present in table',
-                                                     'Percent value already present in table')
+                variables.screen.display_error_popup(
+                    "Percent value already present in table",
+                    "Percent value already present in table",
+                )
                 return
 
             # insert rows in table
             if len(table_ids) % 2 == 1:
-
                 pair_table.insert(
                     "",
                     "end",
                     iid=prcnt_val,
-
-                    values=(prcnt_val,qnty_val),
+                    values=(prcnt_val, qnty_val),
                     tags=("oddrow",),
                 )
             else:
-
                 pair_table.insert(
                     "",
                     "end",
                     iid=prcnt_val,
-
                     values=(prcnt_val, qnty_val),
                     tags=("evenrow",),
                 )
-
 
         # Create the "Add pair " button
         add_pair_button = ttk.Button(
             percentage_qnty_pair_frame,
             text=add_pair_button_text,
-            command=lambda: add_pair(
-
-            ),
+            command=lambda: add_pair(),
         )
-        add_pair_button.grid(row=4, column=0, pady=(0,15), columnspan=2)
+        add_pair_button.grid(row=4, column=0, pady=(0, 15), columnspan=2)
 
         # Create a custom style for the Combobox widget
         custom_style = ttk.Style()
@@ -1334,8 +1249,6 @@ class ScreenScaleTrader(object):
             ],
             foreground=[("disabled", "black")],
         )
-
-
 
         # Treeview Scrollbar
         tree_scroll = Scrollbar(percentage_qnty_pair_table_frame)
@@ -1356,14 +1269,10 @@ class ScreenScaleTrader(object):
         tree_scroll.config(command=pair_table.yview)
 
         # Get columns for series sequence table
-        pair_table_columns = ['Percentage(%)', '#Lots']
-
-
+        pair_table_columns = ["Percentage(%)", "#Lots"]
 
         # Set columns for series sequence table
         pair_table["columns"] = pair_table_columns
-
-
 
         # Creating Column
         pair_table.column("#0", width=0, stretch="no")
@@ -1372,41 +1281,35 @@ class ScreenScaleTrader(object):
         for column_name in pair_table_columns:
             pair_table.column(column_name, anchor="center", width=120)
 
-
-
         # Create Heading
         pair_table.heading("#0", text="", anchor="w")
 
         # Create headings for filter table
         for column_name in pair_table_columns:
-            pair_table.heading(
-                column_name, text=column_name, anchor="center"
-            )
-
-
+            pair_table.heading(column_name, text=column_name, anchor="center")
 
         # Back ground for rows in table
         pair_table.tag_configure("oddrow", background="white")
         pair_table.tag_configure("evenrow", background="lightblue")
 
-
-
-
         def proceed():
-
             # get all talb eids in table
             table_ids = pair_table.get_children()
 
             # check if there are minimum two rows
             if len(table_ids) < 2:
-                variables.screen.display_error_popup('Table should have minimum 2 rows',
-                                                     'Table should have minimum 2 rows')
+                variables.screen.display_error_popup(
+                    "Table should have minimum 2 rows",
+                    "Table should have minimum 2 rows",
+                )
                 return
 
             # check if ap have valid highest price and lowest price values
             if not is_float(highest_price_val) or not is_float(lowest_price_val):
-                variables.screen.display_error_popup('Highest or lowest price not available',
-                                                     'Highest or lowest price not available')
+                variables.screen.display_error_popup(
+                    "Highest or lowest price not available",
+                    "Highest or lowest price not available",
+                )
                 return
 
             # columns list
@@ -1415,56 +1318,60 @@ class ScreenScaleTrader(object):
 
             # making data for dataframe ready
             for row_id in pair_table.get_children():
-                values = [pair_table.item(row_id)["values"][col] for col in range(len(columns))]
+                values = [
+                    pair_table.item(row_id)["values"][col]
+                    for col in range(len(columns))
+                ]
                 data.append(values)
 
             # Create a Pandas DataFrame
             df = pd.DataFrame(data, columns=columns)
 
             # convert column to int
-            df['Percentage'] = df['Percentage'].astype(float)
+            df["Percentage"] = df["Percentage"].astype(float)
 
             # conevert lots to integer
-            df['#Lots'] = df['#Lots'].astype(int)
+            df["#Lots"] = df["#Lots"].astype(int)
 
             # Calculate price based on percentage
-            df['Price'] = lowest_price_val + (df['Percentage'] * (highest_price_val - lowest_price_val) / 100)
+            df["Price"] = lowest_price_val + (
+                df["Percentage"] * (highest_price_val - lowest_price_val) / 100
+            )
 
             # init
             schedule_data = {}
 
             # assign value to dictionary
-            schedule_data['Highest Price'] = highest_price_val
+            schedule_data["Highest Price"] = highest_price_val
 
-            schedule_data['Lowest Price'] = lowest_price_val
+            schedule_data["Lowest Price"] = lowest_price_val
 
-            schedule_data['Percentage Lots Pair'] = df
+            schedule_data["Percentage Lots Pair"] = df
 
             # destroy pop up
             percentage_qnty_pair_popup.destroy()
             print(df)
 
             # open scale trade iput pop up
-            self.add_scale_trade_instance_pop_up(unique_id, flag_multi=flag_multi,schedule_data=schedule_data)
+            self.add_scale_trade_instance_pop_up(
+                unique_id, flag_multi=flag_multi, schedule_data=schedule_data
+            )
 
         # Create the "Add pair " button
         proceed_button = ttk.Button(
             percentage_qnty_pair_popup_frame,
-            text='Proceed',
+            text="Proceed",
             command=lambda: proceed(),
         )
         proceed_button.pack(side=BOTTOM)
 
         # method to delte row in table
         def delete_row_pair_table():
-
             try:
-
                 # get values from selected rows
                 selected_item = pair_table.selection()[0]
 
             except Exception as e:
-
                 return
 
             # delte from table
@@ -1477,18 +1384,15 @@ class ScreenScaleTrader(object):
 
             # reformat rows in table
             for table_id in table_ids:
-
                 if counter % 2 == 0:
-
-                    pair_table.item(table_id,tags='evenrow')
+                    pair_table.item(table_id, tags="evenrow")
 
                 else:
-
-                    pair_table.item(table_id,tags='oddrow')
+                    pair_table.item(table_id, tags="oddrow")
 
                 counter += 1
-        def pair_table_right_click(event):
 
+        def pair_table_right_click(event):
             try:
                 # Get the treeview table row that was clicked
                 row = pair_table.identify_row(event.y)
@@ -1506,7 +1410,6 @@ class ScreenScaleTrader(object):
                     # display the context menu at the location of the mouse cursor
                     menu.post(event.x_root, event.y_root)
             except Exception as e:
-
                 if variables.flag_debug_mode:
                     print(f"Excpetion inside 'pair_table_right_click', Exp: {e}")
 
@@ -1514,17 +1417,20 @@ class ScreenScaleTrader(object):
         pair_table.bind("<Button-3>", pair_table_right_click)
 
     # Pop up to add scale trader instance
-    def add_scale_trade_instance_pop_up(self, unique_id, flag_multi=None, flag_range=False, schedule_data=None, range_data=None):
-
-        range_prices_dict = 'None'
+    def add_scale_trade_instance_pop_up(
+        self,
+        unique_id,
+        flag_multi=None,
+        flag_range=False,
+        schedule_data=None,
+        range_data=None,
+    ):
+        range_prices_dict = "None"
 
         # fetch data for range orders
         if flag_range:
             # Start the web socket in a thread
             range_prices_dict = range_data
-
-
-
 
         # title for pop up
         title_string = f"Add Scale Trade, Combination Unique ID: {unique_id}"
@@ -1538,12 +1444,10 @@ class ScreenScaleTrader(object):
 
         # Check if flag for multi account is True
         if flag_multi:
-
             # Geometry
             popup.geometry("1850x230")
 
         if range_data != None:
-
             pad_y_val = 0
 
             # check flag for multi account
@@ -1554,7 +1458,6 @@ class ScreenScaleTrader(object):
                 pad_y_val = 10
 
             else:
-
                 # Geometry
                 popup.geometry("1850x560")
 
@@ -1562,7 +1465,6 @@ class ScreenScaleTrader(object):
 
         # check if range schedule data is available
         if schedule_data != None:
-
             pad_y_val = 0
 
             # check flag for multi account
@@ -1573,32 +1475,31 @@ class ScreenScaleTrader(object):
                 pad_y_val = 10
 
             else:
-
                 # Geometry
                 popup.geometry("1850x560")
 
                 pad_y_val = 0
 
-
-
             # Create a frame inside the popup
             frame_parent = ttk.Frame(popup)
-            frame_parent.pack(fill='both',expand=True,side=BOTTOM)
+            frame_parent.pack(fill="both", expand=True, side=BOTTOM)
 
             # Create a frame inside the popup
-            frame = ttk.Frame(frame_parent,width=500)
-            frame.pack(side=TOP,pady=(pad_y_val,0))
+            frame = ttk.Frame(frame_parent, width=500)
+            frame.pack(side=TOP, pady=(pad_y_val, 0))
 
             # Treeview Scrollbar
             tree_scroll = Scrollbar(frame)
             tree_scroll.pack(side="right", fill="y")
 
-
-
-
             # Create a Treeview widget inside the frame
-            tree = ttk.Treeview(frame, columns=("Percentage", "#Lots", 'Price'), yscrollcommand=tree_scroll.set, height=11,
-            selectmode="extended", show="headings"
+            tree = ttk.Treeview(
+                frame,
+                columns=("Percentage", "#Lots", "Price"),
+                yscrollcommand=tree_scroll.set,
+                height=11,
+                selectmode="extended",
+                show="headings",
             )
 
             # Configure the scrollbar
@@ -1615,34 +1516,31 @@ class ScreenScaleTrader(object):
             tree.heading("Price", text="Price")
 
             # palce table
-            tree.pack(fill='both',expand=True,side=TOP)
+            tree.pack(fill="both", expand=True, side=TOP)
 
             # Back ground for rows in table
             tree.tag_configure("oddrow", background="white")
             tree.tag_configure("evenrow", background="lightblue")
 
             # get df for data
-            pair_df = schedule_data['Percentage Lots Pair']
+            pair_df = schedule_data["Percentage Lots Pair"]
 
             counter = 0
 
             # fill table of schedule data
             for indx, row in pair_df.iterrows():
-
                 # get table id
-                table_id = row['Percentage']
+                table_id = row["Percentage"]
 
                 # get tuple of values
                 row = tuple(row)
 
                 # insert rows in table
                 if counter % 2 == 0:
-
                     tree.insert(
                         "",
                         "end",
                         iid=table_id,
-
                         values=row,
                         tags=("evenrow",),
                     )
@@ -1652,7 +1550,6 @@ class ScreenScaleTrader(object):
                         "",
                         "end",
                         iid=table_id,
-
                         values=row,
                         tags=("oddrow",),
                     )
@@ -1660,7 +1557,7 @@ class ScreenScaleTrader(object):
                 counter += 1
         # Create a frame for the input fields
         input_frame = ttk.Frame(popup, padding=20)
-        input_frame.pack(fill="both", expand=True,side=TOP)
+        input_frame.pack(fill="both", expand=True, side=TOP)
 
         # Get columns for scale trader table
         scale_trader_table_columns = copy.deepcopy(variables.scale_trader_table_columns)
@@ -1672,38 +1569,30 @@ class ScreenScaleTrader(object):
             + ["Execution Engine"],
             start=1,
         ):
-
             # For label of quantity input
             if input_field_label == "Total Quantity":
-
                 # If flag for multi account is true
                 if flag_multi:
-
                     # Set value for label
                     input_field_label = f"{input_field_label}\n( x% * {variables.account_parameter_for_order_quantity} ) / Price"
 
                 else:
-
                     # Set value for label
                     input_field_label = f"{input_field_label}\n(#Lots)"
 
             # For label of quantity input
             elif input_field_label in ["Initial Quantity", "Subsequent Quantity"]:
-
                 # If flag for multi account is true
                 if flag_multi:
-
                     # Set value for label
                     input_field_label = f"{input_field_label}\n( x% * Total Qty )"
 
                 else:
-
                     # Set value for label
                     input_field_label = f"{input_field_label}\n(#Lots)"
 
             # For label of quantity input
             elif input_field_label in ["Bypass RM Check"]:
-
                 input_field_label = "Bypass RM Checks"
 
             ttk.Label(
@@ -1727,8 +1616,7 @@ class ScreenScaleTrader(object):
         action_combo_box = f"action_combo_box"
 
         if range_data != None:
-
-            action_type_options = [range_data['Action']]
+            action_type_options = [range_data["Action"]]
 
         else:
             # Values to be included in acton drop down
@@ -1777,11 +1665,9 @@ class ScreenScaleTrader(object):
         price_movement_combo_box = f"price_movement_combo_box"
 
         if range_data != None:
-
-            price_movement_options = [range_data['Price Movement']]
+            price_movement_options = [range_data["Price Movement"]]
 
         else:
-
             # Values to be included in price movement drop down
             price_movement_options = ["Better", "Worse"]
 
@@ -1858,7 +1744,6 @@ class ScreenScaleTrader(object):
         )
 
         if flag_multi:
-
             # Create a frame for the input fields
             trade_input_frame_acc = ttk.Frame(input_frame, padding=0)
             trade_input_frame_acc.grid(column=12, row=1, padx=5, pady=15, rowspan=4)
@@ -1891,7 +1776,6 @@ class ScreenScaleTrader(object):
             for indx, account_id in enumerate(
                 variables.current_session_accounts, start=1
             ):
-
                 listbox.insert(indx, "Account: " + account_id)
 
                 listbox_index = indx
@@ -1901,7 +1785,6 @@ class ScreenScaleTrader(object):
             for indx, account_id in enumerate(
                 account_group_df["Group Name"].to_list(), start=1
             ):
-
                 listbox.insert(listbox_index + indx, "Group: " + account_id)
 
             listbox.pack()
@@ -1981,19 +1864,17 @@ class ScreenScaleTrader(object):
 
         # check if flag for range is true
         if flag_range:
+            total_quantity_entry.insert(0, str(range_data["Total Quantity"]))
 
-            total_quantity_entry.insert(0, str(range_data['Total Quantity']))
-
-            number_of_buckets_entry.insert(0, str(range_data['Number of Buckets']))
-
+            number_of_buckets_entry.insert(0, str(range_data["Number of Buckets"]))
 
             # disable entries
-            subsequent_quantity_entry.config(state='disabled')
-            total_quantity_entry.config(state='readonly')
-            number_of_buckets_entry.config(state='readonly')
-            initial_entry_price_entry.config(state='disabled')
-            delta_price_entry.config(state='disabled')
-            initial_quantity_entry.config(state='disabled')
+            subsequent_quantity_entry.config(state="disabled")
+            total_quantity_entry.config(state="readonly")
+            number_of_buckets_entry.config(state="readonly")
+            initial_entry_price_entry.config(state="disabled")
+            delta_price_entry.config(state="disabled")
+            initial_quantity_entry.config(state="disabled")
 
             pad_y_val = 0
 
@@ -2005,7 +1886,6 @@ class ScreenScaleTrader(object):
                 pad_y_val = 10
 
             else:
-
                 # Geometry
                 popup.geometry("1850x560")
 
@@ -2013,7 +1893,7 @@ class ScreenScaleTrader(object):
 
             # Create a frame inside the popup
             frame_parent = ttk.Frame(popup)
-            frame_parent.pack(fill='both', expand=True, side=BOTTOM)
+            frame_parent.pack(fill="both", expand=True, side=BOTTOM)
 
             # Create a frame inside the popup
             frame = ttk.Frame(frame_parent, width=500)
@@ -2023,16 +1903,20 @@ class ScreenScaleTrader(object):
             tree_scroll = Scrollbar(frame)
             tree_scroll.pack(side="right", fill="y")
 
-            lots_extend = ''
+            lots_extend = ""
 
             if flag_multi:
-                lots_extend = '(%)'
+                lots_extend = "(%)"
 
             # Create a Treeview widget inside the frame
-            tree = ttk.Treeview(frame, columns=("#Lots", 'Price'), yscrollcommand=tree_scroll.set,
-                                height=11,
-                                selectmode="extended", show="headings"
-                                )
+            tree = ttk.Treeview(
+                frame,
+                columns=("#Lots", "Price"),
+                yscrollcommand=tree_scroll.set,
+                height=11,
+                selectmode="extended",
+                show="headings",
+            )
 
             # Configure the scrollbar
             tree_scroll.config(command=tree.yview)
@@ -2044,42 +1928,50 @@ class ScreenScaleTrader(object):
 
             # Define column headings
 
-            tree.heading("#Lots", text="#Lots"+lots_extend)
+            tree.heading("#Lots", text="#Lots" + lots_extend)
             tree.heading("Price", text="Price")
 
             # palce table
-            tree.pack(fill='both', expand=True, side=TOP)
+            tree.pack(fill="both", expand=True, side=TOP)
 
             # Back ground for rows in table
             tree.tag_configure("oddrow", background="white")
             tree.tag_configure("evenrow", background="lightblue")
 
-            price_movement = range_data['Price Movement']
+            price_movement = range_data["Price Movement"]
 
-            action = range_data['Action']
+            action = range_data["Action"]
 
-            number_of_buckets = int(range_data['Number of Buckets'])
+            number_of_buckets = int(range_data["Number of Buckets"])
 
             # get entry price and delta price for range orders
-            if action == 'BUY' and price_movement == 'Better':
-                initial_entry_price = range_prices_dict['Highest Price']
-                delta_price = (range_prices_dict['Highest Price'] - range_prices_dict['Lowest Price']) / int(
-                    number_of_buckets)
+            if action == "BUY" and price_movement == "Better":
+                initial_entry_price = range_prices_dict["Highest Price"]
+                delta_price = (
+                    range_prices_dict["Highest Price"]
+                    - range_prices_dict["Lowest Price"]
+                ) / int(number_of_buckets)
 
-            elif action == 'BUY' and price_movement == 'Worse':
-                initial_entry_price = range_prices_dict['Lowest Price']
-                delta_price = (range_prices_dict['Highest Price'] - range_prices_dict['Lowest Price']) / int(
-                    number_of_buckets)
+            elif action == "BUY" and price_movement == "Worse":
+                initial_entry_price = range_prices_dict["Lowest Price"]
+                delta_price = (
+                    range_prices_dict["Highest Price"]
+                    - range_prices_dict["Lowest Price"]
+                ) / int(number_of_buckets)
 
-            elif action == 'SELL' and price_movement == 'Better':
-                initial_entry_price = range_prices_dict['Lowest Price']
-                delta_price = (range_prices_dict['Highest Price'] - range_prices_dict['Lowest Price']) / int(
-                    number_of_buckets)
+            elif action == "SELL" and price_movement == "Better":
+                initial_entry_price = range_prices_dict["Lowest Price"]
+                delta_price = (
+                    range_prices_dict["Highest Price"]
+                    - range_prices_dict["Lowest Price"]
+                ) / int(number_of_buckets)
 
-            elif action == 'SELL' and price_movement == 'Worse':
-                initial_entry_price = range_prices_dict['Highest Price']
-                delta_price = (range_prices_dict['Highest Price'] - range_prices_dict['Lowest Price']) / int(
-                    number_of_buckets)
+            elif action == "SELL" and price_movement == "Worse":
+                initial_entry_price = range_prices_dict["Highest Price"]
+                delta_price = (
+                    range_prices_dict["Highest Price"]
+                    - range_prices_dict["Lowest Price"]
+                ) / int(number_of_buckets)
 
             # round up values
             initial_entry_price = round(initial_entry_price, 2)
@@ -2087,20 +1979,16 @@ class ScreenScaleTrader(object):
 
             # Check if price movement is better
             if price_movement == "Better":
-
                 # Check if action is BUY
                 if action == "BUY":
-
                     delta_price *= -1
                 else:
                     delta_price = delta_price
 
             # Check if price movement is worse
-            elif price_movement == "Worse" and delta_price not in ['None', None]:
-
+            elif price_movement == "Worse" and delta_price not in ["None", None]:
                 # Check if action is SELL
                 if action == "SELL":
-
                     delta_price *= -1
                 else:
                     delta_price = delta_price
@@ -2109,24 +1997,19 @@ class ScreenScaleTrader(object):
             pair_df = pd.DataFrame()
 
             if not flag_multi:
-
-                total_quantity_remaining = int(range_data['Total Quantity'])
+                total_quantity_remaining = int(range_data["Total Quantity"])
 
             else:
-                total_quantity_remaining = float(range_data['Total Quantity'])
+                total_quantity_remaining = float(range_data["Total Quantity"])
 
-            number_of_buckets = int(range_data['Number of Buckets'])
+            number_of_buckets = int(range_data["Number of Buckets"])
 
             subsequent_quantitities_list = []
 
             # Get subsequent qauntity for each bucket
             for bucket_number in range(1, number_of_buckets + 1):
-
                 if bucket_number != number_of_buckets:
-
                     if not flag_multi:
-
-
                         # Get round value of subsequent qauntity in case for number of buckets value is not None
                         round_subsequent_quantity_for_sequences = round(
                             total_quantity_remaining
@@ -2137,9 +2020,9 @@ class ScreenScaleTrader(object):
                         # Get round value of subsequent qauntity in case for number of buckets value is not None
                         round_subsequent_quantity_for_sequences = round(
                             total_quantity_remaining
-                            / (number_of_buckets - (bucket_number - 1)), 2
+                            / (number_of_buckets - (bucket_number - 1)),
+                            2,
                         )
-
 
                     # Getting subsequent quantities for sequences afetr initial sequence and before last sequence in case of number of buckets is not none
                     subsequent_quantitities_list.append(
@@ -2150,7 +2033,6 @@ class ScreenScaleTrader(object):
                     total_quantity_remaining -= round_subsequent_quantity_for_sequences
 
                 elif total_quantity_remaining != 0:
-
                     # Sort list
                     subsequent_quantitities_list.sort(reverse=True)
 
@@ -2165,13 +2047,10 @@ class ScreenScaleTrader(object):
             for indx, qnty in enumerate(subsequent_quantitities_list):
                 price_list.append(round(initial_entry_price + (delta_price * indx), 2))
 
-
-
             counter = 0
 
             # fill table of schedule data
             for lots, price in zip(subsequent_quantitities_list, price_list):
-
                 # get table id
                 table_id = price
 
@@ -2180,12 +2059,10 @@ class ScreenScaleTrader(object):
 
                 # insert rows in table
                 if counter % 2 == 0:
-
                     tree.insert(
                         "",
                         "end",
                         iid=table_id,
-
                         values=row,
                         tags=("evenrow",),
                     )
@@ -2195,30 +2072,25 @@ class ScreenScaleTrader(object):
                         "",
                         "end",
                         iid=table_id,
-
                         values=row,
                         tags=("oddrow",),
                     )
 
                 counter += 1
 
-
         # check for range schedule data
         if schedule_data != None:
             # disable entries
-            subsequent_quantity_entry.config(state='disabled')
-            initial_entry_price_entry.config(state='disabled')
-            delta_price_entry.config(state='disabled')
+            subsequent_quantity_entry.config(state="disabled")
+            initial_entry_price_entry.config(state="disabled")
+            delta_price_entry.config(state="disabled")
             # disable entries
-            total_quantity_entry.config(state='disabled')
-            initial_quantity_entry.config(state='disabled')
-            number_of_buckets_entry.config(state='disabled')
-
-
+            total_quantity_entry.config(state="disabled")
+            initial_quantity_entry.config(state="disabled")
+            number_of_buckets_entry.config(state="disabled")
 
         # Get atr value
         try:
-
             # Get ATR value
             atr = (
                 "N/A"
@@ -2228,23 +2100,19 @@ class ScreenScaleTrader(object):
 
             # Check if atr is float
             if is_float(atr):
-
                 # pre-fill value at delta price textbox
                 delta_price_entry.insert(0, atr)
 
             else:
-
                 pass
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(f"Exceptions in getting ATR for scale trade pop up, Exp: {e}")
 
         # Check if flag for multi account is True
         if flag_multi:
-
             button_frame.place(y=210)
 
         else:
@@ -2261,7 +2129,7 @@ class ScreenScaleTrader(object):
                 add_scale_trade_button, popup
             ),
         )
-        add_scale_trade_button.grid(row=0, column=0, padx=10,pady=(0,0))
+        add_scale_trade_button.grid(row=0, column=0, padx=10, pady=(0, 0))
 
         # Validate all input values from add scale trade pop up
         def validate_values_of_input_fields_from_pop_up(
@@ -2276,16 +2144,11 @@ class ScreenScaleTrader(object):
             flag_multi=False,
             account_id_list=None,
         ):
-
             try:
-
-
                 # Check if flag for multi account is false
                 if not flag_multi:
-
                     # Check if user provided value for both subsequent quantity and number of buckets
                     if subsequent_quantity != "" and number_of_buckets != "":
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Both subsequent quantity and number of buckets fields must not be filled at same time",
@@ -2293,7 +2156,6 @@ class ScreenScaleTrader(object):
 
                     # Check if total quantity fields are not filled
                     if total_quantity == "":
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Total quantity field must be filled",
@@ -2306,7 +2168,6 @@ class ScreenScaleTrader(object):
 
                     # Check if either subsequent quantity or number of buckets field are not filled
                     if subsequent_quantity == "" and number_of_buckets == "":
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Either subsequent quantity or number of buckets fields must be filled",
@@ -2324,7 +2185,6 @@ class ScreenScaleTrader(object):
 
                     # Check if total quantity input has non - integer value
                     if not is_integer(total_quantity):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for total quantity must be numeric",
@@ -2332,7 +2192,6 @@ class ScreenScaleTrader(object):
 
                     # Check if total quantity input has non - positive value
                     if int(float(total_quantity)) <= 1:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for total quantity must be greater than 1",
@@ -2340,7 +2199,6 @@ class ScreenScaleTrader(object):
 
                     # Check if to initial quantity input has non - integer value
                     if initial_quantity != "" and not is_integer(initial_quantity):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for initial quantity must be numeric",
@@ -2348,7 +2206,6 @@ class ScreenScaleTrader(object):
 
                     # Check if initial quantity input has non - positive value
                     if initial_quantity != "" and int(float(initial_quantity)) < 1:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for initial quantity must be positive number",
@@ -2358,7 +2215,6 @@ class ScreenScaleTrader(object):
                     if (
                         subsequent_quantity != "" and number_of_buckets == ""
                     ) and not is_integer(subsequent_quantity):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for subsequent quantity must be numeric",
@@ -2368,7 +2224,6 @@ class ScreenScaleTrader(object):
                     if (subsequent_quantity != "" and number_of_buckets == "") and int(
                         float(subsequent_quantity)
                     ) < 1:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for subsequent quantity must be positive number",
@@ -2378,7 +2233,6 @@ class ScreenScaleTrader(object):
                     if (
                         subsequent_quantity == "" and number_of_buckets != ""
                     ) and not is_integer(number_of_buckets):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for number of buckets must be numeric",
@@ -2388,7 +2242,6 @@ class ScreenScaleTrader(object):
                     if (subsequent_quantity == "" and number_of_buckets != "") and int(
                         float(number_of_buckets)
                     ) < 2:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Number of buckets must be at least 2",
@@ -2398,7 +2251,6 @@ class ScreenScaleTrader(object):
                     if initial_quantity != "" and int(float(total_quantity)) <= int(
                         float(initial_quantity)
                     ):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for total quantity must be greater than initial quantity",
@@ -2411,10 +2263,7 @@ class ScreenScaleTrader(object):
                         and initial_quantity != ""
                     ) and (
                         int(float(total_quantity)) - (int(float(initial_quantity)))
-                    ) // int(
-                        float(number_of_buckets) - 1
-                    ) < 1:
-
+                    ) // int(float(number_of_buckets) - 1) < 1:
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Number of buckets for subsequent orders is greater than total quantity for subsequent orders",
@@ -2428,7 +2277,6 @@ class ScreenScaleTrader(object):
                     ) and (int(float(total_quantity))) // int(
                         float(number_of_buckets)
                     ) < 1:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Number of buckets for subsequent orders is greater than total quantity for subsequent orders",
@@ -2438,17 +2286,14 @@ class ScreenScaleTrader(object):
                     if (subsequent_quantity != "" and number_of_buckets == "") and int(
                         float(total_quantity)
                     ) <= int(float(subsequent_quantity)):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for total quantity must be greater than subsequent quantity",
                         )
 
                 else:
-
                     # Check if user provided value for both subsequent quantity and number of buckets
                     if subsequent_quantity != "" and number_of_buckets != "":
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Both subsequent quantity and number of buckets fields must not be filled at same time",
@@ -2456,7 +2301,6 @@ class ScreenScaleTrader(object):
 
                     # Check if total quantity fields are not filled
                     if total_quantity == "":
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Total quantity field must be filled",
@@ -2469,7 +2313,6 @@ class ScreenScaleTrader(object):
 
                     # Check if either subsequent quantity or number of buckets field are not filled
                     if subsequent_quantity == "" and number_of_buckets == "":
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Either subsequent quantity or number of buckets fields must be filled",
@@ -2477,7 +2320,6 @@ class ScreenScaleTrader(object):
 
                     # Check if total quantity input has non - integer value
                     if not is_float(total_quantity):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for total quantity must be decimal",
@@ -2485,7 +2327,6 @@ class ScreenScaleTrader(object):
 
                     # Check if total quantity input has non - positive value
                     if float(total_quantity) <= 0:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for total quantity must be greater than 0",
@@ -2493,7 +2334,6 @@ class ScreenScaleTrader(object):
 
                     # Check if to initial quantity input has non - integer value
                     if initial_quantity != "" and not is_float(initial_quantity):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for initial quantity must be decimal",
@@ -2501,7 +2341,6 @@ class ScreenScaleTrader(object):
 
                     # Check if initial quantity input has non - positive value
                     if initial_quantity != "" and float(initial_quantity) <= 0:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for initial quantity must be greater than 0",
@@ -2511,7 +2350,6 @@ class ScreenScaleTrader(object):
                     if (
                         subsequent_quantity != "" and number_of_buckets == ""
                     ) and not is_float(subsequent_quantity):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for subsequent quantity must be decimal",
@@ -2521,7 +2359,6 @@ class ScreenScaleTrader(object):
                     if (
                         subsequent_quantity != "" and number_of_buckets == ""
                     ) and float(subsequent_quantity) <= 0:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for subsequent quantity must be greater than 0",
@@ -2531,7 +2368,6 @@ class ScreenScaleTrader(object):
                     if (
                         subsequent_quantity == "" and number_of_buckets != ""
                     ) and not is_integer(number_of_buckets):
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for number of buckets must be decimal",
@@ -2541,7 +2377,6 @@ class ScreenScaleTrader(object):
                     if (subsequent_quantity == "" and number_of_buckets != "") and int(
                         float(number_of_buckets)
                     ) < 2:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Number of buckets must be at least 2",
@@ -2549,7 +2384,6 @@ class ScreenScaleTrader(object):
 
                     # check if initial qunatity is greater than total quantity
                     if initial_quantity != "" and float(initial_quantity) >= 100:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for total quantity must be lesser than 100",
@@ -2569,7 +2403,6 @@ class ScreenScaleTrader(object):
                     if (
                         subsequent_quantity != "" and number_of_buckets == ""
                     ) and float(subsequent_quantity) >= 100:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, Value for total quantity must be lesser than 100",
@@ -2577,7 +2410,6 @@ class ScreenScaleTrader(object):
 
                     # Check if multiple account selection is empty
                     if flag_multi and account_id_list == []:
-
                         return (
                             False,
                             f"Error, For Unique ID: {unique_id}, List of Account ID is Unavailable.",
@@ -2596,7 +2428,6 @@ class ScreenScaleTrader(object):
                         return False, f"Error, For Unique ID: {unique_id}, Current price of combination for initial entry price is invalid"'''
                 # Check if initial entry price is non float value
                 if initial_entry_price != "" and not is_float(initial_entry_price):
-
                     return (
                         False,
                         f"Error, For Unique ID: {unique_id}, Value for initial entry price must be decimal number",
@@ -2604,7 +2435,6 @@ class ScreenScaleTrader(object):
 
                 # Check if delta price field are not filled
                 if delta_price == "":
-
                     return (
                         False,
                         f"Error, For Unique ID: {unique_id}, Delta price field must be filled",
@@ -2612,7 +2442,6 @@ class ScreenScaleTrader(object):
 
                 # Check if delta price is non float value
                 if not is_float(delta_price):
-
                     return (
                         False,
                         f"Error, For Unique ID: {unique_id}, Value for delta price must be decimal number",
@@ -2620,7 +2449,6 @@ class ScreenScaleTrader(object):
 
                 # Check if delta price input has negative or 0 value
                 if float(delta_price) <= 0:
-
                     return (
                         False,
                         f"Error, For Unique ID: {unique_id}, Value for delta price must be positive decimal number",
@@ -2628,7 +2456,6 @@ class ScreenScaleTrader(object):
 
                 # Check if take profit buffer is non float value
                 if take_profit_buffer != "" and not is_float(take_profit_buffer):
-
                     return (
                         False,
                         f"Error, For Unique ID: {unique_id}, Value for take profit buffer must be decimal number",
@@ -2636,7 +2463,6 @@ class ScreenScaleTrader(object):
 
                 # Check if take profit buffer input has negative or 0 value
                 if take_profit_buffer != "" and float(take_profit_buffer) <= 0:
-
                     return (
                         False,
                         f"Error, For Unique ID: {unique_id}, Value for take profit buffer must be positive decimal number",
@@ -2646,13 +2472,11 @@ class ScreenScaleTrader(object):
                 return True, "No Error"
 
             except Exception as e:
-
                 # Returning false if any exception occurs
                 return False, f"Error, For Unique ID: {unique_id}, Exp: {e}"
 
         # On click function for add scale trade button
         def on_add_scale_trade_button_click(add_scale_trade_button, popup):
-
             # Disabled add scale trade button
             add_scale_trade_button.config(state="disabled")
 
@@ -2668,7 +2492,6 @@ class ScreenScaleTrader(object):
 
         # Function for add scale trade button
         def add_scale_trade(add_scale_trade_button, popup):
-
             try:
                 # Dictionary index for action drop down
                 action_combo_box = f"action_combo_box"
@@ -2706,28 +2529,21 @@ class ScreenScaleTrader(object):
                     flag_execution_engine_options_combo_box.get().strip()
                 )
 
-
-
-
                 if flag_multi:
-
                     # Init
                     account_id_list = []
 
                     # Get list of selections
                     for i in listbox.curselection():
-
                         # Split item in listbox
                         accounts_type = listbox.get(i).split(":")[0]
 
                         # Check if its account
                         if accounts_type == "Account":
-
                             # Append account id in list
                             account_id_list.append(listbox.get(i)[8:].strip())
 
                         else:
-
                             # Get account ids in group
                             accounts_in_group = get_accounts_in_account_group_from_db(
                                 listbox.get(i)[6:].strip()
@@ -2735,22 +2551,18 @@ class ScreenScaleTrader(object):
 
                             # Check if account group is 'all'
                             if accounts_in_group == "ALL":
-
                                 # Set value of list to list of all account in current session
                                 account_id_list = variables.current_session_accounts
                                 break
 
                             else:
-
                                 # Append account in account group on by one
                                 for account in accounts_in_group.split(","):
-
                                     # check if unique id is in current session accounts
                                     if (
                                         account
                                         not in variables.current_session_accounts
                                     ):
-
                                         # Error pop up
                                         error_title = f"For Account ID: {account}, Account ID is unavailable in current session."
                                         error_string = f"For Account ID: {account}, Can not trade combo\nbecause Account ID is unavailable in current session."
@@ -2767,7 +2579,6 @@ class ScreenScaleTrader(object):
                     account_id_list = sorted(list(set(account_id_list)))
 
                 else:
-
                     account_id = (
                         drop_down_items_dict[account_id_combo_box].get().strip()
                     )
@@ -2795,36 +2606,34 @@ class ScreenScaleTrader(object):
 
                 # chck if schedule price is available
                 if schedule_data != None:
-
                     # get df
-                    pair_df = schedule_data['Percentage Lots Pair']
+                    pair_df = schedule_data["Percentage Lots Pair"]
 
                     # sorrt df based on action and price movement
-                    if action == 'BUY' and price_movement == 'Better':
+                    if action == "BUY" and price_movement == "Better":
                         # Sorting the DataFrame based on column in reverse order
-                        pair_df = pair_df.sort_values(by='Percentage', ascending=False)
+                        pair_df = pair_df.sort_values(by="Percentage", ascending=False)
 
-                    elif action == 'BUY' and price_movement == 'Worse':
+                    elif action == "BUY" and price_movement == "Worse":
                         # Sorting the DataFrame based on column in reverse order
-                        pair_df = pair_df.sort_values(by='Percentage', ascending=True)
+                        pair_df = pair_df.sort_values(by="Percentage", ascending=True)
 
-                    elif action == 'SELL' and price_movement == 'Better':
+                    elif action == "SELL" and price_movement == "Better":
                         # Sorting the DataFrame based on column in reverse order
-                        pair_df = pair_df.sort_values(by='Percentage', ascending=True)
+                        pair_df = pair_df.sort_values(by="Percentage", ascending=True)
 
                     else:
                         # Sorting the DataFrame based on column in reverse order
-                        pair_df = pair_df.sort_values(by='Percentage', ascending=False)
-
+                        pair_df = pair_df.sort_values(by="Percentage", ascending=False)
 
                     # convert column to int
-                    pair_df['#Lots'] = pair_df['#Lots'].astype(int)
+                    pair_df["#Lots"] = pair_df["#Lots"].astype(int)
 
                     # get list of quantity
-                    list_of_qnty = pair_df['#Lots'].to_list()
+                    list_of_qnty = pair_df["#Lots"].to_list()
 
                     # get list of prices
-                    list_of_price = pair_df['Price'].to_list()
+                    list_of_price = pair_df["Price"].to_list()
 
                     # overwrite values
                     total_quantity = sum(list_of_qnty)
@@ -2837,12 +2646,10 @@ class ScreenScaleTrader(object):
 
                 # check for flag of rnage orders
                 if flag_range and number_of_buckets.isnumeric():
-
-
-                    if range_prices_dict in ['None', None]:
+                    if range_prices_dict in ["None", None]:
                         # Make error string multiline
                         error_title = error_string = make_multiline_mssg_for_gui_popup(
-                            'Historical Data is not fetched yet'
+                            "Historical Data is not fetched yet"
                         )
 
                         # Error Message
@@ -2851,36 +2658,45 @@ class ScreenScaleTrader(object):
                         return
 
                     try:
-
                         # get entry price and delta price for range orders
-                        if action == 'BUY' and price_movement == 'Better':
-                            initial_entry_price = range_prices_dict['Highest Price']
-                            delta_price = (range_prices_dict['Highest Price'] - range_prices_dict['Lowest Price']) / int(number_of_buckets)
+                        if action == "BUY" and price_movement == "Better":
+                            initial_entry_price = range_prices_dict["Highest Price"]
+                            delta_price = (
+                                range_prices_dict["Highest Price"]
+                                - range_prices_dict["Lowest Price"]
+                            ) / int(number_of_buckets)
 
-                        elif action == 'BUY' and price_movement == 'Worse':
-                            initial_entry_price = range_prices_dict['Lowest Price']
-                            delta_price = (range_prices_dict['Highest Price'] - range_prices_dict['Lowest Price']) / int(number_of_buckets)
+                        elif action == "BUY" and price_movement == "Worse":
+                            initial_entry_price = range_prices_dict["Lowest Price"]
+                            delta_price = (
+                                range_prices_dict["Highest Price"]
+                                - range_prices_dict["Lowest Price"]
+                            ) / int(number_of_buckets)
 
-                        elif action == 'SELL' and price_movement == 'Better':
-                            initial_entry_price = range_prices_dict['Lowest Price']
-                            delta_price = (range_prices_dict['Highest Price'] - range_prices_dict['Lowest Price']) / int(number_of_buckets)
+                        elif action == "SELL" and price_movement == "Better":
+                            initial_entry_price = range_prices_dict["Lowest Price"]
+                            delta_price = (
+                                range_prices_dict["Highest Price"]
+                                - range_prices_dict["Lowest Price"]
+                            ) / int(number_of_buckets)
 
-                        elif action == 'SELL' and price_movement == 'Worse':
-                            initial_entry_price = range_prices_dict['Highest Price']
-                            delta_price = (range_prices_dict['Highest Price'] - range_prices_dict['Lowest Price']) / int(number_of_buckets)
+                        elif action == "SELL" and price_movement == "Worse":
+                            initial_entry_price = range_prices_dict["Highest Price"]
+                            delta_price = (
+                                range_prices_dict["Highest Price"]
+                                - range_prices_dict["Lowest Price"]
+                            ) / int(number_of_buckets)
 
                         # round up values
                         initial_entry_price = round(initial_entry_price, 2)
                         delta_price = round(delta_price, 2)
 
                     except Exception as e:
-
                         # init
-                        initial_entry_price = 'None'
-                        delta_price = 'None'
+                        initial_entry_price = "None"
+                        delta_price = "None"
 
                 if flag_multi:
-
                     # Check input values in add scale trade pop up are valid
                     (
                         is_input_values_valid,
@@ -2899,7 +2715,6 @@ class ScreenScaleTrader(object):
                     )
 
                 else:
-
                     # Check input values in add scale trade pop up are valid
                     (
                         is_input_values_valid,
@@ -2916,7 +2731,6 @@ class ScreenScaleTrader(object):
                     )
 
             except Exception as e:
-
                 # If exception occurs
                 is_input_values_valid, error_message = (
                     False,
@@ -2925,7 +2739,6 @@ class ScreenScaleTrader(object):
 
             # If there is error in input values then display error pop up
             if not is_input_values_valid:
-
                 # Make error string multiline
                 error_title = error_string = make_multiline_mssg_for_gui_popup(
                     error_message
@@ -2936,23 +2749,18 @@ class ScreenScaleTrader(object):
 
             # If all input values are valid
             else:
-
                 # make delta price None for schedule orders
                 if schedule_data != None:
-
-                    delta_price = 'None'
+                    delta_price = "None"
 
                 if flag_multi:
-
                     try:
-
                         price = (
                             variables.unique_id_to_prices_dict[unique_id]["BUY"]
                             + variables.unique_id_to_prices_dict[unique_id]["SELL"]
                         ) / 2
 
                     except Exception as e:
-
                         error_title = f"For Unique ID: {unique_id}, Could not get price of combination"
                         error_string = f"For Unique ID: {unique_id}, Could not get price of combination"
 
@@ -2965,23 +2773,24 @@ class ScreenScaleTrader(object):
                     map_account_to_subsequent_quanity_dict = {}
 
                     try:
-
                         # Iterating account ids
                         for account in account_id_list:
-
                             # get total quanity, intital quantity and subsequence quanity for range schedule orders
                             if schedule_data != None:
                                 map_account_to_quanity_dict[account] = total_quantity
 
-                                map_account_to_initial_quanity_dict[account] = initial_quantity
+                                map_account_to_initial_quanity_dict[account] = (
+                                    initial_quantity
+                                )
 
-                                map_account_to_subsequent_quanity_dict = total_quantity - initial_quantity
+                                map_account_to_subsequent_quanity_dict = (
+                                    total_quantity - initial_quantity
+                                )
 
                                 continue
 
                             # Getting value of account parameter
                             if variables.account_parameter_for_order_quantity == "NLV":
-
                                 value_of_account_parameter = (
                                     variables.accounts_table_dataframe.loc[
                                         variables.accounts_table_dataframe["Account ID"]
@@ -2993,7 +2802,6 @@ class ScreenScaleTrader(object):
                             elif (
                                 variables.account_parameter_for_order_quantity == "SMA"
                             ):
-
                                 value_of_account_parameter = (
                                     variables.accounts_table_dataframe.loc[
                                         variables.accounts_table_dataframe["Account ID"]
@@ -3005,7 +2813,6 @@ class ScreenScaleTrader(object):
                             elif (
                                 variables.account_parameter_for_order_quantity == "CEL"
                             ):
-
                                 value_of_account_parameter = (
                                     variables.accounts_table_dataframe.loc[
                                         variables.accounts_table_dataframe["Account ID"]
@@ -3023,16 +2830,16 @@ class ScreenScaleTrader(object):
 
                             # Check if account parameter value is invalid
                             if not is_float(value_of_account_parameter):
-
                                 error_title = "Invalid Account Parameter Value"
                                 error_string = f"For Account ID: {account}, Value of account Parameter: {variables.account_parameter_for_order_quantity} is invalid"
 
-                                variables.screen.display_error_popup(error_title, error_string)
+                                variables.screen.display_error_popup(
+                                    error_title, error_string
+                                )
                                 return
 
                             # Calculate combo qunaity for account id
                             if float(price) != 0:
-
                                 combo_quantity = float(total_quantity)
 
                                 combo_quantity_for_account = round(
@@ -3044,32 +2851,26 @@ class ScreenScaleTrader(object):
                                 )
 
                             else:
-
                                 combo_quantity_for_account = 0
 
                             # add it to dictionary
-                            map_account_to_quanity_dict[
-                                account
-                            ] = combo_quantity_for_account
+                            map_account_to_quanity_dict[account] = (
+                                combo_quantity_for_account
+                            )
 
                             if initial_quantity != "":
-
                                 map_account_to_initial_quanity_dict[account] = round(
                                     combo_quantity_for_account
                                     * (float(initial_quantity) / 100)
                                 )
 
                             if subsequent_quantity != "":
-
                                 map_account_to_subsequent_quanity_dict[account] = round(
                                     combo_quantity_for_account
                                     * (float(subsequent_quantity) / 100)
                                 )
 
-
-
                     except Exception as e:
-
                         error_title = f"For Unique ID: {unique_id}, Could not get quantity for accounts"
                         error_string = f"For Unique ID: {unique_id}, Could not get quantity for accounts"
 
@@ -3077,12 +2878,9 @@ class ScreenScaleTrader(object):
                         return
 
                 try:
-
                     # If entry price is empty
                     if initial_entry_price == "":
-
                         try:
-
                             # get current combo price
                             initial_entry_price = (
                                 variables.unique_id_to_prices_dict[unique_id]["BUY"]
@@ -3091,16 +2889,14 @@ class ScreenScaleTrader(object):
 
                             # check if value is valid
                             if initial_entry_price not in ["N/A", None]:
-
                                 initial_entry_price = round(initial_entry_price, 2)
 
                         except Exception as e:
-
                             # Make error string multiline
-                            error_title = (
-                                error_string
-                            ) = make_multiline_mssg_for_gui_popup(
-                                f"Error, For Unique ID: {unique_id}, Current price of combination for initial entry price is invalid"
+                            error_title = error_string = (
+                                make_multiline_mssg_for_gui_popup(
+                                    f"Error, For Unique ID: {unique_id}, Current price of combination for initial entry price is invalid"
+                                )
                             )
 
                             # Error Message
@@ -3111,50 +2907,40 @@ class ScreenScaleTrader(object):
                             return
 
                     else:
-
                         # Convert user inputted value to float
                         initial_entry_price = float(initial_entry_price)
 
                         # check if value is valid
                         if initial_entry_price not in ["N/A", None]:
-
                             initial_entry_price = round(initial_entry_price, 2)
 
                     # Check if take profit buffer is empty
                     if take_profit_buffer == "":
-
                         take_profit_buffer = "None"
 
                     else:
-
                         take_profit_buffer = float(take_profit_buffer)
 
                     if is_float(delta_price):
-
-
                         # convert values to float
                         delta_price = float(delta_price)
 
                     if not flag_multi:
-
                         # Convert values to integer
                         total_quantity = int(float(total_quantity))
 
                         # If subsequent quantity is empty then make it None
                         if subsequent_quantity == "":
-
                             # Convert value to integer
                             number_of_buckets = int(float(number_of_buckets))
 
                             # Check if initial quanity is empty
                             if initial_quantity == "":
-
                                 # Set value for initial quanity
                                 initial_quantity = round(
                                     total_quantity / (number_of_buckets)
                                 )
                             else:
-
                                 # Format value for initial quanity
                                 initial_quantity = int(float(initial_quantity))
 
@@ -3162,17 +2948,14 @@ class ScreenScaleTrader(object):
 
                         # If number of buckets is empty then make it None
                         elif number_of_buckets == "":
-
                             # Convert value to integer
                             subsequent_quantity = int(float(subsequent_quantity))
 
                             # Check if initial quanity is empty
                             if initial_quantity == "":
-
                                 # Set value for initial quanity
                                 initial_quantity = subsequent_quantity
                             else:
-
                                 # Format value for initial quanity
                                 initial_quantity = int(float(initial_quantity))
 
@@ -3210,9 +2993,7 @@ class ScreenScaleTrader(object):
                         return
 
                     else:
-
                         for account in map_account_to_quanity_dict:
-
                             # Convert values to integer
                             total_quantity_val = int(
                                 float(map_account_to_quanity_dict[account])
@@ -3220,19 +3001,16 @@ class ScreenScaleTrader(object):
 
                             # If subsequent quantity is empty then make it None
                             if subsequent_quantity == "":
-
                                 # Convert value to integer
                                 number_of_buckets_val = int(float(number_of_buckets))
 
                                 # Check if initial quanity is empty
                                 if initial_quantity == "":
-
                                     # Set value for initial quanity
                                     initial_quantity_val = round(
                                         total_quantity_val / (number_of_buckets_val)
                                     )
                                 else:
-
                                     # Format value for initial quanity
                                     initial_quantity_val = int(
                                         float(
@@ -3244,7 +3022,6 @@ class ScreenScaleTrader(object):
 
                             # If number of buckets is empty then make it None
                             elif number_of_buckets == "":
-
                                 # Convert value to integer
                                 subsequent_quantity_val = int(
                                     float(
@@ -3254,13 +3031,11 @@ class ScreenScaleTrader(object):
 
                                 # Check if initial quanity is empty
                                 if initial_quantity == "":
-
                                     # Set value for initial quanity
                                     initial_quantity_val = (
                                         map_account_to_subsequent_quanity_dict[account]
                                     )
                                 else:
-
                                     # Format value for initial quanity
                                     initial_quantity_val = int(
                                         float(
@@ -3275,17 +3050,14 @@ class ScreenScaleTrader(object):
 
                             # if initial quantity is zero
                             if initial_quantity_val == 0:
-
                                 initial_quantity_val = 1
 
                             # if subsequent quantity is zero
                             if subsequent_quantity_val == 0:
-
                                 subsequent_quantity_val = 1
 
                             # Only create scale trade if total qty is greater than 0
                             if total_quantity_val > 0:
-
                                 # Create ladder instance and sequences instances
                                 create_ladder_and_sequences(
                                     unique_id,
@@ -3315,7 +3087,6 @@ class ScreenScaleTrader(object):
                         return
 
                 except Exception as e:
-
                     # Make error string multiline
                     error_title = error_string = make_multiline_mssg_for_gui_popup(
                         f"Error, For Unique ID: {unique_id}, Exp: {e}"
@@ -3331,7 +3102,6 @@ class ScreenScaleTrader(object):
 
     # Method to Insert scale trades in scale trade table at start of app
     def insert_scale_trade_in_scale_trader_table(self, row_value):
-
         # Convert row values to list
         value = [val for val in row_value]
 
@@ -3362,9 +3132,7 @@ class ScreenScaleTrader(object):
 
     # Method to update sclae trade after its order filled
     def update_scale_trade_after_order_filled(self, filled_order_details):
-
         try:
-
             # Get ladder id, sequence id and unique id of filled order of scale trade
             ladder_id = int(float(filled_order_details["Ladder ID"]))
             sequence_id = int(float(filled_order_details["Sequence ID"]))
@@ -3411,16 +3179,13 @@ class ScreenScaleTrader(object):
 
             # set boolean value for flag for execution engine
             if flag_use_execution_engine == "True":
-
                 flag_use_execution_engine = True
 
             else:
-
                 flag_use_execution_engine = False
 
             # Check if filled order is entry or exit
             if action == ladder_obj.action:
-
                 # Get values of ladder in table for ladder id
                 values = self.scale_trader_table.item(
                     ladder_id, "values"
@@ -3494,10 +3259,8 @@ class ScreenScaleTrader(object):
 
                 # Code for cancelling current exit sequence and add new exit sequence sequence
                 if ladder_take_profit_buffer != "None":
-
                     # Get current exit sequence
                     if len(ladder_obj.exit_sequences) > 0:
-
                         # Get active exit sequence
                         current_exit_sequence = ladder_obj.exit_sequences[-1]
 
@@ -3513,7 +3276,6 @@ class ScreenScaleTrader(object):
                         )
 
                         if current_exit_sequence_status not in ["Sent", "Filled"]:
-
                             # Cancel current exit order
                             cancel_orders_of_ladder_id_or_sequence_id(
                                 sequence_id=str(current_exit_sequence_id)
@@ -3552,7 +3314,6 @@ class ScreenScaleTrader(object):
 
                     # Action for exit order, price for new exit sequence
                     if action == "BUY":
-
                         # Set Action for exit order 'SELL'
                         action_for_exit_sequence = "SELL"
 
@@ -3561,7 +3322,6 @@ class ScreenScaleTrader(object):
                             ladder_obj.take_profit_buffer
                         )
                     else:
-
                         # Set Action for exit order 'BUY'
                         action_for_exit_sequence = "BUY"
 
@@ -3625,7 +3385,6 @@ class ScreenScaleTrader(object):
 
                     # Place order only if status is active
                     if ladder_status == "Active":
-
                         # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
                         if (
                             bypass_rm_check == "False"
@@ -3634,7 +3393,6 @@ class ScreenScaleTrader(object):
                                 ladder_account_id
                             ]
                         ):
-
                             time.sleep(variables.rm_checks_interval_if_failed)
 
                             # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -3667,13 +3425,11 @@ class ScreenScaleTrader(object):
                         elif not trade_level_rm_check_result(
                             bypass_rm_check, unique_id
                         ):
-
                             time.sleep(variables.rm_checks_interval_if_failed)
 
                             if not trade_level_rm_check_result(
                                 bypass_rm_check, unique_id
                             ):
-
                                 # Pause ladder
                                 self.pause_scale_trade(selected_item=ladder_id)
 
@@ -3727,7 +3483,6 @@ class ScreenScaleTrader(object):
                 if index_of_next_entry_sequence_to_activate < len(
                     ladder_obj.entry_sequences
                 ):
-
                     # Get next entry sequence obj to be activate
                     next_entry_sequence_object = ladder_obj.entry_sequences[
                         index_of_next_entry_sequence_to_activate
@@ -3749,7 +3504,6 @@ class ScreenScaleTrader(object):
 
                     # Place order only if status is active
                     if ladder_status == "Active":
-
                         # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
                         if (
                             bypass_rm_check == "False"
@@ -3758,7 +3512,6 @@ class ScreenScaleTrader(object):
                                 ladder_account_id
                             ]
                         ):
-
                             time.sleep(variables.rm_checks_interval_if_failed)
 
                             # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -3791,13 +3544,11 @@ class ScreenScaleTrader(object):
                         elif not trade_level_rm_check_result(
                             bypass_rm_check, unique_id
                         ):
-
                             time.sleep(variables.rm_checks_interval_if_failed)
 
                             if not trade_level_rm_check_result(
                                 bypass_rm_check, unique_id
                             ):
-
                                 # Pause ladder
                                 self.pause_scale_trade(selected_item=ladder_id)
 
@@ -3847,9 +3598,7 @@ class ScreenScaleTrader(object):
                     >= len(ladder_obj.entry_sequences)
                     and ladder_take_profit_buffer == "None"
                 ):
-
                     try:
-
                         # Get ladder total quantity
                         ladder_total_quantity = float(
                             get_ladder_or_sequence_column_value_from_db(
@@ -3865,21 +3614,17 @@ class ScreenScaleTrader(object):
                         )
 
                     except Exception as e:
-
                         # Print to console
                         if variables.flag_debug_mode:
-
                             print(
                                 f"For Sequence ID: {sequence_id}, Could not convert value of total quantity and entry qauntity filled to float"
                             )
 
                     # check if total quantity is filled for both entry and exit orders
                     if ladder_total_quantity == ladder_entry_quantity_filled:
-
                         # Terminate ladder
                         self.mark_scale_trade_as_completed(selected_item=ladder_id)
             else:
-
                 # Get values in table for ladder id
                 values = self.scale_trader_table.item(
                     ladder_id, "values"
@@ -3946,7 +3691,6 @@ class ScreenScaleTrader(object):
                 ] = sequence_obj
 
                 try:
-
                     # Get ladder total quantity
                     ladder_total_quantity = float(
                         get_ladder_or_sequence_column_value_from_db(
@@ -3961,10 +3705,8 @@ class ScreenScaleTrader(object):
                     )
 
                 except Exception as e:
-
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"For Sequence ID: {sequence_id}, Could not convert value of total quantity and entry qauntity filled to float"
                         )
@@ -3975,20 +3717,17 @@ class ScreenScaleTrader(object):
                     and ladder_total_quantity == updated_exit_quantity_filled
                     and ladder_obj.take_profit_behaviour == "Continue"
                 ):
-
                     # Terminate ladder
                     self.mark_scale_trade_as_completed(selected_item=ladder_id)
                     # self.terminate_scale_trade(selected_item=ladder_id)
 
                 # check if take profit behavious is terminate
                 if ladder_obj.take_profit_behaviour == "Terminate":
-
                     # Terminate ladder
                     self.terminate_scale_trade(selected_item=ladder_id)
 
                 # check if take profit behavious is restart
                 elif ladder_obj.take_profit_behaviour == "Restart":
-
                     flag_execution_engine = get_ladder_or_sequence_column_value_from_db(
                         ladder_id=ladder_id, column_name_as_in_db="Execution Engine"
                     )
@@ -4017,15 +3756,12 @@ class ScreenScaleTrader(object):
 
                     # get boolean value for execution engine flag
                     if flag_execution_engine == "True":
-
                         flag_execution_engine = True
 
                     else:
-
                         flag_execution_engine = False
 
-                    if delta_price not in ['None', None]:
-
+                    if delta_price not in ["None", None]:
                         # replicate ladder and sequences
                         create_ladder_and_sequences(
                             unique_id,
@@ -4046,47 +3782,50 @@ class ScreenScaleTrader(object):
                         )
 
                     else:
-
                         try:
-
-                            data_dict = self.get_range_order_data(unique_id, flag_range=False, flag_hide_pop_up=True)
-
-
+                            data_dict = self.get_range_order_data(
+                                unique_id, flag_range=False, flag_hide_pop_up=True
+                            )
 
                             # convert thighest and lowest values to float
-                            highest_price_val = float(data_dict['Highest Price'])
+                            highest_price_val = float(data_dict["Highest Price"])
 
-                            lowest_price_val = float(data_dict['Lowest Price'])
+                            lowest_price_val = float(data_dict["Lowest Price"])
 
                             # get seuqneces df
                             sequence_df = get_sequences_for_ladder(old_ladder_id)
 
                             # Renaming columns in the DataFrame
-                            sequence_df = sequence_df.rename(columns={'Quantity': '#Lots'})
+                            sequence_df = sequence_df.rename(
+                                columns={"Quantity": "#Lots"}
+                            )
 
-
-
-                            sequence_df = sequence_df[['Percentage', '#Lots']]
+                            sequence_df = sequence_df[["Percentage", "#Lots"]]
 
                             # convert column to int
-                            sequence_df['Percentage'] = sequence_df['Percentage'].astype(float)
+                            sequence_df["Percentage"] = sequence_df[
+                                "Percentage"
+                            ].astype(float)
 
                             # conevert lots to integer
-                            sequence_df['#Lots'] = sequence_df['#Lots'].astype(int)
+                            sequence_df["#Lots"] = sequence_df["#Lots"].astype(int)
 
                             # Calculate price based on percentage
-                            sequence_df['Price'] = lowest_price_val + (
-                                        sequence_df['Percentage'] * (highest_price_val - lowest_price_val) / 100)
+                            sequence_df["Price"] = lowest_price_val + (
+                                sequence_df["Percentage"]
+                                * (highest_price_val - lowest_price_val)
+                                / 100
+                            )
 
                             # get initial entry price
-                            initial_entry_price = sequence_df['Price'].to_list()[0]
+                            initial_entry_price = sequence_df["Price"].to_list()[0]
 
                             # get schedule data
-                            data_dict['Highest Price'] = highest_price_val
+                            data_dict["Highest Price"] = highest_price_val
 
-                            data_dict['Lowest Price'] = lowest_price_val
+                            data_dict["Lowest Price"] = lowest_price_val
 
-                            data_dict['Percentage Lots Pair'] = sequence_df
+                            data_dict["Percentage Lots Pair"] = sequence_df
 
                             # replicate ladder and sequences
                             create_ladder_and_sequences(
@@ -4105,14 +3844,14 @@ class ScreenScaleTrader(object):
                                 account_id,
                                 bypass_rm_check,
                                 flag_execution_engine,
-                                data_dict
+                                data_dict,
                             )
 
                         except Exception as e:
-
                             if True or variables.flag_debug_mode:
-
-                                print(f"Exception while restarting range schedule orders, Exp: {e}")
+                                print(
+                                    f"Exception while restarting range schedule orders, Exp: {e}"
+                                )
 
                     # Update scale trade GUI table
                     self.update_scale_trader_table()
@@ -4123,17 +3862,14 @@ class ScreenScaleTrader(object):
             # Update scale trade GUI table
             self.update_scale_trader_table()
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
-
                 print(
                     f"Exception inside 'update_scale_trade_after_order_filled', Exp :{e}"
                 )
 
     # Update scale trader GUI table
     def update_scale_trader_table(self):
-
         # All the Unique IDs in the System
         # Get scale trade dataframe
         local_scale_trade_table_dataframe = copy.deepcopy(
@@ -4181,7 +3917,6 @@ class ScreenScaleTrader(object):
 
             # Update the rows
             for i, row_val in local_scale_trade_table_dataframe.iterrows():
-
                 """# Unique ID of row val
                 unique_id = int(float(row_val['Unique ID']))"""
 
@@ -4209,13 +3944,11 @@ class ScreenScaleTrader(object):
 
             # Move According to data Color here, Change Color
             for i, row in local_scale_trade_table_dataframe.iterrows():
-
                 # Ladder Id of row val
                 ladder_id = str(row["Ladder ID"])
 
                 # If unique_id in table
                 if ladder_id in all_ladder_id_in_scale_trade_table:
-
                     self.scale_trader_table.move(ladder_id, "", counter_row)
 
                     if counter_row % 2 == 0:
@@ -4227,7 +3960,6 @@ class ScreenScaleTrader(object):
                     counter_row += 1
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(f"Error Inside update_scale_trader_table, Exp: {e}")

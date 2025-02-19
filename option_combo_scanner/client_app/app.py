@@ -19,7 +19,6 @@ import warnings
 
 
 class AlgoOneAPI(EClient, EWrapper):
-
     def __init__(self, data_server_host, data_server_port, data_server_client_id, loop):
         EClient.__init__(self, self, loop=loop)
         self.loop = loop
@@ -37,8 +36,9 @@ class AlgoOneAPI(EClient, EWrapper):
 
     async def setup_api_connection(self):
         try:
-
-            await self.connect(self.data_server_host, self.data_server_port, self.data_server_client_id)
+            await self.connect(
+                self.data_server_host, self.data_server_port, self.data_server_client_id
+            )
 
             print("Connecting to Data Server...")
 
@@ -83,7 +83,7 @@ class AlgoOneAPI(EClient, EWrapper):
     def historical_data(self, request_id: str, historical_bars: dict):
         # print(f"Historical Data: reqId: {request_id} Bar: {historical_bars}")
         request_id = int(request_id)
-        
+
         # # Formatting bar_date and converting to users target_timezone
         # try:
         #     # Time, and timezone string
@@ -114,31 +114,34 @@ class AlgoOneAPI(EClient, EWrapper):
 
         # return target_datetime.strftime('%Y-%m-%d %H:%M:%S %Z')def convert_utc_to_timezone(utc_time, target_timezone):
 
-        bar_date = historical_bars['datetime']
-        bar_open = historical_bars['open']
-        bar_high = historical_bars['high']
-        bar_low = historical_bars['low']
-        bar_close = historical_bars['close']
-        bar_volume = historical_bars['volume']
+        bar_date = historical_bars["datetime"]
+        bar_open = historical_bars["open"]
+        bar_high = historical_bars["high"]
+        bar_low = historical_bars["low"]
+        bar_close = historical_bars["close"]
+        bar_volume = historical_bars["volume"]
 
         try:
-                
             # Formatting bar_date and converting to users target_timezone
             utc_timezone = pytz.utc
 
             # Parse bar date string to datetime object
-            utc_datetime_dt_obj = datetime.datetime.strptime(bar_date, '%Y%m%d %H%M%S')
+            utc_datetime_dt_obj = datetime.datetime.strptime(bar_date, "%Y%m%d %H%M%S")
 
             # Convert UTC time to target time zone
-            bar_target_datetime = utc_timezone.localize(utc_datetime_dt_obj).astimezone(variables.target_timezone_obj)
+            bar_target_datetime = utc_timezone.localize(utc_datetime_dt_obj).astimezone(
+                variables.target_timezone_obj
+            )
 
             # bar_target_datetime = bar_target_datetime.strftime('%Y-%m-%d %H:%M:%S')
         except Exception as e:
             print(e)
 
         # Add Row to dataframe (concat)
-        warnings.filterwarnings("ignore", category=FutureWarning,)
-
+        warnings.filterwarnings(
+            "ignore",
+            category=FutureWarning,
+        )
 
         # create another row to append
         row = pd.DataFrame(
@@ -153,7 +156,6 @@ class AlgoOneAPI(EClient, EWrapper):
 
         # While Using Price Chart Making a dataframe
         if request_id in variables.map_req_id_to_historical_data_dataframe:
-
             # Add Row to dataframe (concat)
             variables.map_req_id_to_historical_data_dataframe[request_id] = pd.concat(
                 [variables.map_req_id_to_historical_data_dataframe[request_id], row],
@@ -161,7 +163,7 @@ class AlgoOneAPI(EClient, EWrapper):
             )
         # self.map_req_id_to_historical_data[request_id].append(historical_bars)
 
-    def historical_data_end(self, request_id: str):        
+    def historical_data_end(self, request_id: str):
         request_id = int(request_id)
         variables.req_mkt_data_end[request_id] = True
         # self.map_req_id_to_historical_data_ended[request_id] = True
@@ -175,7 +177,7 @@ class AlgoOneAPI(EClient, EWrapper):
     ):
         request_id = int(request_id)
         # print(f"Error: request_id={request_id}, {error_code=} msg={error_msg} {advance_order_reject_json=}")
-        
+
         variables.req_mkt_data_end[request_id] = True
 
     async def _start_setup(self):

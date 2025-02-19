@@ -2,16 +2,15 @@ from com import *
 from com.variables import *
 from com.mysql_io_scale_trader import *
 
+
 # Update columns in DB table
 def update_account_condition_table_db(account_id, column_to_value_dict):
-
     query_update_account_condition_values = (
         f"UPDATE `{variables.sql_table_account_conditions}` SET"
     )
 
     # Get columns and its values from dictionary
     for column_name in column_to_value_dict:
-
         # Add columns to update and its updated values
         query_update_account_condition_values += (
             f" `{column_name}` = '{column_to_value_dict[column_name]}',"
@@ -34,7 +33,6 @@ def update_account_condition_table_db(account_id, column_to_value_dict):
             )
 
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(
                 f"Unable to Execute the query to UPDATE the account condition values for Account ID: {account_id}, Query : {query_update_account_condition_values}, Exp: {e}"
@@ -43,12 +41,13 @@ def update_account_condition_table_db(account_id, column_to_value_dict):
 
 # Method to insert new account group
 def insert_account_condition_in_db(account_id, condition):
-
     # replace %
     condition = condition.replace("%", "%%")
 
-    query = f"INSERT INTO `{variables.sql_table_account_conditions}` ( `Account ID`, `Condition`) \
+    query = (
+        f"INSERT INTO `{variables.sql_table_account_conditions}` ( `Account ID`, `Condition`) \
          VALUES ( '{account_id}', '{condition}');"
+    )
 
     try:
         variables.active_sqlalchemy_connection.execute(query)
@@ -60,7 +59,6 @@ def insert_account_condition_in_db(account_id, condition):
             )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -70,7 +68,6 @@ def insert_account_condition_in_db(account_id, condition):
 
 # Method to delete account group
 def delete_account_condition_in_db(account_id, condition):
-
     # replace %
     condition = condition.replace("%", "%%")
 
@@ -86,7 +83,6 @@ def delete_account_condition_in_db(account_id, condition):
             )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -96,7 +92,6 @@ def delete_account_condition_in_db(account_id, condition):
 
 # Method to get all account groups
 def get_account_conditions_from_db(account_id):
-
     query = f"SELECT * FROM `{variables.sql_table_account_conditions}` WHERE `Account ID`='{account_id}';"
 
     try:
@@ -116,7 +111,6 @@ def get_account_conditions_from_db(account_id):
 
         return all_rows_df
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -128,7 +122,6 @@ def get_account_conditions_from_db(account_id):
 
 # Method to get all account groups
 def get_all_conditions_from_db():
-
     query = f"SELECT * FROM `{variables.sql_table_account_conditions}`;"
 
     try:
@@ -148,7 +141,6 @@ def get_all_conditions_from_db():
 
         return all_rows_df
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(

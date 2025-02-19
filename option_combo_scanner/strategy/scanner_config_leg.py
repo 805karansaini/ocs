@@ -23,17 +23,16 @@ class ConfigLeg:
         self.dte_range_min = float(self.dte_range_min)
         self.instrument_id = int(self.instrument_id)
         self.quantity = int(self.quantity)
+
     #     self.map_configleg_id_to_config_object()
 
     # def map_configleg_id_to_config_object(self):
     #     # Map leg_number to config leg Object
     #     strategy_variables.map_configleg_id_to_config_object[self.leg_number] = self
 
-
     def __str__(self) -> str:
         return f"ConfigLeg: {pprint(vars(self))}"
 
-    
     def get_config_leg_tuple_for_gui(
         self,
     ):

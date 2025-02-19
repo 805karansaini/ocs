@@ -22,7 +22,6 @@ def calculate_hv(
     leg_number=None,
     flag_combination=False,
 ):
-
     try:
         # Redirecting to Standard deviation of closing prices method
         if hv_method.name == "STANDARD_DEVIATION":
@@ -71,7 +70,6 @@ def calculate_hv(
             print(f"Wrong HV Method was given... Exiting")
             sys.exit()
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(f"Inside calculate HV, error is {e}")
 
@@ -86,7 +84,6 @@ def calculate_standard_deviation(
     leg_number,
     flag_combination,
 ):
-
     # Change percentage (i+1_close / i_close) - 1
     if not flag_is_intraday or flag_combination:
         # Calculating candle return for the long term candle(Regulary HV Calcultaions)
@@ -109,7 +106,6 @@ def calculate_standard_deviation(
 
     # Save DF to CSV File (HV) Export data-frame to csv file
     if variables.flag_store_cas_tab_csv_files:
-
         # if we are calculating the intraday values we want to store CSV File in a sub-folder
         if flag_is_intraday:
             file_path = rf"{variables.cas_tab_csv_file_path}\HV\IntraDayCal\{unique_id}"
@@ -141,7 +137,6 @@ def calculate_standard_deviation(
 
 # Calculating parkison's range formula with given values
 def calculate_parkinson_range_formula_calculations(high_prices, low_prices):
-
     # Converting list to numpy array
     high_prices, low_prices = np.array(high_prices), np.array(low_prices)
 
@@ -155,11 +150,9 @@ def calculate_parkinson_range_formula_calculations(high_prices, low_prices):
 
     # Check if the ndarray is empty
     if parkinson_volatility_term_square.size == 0:
-
         parkinson_range = "N/A"
 
     else:
-
         # Applying parkinson's range formula
         parkinson_range = np.sqrt(
             (1 / (4 * np.log(2))) * np.mean(parkinson_volatility_term_square)
@@ -183,7 +176,6 @@ def calculate_parkinson_range_without_gaps(
     leg_number,
     flag_combination,
 ):
-
     # If we are calculating the Parksionson's range without gaps for Intraday values and for individual legs, columns will be Open x, Close x
     if flag_is_intraday and leg_number != None:
         open_price_column_name = f"Open {leg_number}"
@@ -201,25 +193,25 @@ def calculate_parkinson_range_without_gaps(
         high_price_column_name = "Combination High"
 
     # Comnbination High
-    combination_price_dataframe[
-        high_price_column_name
-    ] = combination_price_dataframe.apply(
-        lambda row: max(
-            row[open_price_column_name],
-            row[close_price_column_name],
-        ),
-        axis=1,
+    combination_price_dataframe[high_price_column_name] = (
+        combination_price_dataframe.apply(
+            lambda row: max(
+                row[open_price_column_name],
+                row[close_price_column_name],
+            ),
+            axis=1,
+        )
     )
 
     # Combination Low
-    combination_price_dataframe[
-        low_price_column_name
-    ] = combination_price_dataframe.apply(
-        lambda row: min(
-            row[open_price_column_name],
-            row[close_price_column_name],
-        ),
-        axis=1,
+    combination_price_dataframe[low_price_column_name] = (
+        combination_price_dataframe.apply(
+            lambda row: min(
+                row[open_price_column_name],
+                row[close_price_column_name],
+            ),
+            axis=1,
+        )
     )
 
     # Applying parkinson's range formula
@@ -242,13 +234,12 @@ def calculate_parkinson_range_without_gaps(
 
     # Adding 2 columns in data frame namely parkinson_volatility_term and parkinson_volatility_term_square
     combination_price_dataframe[pv_term_values_column_name] = parkinson_volatility_term
-    combination_price_dataframe[
-        pv_term_sq_values_column_name
-    ] = parkinson_volatility_term_square
+    combination_price_dataframe[pv_term_sq_values_column_name] = (
+        parkinson_volatility_term_square
+    )
 
     # Save DF to CSV File (HV) Export data-frame to csv file
     if variables.flag_store_cas_tab_csv_files:
-
         # if we are calculating the intraday values we want to store CSV File in a sub-folder
         if flag_is_intraday:
             file_path = rf"{variables.cas_tab_csv_file_path}\HV\IntraDayCal\{unique_id}"
@@ -279,7 +270,6 @@ def calculate_parkinson_range_without_gaps(
 
 # Determining Combination high with gaps from csv
 def get_combination_high_with_gaps(open_prices, close_prices):
-
     return [
         max(open_prices[index], close_prices[index], close_prices[index - 1])
         for index in range(1, len(open_prices))
@@ -288,7 +278,6 @@ def get_combination_high_with_gaps(open_prices, close_prices):
 
 # Determining Combination low with gaps from csv
 def get_combination_low_with_gaps(open_prices, close_prices):
-
     return [
         min(open_prices[index], close_prices[index], close_prices[index - 1])
         for index in range(1, len(open_prices))
@@ -303,7 +292,6 @@ def calculate_parkinson_range_with_gaps(
     leg_number,
     flag_combination,
 ):
-
     # If we are calculating the Parksionson's range with gaps for Intraday values and for individual legs, columns will be Open x, Close x
     if flag_is_intraday and leg_number != None:
         open_price_column_name = f"Open {leg_number}"
@@ -381,7 +369,6 @@ def calculate_parkinson_range_with_gaps(
 
     # Save DF to CSV File (HV) Export data-frame to csv file
     if variables.flag_store_cas_tab_csv_files:
-
         # if we are calculating the intraday values we want to store CSV File in a sub-folder
         if flag_is_intraday:
             file_path = rf"{variables.cas_tab_csv_file_path}\HV\IntraDayCal\{unique_id}"
@@ -409,6 +396,7 @@ def calculate_parkinson_range_with_gaps(
 
     return parkinson_range_result
 
+
 # Method to calculate ATR
 def calculate_combo_atr(
     combo_daily_open_close_df,
@@ -418,7 +406,6 @@ def calculate_combo_atr(
     leg_number=None,
     flag_combination=False,
 ):
-
     # Take 'K' Data Points
     k = len(combo_daily_open_close_df)
 
@@ -434,7 +421,6 @@ def calculate_combo_atr(
         close_price_column_name = "Combination Close"
 
     for i in range(len(combo_daily_open_close_df)):
-
         if i == 0:
             combo_daily_open_close_df.loc[i, "TR"] = max(
                 combo_daily_open_close_df.loc[i, open_price_column_name],
@@ -471,7 +457,6 @@ def calculate_combo_atr(
     if (variables.flag_store_cas_tab_csv_files) and (
         atr_type == "Historical Volatility"
     ):
-
         # if we are calculating the intraday values we want to store CSV File in a sub-folder
         if flag_is_intraday:
             file_path = rf"{variables.cas_tab_csv_file_path}\HV\IntraDayCal\{unique_id}"
@@ -500,7 +485,6 @@ def calculate_combo_atr(
     try:
         atr = combo_daily_open_close_df.iloc[-1]["ATR"]
     except Exception as e:
-
         if variables.flag_debug_mode:
             # Print to console
             print(f"Unable to calculate ATR")
@@ -508,6 +492,7 @@ def calculate_combo_atr(
         atr = None
 
     return atr
+
 
 # Method to calculate ATR for positive and negative candles
 def calculate_combo_atr_for_positive_negative_candles(combo_daily_open_close_df):
@@ -526,7 +511,6 @@ def calculate_combo_atr_for_positive_negative_candles(combo_daily_open_close_df)
     previous_close_price_column_name = "Previous Close"
 
     for i in range(len(combo_daily_open_close_df)):
-
         if i == 0:
             combo_daily_open_close_df.loc[i, "TR"] = max(
                 combo_daily_open_close_df.loc[i, open_price_column_name],
@@ -607,7 +591,6 @@ def get_timestamp_of_lowest_and_highest_point_of_price(latest_day_dataframe):
 
     try:
         for _, row in latest_day_dataframe.iterrows():
-
             open_price = row["Combination Open"]
             close_price = row["Combination Close"]
             date_time_stamp = row["Time"]
@@ -620,7 +603,6 @@ def get_timestamp_of_lowest_and_highest_point_of_price(latest_day_dataframe):
                 highest_timestamp = date_time_stamp
                 high_price = close_price
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(e)
 
@@ -639,7 +621,6 @@ def atr_div_by_atr_avg(
     date_time_close,
     flag_positive_negative_candle=None,
 ):
-
     # Convert the 'Time' column to datetime type if it's not already
     historical_data_except_current_day_dataframe["Time"] = pd.to_datetime(
         historical_data_except_current_day_dataframe["Time"]
@@ -658,12 +639,10 @@ def atr_div_by_atr_avg(
     ].reset_index(drop=True)
 
     if flag_positive_negative_candle == None:
-
         # Calculate ATR for open and close prices for current day time period
         atr_for_current_day_for_time_period = calculate_combo_atr(latest_day_dataframe)
 
     else:
-
         # Calculate ATR for open and close prices for current day time period
         atr_for_current_day_for_time_period = (
             calculate_combo_atr_for_positive_negative_candles(latest_day_dataframe)
@@ -681,7 +660,6 @@ def atr_div_by_atr_avg(
     calculated_atr_for_look_back_days = []
 
     for date_ith in all_date_values:
-
         # Filtering the dataframe for the 'date_ith'
         date_specific_dataframe_for_atr = filtered_historical_data_dataframe[
             filtered_historical_data_dataframe["Time"].dt.date == date_ith
@@ -689,7 +667,6 @@ def atr_div_by_atr_avg(
 
         # Save DF to CSV File (HV) Export data-frame to csv file
         if variables.flag_store_cas_tab_csv_files:
-
             file_path = rf"{variables.cas_tab_csv_file_path}\Support Resistance And Relative Fields\RelativeAtr"
 
             if not os.path.exists(file_path):
@@ -707,7 +684,6 @@ def atr_div_by_atr_avg(
             )
 
         else:
-
             # Calculating the ATR
             calculated_atr_for_look_back_days.append(
                 calculate_combo_atr_for_positive_negative_candles(
@@ -729,7 +705,6 @@ def atr_div_by_atr_avg(
         # calculate ATR for a particular period of time in the day / Avg ATR for the same time period averaged over the look back
         relative_atr = round(atr_for_current_day_for_time_period / atr_avg, 2)
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Calculating Realtive ATR 'atr_div_by_atr_avg' Exception: {e}")
@@ -772,7 +747,6 @@ def calculate_candle_volatility(
     current_day_close_prices,
     number_of_candles_since_day_open,
 ):
-
     # Calculating sum of absolute changes in prices since market opened
     sum_of_change_since_market_opened_on_candle_basis = sum_of_abs_changes(
         current_day_open_prices, current_day_close_prices

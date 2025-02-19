@@ -23,14 +23,12 @@ class Execution(BaseModel):
 
 
 def json_to_algo_execution(json_data) -> Execution:
-
     execution_obj = Execution.model_validate_json(json_data)
 
     return execution_obj
 
 
 def algo_execution_to_json(execution: Execution):
-
     execution_json = execution.model_dump_json(
         exclude_none=True, exclude_unset=True, exclude_defaults=True
     )
@@ -50,14 +48,12 @@ class ExecutionFilter(BaseModel):
 
 
 def json_to_algo_execution_filter(json_data) -> ExecutionFilter:
-
     execution_filter_obj = ExecutionFilter.model_validate_json(json_data)
 
     return execution_filter_obj
 
 
 def execution_filter_to_json(execution_filter: ExecutionFilter):
-
     execution_filter_json = execution_filter.model_dump_json(
         exclude_none=True, exclude_unset=True, exclude_defaults=True
     )

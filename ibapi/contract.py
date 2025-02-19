@@ -3,7 +3,6 @@ Copyright (C) 2019 Interactive Brokers LLC. All rights reserved. This code is su
  and conditions of the IB API Non-Commercial License or the IB API Commercial License, as applicable.
 """
 
-
 """
 	SAME_POS    = open/close leg value is same as combo
 	OPEN_POS    = open
@@ -81,9 +80,7 @@ class Contract(Object):
         self.issuerId = ""
 
         # combos
-        self.comboLegsDescrip = (
-            ""
-        )  # type: str; received in open order 14 and up for all combos
+        self.comboLegsDescrip = ""  # type: str; received in open order 14 and up for all combos
         self.comboLegs = None  # type: list<ComboLeg>
         self.deltaNeutralContract = None
 

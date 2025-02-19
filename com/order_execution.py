@@ -14,10 +14,8 @@ from com.trade_rm_check_result_module import *
 from com.mysql_io_scale_trader import *
 
 
-
 # Creates the base_order, Adaptive IB Algo order
 def make_order_adaptive_ib_algo(unique_id, base_order, priority):
-
     # Print to console
     if variables.flag_debug_mode:
         print(
@@ -31,9 +29,9 @@ def make_order_adaptive_ib_algo(unique_id, base_order, priority):
 
     return base_order
 
+
 # Method to get tick size for market
 def get_tick_size(bid, ask, con_id):
-
     try:
         # get market rule id
         market_rule_id = variables.map_con_id_to_rule_id[con_id]
@@ -49,21 +47,16 @@ def get_tick_size(bid, ask, con_id):
 
         # iterate price increment
         for increment in price_incr:
-
             # check if mid is greater than lowedge
             if mid > increment.lowEdge:
-
                 if tick_size < increment.increment:
-
                     # get value fot ticksize
                     tick_size = increment.increment
 
         return tick_size
 
     except Exception as e:
-
         if variables.flag_debug_mode:
-
             print(f"Exception inside 'get_tick_size', Exp: {e}")
 
         return "N/A"
@@ -84,7 +77,6 @@ def place_market_order(
     ib_algo_mkt=False,
     limit_order=False,
 ):
-
     # Print to console
     if variables.flag_debug_mode:
         print(
@@ -126,37 +118,31 @@ def place_market_order(
         tick_size = get_tick_size(bid_price, ask_price, con_id)
 
         if variables.limit_price_selection_for_execution_engine == "Limit_Bid":
-
             # Make it available in variables
             avg_price_combo = bid_price
 
         elif variables.limit_price_selection_for_execution_engine == "Limit_Ask":
-
             # Make it available in variables
             avg_price_combo = ask_price
 
         elif variables.limit_price_selection_for_execution_engine == "Limit_Mid":
-
             # Make it available in variables
             avg_price_combo = (bid_price + ask_price) / 2
 
             avg_price_combo = round(avg_price_combo / tick_size) * tick_size
 
         elif variables.limit_price_selection_for_execution_engine == "Pegged_Market":
-
             # send pegged to market only for stocks
             if combo_contract.secType == "STK":
                 order.orderType = "PEG BEST"
 
             if order_action == "BUY":
-
                 # Make it available in variables
                 avg_price_combo = (bid_price + ask_price) / 2
 
                 offset = variables.offset_value_execution_engine
 
             else:
-
                 # Make it available in variables
                 avg_price_combo = (bid_price + ask_price) / 2
 
@@ -170,10 +156,8 @@ def place_market_order(
             order.auxPrice = offset
 
         elif variables.limit_price_selection_for_execution_engine == "Pegged_Midpoint":
-
             # send pegged to midpoint only for stocks
             if combo_contract.secType == "STK":
-
                 order.orderType = "PEG MID"
 
             # Make it available in variables
@@ -182,12 +166,10 @@ def place_market_order(
             offset = 0
 
             if order_action == "BUY":
-
                 # Make it available in variables
                 avg_price_combo = avg_price_combo
 
             else:
-
                 # Make it available in variables
                 avg_price_combo = avg_price_combo
 
@@ -213,7 +195,6 @@ def place_market_order(
         and not limit_order
         and (variables.map_con_id_to_flag_supports_ib_algo_order[con_id])
     ):
-
         # Create IB ALGO order
         order = make_order_adaptive_ib_algo(
             unique_id, order, variables.ib_algo_priority
@@ -249,7 +230,6 @@ def place_market_order(
         result = variables.active_sqlalchemy_connection.execute(insr_query)
         time.sleep(variables.sleep_time_db)
     except:
-
         # Print to console
         print(
             f"Unique ID = {unique_id}: Unable to insert the identified butterfly in to database, Unique ID: {unique_id}"
@@ -260,6 +240,8 @@ def place_market_order(
         print(
             f"Unique ID = {unique_id}: {order_action.capitalize()} {order_type_des}, Qty: '{order_total_quantity}', {entry_exit_order} order placed, order_id= {order_id}"
         )
+
+
 # Method to check if value is float or not
 def is_float(value):
     try:
@@ -270,9 +252,9 @@ def is_float(value):
         return True
 
     except Exception as e:
-
         # Return false if value cannot be converted to float
         return False
+
 
 # Places Order for Single leg, get option contract then places order,
 def send_order_singe_leg(
@@ -287,7 +269,6 @@ def send_order_singe_leg(
     account_id=None,
     limit_order=False,
 ):
-
     # Print to console
     if variables.flag_debug_mode:
         print(f"Unique ID = {unique_id}: Sending Single Leg Order")
@@ -312,6 +293,7 @@ def send_order_singe_leg(
         ib_algo_mkt,
         limit_order,
     )
+
 
 # Method to send order
 def send_order(
@@ -342,14 +324,11 @@ def send_order(
 ):
     actual_entry_price = None
 
-
-
     # Combo _object for order placement, When CAS condition is triggered (for "ADD" we needed to take position in cas legs, with new unique ID)
     # (later the combo was updated to Existing combo + Incremental Combo), to avoid the issue where the order was waiting for locks to be freed on the tickers and
     # during that wait time the incremental combo was updated that is cas_legs combo was replaced by (existing combo + cas_legs_combo). to avoid this error storing the combo here
     # check if flag for incremental combo is false
     if incremental_combo == None:
-
         # Get combo obj
         local_stored_copy_of_combo_object = variables.unique_id_to_combo_obj[unique_id]
 
@@ -357,7 +336,6 @@ def send_order(
         ticker_string = make_informative_combo_string(local_stored_copy_of_combo_object)
 
     else:
-
         # Get incremental combo obj
         local_stored_copy_of_combo_object = (
             incremental_combo  # Get CAS Legs Combo Object
@@ -390,10 +368,7 @@ def send_order(
 
     # Entry_price
     if entry_price == None:
-
         entry_price = variables.unique_id_to_prices_dict[unique_id][action]
-
-
 
     # reference_price
     if order_type == "Trailing Stop Loss":
@@ -407,9 +382,10 @@ def send_order(
     if order_type in [
         "Limit",
         "Stop Loss",
-        "Trailing Stop Loss", "Limit Volatility", "Stop Loss Volatility"
+        "Trailing Stop Loss",
+        "Limit Volatility",
+        "Stop Loss Volatility",
     ]:
-
         # save order in DB
         entry_price = -1
         status = "Pending"
@@ -441,7 +417,6 @@ def send_order(
 
         # Check if sequence id is not None
         if sequence_id != None:
-
             # Creatinf dict of values to update in sequence table
             sequence_table_values_dict = {
                 "Order Time": order_time,
@@ -453,7 +428,6 @@ def send_order(
 
         # Check if sequence id is not None
         if sequence_id != None:
-
             # Get order details for sequence obj order
             variables.map_sequence_id_to_order_details[sequence_id] = [
                 unique_id,
@@ -518,7 +492,7 @@ def send_order(
             str(execution_engine),
             limit_iv,
             trigger_iv,
-            actual_entry_price
+            actual_entry_price,
         )
 
         # Creating dataframe for row data
@@ -564,7 +538,7 @@ def send_order(
                     str(execution_engine),
                     limit_iv,
                     trigger_iv,
-                    actual_entry_price
+                    actual_entry_price,
                 )
             )
 
@@ -573,13 +547,11 @@ def send_order(
         variables.screen.update_orders_book_table_watchlist_changed()
 
     elif order_type in ["MKT", "IB Algo Market"]:
-
         # save copy of original order time
         original_order_time_stored = original_order_time
 
         # if original order time is none
         if original_order_time == None:
-
             # assign value of order time for market and ib algo market orders
             original_order_time = order_time
 
@@ -591,7 +563,6 @@ def send_order(
             and variables.flag_enable_rm_account_rules
             and variables.flag_account_liquidation_mode[account_id]
         ):
-
             time.sleep(variables.rm_checks_interval_if_failed)
 
             # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -600,7 +571,6 @@ def send_order(
                 and variables.flag_enable_rm_account_rules
                 and variables.flag_account_liquidation_mode[account_id]
             ):
-
                 # set flag to false
                 flag_send_order = False
 
@@ -618,7 +588,6 @@ def send_order(
                     )
 
                     if ladder_id not in [None, "None", "N/A"]:
-
                         variables.screen.screen_scale_trader_obj.pause_scale_trade(
                             selected_item=ladder_id
                         )
@@ -666,11 +635,9 @@ def send_order(
             not trade_level_rm_check_result(bypass_rm_check, unique_id)
             and flag_send_order
         ):
-
             time.sleep(variables.rm_checks_interval_if_failed)
 
             if not trade_level_rm_check_result(bypass_rm_check, unique_id):
-
                 # set flag to false
                 flag_send_order = False
 
@@ -723,7 +690,6 @@ def send_order(
                         limit_iv=limit_iv,
                         trigger_iv=trigger_iv,
                         actual_entry_price=actual_entry_price,
-
                     )
 
                 # get details of which check in trade rm check failed
@@ -738,7 +704,6 @@ def send_order(
                 variables.screen.display_error_popup(error_title, error_string)
 
         if flag_send_order:
-
             # Send order now
             # Combo _object for order placement
             combination_object = local_stored_copy_of_combo_object
@@ -754,7 +719,6 @@ def send_order(
 
             # Checking if ib algo order is supported or not.
             if ib_algo_mkt:
-
                 legs_does_not_support_algo = []
 
                 for leg_obj in all_legs:
@@ -763,8 +727,13 @@ def send_order(
                     temp_con_id = contract.conId
 
                     if (
-                        variables.map_con_id_to_flag_supports_ib_algo_order[temp_con_id]
-                    ) == False:
+                        (
+                            variables.map_con_id_to_flag_supports_ib_algo_order[
+                                temp_con_id
+                            ]
+                        )
+                        == False
+                    ):
                         legs_does_not_support_algo.append(leg_obj)
 
                 if len(legs_does_not_support_algo) > 0:
@@ -796,7 +765,6 @@ def send_order(
             flag_tick_size = True
 
             if not execution_engine:
-
                 ##### ACQUIRING LOCKS -- When Sending Market Orders ################
                 # Acquire lock on order sending
                 variables.order_sending_lock.acquire()
@@ -804,7 +772,6 @@ def send_order(
                 try:
                     # Acquire lock on coninds
                     for leg_obj_for_order_lock in all_legs:
-
                         hash_for_lock = f"{leg_obj_for_order_lock.con_id}{account_id}"
 
                         if hash_for_lock in variables.order_lock:
@@ -818,7 +785,6 @@ def send_order(
                     if variables.flag_debug_mode:
                         print(f"Unique ID: {unique_id}, Sending Orders Locks Acquired")
                 except Exception as e:
-
                     # Print to console
                     if variables.flag_debug_mode:
                         print(f"Error in Acquiring order sending lock")
@@ -828,7 +794,6 @@ def send_order(
 
                 # Sending order for each leg one by one
                 for leg_obj in all_legs:
-
                     # Contract
                     contract = leg_obj.contract
 
@@ -883,12 +848,10 @@ def send_order(
                         )
 
             else:
-
                 leg_to_bid_ask_spread_dict = {}
 
                 # Sending order for each leg one by one
                 for leg_obj in all_legs:
-
                     # Get con id
                     con_id = leg_obj.con_id
 
@@ -910,10 +873,8 @@ def send_order(
                         "Pegged_Market",
                         "Pegged_Midpoint",
                     ]:
-
                         # check if tick price is invalid
                         if tick_size == -1 or tick_size == "N/A":
-
                             flag_tick_size = False
 
                             break
@@ -924,7 +885,6 @@ def send_order(
                     leg_to_bid_ask_spread_dict[leg_obj] = spread
 
                 if flag_tick_size:
-
                     # Find the key-value pair with the maximum value
                     max_pair = max(
                         leg_to_bid_ask_spread_dict.items(), key=lambda x: x[1]
@@ -940,7 +900,6 @@ def send_order(
                     try:
                         # Acquire lock on coninds
                         for leg_obj_for_order_lock in all_legs:
-
                             hash_for_lock = (
                                 f"{leg_obj_for_order_lock.con_id}{account_id}"
                             )
@@ -958,7 +917,6 @@ def send_order(
                                 f"Unique ID: {unique_id}, Sending Orders Locks Acquired"
                             )
                     except Exception as e:
-
                         # Print to console
                         if variables.flag_debug_mode:
                             print(f"Error in Acquiring order sending lock")
@@ -968,7 +926,6 @@ def send_order(
 
                     # Sending order for each leg one by one
                     for leg_obj in all_legs:
-
                         limit_order = True
 
                         # Contract
@@ -1011,7 +968,6 @@ def send_order(
                                 limit_order,
                             )
                         else:
-
                             send_order_singe_leg(
                                 unique_id,
                                 contract,
@@ -1029,13 +985,11 @@ def send_order(
 
             # if tick size is invlaid
             if not flag_tick_size:
-
                 status = "Failed"
 
                 reason_for_failed = "Tick size not available"
 
             if order_from_db == False:
-
                 # Change orderType from MKT to Market, for Viewing
                 order_type = "IB Algo Market" if ib_algo_mkt else "Market"
                 insert_combination_order_in_combo_status_db(
@@ -1061,7 +1015,7 @@ def send_order(
                     execution_engine=execution_engine,
                     limit_iv=limit_iv,
                     trigger_iv=trigger_iv,
-                    actual_entry_price=actual_entry_price
+                    actual_entry_price=actual_entry_price,
                 )
 
                 # Formatting Values
@@ -1111,7 +1065,7 @@ def send_order(
                     str(execution_engine),
                     limit_iv,
                     trigger_iv,
-                    actual_entry_price
+                    actual_entry_price,
                 )
 
                 # Creating dataframe for row data
@@ -1162,7 +1116,7 @@ def send_order(
                             str(execution_engine),
                             limit_iv,
                             trigger_iv,
-                            actual_entry_price
+                            actual_entry_price,
                         )
                     )
 
@@ -1184,7 +1138,7 @@ def send_order(
                     status,
                     combo_quantity,
                     exit_type,
-                    actual_entry_price=actual_entry_price
+                    actual_entry_price=actual_entry_price,
                 )
 
                 # Update Combination order status in order_book_table
@@ -1196,7 +1150,7 @@ def send_order(
                     status,
                     combo_quantity,
                     exit_type,
-                    actual_entry_price=actual_entry_price
+                    actual_entry_price=actual_entry_price,
                 )
 
                 # update/put order ID's in the combination table.
@@ -1213,7 +1167,6 @@ def send_order(
             while counter <= int(
                 variables.max_time_order_fill / variables.sleep_order_status_update
             ):
-
                 # If orders are not filled or cancelled wait
                 if check_all_orders_filled(unique_id, order_time) > 0:
                     time.sleep(variables.sleep_order_status_update)
@@ -1231,11 +1184,9 @@ def send_order(
 
             # Release lock on coninds
             for leg_obj_for_order_lock in all_legs:
-
                 hash_for_lock = f"{leg_obj_for_order_lock.con_id}{account_id}"
 
                 if hash_for_lock in variables.order_lock:
-
                     variables.order_lock[hash_for_lock].release()
 
             # Print to console
@@ -1253,18 +1204,15 @@ def send_order(
 
 # Function to monitior and send orders
 def monitor_and_send_order():
-
     # print("Monitoring")
     # get all the open/pending order from the db Quantity, TIme, unique ID, Prices all 4
 
     pending_orders = get_pending_orders()
 
     if not variables.flag_account_checks_completed_first_time:
-
         return
 
     for _, row in pending_orders.iterrows():
-
         unique_id = row["Unique ID"]
         order_action = row["Action"]
         combo_quantity = row["#Lots"]
@@ -1287,11 +1235,9 @@ def monitor_and_send_order():
 
         # set boolean value for flag for execution engine
         if flag_use_execution_engine == "True":
-
             flag_use_execution_engine = True
 
         else:
-
             flag_use_execution_engine = False
 
         if order_type == "Limit":
@@ -1348,11 +1294,9 @@ def monitor_and_send_order():
                     )
 
         elif order_type in ["Stop Loss", "STP Market", "STP IB Algo Market"]:
-
             order_description = f"{order_type}"
 
             if order_type in ["STP Market", "STP IB Algo Market"]:
-
                 # Get Position,
                 try:
                     position_for_unique_id = variables.map_unique_id_to_positions[
@@ -1395,7 +1339,6 @@ def monitor_and_send_order():
                     )
 
         elif order_type == "Trailing Stop Loss":
-
             order_description = "Trailing Stop Loss"
 
             if order_action == "BUY" and (buy_price >= reference_price + trail_value):
@@ -1422,15 +1365,16 @@ def monitor_and_send_order():
                         reference_price - trail_value,
                     )
 
-        elif order_type in ['Limit Volatility']:
-
+        elif order_type in ["Limit Volatility"]:
             order_description = "Limit"
 
             # Get unique id for selecte row
             unique_id = int(unique_id)
 
             # local copy of 'unique_id_to_combo_obj'
-            local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
+            local_unique_id_to_combo_obj = copy.deepcopy(
+                variables.unique_id_to_combo_obj
+            )
 
             # get combo object
             combo_obj = local_unique_id_to_combo_obj[unique_id]
@@ -1446,37 +1390,38 @@ def monitor_and_send_order():
 
                 req_id_list.append(req_id)
 
-
-
             # init
             current_iv = 0
 
             try:
-
-
-
                 # iterate request ids and legs
                 for req_id, leg_obj in zip(req_id_list, all_legs):
-
-
-
-                    if order_action.upper() in 'BUY':
-
+                    if order_action.upper() in "BUY":
                         # calculate buy implied volatilitty and sell implied volatility
-                        current_iv += (variables.options_iv_bid[req_id] if leg_obj.action.upper() in 'BUY' else
-                                   variables.options_iv_ask[req_id]) * leg_obj.quantity * leg_obj.multiplier * (
-                                      1 if leg_obj.action.upper() in 'BUY' else -1)
+                        current_iv += (
+                            (
+                                variables.options_iv_bid[req_id]
+                                if leg_obj.action.upper() in "BUY"
+                                else variables.options_iv_ask[req_id]
+                            )
+                            * leg_obj.quantity
+                            * leg_obj.multiplier
+                            * (1 if leg_obj.action.upper() in "BUY" else -1)
+                        )
 
                     else:
-
-                        current_iv += (variables.options_iv_bid[req_id] if leg_obj.action.upper() in 'SELL' else
-                                    variables.options_iv_ask[req_id]) * leg_obj.quantity * leg_obj.multiplier * (
-                                       1 if leg_obj.action.upper() in 'BUY' else -1)
-
-
+                        current_iv += (
+                            (
+                                variables.options_iv_bid[req_id]
+                                if leg_obj.action.upper() in "SELL"
+                                else variables.options_iv_ask[req_id]
+                            )
+                            * leg_obj.quantity
+                            * leg_obj.multiplier
+                            * (1 if leg_obj.action.upper() in "BUY" else -1)
+                        )
 
             except Exception as e:
-
                 current_iv = None
 
                 if variables.flag_debug_mode:
@@ -1484,35 +1429,31 @@ def monitor_and_send_order():
 
                 continue
 
-            #print([current_iv, limit_iv, order_action])
-
-
+            # print([current_iv, limit_iv, order_action])
 
             if current_iv is None:
-
                 continue
 
             current_iv *= 100
 
-            if current_iv <= float(limit_iv) and order_action == 'BUY':
-
+            if current_iv <= float(limit_iv) and order_action == "BUY":
                 level_reached = True
                 entry_price = buy_price
 
-            elif current_iv >= float(limit_iv) and order_action == 'SELL':
-
+            elif current_iv >= float(limit_iv) and order_action == "SELL":
                 level_reached = True
                 entry_price = sell_price
 
-        elif order_type in ['Stop Loss Volatility']:
-
-            order_description = 'Stop Loss'
+        elif order_type in ["Stop Loss Volatility"]:
+            order_description = "Stop Loss"
 
             # Get unique id for selecte row
             unique_id = int(unique_id)
 
             # local copy of 'unique_id_to_combo_obj'
-            local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
+            local_unique_id_to_combo_obj = copy.deepcopy(
+                variables.unique_id_to_combo_obj
+            )
 
             # get combo object
             combo_obj = local_unique_id_to_combo_obj[unique_id]
@@ -1532,25 +1473,34 @@ def monitor_and_send_order():
             current_iv = 0
 
             try:
-
                 # iterate request ids and legs
                 for req_id, leg_obj in zip(req_id_list, all_legs):
-
-                    if order_action.upper() == 'BUY':
-
+                    if order_action.upper() == "BUY":
                         # calculate buy implied volatilitty and sell implied volatility
-                        current_iv += (variables.options_iv_bid[req_id] if leg_obj.action.upper() == 'BUY' else
-                                   variables.options_iv_ask[req_id]) * leg_obj.quantity * leg_obj.multiplier * (
-                                      1 if leg_obj.action.upper() == 'BUY' else -1)
+                        current_iv += (
+                            (
+                                variables.options_iv_bid[req_id]
+                                if leg_obj.action.upper() == "BUY"
+                                else variables.options_iv_ask[req_id]
+                            )
+                            * leg_obj.quantity
+                            * leg_obj.multiplier
+                            * (1 if leg_obj.action.upper() == "BUY" else -1)
+                        )
 
                     else:
-
-                        current_iv += (variables.options_iv_bid[req_id] if leg_obj.action.upper() == 'SELL' else
-                                    variables.options_iv_ask[req_id]) * leg_obj.quantity * leg_obj.multiplier * (
-                                       1 if leg_obj.action.upper() == 'BUY' else -1)
+                        current_iv += (
+                            (
+                                variables.options_iv_bid[req_id]
+                                if leg_obj.action.upper() == "SELL"
+                                else variables.options_iv_ask[req_id]
+                            )
+                            * leg_obj.quantity
+                            * leg_obj.multiplier
+                            * (1 if leg_obj.action.upper() == "BUY" else -1)
+                        )
 
             except Exception as e:
-
                 if variables.flag_debug_mode:
                     print(f"Exception for getting implied volatility, Exp: {e}")
 
@@ -1558,19 +1508,17 @@ def monitor_and_send_order():
 
             current_iv *= 100
 
-            if current_iv >= float(trigger_iv) and order_action == 'BUY':
+            if current_iv >= float(trigger_iv) and order_action == "BUY":
                 level_reached = True
                 entry_price = buy_price
 
-            elif current_iv <= float(trigger_iv) and order_action == 'SELL':
+            elif current_iv <= float(trigger_iv) and order_action == "SELL":
                 level_reached = True
                 entry_price = sell_price
 
         if level_reached:
-
             # Check if account is not available in current session
             if account_id not in variables.current_session_accounts:
-
                 # check if order time is in tbale
                 if order_time in variables.screen.order_book_table.get_children():
                     # converting value to string
@@ -1594,7 +1542,6 @@ def monitor_and_send_order():
             flag_send_this_order = False
 
             try:
-
                 # Getting the Order Type if order is for the sequence of a ladder.
                 if ladder_id not in [None, "None"]:
                     order_type = get_ladder_or_sequence_column_value_from_db(
@@ -1602,10 +1549,8 @@ def monitor_and_send_order():
                     )
 
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
-
                     print(
                         f"For Ladder ID: {ladder_id}, Query for getting ladder order type failed"
                     )
@@ -1616,26 +1561,22 @@ def monitor_and_send_order():
             # Checking if we have this lock in order_lock dict
             if lock_hash_for_db_order in variables.order_lock:
                 try:
-
                     if variables.order_lock[lock_hash_for_db_order].acquire():
                         pass
                     else:
                         flag_send_this_order = True
 
                 except Exception as e:
-
                     if variables.flag_debug_mode:
                         print(f"Inside monitor order, Exp: {e}")
 
             else:
-
                 # Make lock and send the order
                 variables.order_lock[lock_hash_for_db_order] = Lock()
                 variables.order_lock[lock_hash_for_db_order].acquire()
                 flag_send_this_order = True
 
             if flag_send_this_order:
-
                 # Send order in a separate thread
                 send_order_thread = threading.Thread(
                     target=send_order,
@@ -1664,6 +1605,7 @@ def monitor_and_send_order():
                 )
                 send_order_thread.start()
 
+
 # Method to add dummy failed order
 def add_failed_mkt_order(
     unique_id,
@@ -1686,13 +1628,11 @@ def add_failed_mkt_order(
     ticker_string=None,
     bypass_rm_check=None,
     execution_engine=False,
-limit_iv=None,
-        trigger_iv=None,
-actual_entry_price=None
+    limit_iv=None,
+    trigger_iv=None,
+    actual_entry_price=None,
 ):
-
     if not is_float(actual_entry_price):
-
         return
 
     # Current time when order is created

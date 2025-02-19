@@ -211,7 +211,7 @@ count = 0
 rep = 2
 sleep_time = 1
 while count < rep:
-    print(f"Exiting Gracefully in {rep-count} seconds")
+    print(f"Exiting Gracefully in {rep - count} seconds")
     count += 1
     time.sleep(1)
 else:

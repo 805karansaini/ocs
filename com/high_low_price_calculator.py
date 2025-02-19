@@ -3,6 +3,7 @@ Created on 14-Apr-2023
 
 @author: Karan
 """
+
 import copy
 import enum
 from com import *
@@ -31,7 +32,6 @@ class HighLowCalculator(object):
 
     # Manage long erm values calculation
     def update_long_term_values(self, conid_list=None, unique_id_added=None):
-
         # local copy of 'unique_id_to_combo_obj'
         local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
 
@@ -46,10 +46,7 @@ class HighLowCalculator(object):
             variables.cas_map_con_id_to_action_type_and_combo_type
         )
 
-
-
         if conid_list != None:
-
             # Create a filtered dictionary using a dictionary comprehension
             cas_coinds_for_fetching_historical_data = {
                 key: cas_coinds_for_fetching_historical_data[key] for key in conid_list
@@ -64,12 +61,16 @@ class HighLowCalculator(object):
 
         max_id = 0
 
-        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(local_unique_id_to_combo_obj)
+        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(
+            local_unique_id_to_combo_obj
+        )
 
         # create combo objects for legs separately to calculate values for legs
         for unique_id_combo in local_unique_id_to_combo_obj_loop_copy:
-
-            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {'Leg Unique Ids': [], 'Combo Obj List': []}
+            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {
+                "Leg Unique Ids": [],
+                "Combo Obj List": [],
+            }
 
             combo_obj = local_unique_id_to_combo_obj[unique_id_combo]
 
@@ -78,10 +79,26 @@ class HighLowCalculator(object):
             for leg_obj in all_legs:
                 max_id += 1
 
-                list_of_tuple_of_values = [(max_id, leg_obj.action, leg_obj.sec_type, leg_obj.symbol, 'None', 'None', leg_obj.right, leg_obj.quantity,
-                 leg_obj.multiplier, leg_obj.exchange,
-                 leg_obj.trading_class, leg_obj.currency, leg_obj.con_id, leg_obj.primary_exchange, leg_obj.strike_price,
-                 leg_obj.expiry_date,)]
+                list_of_tuple_of_values = [
+                    (
+                        max_id,
+                        leg_obj.action,
+                        leg_obj.sec_type,
+                        leg_obj.symbol,
+                        "None",
+                        "None",
+                        leg_obj.right,
+                        leg_obj.quantity,
+                        leg_obj.multiplier,
+                        leg_obj.exchange,
+                        leg_obj.trading_class,
+                        leg_obj.currency,
+                        leg_obj.con_id,
+                        leg_obj.primary_exchange,
+                        leg_obj.strike_price,
+                        leg_obj.expiry_date,
+                    )
+                ]
 
                 # Create combination and check if there is any error
                 combination_obj = create_combination(
@@ -90,13 +107,15 @@ class HighLowCalculator(object):
                     input_from_cas_tab=True,
                 )
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Leg Unique Ids'].append(max_id * -1)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Leg Unique Ids"
+                ].append(max_id * -1)
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Combo Obj List'].append(combination_obj)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Combo Obj List"
+                ].append(combination_obj)
 
                 local_unique_id_to_combo_obj[max_id * -1] = combination_obj
-
-
 
         # Creating a local copy of 'cas_conditional_legs_map_con_id_to_action_type_and_combo_type'
         cas_conids_for_correlation = copy.deepcopy(
@@ -106,7 +125,6 @@ class HighLowCalculator(object):
         # Creating a single dict for which the N-Day historical data is required
         for key, val in cas_conids_for_correlation.items():
             if key in cas_coinds_for_fetching_historical_data:
-
                 # Adding Values
                 for action_ in ["BUY", "SELL"]:
                     for candle_ in [
@@ -124,7 +142,9 @@ class HighLowCalculator(object):
         map_conid_action_bar_size_to_req_id = self.get_long_term_values(
             cas_coinds_for_fetching_historical_data
         )
-        map_conid_action_bar_size_to_req_id = copy.deepcopy(map_conid_action_bar_size_to_req_id)
+        map_conid_action_bar_size_to_req_id = copy.deepcopy(
+            map_conid_action_bar_size_to_req_id
+        )
 
         # Getting Highest and Lowest Price of combo for N-Days (cas_number_of_days)
         map_unique_id_to_high_low = self.get_ndays_highest_lowest_price(
@@ -139,18 +159,15 @@ class HighLowCalculator(object):
 
         # Updating Long Term Value in DB
         for unique_id_, values in map_unique_id_to_high_low.items():
-
             # Print to console
             if variables.flag_debug_mode:
                 print(unique_id_, " : ", values)
 
             try:
-
                 n_day_high = values["N-Day High"]
                 n_day_low = values["N-Day Low"]
 
             except Exception as e:
-
                 n_day_high = "N/A"
                 n_day_low = "N/A"
 
@@ -162,15 +179,12 @@ class HighLowCalculator(object):
 
     # Method to get long term values
     def get_long_term_values(self, cas_coinds_for_fetching_historical_data):
-
         # Info 'cas_coinds_for_fetching_historical_data' contains dict {coind : {BUY : 1H 1D ,  SELL: 1H 1D} }
 
         # Duration String, user input max(cas_number_of_days and atr)
         duration_for_historical_data = max(
             variables.cas_number_of_days, variables.atr_number_of_days
         )
-
-
 
         # string for ibkr reqHistoricalData
         duration_size = f"{duration_for_historical_data} D"
@@ -183,7 +197,6 @@ class HighLowCalculator(object):
 
         # To update long term values we need Daily Candles for which we need '1D' '1H' data.
         for conid, sub_info_dict in cas_coinds_for_fetching_historical_data.items():
-
             # Get Contract for conId
             contract = variables.map_con_id_to_contract[conid]
 
@@ -192,17 +205,13 @@ class HighLowCalculator(object):
                 map_conid_action_bar_size_to_req_id[conid] = {}
 
             for action, sub_values in sub_info_dict.items():
-
                 # Create dict with conid as key
                 if action not in map_conid_action_bar_size_to_req_id[conid]:
                     map_conid_action_bar_size_to_req_id[conid][action] = {}
 
-
                 # Get data for bar_size, if leg is active in all combinations
                 for bar_size, sub_val in sub_values.items():
-
                     if sub_val > 0:
-
                         # Getting req_id from CAS APP
                         reqId = variables.cas_app.nextorderId
                         variables.cas_app.nextorderId += 1
@@ -217,9 +226,9 @@ class HighLowCalculator(object):
                             ] = 0
 
                         # Map Historical Data ReqId to the dict
-                        map_conid_action_bar_size_to_req_id[conid][action][
-                            bar_size
-                        ] = reqId
+                        map_conid_action_bar_size_to_req_id[conid][action][bar_size] = (
+                            reqId
+                        )
 
                         # append reqid it to the list, will be used to check when all the data is available
                         req_id_list.append(reqId)
@@ -250,7 +259,6 @@ class HighLowCalculator(object):
         while variables.cas_wait_time_for_historical_data > (
             counter * variables.sleep_time_waiting_for_tws_response
         ):
-
             # dict_mkt_end = variables.req_mkt_data_end
             # dicterr_msg = variables.req_error
             #
@@ -292,7 +300,6 @@ class HighLowCalculator(object):
         map_conid_action_bar_size_to_req_id,
         local_cas_unique_id_to_combo_obj,
     ):
-
         # Dictionary maps unique_id to long_term_high_low
         # variables.map_unique_id_to_long_term_high_low = {}
         try:
@@ -332,7 +339,6 @@ class HighLowCalculator(object):
 
         # Process unique Id one by one
         for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
             # Creating a sub dictionary
             variables.map_unique_id_to_long_term_high_low[unique_id] = {}
 
@@ -345,16 +351,14 @@ class HighLowCalculator(object):
 
             # Save DF to CSV File
             if variables.flag_store_cas_tab_csv_files:
-
                 # Save all DF to CSV
                 for i, df_nday_legwise in enumerate(all_data_frames):
-
                     file_path = rf"{variables.cas_tab_csv_file_path}\N_Day\LegWise\Unique_id_{unique_id}"
 
                     if not os.path.exists(file_path):
                         os.makedirs(file_path)
 
-                    df_nday_legwise.to_csv(rf"{file_path}\Leg_{i+1}.csv", index=False)
+                    df_nday_legwise.to_csv(rf"{file_path}\Leg_{i + 1}.csv", index=False)
 
             # Data not found for any leg
             is_data_frame_empty = False
@@ -394,7 +398,6 @@ class HighLowCalculator(object):
 
             # Save DF to CSV File
             if variables.flag_store_cas_tab_csv_files:
-
                 # Saving dataframe to csv
                 file_path = rf"{variables.cas_tab_csv_file_path}\N_Day\Merged"
 
@@ -430,12 +433,10 @@ class HighLowCalculator(object):
             )
 
             try:
-
                 # check length of df
                 if len(combination_price_dataframe_for_avg_chg_in_price) < 2:
                     avg_change_in_price_for_n_days = "N/A"
                 else:
-
                     # calcualte avg change in price for n days
                     combination_price_dataframe_for_avg_chg_in_price[
                         "Combination Close Change"
@@ -443,9 +444,7 @@ class HighLowCalculator(object):
                         "Combination Close"
                     ] - combination_price_dataframe_for_avg_chg_in_price[
                         "Combination Close"
-                    ].shift(
-                        1
-                    )
+                    ].shift(1)
                     avg_change_in_price_for_n_days = (
                         combination_price_dataframe_for_avg_chg_in_price[
                             "Combination Close Change"
@@ -454,7 +453,6 @@ class HighLowCalculator(object):
 
                 # Save DF to CSV File (HV) Export data-frame to csv file
                 if variables.flag_store_cas_tab_csv_files:
-
                     file_path = rf"{variables.cas_tab_csv_file_path}\Bid Ask Related Columns\Average Change In Price"
 
                     if not os.path.exists(file_path):
@@ -488,7 +486,6 @@ class HighLowCalculator(object):
 
             # if we have cas legs calculate the Correlation
             if unique_id in local_cas_unique_id_to_combo_obj:
-
                 # Cas Combo Object
                 cas_combo_object = local_cas_unique_id_to_combo_obj[unique_id]
 
@@ -501,17 +498,15 @@ class HighLowCalculator(object):
 
                 # Save DF to CSV File
                 if variables.flag_store_cas_tab_csv_files:
-
                     # Save all DF to CSV
                     for i, df_nday_cas_legwise in enumerate(all_data_frames):
-
                         file_path = rf"{variables.cas_tab_csv_file_path}\N_Day\CASLegsLegWise\Unique_id_{unique_id}"
 
                         if not os.path.exists(file_path):
                             os.makedirs(file_path)
 
                         df_nday_cas_legwise.to_csv(
-                            rf"{file_path}\Leg_{i+1}.csv", index=False
+                            rf"{file_path}\Leg_{i + 1}.csv", index=False
                         )
 
                 # Data not found for any leg
@@ -538,7 +533,6 @@ class HighLowCalculator(object):
                     }
 
                 else:
-
                     # Merging the data frame, inner join on time
                     cas_merged_df = (
                         self.merge_dataframe_inner_join_with_combo_price_calculation(
@@ -548,7 +542,6 @@ class HighLowCalculator(object):
 
                     # Save DF to CSV File
                     if variables.flag_store_cas_tab_csv_files:
-
                         file_path = rf"{variables.cas_tab_csv_file_path}\N_Day\CASLegsMerged\Unique_id_{unique_id}"
 
                         if not os.path.exists(file_path):
@@ -589,7 +582,6 @@ class HighLowCalculator(object):
 
             # Getting Min, Max value from the DataFrame
             for i, row in combination_price_dataframe.iterrows():
-
                 # Open and Close Prices of combination
                 open_price = row["Combination Open"]
                 close_price = row["Combination Close"]
@@ -628,7 +620,6 @@ class HighLowCalculator(object):
 
     # Method to get highst and lowest price for intraday
     def get_intraday_highlow_values(self, duration_size="1 D", bar_size="1 min"):
-
         # Map of [conid][action] = req_id
         map_conid_action_to_req_id = {}
 
@@ -648,7 +639,6 @@ class HighLowCalculator(object):
                 map_conid_action_to_req_id[conid] = {}
 
             for action, sub_values in sub_info_dict.items():
-
                 # Create dict with conid as key
                 if action not in map_conid_action_to_req_id[conid]:
                     map_conid_action_to_req_id[conid][action] = None
@@ -682,7 +672,6 @@ class HighLowCalculator(object):
         while variables.cas_wait_time_for_historical_data > (
             counter * variables.sleep_time_waiting_for_tws_response
         ):
-
             # dict_mkt_end = variables.req_mkt_data_end
             # dicterr_msg = variables.req_error
             #
@@ -721,7 +710,6 @@ class HighLowCalculator(object):
     def get_current_day_open_highest_lowest_price(
         self, local_unique_id_to_combo_obj, map_conid_action_to_req_id
     ):
-
         # Dict
         local_map_unique_id_to_intraday_high_low = {}
 
@@ -733,7 +721,6 @@ class HighLowCalculator(object):
         get_leg_div_by_combination_values_for_unique_id = {}
 
         for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
             local_map_unique_id_to_intraday_high_low[unique_id] = {
                 "1-Day Open": "N/A",
                 "1-Day High": "N/A",
@@ -775,7 +762,6 @@ class HighLowCalculator(object):
 
             # Merge Data
             for leg in all_legs:
-
                 action = leg.action
                 con_id = leg.con_id
                 req_id = map_conid_action_to_req_id[con_id][action]
@@ -789,9 +775,7 @@ class HighLowCalculator(object):
 
             # Save DF to CSV File
             if variables.flag_store_cas_tab_csv_files:
-
                 for i, df_intraday_legwise in enumerate(all_data_frames):
-
                     file_path = rf"{variables.cas_tab_csv_file_path}\IntraDay\LegWise"
                     file_path += rf"\Unique_id_{unique_id}"
 
@@ -799,7 +783,7 @@ class HighLowCalculator(object):
                         os.makedirs(file_path)
 
                     df_intraday_legwise.to_csv(
-                        rf"{file_path}\Leg_{i+1}_Intraday.csv", index=False
+                        rf"{file_path}\Leg_{i + 1}_Intraday.csv", index=False
                     )
 
             # Data not found for any leg
@@ -885,7 +869,6 @@ class HighLowCalculator(object):
                 highest_price_of_leg_div_by_highest_price_of_combination_value,
                 change_in_price_for_leg_div_by_change_in_price_for_combination_value,
             ):
-
                 get_leg_div_by_combination_values_for_unique_id[unique_id][
                     f"Leg {leg_number}"
                 ] = {}
@@ -894,16 +877,12 @@ class HighLowCalculator(object):
                     f"Leg {leg_number}"
                 ][
                     f"HV for leg to Combo Comparison"
-                ] = hv_of_leg_since_open_div_by_hv_of_combination_since_open_value[
-                    key1
-                ]
+                ] = hv_of_leg_since_open_div_by_hv_of_combination_since_open_value[key1]
                 get_leg_div_by_combination_values_for_unique_id[unique_id][
                     f"Leg {leg_number}"
                 ][
                     f"Highest price for leg to Combo Comparison"
-                ] = highest_price_of_leg_div_by_highest_price_of_combination_value[
-                    key2
-                ]
+                ] = highest_price_of_leg_div_by_highest_price_of_combination_value[key2]
                 get_leg_div_by_combination_values_for_unique_id[unique_id][
                     f"Leg {leg_number}"
                 ][
@@ -914,13 +893,12 @@ class HighLowCalculator(object):
 
                 leg_number += 1
 
-            variables.map_unique_id_to_leg_combo_comparision_val[
-                unique_id
-            ] = get_leg_div_by_combination_values_for_unique_id[unique_id]
+            variables.map_unique_id_to_leg_combo_comparision_val[unique_id] = (
+                get_leg_div_by_combination_values_for_unique_id[unique_id]
+            )
 
             # Save DF to CSV File
             if variables.flag_store_cas_tab_csv_files:
-
                 # Saving dataframe to csv
                 file_path = rf"{variables.cas_tab_csv_file_path}\IntraDay\Merged"
 
@@ -938,7 +916,6 @@ class HighLowCalculator(object):
             ].copy()
 
             if variables.flag_weighted_change_in_price:
-
                 # Get day open prices for each leg
                 current_day_open_for_legs_list = get_values_for_each_leg(
                     merged_df, combo_obj
@@ -956,7 +933,6 @@ class HighLowCalculator(object):
                     )
 
                 else:
-
                     values_to_calculate_change_from_open_value = (
                         current_day_open_for_legs_list
                     )
@@ -976,7 +952,6 @@ class HighLowCalculator(object):
             )
 
             if unique_id > 0:
-
                 (
                     significant_level_for_intraday_in_range,
                     significant_level_count_values_for_intraday_in_range,
@@ -985,15 +960,15 @@ class HighLowCalculator(object):
                 )
 
             else:
-
                 (
                     significant_level_for_intraday_in_range,
                     significant_level_count_values_for_intraday_in_range,
                 ) = calc_signficant_levels(
-                    list_of_intraday_candles, flag_in_range=True, unique_id=unique_id, combo_obj=combo_obj
+                    list_of_intraday_candles,
+                    flag_in_range=True,
+                    unique_id=unique_id,
+                    combo_obj=combo_obj,
                 )
-
-
 
             # Defining resistance and support variables
             resistance, support = "N/A", "N/A"
@@ -1037,11 +1012,14 @@ class HighLowCalculator(object):
                     # print(resistane_count, support_count, "Count")
                 else:
                     if unique_id > 0:
-                        current_buy_price, current_sell_price = 'N/A', 'N/A'
+                        current_buy_price, current_sell_price = "N/A", "N/A"
 
                     for leg_obj in all_legs:
                         req_id = variables.con_id_to_req_id_dict[leg_obj.con_id]
-                        bid, ask = variables.bid_price[req_id], variables.ask_price[req_id]
+                        bid, ask = (
+                            variables.bid_price[req_id],
+                            variables.ask_price[req_id],
+                        )
                         current_buy_price, current_sell_price = ask, bid
 
                     # Calculating the Resistance, Support
@@ -1066,7 +1044,6 @@ class HighLowCalculator(object):
                             support
                         ]
 
-
             except Exception as e:
                 if variables.flag_debug_mode:
                     print(
@@ -1074,11 +1051,9 @@ class HighLowCalculator(object):
                     )
 
             try:
-
                 resistance_in_range, support_in_range = "N/A", "N/A"
 
                 if unique_id in local_unique_id_to_prices_dict:
-
                     current_buy_price, current_sell_price = (
                         local_unique_id_to_prices_dict[unique_id]["BUY"],
                         local_unique_id_to_prices_dict[unique_id]["SELL"],
@@ -1109,7 +1084,6 @@ class HighLowCalculator(object):
                         support_in_range = support_in_range - avg_price_combo
 
                     else:
-
                         support_in_range = "N/A"
 
                     # Check if values are valid
@@ -1121,7 +1095,6 @@ class HighLowCalculator(object):
                         resistance_in_range = resistance_in_range - avg_price_combo
 
                     else:
-
                         resistance_in_range = "N/A"
 
                     # Calculating the Resistance count, Support count
@@ -1137,13 +1110,15 @@ class HighLowCalculator(object):
                         support_count_in_range = 'N/A""" ""
 
                 else:
-
                     if unique_id > 0:
-                        current_buy_price, current_sell_price = 'N/A', 'N/A'
+                        current_buy_price, current_sell_price = "N/A", "N/A"
 
                     for leg_obj in all_legs:
                         req_id = variables.con_id_to_req_id_dict[leg_obj.con_id]
-                        bid, ask = variables.bid_price[req_id], variables.ask_price[req_id]
+                        bid, ask = (
+                            variables.bid_price[req_id],
+                            variables.ask_price[req_id],
+                        )
                         current_buy_price, current_sell_price = ask, bid
 
                     # Calculating the Resistance, Support
@@ -1157,10 +1132,7 @@ class HighLowCalculator(object):
                     )
 
                     # Make it available in variables
-                    avg_price_combo = (
-                                              current_buy_price
-                                              + current_sell_price
-                                      ) / 2
+                    avg_price_combo = (current_buy_price + current_sell_price) / 2
 
                     # Check if values are valid
                     if avg_price_combo not in [
@@ -1171,7 +1143,6 @@ class HighLowCalculator(object):
                         support_in_range = support_in_range - avg_price_combo
 
                     else:
-
                         support_in_range = "N/A"
 
                     # Check if values are valid
@@ -1183,7 +1154,6 @@ class HighLowCalculator(object):
                         resistance_in_range = resistance_in_range - avg_price_combo
 
                     else:
-
                         resistance_in_range = "N/A"
 
                     # resistance_count_in_range, support_count_in_range = 'N/A', 'N/A'
@@ -1209,7 +1179,6 @@ class HighLowCalculator(object):
 
             # Getting Min, Max value from the DataFrame
             for i, row in combination_price_dataframe.iterrows():
-
                 # Open and Close Price of
                 open_price = row["Combination Open"]
                 close_price = row["Combination Close"]
@@ -1233,14 +1202,12 @@ class HighLowCalculator(object):
 
             # Check flag indicating which candles to use either since start of day or current candle
             if not variables.flag_since_start_of_day_candles_for_relative_fields:
-
                 # Get day open or current candle values
-                day_open_or_current_candle_price = (
-                    current_candle
-                ) = combination_price_dataframe["Combination Close"].iloc[-1]
+                day_open_or_current_candle_price = current_candle = (
+                    combination_price_dataframe["Combination Close"].iloc[-1]
+                )
 
             else:
-
                 day_open_or_current_candle_price = day_open
 
             # Get comparison of prices in 2 time slots - Code
@@ -1260,7 +1227,6 @@ class HighLowCalculator(object):
 
                 # If dataframe for sub time frame in intraday s not N/A
                 if not recent_time_dataframe.empty:
-
                     # Get highest price for recent time
                     recent_time_highest_price = recent_time_dataframe[
                         "Combination Close"
@@ -1292,10 +1258,8 @@ class HighLowCalculator(object):
                     )
 
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
-
                     print(
                         f"Exception inside calculating highest and lowest prices comparison, Exp: {e}"
                     )
@@ -1332,10 +1296,8 @@ class HighLowCalculator(object):
                 intraday_price_range_ratio = price_range_in_time_frame / (high - low)
 
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
-
                     print(
                         f"Exception inside calculating intraday price range ratio comparison, Exp: {e}"
                     )
@@ -1385,15 +1347,12 @@ class HighLowCalculator(object):
             }
 
             try:
-
-                variables.map_unique_id_to_intraday_high_low[
-                    unique_id
-                ] = local_map_unique_id_to_intraday_high_low[unique_id]
+                variables.map_unique_id_to_intraday_high_low[unique_id] = (
+                    local_map_unique_id_to_intraday_high_low[unique_id]
+                )
 
             except Exception as e:
-
                 if variables.flag_debug_mode:
-
                     print(f"Exception insode assigning intraday values: Exp: {e}")
 
         # Setting updated value in the variables dict
@@ -1405,14 +1364,12 @@ class HighLowCalculator(object):
     def divide_dataframe_based_on_two_time_frames(
         self, combination_dataframe, sub_time_frame_in_intraday
     ):
-
         try:
             # Get number of rows in dataframe
             length_of_dataframe = len(combination_dataframe)
 
             # time frame in intraday combo dataframe must be bigger than sub time frame in intraday
             if length_of_dataframe <= sub_time_frame_in_intraday:
-
                 return [pd.DataFrame(), pd.DataFrame()]
 
             # Get the last 10 rows of the DataFrame and store it in another variable
@@ -1427,12 +1384,10 @@ class HighLowCalculator(object):
 
             return [recent_time_dataframe, rest_of_day_dataframe]
         except Exception as e:
-
             return [pd.DataFrame(), pd.DataFrame()]
 
     # Method to manage intraday values calculations
     def update_intraday_values(self, conid_list=None, unique_id_added=None):
-
         # local copy of 'unique_id_to_combo_obj'
         local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
 
@@ -1446,7 +1401,6 @@ class HighLowCalculator(object):
         )
 
         if conid_list != None:
-
             # Create a filtered dictionary using a dictionary comprehension
             cas_coinds_for_fetching_historical_data = {
                 key: map_conid_action_bar_size_to_req_id[key] for key in conid_list
@@ -1461,12 +1415,16 @@ class HighLowCalculator(object):
 
         max_id = 0
 
-        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(local_unique_id_to_combo_obj)
+        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(
+            local_unique_id_to_combo_obj
+        )
 
         # Add combo object for legs separately to calculate legs indicator values
         for unique_id_combo in local_unique_id_to_combo_obj_loop_copy:
-
-            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {'Leg Unique Ids': [], 'Combo Obj List': []}
+            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {
+                "Leg Unique Ids": [],
+                "Combo Obj List": [],
+            }
 
             combo_obj = local_unique_id_to_combo_obj[unique_id_combo]
 
@@ -1475,12 +1433,26 @@ class HighLowCalculator(object):
             for leg_obj in all_legs:
                 max_id += 1
 
-                list_of_tuple_of_values = [(max_id, leg_obj.action, leg_obj.sec_type, leg_obj.symbol, 'None', 'None',
-                                            leg_obj.right, leg_obj.quantity,
-                                            leg_obj.multiplier, leg_obj.exchange,
-                                            leg_obj.trading_class, leg_obj.currency, leg_obj.con_id,
-                                            leg_obj.primary_exchange, leg_obj.strike_price,
-                                            leg_obj.expiry_date,)]
+                list_of_tuple_of_values = [
+                    (
+                        max_id,
+                        leg_obj.action,
+                        leg_obj.sec_type,
+                        leg_obj.symbol,
+                        "None",
+                        "None",
+                        leg_obj.right,
+                        leg_obj.quantity,
+                        leg_obj.multiplier,
+                        leg_obj.exchange,
+                        leg_obj.trading_class,
+                        leg_obj.currency,
+                        leg_obj.con_id,
+                        leg_obj.primary_exchange,
+                        leg_obj.strike_price,
+                        leg_obj.expiry_date,
+                    )
+                ]
 
                 # Create combination and check if there is any error
                 combination_obj = create_combination(
@@ -1489,9 +1461,13 @@ class HighLowCalculator(object):
                     input_from_cas_tab=True,
                 )
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Leg Unique Ids'].append(max_id * -1)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Leg Unique Ids"
+                ].append(max_id * -1)
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Combo Obj List'].append(combination_obj)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Combo Obj List"
+                ].append(combination_obj)
 
                 local_unique_id_to_combo_obj[max_id * -1] = combination_obj
 
@@ -1524,7 +1500,6 @@ class HighLowCalculator(object):
     def calculate_combo_atr_and_last_close_price(
         self, unique_id, combo_open_close_df, flag_order_paramrameter_atr=False
     ):
-
         if not flag_order_paramrameter_atr:
             # Group dataframe by date and get 1d candle (first open, last close)
             combo_daily_open_close_df = (
@@ -1537,7 +1512,6 @@ class HighLowCalculator(object):
 
         # Save DF to CSV File
         if variables.flag_store_cas_tab_csv_files and not flag_order_paramrameter_atr:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\ATR"
 
@@ -1549,7 +1523,6 @@ class HighLowCalculator(object):
             )
 
         elif variables.flag_store_cas_tab_csv_files and flag_order_paramrameter_atr:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\Order Parameter ATR\ATR"
 
@@ -1606,7 +1579,6 @@ class HighLowCalculator(object):
 
         # Save DF to CSV File
         if variables.flag_store_cas_tab_csv_files and not flag_order_paramrameter_atr:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\ATR"
 
@@ -1618,7 +1590,6 @@ class HighLowCalculator(object):
             )
 
         elif variables.flag_store_cas_tab_csv_files and flag_order_paramrameter_atr:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\Order Parameter ATR\ATR"
 
@@ -1660,7 +1631,6 @@ class HighLowCalculator(object):
     def merge_dataframe_inner_join_with_combo_price_calculation(
         self, combo_obj, all_data_frames
     ):
-
         # All legs in combo
         all_legs = combo_obj.buy_legs + combo_obj.sell_legs
 
@@ -1670,7 +1640,7 @@ class HighLowCalculator(object):
         # Merging all data frames such that Time is available in all data frames
         for i, df_ith in enumerate(all_data_frames[1:]):
             merged_df = pd.merge(
-                merged_df, df_ith, on="Time", how="inner", suffixes=(f"", f" {i+1}")
+                merged_df, df_ith, on="Time", how="inner", suffixes=(f"", f" {i + 1}")
             )
 
         # Dropping nan values, if any
@@ -1681,9 +1651,9 @@ class HighLowCalculator(object):
 
         # Open and Close with leg
         for i in range(len(all_data_frames)):
-            merged_df_columns.append(f"Open {i+1}")
-            merged_df_columns.append(f"Close {i+1}")
-            merged_df_columns.append(f"Volume {i+1}")
+            merged_df_columns.append(f"Open {i + 1}")
+            merged_df_columns.append(f"Close {i + 1}")
+            merged_df_columns.append(f"Volume {i + 1}")
 
         # Setting columns in merged_df
         merged_df.columns = merged_df_columns
@@ -1785,7 +1755,6 @@ class HighLowCalculator(object):
         active_combo_legs_dataframe,
         cas_legs_dataframe,
     ):
-
         # Pass
         combo_daily_open_close_df = (
             self.group_dataframe_by_time_and_create_1d_candle_first_open_last_close(
@@ -1814,7 +1783,6 @@ class HighLowCalculator(object):
 
         # Save DF to CSV File
         if variables.flag_store_cas_tab_csv_files:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\Correlation"
 
@@ -1842,7 +1810,6 @@ class HighLowCalculator(object):
 
         # Save DF to CSV File
         if variables.flag_store_cas_tab_csv_files:
-
             # Saving dataframe to csv
             file_path = rf"{variables.cas_tab_csv_file_path}\Correlation"
 
@@ -1871,7 +1838,6 @@ class HighLowCalculator(object):
     def get_the_dataframe_that_contains_historical_data_for_combo(
         self, combo_obj, map_conid_action_bar_size_to_req_id, df_for_hv=False
     ):
-
         # All Legs in combo
         buy_legs = combo_obj.buy_legs
         sell_legs = combo_obj.sell_legs
@@ -1882,7 +1848,6 @@ class HighLowCalculator(object):
 
         # Checking Combo type, and map con_id to contract
         for leg_obj_ in buy_legs + sell_legs:
-
             if leg_obj_.sec_type in ["OPT", "FOP"]:
                 only_stk_fut = False
 
@@ -1894,7 +1859,6 @@ class HighLowCalculator(object):
 
         # Get all reqId (reqHisData) so we can get dataframe,
         for leg in all_legs:
-
             # Action and con_id of leg
             action = leg.action
             con_id = leg.con_id
@@ -1904,7 +1868,9 @@ class HighLowCalculator(object):
                 if df_for_hv == True:
                     req_id = map_conid_action_bar_size_to_req_id[con_id][action]
                 else:
-                    req_id = map_conid_action_bar_size_to_req_id[con_id][action][bar_size]
+                    req_id = map_conid_action_bar_size_to_req_id[con_id][action][
+                        bar_size
+                    ]
             except Exception as exp:
                 # TODO - Remoe this later on
                 # print("Inside HighLowCal Line 1726", exp)
@@ -1936,7 +1902,6 @@ class HighLowCalculator(object):
         date_time_start,
         date_time_close,
     ):
-
         # Get combo obj
         try:
             local_unique_id_to_combo_obj = copy.deepcopy(
@@ -1973,7 +1938,6 @@ class HighLowCalculator(object):
         calculated_change_in_for_look_back_days = []
 
         for date_ith in all_date_values:
-
             # Filtering the dataframe for the 'date_ith'
             date_specific_dataframe_for_change_in_price = (
                 filtered_historical_data_dataframe[
@@ -1983,7 +1947,6 @@ class HighLowCalculator(object):
 
             # Save DF to CSV File (HV) Export data-frame to csv file
             if variables.flag_store_cas_tab_csv_files:
-
                 file_path = rf"{variables.cas_tab_csv_file_path}\Price\RelativeChange"
 
                 if not os.path.exists(file_path):
@@ -2025,20 +1988,15 @@ class HighLowCalculator(object):
                     1, most_recent_values_for_day_row["Combination Close"]
                 ) - math.log(
                     abs(day_start_values_for_day_row["Combination Close"]) + 1
-                ) * math.copysign(
-                    1, day_start_values_for_day_row["Combination Close"]
-                )
+                ) * math.copysign(1, day_start_values_for_day_row["Combination Close"])
 
             # Appending values in list
             calculated_change_in_for_look_back_days.append(abs(change_from_open_value))
 
         try:
-
             if calculated_change_in_for_look_back_days == []:
-
                 avg_of_change_in_prices_over_lookback = "N/A"
             else:
-
                 avg_of_change_in_prices_over_lookback = np.mean(
                     calculated_change_in_for_look_back_days
                 )
@@ -2052,7 +2010,6 @@ class HighLowCalculator(object):
 
     # Method to calculate beta value
     def calculate_beta_value(self, unique_id, index_data_frame, combination_data_frame):
-
         all_data_frames = [index_data_frame, combination_data_frame]
 
         merged_df = all_data_frames[0]
@@ -2060,7 +2017,7 @@ class HighLowCalculator(object):
         # Merging all data frames such that Time is available in all data frames
         for i, df_ith in enumerate(all_data_frames[1:]):
             merged_df = pd.merge(
-                merged_df, df_ith, on="Date", how="inner", suffixes=(f"", f" {i+1}")
+                merged_df, df_ith, on="Date", how="inner", suffixes=(f"", f" {i + 1}")
             )
 
         # Dropping nan values, if any
@@ -2075,29 +2032,23 @@ class HighLowCalculator(object):
         ]
 
         if len(merged_df) < 2:
-
             # Return Beta value 'N/A'
             return "N/A"
 
         try:
-
             # Calculating the return for index
             merged_df["Return For Index"] = np.log(
                 np.abs(merged_df["Index Close Price"]) + 1
             ) * np.sign(merged_df["Index Close Price"]) - np.log(
                 np.abs(merged_df["Index Close Price"].shift(1)) + 1
-            ) * np.sign(
-                merged_df["Index Close Price"].shift(1)
-            )
+            ) * np.sign(merged_df["Index Close Price"].shift(1))
 
             # Calculating the return for combination
             merged_df["Return For Combination"] = np.log(
                 np.abs(merged_df["Combination Close"]) + 1
             ) * np.sign(merged_df["Combination Close"]) - np.log(
                 np.abs(merged_df["Combination Close"].shift(1)) + 1
-            ) * np.sign(
-                merged_df["Combination Close"].shift(1)
-            )
+            ) * np.sign(merged_df["Combination Close"].shift(1))
 
             # Covariance b/t index and combination
             co_variance = merged_df["Return For Index"].cov(
@@ -2114,7 +2065,6 @@ class HighLowCalculator(object):
 
         # Save DF to CSV File (HV) Export data-frame to csv file
         if variables.flag_store_cas_tab_csv_files:
-
             file_path = rf"{variables.cas_tab_csv_file_path}\Beta"
 
             if not os.path.exists(file_path):
@@ -2127,7 +2077,6 @@ class HighLowCalculator(object):
             )
 
         try:
-
             co_variance = float(co_variance)
             variance = float(variance)
 
@@ -2151,7 +2100,6 @@ class HighLowCalculator(object):
     def historical_data_for_index(
         self, duration_size_for_index_data, bar_size_for_index_data
     ):
-
         # TODO KARAN ASHISH CRItiCAL tODO NEED TO CHeCK it
         # Getting req_id
         req_id = variables.app.nextorderId
@@ -2174,7 +2122,6 @@ class HighLowCalculator(object):
         while variables.cas_wait_time_for_historical_data > (
             counter * variables.sleep_time_waiting_for_tws_response
         ):
-
             # If reqHistorical Data ended for all the reqId or Got Error for any of the reqId
             if all([variables.req_mkt_data_end[req_id]]) or any(
                 [variables.req_error[req_id]]
@@ -2194,7 +2141,6 @@ class HighLowCalculator(object):
 
         # Save DF to CSV File (HV) Export data-frame to csv file
         if variables.flag_store_cas_tab_csv_files:
-
             file_path = rf"{variables.cas_tab_csv_file_path}\Beta"
 
             if not os.path.exists(file_path):
@@ -2210,12 +2156,10 @@ class HighLowCalculator(object):
 
     # Method to calculate last candle for order parameter
     def get_last_candle_for_order(self, conid_list=None, unique_id_added=None):
-
         # Init
         unique_id_to_candle_dict = {}
 
         try:
-
             # All active combos in the system
             local_unique_id_to_combo_obj = copy.deepcopy(
                 variables.unique_id_to_combo_obj
@@ -2238,7 +2182,7 @@ class HighLowCalculator(object):
                     unique_id_added: local_unique_id_to_combo_obj[unique_id_added]
                 }
 
-            #print(variables.order_parameter_candle_candle_size)
+            # print(variables.order_parameter_candle_candle_size)
 
             # Requesting Historical data for all the combos, for ATR Calculation
             map_conid_action_to_req_id = self.get_historical_data_for_hv(
@@ -2252,9 +2196,7 @@ class HighLowCalculator(object):
 
             # Getting the Combo Open and Close Dataframe for each combo,
             for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
                 try:
-
                     all_data_frames = (
                         self.get_the_dataframe_that_contains_historical_data_for_combo(
                             combo_obj, map_conid_action_to_req_id, df_for_candle
@@ -2263,10 +2205,8 @@ class HighLowCalculator(object):
 
                     # Save DF to CSV File (HV)
                     if variables.flag_store_cas_tab_csv_files:
-
                         # Save all DF to CSV
                         for i, df_hv_legwise in enumerate(all_data_frames):
-
                             file_path = rf"{variables.cas_tab_csv_file_path}\Order Parameter Candle\LegWise\Unique_id_{unique_id}"
 
                             if not os.path.exists(file_path):
@@ -2282,9 +2222,9 @@ class HighLowCalculator(object):
                     # If data is not present
                     for i, dataframe in enumerate(all_data_frames):
                         if (
-                                dataframe is None
-                                or len(dataframe.index) == 0
-                                or dataframe.empty
+                            dataframe is None
+                            or len(dataframe.index) == 0
+                            or dataframe.empty
                         ):
                             is_data_frame_empty = True
 
@@ -2302,7 +2242,6 @@ class HighLowCalculator(object):
 
                     # Save DF to CSV File
                     if variables.flag_store_cas_tab_csv_files:
-
                         # Saving dataframe to csv
                         file_path = rf"{variables.cas_tab_csv_file_path}\Order Parameter Candle\Merged"
 
@@ -2320,45 +2259,44 @@ class HighLowCalculator(object):
                     ].copy()
 
                     if combination_price_dataframe.empty:
-
                         continue
-
-
-
-
-
-
 
                     # Get the last row of the DataFrame
                     last_row = combination_price_dataframe.iloc[-2]
 
-                    high_val = max(last_row["Combination Open"], last_row["Combination Close"])
-                    low_val = min(last_row["Combination Open"], last_row["Combination Close"])
+                    high_val = max(
+                        last_row["Combination Open"], last_row["Combination Close"]
+                    )
+                    low_val = min(
+                        last_row["Combination Open"], last_row["Combination Close"]
+                    )
 
                     unique_id_to_candle_dict[unique_id] = {}
 
-                    unique_id_to_candle_dict[unique_id]['High Candle Value'] = round(high_val, 4)
-                    unique_id_to_candle_dict[unique_id]['Low Candle Value'] = round(low_val, 4)
+                    unique_id_to_candle_dict[unique_id]["High Candle Value"] = round(
+                        high_val, 4
+                    )
+                    unique_id_to_candle_dict[unique_id]["Low Candle Value"] = round(
+                        low_val, 4
+                    )
 
                     # assign value to global dictionary
-                    variables.map_unique_id_to_candle_for_order_values[
-                        unique_id
-                    ] = unique_id_to_candle_dict[unique_id]
+                    variables.map_unique_id_to_candle_for_order_values[unique_id] = (
+                        unique_id_to_candle_dict[unique_id]
+                    )
 
                 except Exception as e:
-
                     unique_id_to_candle_dict[unique_id] = {}
 
-                    unique_id_to_candle_dict[unique_id]['High Candle Value'] = "N/A"
-                    unique_id_to_candle_dict[unique_id]['Low Candle Value'] = "N/A"
+                    unique_id_to_candle_dict[unique_id]["High Candle Value"] = "N/A"
+                    unique_id_to_candle_dict[unique_id]["Low Candle Value"] = "N/A"
 
                     # assign value to global dictionary
-                    variables.map_unique_id_to_candle_for_order_values[
-                        unique_id
-                    ] = unique_id_to_candle_dict[unique_id]
+                    variables.map_unique_id_to_candle_for_order_values[unique_id] = (
+                        unique_id_to_candle_dict[unique_id]
+                    )
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(f"Exception inside 'calculate_atr_for_order', Exp: {e}")
@@ -2367,11 +2305,8 @@ class HighLowCalculator(object):
 
     # Method to calculate ATR as order parameter
     def calculate_atr_for_order(self, conid_list=None, unique_id_added=None):
-
         # Init
         unique_id_to_atr_dict = {}
-
-
 
         try:
             # Init
@@ -2411,9 +2346,7 @@ class HighLowCalculator(object):
 
             # Getting the Combo Open and Close Dataframe for each combo,
             for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
                 try:
-
                     all_data_frames = (
                         self.get_the_dataframe_that_contains_historical_data_for_combo(
                             combo_obj, map_conid_action_to_req_id, df_for_hv
@@ -2422,17 +2355,15 @@ class HighLowCalculator(object):
 
                     # Save DF to CSV File (HV)
                     if variables.flag_store_cas_tab_csv_files:
-
                         # Save all DF to CSV
                         for i, df_hv_legwise in enumerate(all_data_frames):
-
                             file_path = rf"{variables.cas_tab_csv_file_path}\Order Parameter ATR\LegWise\Unique_id_{unique_id}"
 
                             if not os.path.exists(file_path):
                                 os.makedirs(file_path)
 
                             df_hv_legwise.to_csv(
-                                rf"{file_path}\Leg_{i+1}.csv", index=False
+                                rf"{file_path}\Leg_{i + 1}.csv", index=False
                             )
 
                     # Data not found for any leg
@@ -2461,7 +2392,6 @@ class HighLowCalculator(object):
 
                     # Save DF to CSV File
                     if variables.flag_store_cas_tab_csv_files:
-
                         # Saving dataframe to csv
                         file_path = rf"{variables.cas_tab_csv_file_path}\Order Parameter ATR\Merged"
 
@@ -2488,31 +2418,27 @@ class HighLowCalculator(object):
                     unique_id_to_atr_dict[unique_id] = round(calculated_atr, 4)
 
                     # assign value to global dictionary
-                    variables.map_unique_id_to_atr_for_order_values[
-                        unique_id
-                    ] = unique_id_to_atr_dict[unique_id]
+                    variables.map_unique_id_to_atr_for_order_values[unique_id] = (
+                        unique_id_to_atr_dict[unique_id]
+                    )
 
                 except Exception as e:
-
                     unique_id_to_atr_dict[unique_id] = "N/A"
 
                     # assign value to global dictionary
-                    variables.map_unique_id_to_atr_for_order_values[
-                        unique_id
-                    ] = unique_id_to_atr_dict[unique_id]
+                    variables.map_unique_id_to_atr_for_order_values[unique_id] = (
+                        unique_id_to_atr_dict[unique_id]
+                    )
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
-
                 print(f"Exception inside 'calculate_atr_for_order', Exp: {e}")
 
             return "N/A"
 
     # Method to calculate HV values
     def calculate_hv_related_columns(self, conid_list=None, unique_id_added=None):
-
         # Calculate order parameter ATR
         # unique_id_to_order_parameter_atr_dict = self.calculate_atr_for_order()
 
@@ -2525,7 +2451,6 @@ class HighLowCalculator(object):
         )
 
         if conid_list != None:
-
             # Create a filtered dictionary using a dictionary comprehension
             cas_coinds_for_fetching_historical_data = {
                 key: cas_coinds_for_fetching_historical_data[key] for key in conid_list
@@ -2540,11 +2465,15 @@ class HighLowCalculator(object):
 
         max_id = 0
 
-        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(local_unique_id_to_combo_obj)
+        local_unique_id_to_combo_obj_loop_copy = copy.deepcopy(
+            local_unique_id_to_combo_obj
+        )
 
         for unique_id_combo in local_unique_id_to_combo_obj_loop_copy:
-
-            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {'Leg Unique Ids': [], 'Combo Obj List': []}
+            variables.map_unique_id_to_legs_unique_id[unique_id_combo] = {
+                "Leg Unique Ids": [],
+                "Combo Obj List": [],
+            }
 
             combo_obj = local_unique_id_to_combo_obj[unique_id_combo]
 
@@ -2553,12 +2482,26 @@ class HighLowCalculator(object):
             for leg_obj in all_legs:
                 max_id += 1
 
-                list_of_tuple_of_values = [(max_id, leg_obj.action, leg_obj.sec_type, leg_obj.symbol, 'None', 'None',
-                                            leg_obj.right, leg_obj.quantity,
-                                            leg_obj.multiplier, leg_obj.exchange,
-                                            leg_obj.trading_class, leg_obj.currency, leg_obj.con_id,
-                                            leg_obj.primary_exchange, leg_obj.strike_price,
-                                            leg_obj.expiry_date,)]
+                list_of_tuple_of_values = [
+                    (
+                        max_id,
+                        leg_obj.action,
+                        leg_obj.sec_type,
+                        leg_obj.symbol,
+                        "None",
+                        "None",
+                        leg_obj.right,
+                        leg_obj.quantity,
+                        leg_obj.multiplier,
+                        leg_obj.exchange,
+                        leg_obj.trading_class,
+                        leg_obj.currency,
+                        leg_obj.con_id,
+                        leg_obj.primary_exchange,
+                        leg_obj.strike_price,
+                        leg_obj.expiry_date,
+                    )
+                ]
 
                 # Create combination and check if there is any error
                 combination_obj = create_combination(
@@ -2567,9 +2510,13 @@ class HighLowCalculator(object):
                     input_from_cas_tab=True,
                 )
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Leg Unique Ids'].append(max_id * -1)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Leg Unique Ids"
+                ].append(max_id * -1)
 
-                variables.map_unique_id_to_legs_unique_id[unique_id_combo]['Combo Obj List'].append(combination_obj)
+                variables.map_unique_id_to_legs_unique_id[unique_id_combo][
+                    "Combo Obj List"
+                ].append(combination_obj)
 
                 local_unique_id_to_combo_obj[max_id * -1] = combination_obj
 
@@ -2588,7 +2535,6 @@ class HighLowCalculator(object):
 
         # Getting the Combo Open and Close Dataframe for each combo,
         for unique_id, combo_obj in local_unique_id_to_combo_obj.items():
-
             all_data_frames = (
                 self.get_the_dataframe_that_contains_historical_data_for_combo(
                     combo_obj, map_conid_action_to_req_id, df_for_hv
@@ -2597,16 +2543,14 @@ class HighLowCalculator(object):
 
             # Save DF to CSV File (HV)
             if variables.flag_store_cas_tab_csv_files:
-
                 # Save all DF to CSV
                 for i, df_hv_legwise in enumerate(all_data_frames):
-
                     file_path = rf"{variables.cas_tab_csv_file_path}\HV\LegWise\Unique_id_{unique_id}"
 
                     if not os.path.exists(file_path):
                         os.makedirs(file_path)
 
-                    df_hv_legwise.to_csv(rf"{file_path}\Leg_{i+1}.csv", index=False)
+                    df_hv_legwise.to_csv(rf"{file_path}\Leg_{i + 1}.csv", index=False)
 
             # Data not found for any leg
             is_data_frame_empty = False
@@ -2642,7 +2586,6 @@ class HighLowCalculator(object):
 
             # Save DF to CSV File
             if variables.flag_store_cas_tab_csv_files:
-
                 # Saving dataframe to csv
                 file_path = rf"{variables.cas_tab_csv_file_path}\HV\Merged"
 
@@ -2680,7 +2623,6 @@ class HighLowCalculator(object):
                 )
 
                 if unique_id in current_price_and_spread_of_combo_dict:
-
                     buy_price, sell_price = (
                         current_price_and_spread_of_combo_dict[unique_id]["BUY"],
                         current_price_and_spread_of_combo_dict[unique_id]["SELL"],
@@ -2690,19 +2632,19 @@ class HighLowCalculator(object):
                     avg_price_combo = (buy_price + sell_price) / 2
 
                 elif unique_id < 0:
-
                     for leg_obj in all_legs:
                         req_id = variables.con_id_to_req_id_dict[leg_obj.con_id]
-                        bid, ask = variables.bid_price[req_id], variables.ask_price[req_id]
+                        bid, ask = (
+                            variables.bid_price[req_id],
+                            variables.ask_price[req_id],
+                        )
                         # Avg. Price of combo
                         avg_price_combo = (ask + bid) / 2
 
                 else:
-
-                    avg_price_combo = 'N/A'
+                    avg_price_combo = "N/A"
 
             except Exception as e:
-
                 # Print to console:
                 if variables.flag_debug_mode:
                     print(f"Could not compute the H. V. Related value. Exception {e}")
@@ -2724,7 +2666,6 @@ class HighLowCalculator(object):
 
             # check if flag for calculating hv for daily candles is true
             if variables.flag_hv_daily:
-
                 # Get dataframe with 1 D candles
                 combination_price_dataframe_for_hv = self.group_dataframe_by_time_and_create_1d_candle_first_open_last_close(
                     combination_price_dataframe.copy()
@@ -2732,7 +2673,6 @@ class HighLowCalculator(object):
 
             # If flag for calculating hv for daily candles is false
             else:
-
                 combination_price_dataframe_for_hv = combination_price_dataframe.copy()
 
             # Calculate Historical volatility data
@@ -2745,9 +2685,7 @@ class HighLowCalculator(object):
 
             # Annualized Historical Volatility  (this will be showed in the GUI)
             if variables.flag_enable_hv_annualized:
-
                 if historical_volatility_value not in ["N/A", None]:
-
                     annualized_historical_volatility_value = (
                         historical_volatility_value
                         * math.sqrt(
@@ -2756,13 +2694,11 @@ class HighLowCalculator(object):
                     )
 
                 else:
-
                     annualized_historical_volatility_value = "N/A"
             else:
                 annualized_historical_volatility_value = historical_volatility_value
 
             if historical_volatility_value not in ["N/A", None]:
-
                 # Candle Volatility
                 candle_volatility_value = calculate_candle_volatility(
                     historical_volatility_value,
@@ -2771,12 +2707,10 @@ class HighLowCalculator(object):
                     number_of_candles_since_day_open,
                 )
             else:
-
                 candle_volatility_value = "N/A"
 
             # Print to console
             if variables.flag_debug_mode:
-
                 print(f"UniqueId: {unique_id}")
                 print(
                     variables.hv_method.name
@@ -2816,7 +2750,6 @@ class HighLowCalculator(object):
     def get_historical_data_for_hv(
         self, cas_coinds_for_fetching_historical_data, hv_look_back_days, hv_candle_size
     ):
-
         # Info 'cas_coinds_for_fetching_historical_data' contains dict {coind : {BUY : 1H 1D ,  SELL: 1H 1D} }
         cas_coinds_for_fetching_historical_data = (
             cas_coinds_for_fetching_historical_data
@@ -2836,7 +2769,6 @@ class HighLowCalculator(object):
 
         # To update long term values we need Daily Candles for which we need '1D' '1H' data.
         for conid, sub_info_dict in cas_coinds_for_fetching_historical_data.items():
-
             # Get Contract for conId
             contract = variables.map_con_id_to_contract[conid]
 
@@ -2845,7 +2777,6 @@ class HighLowCalculator(object):
                 map_conid_action_to_req_id[conid] = {}
 
             for action, sub_values in sub_info_dict.items():
-
                 # Create dict with conid as key
                 if action not in map_conid_action_to_req_id[conid]:
                     map_conid_action_to_req_id[conid][action] = None
@@ -2854,9 +2785,7 @@ class HighLowCalculator(object):
 
                 # Get data for bar_size, if leg is active in all combinations
                 for bar_size, sub_val in sub_values.items():
-
                     if sub_val > 0:
-
                         # Getting req_id from CAS APP
                         reqId = variables.cas_app.nextorderId
                         variables.cas_app.nextorderId += 1
@@ -2893,7 +2822,6 @@ class HighLowCalculator(object):
         while variables.cas_wait_time_for_historical_data > (
             counter * variables.sleep_time_waiting_for_tws_response
         ):
-
             # dict_mkt_end = variables.req_mkt_data_end
             # dicterr_msg = variables.req_error
             #

@@ -4,7 +4,6 @@ Created on 14-Mar-2023
 @author: Karan
 """
 
-
 from com import *
 from com.variables import *
 from com.mysql_io import *
@@ -26,7 +25,6 @@ class IBapi(
 
     # This callback is invoked when first connecting to TWS. Subsequently it will be invoked whenever variables.reqIds(-1) is requested.
     def nextValidId(self, orderId: int):
-
         super().nextValidId(orderId)
         variables.nextorderId = orderId
 
@@ -45,7 +43,6 @@ class IBapi(
         errorString: str,
         advancedOrderRejectJson="",
     ):
-
         # When we get a make some request like cancelling of subscription and it get excecuted
         # we receive "Error returned by TWS: reqId: -1  Error Code: 2100  Msg: API client has been unsubscribed from account data."
         # When reqId = -1 and flag_debug_mode is off we will not print this for user.
@@ -76,7 +73,6 @@ class IBapi(
             variables.req_error[reqId] = True
 
             if variables.flag_debug_mode:
-
                 print(
                     "Error returned by TWS: reqId:",
                     reqId,
@@ -150,7 +146,6 @@ class IBapi(
 
     # Callback for reqContractDetails
     def contractDetails(self, reqId: int, contractDetails):
-
         # Record in class variable
         variables.contract_details[reqId] = contractDetails
 
@@ -187,14 +182,12 @@ class IBapi(
 
         # get market rules for each rule id
         for rule_ids in list_of_all_rules:
-
             variables.map_con_id_to_rule_id[con_id] = rule_ids
 
             self.reqMarketRule(rule_ids)
 
     # Callback for reqContractDetails
     def contractDetailsEnd(self, reqId: int):
-
         super().contractDetailsEnd(reqId)
 
         # Indicates that the reqContractDetails response has ended
@@ -219,7 +212,6 @@ class IBapi(
         theta: float,
         undPrice: float,
     ):
-
         super().tickOptionComputation(
             reqId,
             tickType,
@@ -293,8 +285,6 @@ class IBapi(
             variables.options_vega[reqId] = vega
             variables.und_price[reqId] = undPrice
 
-
-
         # Print to console
         if (
             variables.flag_debug_mode
@@ -305,23 +295,17 @@ class IBapi(
                 f"Option delta is set for reqId : {reqId} delta_value : {variables.options_delta[reqId]}"
             )
 
-
         if tickType == 10:
-
             variables.options_iv_bid[reqId] = impliedVol
 
-
         elif tickType == 11:
-
             variables.options_iv_ask[reqId] = impliedVol
-        
+
         elif tickType == 12:
-            
             variables.options_iv_last[reqId] = impliedVol
 
     # Callback for reqMktData
     def tickSnapshotEnd(self, reqId: int):
-
         # Indicates that the reqMktData response has ended
         variables.req_mkt_data_end[reqId] = True
 
@@ -331,7 +315,6 @@ class IBapi(
 
     # Callback for reqHistoricalData
     def historicalData(self, reqId, bar):
-
         # Print to console
         if variables.flag_debug_mode:
             print("HistoricalData. ReqId:", reqId, "BarData.", bar)
@@ -353,7 +336,6 @@ class IBapi(
         # target_datetime = utc_timezone.localize(utc_datetime).astimezone(variables.target_timezone_obj)
 
         # bar_date = target_datetime.strftime('%Y-%m-%d %H:%M:%S')
-
 
         # Formatting bar_date and converting to users target_timezone
         # try:
@@ -390,7 +372,6 @@ class IBapi(
 
         # While Using Price Chart Making a dataframe
         if reqId in variables.map_req_id_to_historical_data_dataframe:
-
             # Add Row to dataframe (concat)
             variables.map_req_id_to_historical_data_dataframe[reqId] = pd.concat(
                 [variables.map_req_id_to_historical_data_dataframe[reqId], row],
@@ -422,7 +403,6 @@ class IBapi(
 
     # Callback for reqHistoricalData
     def historicalDataEnd(self, reqId: int, start: str, end: str):
-
         super().historicalDataEnd(reqId, start, end)
 
         # Indicates that the reqHistoricalData response has ended
@@ -438,37 +418,30 @@ class IBapi(
 
     # Callback for ticksize
     def tickSize(self, reqId: TickerId, tickType: TickType, size: float):
-
         super().tickSize(reqId, tickType, size)
 
         size = float(size)
-        
+
         # print(f"ReqID: {reqId} tickType {tickType}: {size}")
         # Updating ask price, if price is not -1
         if (tickType == TickTypeEnum.BID_SIZE) and (size != -1):
-
             variables.bid_size[reqId] = size
 
         # Updating ask price, if price is not -1
         if (tickType == TickTypeEnum.ASK_SIZE) and (size != -1):
-
             variables.ask_size[reqId] = size
 
         # Updating ask price, if price is not -1
         if (tickType == TickTypeEnum.VOLUME) and (size != -1):
-
             variables.volume[reqId] = size
-        
-        if (tickType == TickTypeEnum.OPTION_CALL_OPEN_INTEREST):
+
+        if tickType == TickTypeEnum.OPTION_CALL_OPEN_INTEREST:
             # print(f"ReqID: {reqId} Call OI: {size}")
             variables.call_option_open_interest[reqId] = size
 
-        if (tickType == TickTypeEnum.OPTION_PUT_OPEN_INTEREST):
-            
+        if tickType == TickTypeEnum.OPTION_PUT_OPEN_INTEREST:
             # print(f"ReqID: {reqId} Put OI: {size}")
             variables.put_option_open_interest[reqId] = size
-        
-
 
     # Callback for reqMktData (BID, ASK)
     def tickPrice(
@@ -494,7 +467,6 @@ class IBapi(
 
         # Updating bid price, if price is not -1
         if (tickType == TickTypeEnum.BID) and (price != -1):
-
             variables.bid_price[reqId] = price
 
         # Updating ask price, if price is not -1

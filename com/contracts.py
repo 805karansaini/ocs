@@ -23,7 +23,6 @@ def get_contract(
     primary_exchange=None,
     trading_class=None,
 ):
-
     # Creating contract
     contract = Contract()
 
@@ -56,7 +55,6 @@ def get_contract(
 
 # Function to request Contract Details from IBKR
 def get_contract_details(contract, req_id=None):
-
     if req_id is None:
         # Get reqId
         reqId = variables.nextorderId
@@ -93,14 +91,12 @@ def get_contract_details(contract, req_id=None):
     counter = 0
     # Wait for response from TWS
     while True:
-
         # (Error received for the request) OR (Timeout of 11 secs) OR (Response end indicated by API)
         if (
             (variables.req_error[reqId] == True)
             or (counter >= int(11 / variables.sleep_time_waiting_for_tws_response))
             or (variables.contract_details_end[reqId] == True)
         ):
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -115,7 +111,6 @@ def get_contract_details(contract, req_id=None):
 
         # Response not yet ended
         else:
-
             # Print to console
             if variables.flag_debug_mode:
                 print("Waiting for contract details from TWS for reqId = ", reqId)
@@ -131,7 +126,6 @@ def get_contract_details(contract, req_id=None):
 # To avoid wait time (for user) and Increase the contract_details wait time to 30sec (from 11sec) this function was created.
 # Used in Resolve Leg(leg_identifier)
 async def get_contract_details_async(contract, req_id=None):
-
     # Check if req id is none
     if req_id is None:
         # Get reqId
@@ -171,14 +165,12 @@ async def get_contract_details_async(contract, req_id=None):
 
     # Wait for response from TWS
     while True:
-
         # (Error received for the request) OR (Timeout of 30 secs) OR (Response end indicated by API)
         if (
             (variables.req_error[reqId] == True)
             or (counter >= int(30 / variables.sleep_time_waiting_for_tws_response))
             or (variables.contract_details_end[reqId] == True)
         ):
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -193,7 +185,6 @@ async def get_contract_details_async(contract, req_id=None):
 
         # Response not yet ended
         else:
-
             # Print to console
             if variables.flag_debug_mode:
                 print("Waiting for contract details from TWS for reqId = ", reqId)
@@ -207,7 +198,6 @@ async def get_contract_details_async(contract, req_id=None):
 def create_combo_contract(
     symbol, legs_exchange_list, combo_exchange, currency, conid_list, qty_list
 ):
-
     # Add underlying details
     contract = Contract()
     contract.symbol = symbol
@@ -240,7 +230,6 @@ def create_combo_contract(
 
 # Method tog et beta contract
 def get_beta_contract():
-
     # If user didnot gave incorrect input, return False. Indicating error
     if variables.index_select_for_beta_column not in ["QQQ", "SPY"]:
         return False
@@ -262,7 +251,6 @@ def get_beta_contract():
 
     # If we have contract detials setting the contract in global variable
     if contract_details != None:
-
         # Setting the beta contract in variables for further use
         variables.beta_contract = contract_details.contract
 

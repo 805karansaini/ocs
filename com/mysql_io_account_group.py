@@ -1,15 +1,14 @@
 from com.variables import *
 
+
 # Update columns in DB table
 def update_account_group_table_db(group_id, column_to_value_dict):
-
     query_update_account_group_values = (
         f"UPDATE `{variables.sql_table_account_group}` SET"
     )
 
     # Get columns and its values from dictionary
     for column_name in column_to_value_dict:
-
         # Add columns to update and its updated values
         query_update_account_group_values += (
             f" `{column_name}` = '{column_to_value_dict[column_name]}',"
@@ -31,7 +30,6 @@ def update_account_group_table_db(group_id, column_to_value_dict):
             )
 
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(
                 f"Unable to Execute the query to UPDATE the account group values for Group ID: {group_id}, Query : {query_update_account_group_values}, Exp: {e}"
@@ -40,9 +38,10 @@ def update_account_group_table_db(group_id, column_to_value_dict):
 
 # Method to insert new account group
 def insert_account_group_in_db(group_name):
-
-    query = f"INSERT INTO `{variables.sql_table_account_group}` ( `Group Name`, `Account IDs`) \
+    query = (
+        f"INSERT INTO `{variables.sql_table_account_group}` ( `Group Name`, `Account IDs`) \
          VALUES ( '{group_name}', '');"
+    )
 
     try:
         variables.active_sqlalchemy_connection.execute(query)
@@ -54,7 +53,6 @@ def insert_account_group_in_db(group_name):
             )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -76,7 +74,6 @@ def delete_account_group_in_db(group_id):
             )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -86,7 +83,6 @@ def delete_account_group_in_db(group_id):
 
 # Method to get all account groups
 def get_all_account_groups_from_db():
-
     query = f"SELECT * FROM `{variables.sql_table_account_group}`;"
 
     try:
@@ -104,7 +100,6 @@ def get_all_account_groups_from_db():
 
         return all_rows_df
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -116,7 +111,6 @@ def get_all_account_groups_from_db():
 
 # Method to get accounts in group
 def get_accounts_in_account_group_from_db(group_name):
-
     query = f"SELECT `Account IDs` FROM `{variables.sql_table_account_group}` WHERE `Group Name` = '{group_name}';"
 
     try:
@@ -134,7 +128,6 @@ def get_accounts_in_account_group_from_db(group_name):
             )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -143,9 +136,9 @@ def get_accounts_in_account_group_from_db(group_name):
 
         return "N/A"
 
+
 # Method to reset auto increment value
 def reset_group_id():
-
     query = f"ALTER TABLE `{variables.sql_table_account_group}` AUTO_INCREMENT = 1;"
 
     try:
@@ -156,7 +149,6 @@ def reset_group_id():
             print(f"Query successfully executed: {query}")
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Query Failed: {query}, Exception {e}")

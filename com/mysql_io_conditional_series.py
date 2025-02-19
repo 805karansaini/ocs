@@ -7,14 +7,13 @@ from com.mysql_io import (
     do_cas_condition_series_exists_for_unique_id_in_db,
 )
 
+
 # Method to get most recent series id from DB
 def get_series_id_db():
-
     # Initializing max ladder id variable
     max_series_id = 0
 
     try:
-
         # get max ladder id SQL query
         query = text(
             f"SELECT MAX(`Series ID`) FROM {variables.sql_table_conditional_series}"
@@ -28,10 +27,8 @@ def get_series_id_db():
         result = result.fetchone()[0]
 
         if result != None:
-
             result = int(result)
         else:
-
             result = 0
 
         max_series_id = max(max_series_id, result)
@@ -57,12 +54,10 @@ def get_series_id_db():
 
 # Method to get most recent sequence id from DB
 def get_sequence_id_db():
-
     # Initializing max ladder id variable
     max_sequence_id = 0
 
     try:
-
         # get max ladder id SQL query
         query = text(
             f"SELECT MAX(`Sequence ID`) FROM {variables.sql_table_conditional_series_sequence}"
@@ -76,10 +71,8 @@ def get_sequence_id_db():
         result = result.fetchone()[0]
 
         if result != None:
-
             result = int(result)
         else:
-
             result = 0
 
         max_sequence_id = max(max_sequence_id, result)
@@ -91,7 +84,6 @@ def get_sequence_id_db():
             )
 
     except Exception as e:
-
         max_sequence_id = None
 
         # Print to console
@@ -101,6 +93,7 @@ def get_sequence_id_db():
             )
     # print(f"{max_sequence_id=}")
     return max_sequence_id
+
 
 # Method to execute insert queries for conditional series
 def execute_all_insert_queries(
@@ -115,17 +108,13 @@ def execute_all_insert_queries(
     try:
         # Start a transaction
         with session.begin() as transaction:
-
             result = session.execute(series_query)
 
             for query_list in position_query_list:
-
                 for query in query_list:
-
                     session.execute(query)
 
             for query_list in cas_legs_query_list:
-
                 for query in query_list:
                     session.execute(query)
 
@@ -137,7 +126,6 @@ def execute_all_insert_queries(
         session.rollback()
 
         if variables.flag_debug_mode:
-
             print(f"Transaction failed: {e}")
 
     finally:
@@ -150,7 +138,6 @@ def insert_conditional_series_instance_values_to_conditional_series_table(
     values_dict, return_only=False
 ):
     try:
-
         # Get unique id for which conditional series is being created
         unique_id = values_dict["Unique ID"]
 
@@ -183,7 +170,6 @@ def insert_conditional_series_instance_values_to_conditional_series_table(
 
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f"Unique ID= {unique_id}, Query successfully executed for inserting new series values ",
                 query,
@@ -192,11 +178,10 @@ def insert_conditional_series_instance_values_to_conditional_series_table(
         # If query executed successfully then return true and 'no error' message
         return True, "No Error", "No Error"
     except Exception as e:
-
         # Show an error popup unable to insert a scale trader.
-        error_title = (
-            error_string
-        ) = "Error, Query failed for inserting new conditional series values"
+        error_title = error_string = (
+            "Error, Query failed for inserting new conditional series values"
+        )
 
         variables.screen.display_error_popup(error_title, error_string)
 
@@ -255,11 +240,10 @@ def insert_conditional_series_sequence_instance_values_to_conditional_series_seq
         # If query executed successfully then return true and 'no error' message
         return True, "No Error", "No Error"
     except Exception as e:
-
         # Show an error popup unable to insert a scale trader.
-        error_title = (
-            error_string
-        ) = "Error, Query failed for inserting new conditional series sequence values"
+        error_title = error_string = (
+            "Error, Query failed for inserting new conditional series sequence values"
+        )
 
         variables.screen.display_error_popup(error_title, error_string)
 
@@ -294,7 +278,6 @@ def insert_cas_legs_for_series_db(
 
     # Loop over leg object and insert it into the database
     for leg_obj in buy_legs + sell_legs:
-
         action = leg_obj.action
         symbol = leg_obj.symbol
         sec_type = leg_obj.sec_type
@@ -328,7 +311,6 @@ def insert_cas_legs_for_series_db(
             time.sleep(variables.sleep_time_db)
 
         except Exception as e:
-
             if variables.flag_debug_mode:
                 print(
                     f"Unable to insert the identified cas legs for series in to database, Unique ID: {unique_id}"
@@ -346,13 +328,11 @@ def insert_positions_for_series(
     unique_id,
     return_only=False,
 ):
-
     # print([reference_positions, target_positions])
 
     query_list = []
 
     for account in target_positions:
-
         ref_position = reference_positions[account]
 
         target_pos = target_positions[account]
@@ -378,7 +358,6 @@ def insert_positions_for_series(
             time.sleep(variables.sleep_time_db)
 
         except Exception as e:
-
             if variables.flag_debug_mode:
                 print(
                     f"Unable to insert the positions for series in to database, Sequence ID: {sequence_id}"
@@ -386,11 +365,10 @@ def insert_positions_for_series(
 
     return query_list
 
+
 # Method to update data in series db table to relaunch
 def relaunch_series_db(old_unique_id, new_unique_id, series_id):
-
     try:
-
         # update conditional series table
         query = text(
             f"UPDATE `{variables.sql_table_conditional_series}` SET `Unique ID` = '{new_unique_id}' WHERE `Unique ID` = '{old_unique_id}' AND `Series ID`='{series_id}'"
@@ -476,14 +454,12 @@ def relaunch_series_db(old_unique_id, new_unique_id, series_id):
         result = variables.active_sqlalchemy_connection.execute(query)
 
     except Exception as e:
-
         if variables.flag_debug_mode:
-
             print(f"Exception inside 'relaunch_series_db', Exp: {e}")
+
 
 # Method to get conditional seres table in dataframe
 def get_conditional_series_df(flag_inactive=False):
-
     if flag_inactive:
         # Query to get all rows from the DB
         query_get_all_rows = text(
@@ -524,9 +500,9 @@ def get_conditional_series_df(flag_inactive=False):
 
         return pd.DataFrame()
 
+
 # Method to fetch all sequences of series
 def get_all_sequences_of_series(series_id, flag_active=False):
-
     # Query to get all rows from the DB
     query_get_all_rows = text(
         f"SELECT * FROM `{variables.sql_table_conditional_series_sequence}` WHERE `Series ID`={series_id}"
@@ -567,6 +543,7 @@ def get_all_sequences_of_series(series_id, flag_active=False):
 
         return pd.DataFrame()
 
+
 # Method to fetch details of next sequence in series
 def get_next_sequences_of_series(series_id):
     # Query to get all rows from the DB
@@ -601,6 +578,7 @@ def get_next_sequences_of_series(series_id):
             )
 
         return pd.DataFrame()
+
 
 # Method to get cas legs for series
 def get_series_cas_legs_df(sequence_id):
@@ -637,6 +615,7 @@ def get_series_cas_legs_df(sequence_id):
 
         return pd.DataFrame()
 
+
 # Method to fetch positions from series db table
 def get_positions_from_series_positions_table(sequence_id):
     # Query to get all rows from the DB
@@ -671,6 +650,7 @@ def get_positions_from_series_positions_table(sequence_id):
             )
 
         return pd.DataFrame()
+
 
 # Method to fetch position for series
 def get_positions_from_series_positions_table_for_series(series_id):
@@ -731,7 +711,6 @@ def update_conditional_series_table_values(series_id, values_to_update_dict):
             )
 
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(
                 f"Unable to Execute the query to UPDATE the series values for Series ID: {series_id}, Query : {query}, Exp: {e}"
@@ -768,11 +747,11 @@ def update_conditional_series_sequence_table_values(
             )
 
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(
                 f"Unable to Execute the query to UPDATE the series sequence values for Series ID: {sequence_id}, Query : {query}, Exp: {e}"
             )
+
 
 # Method to get db table in dataframe
 def get_table_db(table_name):
@@ -805,11 +784,10 @@ def get_table_db(table_name):
 
         return pd.DataFrame()
 
+
 # Method to delete series from db tables
 def delete_series_db(series_id):
-
     try:
-
         # delete from conditional series table
         query = text(
             f"DELETE FROM `{variables.sql_table_conditional_series}` WHERE `Series ID` = '{series_id}'"
@@ -838,10 +816,9 @@ def delete_series_db(series_id):
 
         result = variables.active_sqlalchemy_connection.execute(query)
     except Exception as e:
-
         if variables.flag_debug_mode:
-
             print(f"Query failed inside 'series_id', Exp: {e} ")
+
 
 # Method to update unique ids in db table for series
 def update_unique_id_series_db(
@@ -852,9 +829,7 @@ def update_unique_id_series_db(
     series_id=None,
 ):
     try:
-
         if not flag_series:
-
             new_unique_id = new_unique_id_for_old_combo
 
         # delete from conditional series table
@@ -920,9 +895,9 @@ def update_unique_id_series_db(
 
         result = variables.active_sqlalchemy_connection.execute(query)
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(f"Query failed inside 'series_id', Exp: {e} ")
+
 
 # Method to fetch series id for unique id
 def get_series_id_for_deleted_unique_id(unique_id):
@@ -942,7 +917,6 @@ def get_series_id_for_deleted_unique_id(unique_id):
         all_rows_df = pd.DataFrame(all_rows)
 
         if all_rows_df.empty:
-
             return []
 
         series_id_list = all_rows_df["Series ID"].to_list()
@@ -955,24 +929,21 @@ def get_series_id_for_deleted_unique_id(unique_id):
 
         return series_id_list
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Could not get rows, Query Failed: {query_get_all_rows}")
 
         return []
 
+
 # Method to make series fail for deleted unique id
 def series_fail_for_deleted_unique_id(unique_id):
-
     try:
-
         series_id_list = get_series_id_for_deleted_unique_id(unique_id)
 
         series_id_list = list(set(series_id_list))
 
         if series_id_list == []:
-
             return
 
         # Convert the list elements to strings and join them with commas
@@ -987,7 +958,6 @@ def series_fail_for_deleted_unique_id(unique_id):
         result = variables.active_sqlalchemy_connection.execute(update_query)
 
     except Exception as e:
-
         if variables.flag_debug_mode:
             print(f"Query failed inside 'series_id', Exp: {e} ")
 
@@ -998,12 +968,10 @@ def get_series_column_value_from_db(
 ):
     # When series id is not none
     if series_id != None:
-
         query = f"""SELECT `{column_name_as_in_db}` FROM `{variables.sql_table_conditional_series}` WHERE `Series ID` = '{series_id}' """
 
     # When sequence id is not none
     elif sequence_id != None:
-
         query = f"""SELECT `{column_name_as_in_db}` FROM `{variables.sql_table_conditional_series_sequence}` WHERE `Sequence ID` = '{sequence_id}' """
 
     try:
@@ -1015,16 +983,11 @@ def get_series_column_value_from_db(
                 f"Getting series {column_name_as_in_db} from DB table, Query successfully executed: {query}"
             )
 
-
-
         column_value = str(result.fetchall()[0][0])
-
-
 
         return column_value
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(

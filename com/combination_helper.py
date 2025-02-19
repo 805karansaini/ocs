@@ -3,6 +3,7 @@ Created on 15-Mar-2023
 
 @author: Karan
 """
+
 import time
 
 from com.leg import *
@@ -16,16 +17,13 @@ from com.leg_identifier import *
 
 # To check if values if int or not
 def is_integer(num):
-
     try:
-
         # check if reminder is zero or not
         if float(num) % 1 != 0:
             return False
         else:
             return True
     except Exception as e:
-
         return False
 
 
@@ -33,7 +31,6 @@ def is_integer(num):
 def create_combination(
     user_combination_input, input_from_db=False, input_from_cas_tab=False
 ):
-
     # Print to console
     if variables.flag_debug_mode:
         print("\nCreating Combination: ")
@@ -54,7 +51,6 @@ def create_combination(
 
     # First check all the legs, if the sufficient info not given throw error, Then try resolving the legs (get conid etc)
     for leg_no, row in all_rows_df.iterrows():
-
         # If we have conid we will not throw any error
         is_con_id_available_for_leg = False
 
@@ -161,7 +157,6 @@ def create_combination(
 
         # If Values are blank set these to 'None'
         for column_name in leg_columns:
-
             if (column_name != "Unique ID") and (
                 (leg_specs_dict[unique_id][column_name] == "")
                 or (leg_specs_dict[unique_id][column_name] == "None")
@@ -204,7 +199,6 @@ def create_combination(
             # If DTE is negative or non integer value
             if leg_specs_dict[unique_id]["DTE"] != None:
                 try:
-
                     # validate vlaue is integer or not
                     if not is_integer(leg_specs_dict[unique_id]["DTE"]):
                         raise Exception(f"Combo Leg:{leg_no + 1}, DTE must be numeric.")
@@ -286,7 +280,6 @@ def create_combination(
 
             #### For (STK, FUT, OPT and FOP) --> Lot Size is required #####
             if leg_specs_dict[unique_id]["Lot Size"] == None:
-
                 return (
                     True,
                     f"Missing Multiplier",
@@ -295,7 +288,6 @@ def create_combination(
                 )
 
             else:
-
                 try:
                     if not is_integer(leg_specs_dict[unique_id]["Lot Size"]):
                         raise Exception(
@@ -325,7 +317,6 @@ def create_combination(
 
             #### For (FUT, OPT and FOP) --> DTE or Expiry is required #####
             if leg_specs_dict[unique_id]["SecType"] in ["FUT", "OPT", "FOP"]:
-
                 # We must have DTE or Expiry
                 if (
                     leg_specs_dict[unique_id]["DTE"] == None
@@ -340,7 +331,6 @@ def create_combination(
 
             #### For (OPT and FOP) --> [Strike or Delta] and  [DTE (OPT) or Expiry (OPT)] is required #####
             if leg_specs_dict[unique_id]["SecType"] in ["OPT", "FOP"]:
-
                 # Right is required
                 if leg_specs_dict[unique_id]["Right"] == None or (
                     leg_specs_dict[unique_id]["Right"]
@@ -372,7 +362,6 @@ def create_combination(
 
             #### For FOP --> Trading Class is required #####
             if leg_specs_dict[unique_id]["SecType"] == "FOP":
-
                 if leg_specs_dict[unique_id]["Trading Class"] == None:
                     return (
                         True,
@@ -405,7 +394,6 @@ def create_combination(
 
     # Processing individual leg_dict, to get conid.
     for leg_no, leg_dict in enumerate(legs_dict_list):
-
         # Init Variables
         action = leg_dict["Action"]
         symbol = leg_dict["Symbol"]
@@ -428,7 +416,6 @@ def create_combination(
 
         # we need to resolve this FUT which is without expiry_date and con_id
         if (sec_type == "FUT") and (expiry_date == None) and (con_id == None):
-
             # Adding leg which needs to be resolved
             legs_needs_to_be_solved.append(
                 (
@@ -460,7 +447,6 @@ def create_combination(
             and (con_id == None)
             and (expiry_date == None or strike_price == None)
         ):
-
             # Adding leg which needs to be resolved
             legs_needs_to_be_solved.append(
                 (
@@ -488,7 +474,6 @@ def create_combination(
 
         # Resolve these legs, STK/Full info legs
         else:
-
             # Create contract for adding to leg_obj,
             contract = get_contract(
                 symbol,
@@ -510,7 +495,6 @@ def create_combination(
 
             # Throw error pop can not get contract id
             if contract_details == None:
-
                 # Give error not able to find Contract ID
                 return (
                     True,
@@ -520,7 +504,6 @@ def create_combination(
                 )
 
             else:
-
                 # Contract
                 contract = contract_details.contract
 
@@ -596,31 +579,33 @@ def create_combination(
         # Print to console
         if variables.flag_debug_mode:
             print(
-                f"Time took to resolve {len(legs_needs_to_be_solved)} legs :{end-start}"
+                f"Time took to resolve {len(legs_needs_to_be_solved)} legs :{end - start}"
             )
             print(f"Contract Details : {contracts_details}")
 
         for leg_info, contract_details in zip(
             legs_needs_to_be_solved, contracts_details
         ):
-
             # unpack user prodived info for leg object,
-            leg_no, (
-                action,
-                symbol,
-                sec_type,
-                exchange,
-                currency,
-                quantity,
-                expiry_date,
-                strike_price,
-                right,
-                multiplier,
-                con_id,
-                primary_exchange,
-                trading_class,
-                dte,
-                delta,
+            (
+                leg_no,
+                (
+                    action,
+                    symbol,
+                    sec_type,
+                    exchange,
+                    currency,
+                    quantity,
+                    expiry_date,
+                    strike_price,
+                    right,
+                    multiplier,
+                    con_id,
+                    primary_exchange,
+                    trading_class,
+                    dte,
+                    delta,
+                ),
             ) = leg_info
 
             # Throw error pop can not get contract id
@@ -704,13 +689,11 @@ def create_combination(
 
     # If CAS
     if input_from_cas_tab == True:
-
         # Create combination object
         combination_obj = Combination(unique_id, leg_obj_list)
 
         # # Checking Combo type, and map con_id to contract
         for leg_obj_ in combination_obj.buy_legs + combination_obj.sell_legs:
-
             if leg_obj_.sec_type in ["OPT", "FOP"]:
                 only_stk_fut = False
 
@@ -719,10 +702,8 @@ def create_combination(
 
         # if from db, only return the combination
         if input_from_db:
-
             return combination_obj
         else:
-
             return False, "no error", "no error", combination_obj
 
     # Init Variables for Treeview - Combination table
@@ -730,7 +711,6 @@ def create_combination(
 
     # Counting sec_type of legs
     for leg_obj in leg_obj_list:
-
         sec_type = leg_obj.sec_type
 
         # Keeping count, of sec_type to insert in active combo GUI table
@@ -782,12 +762,10 @@ def create_combination(
 
     # check if df is empty
     if all_combination_order.empty:
-
         # Init
         all_account_ids_in_order_book = []
 
     else:
-
         # all account ids in order book
         all_account_ids_in_order_book = all_combination_order["Account ID"].to_list()
 
@@ -807,7 +785,6 @@ def create_combination(
 
     # iterate accounts in current session
     for account_id in all_account_ids_in_system:
-
         # Row Value in combination position tab in GUI (unique_id. #Legs, Tickers, Positions)
         value_of_row_in_positions_table = (
             unique_id,
@@ -830,7 +807,6 @@ def create_combination(
 
         # check watchlist value
         if variables.unique_id_list_of_selected_watchlist == "ALL":
-
             # Add row to the Positions table
             variables.screen.screen_position_obj.insert_positions_in_positions_table(
                 value_of_row_in_positions_table
@@ -851,7 +827,6 @@ def create_combination(
             )
 
     except Exception as e:
-
         # Print to Console
         print(f"Error occured while inserting cas table row, is {e}")
 
@@ -860,7 +835,6 @@ def create_combination(
 
     # # Checking Combo type, and map con_id to contract
     for leg_obj_ in combination_obj.buy_legs + combination_obj.sell_legs:
-
         if leg_obj_.sec_type in ["OPT", "FOP"]:
             only_stk_fut = False
 
@@ -903,7 +877,6 @@ def create_combination(
 
 # Subscribes the market data for combination, all legs if not already subscribed, and insert the (nones) in market watch for first time
 def subscribe_mktdata_combo_obj(combination_obj):
-
     # Print to console
     if variables.flag_debug_mode:
         print(f"Subscribing the market data for {combination_obj}")
@@ -920,7 +893,6 @@ def subscribe_mktdata_combo_obj(combination_obj):
 
     # Subscribing Bid-Ask for all the legs
     for leg_obj in all_leg_objs:
-
         # Contract to subscribe the data, ConId to make sure we are subscribing only once.
         contract = leg_obj.contract
         con_id = contract.conId
@@ -969,7 +941,6 @@ def subscribe_mktdata_combo_obj(combination_obj):
 
 # Deletes combination, unsubscribe mkt data, moves data from active DB to Archive DB, (also removes all the Orders from the OrderBook -- order_time is iid in table)
 def delete_combination(unique_id):
-
     # Print to console
     if variables.flag_debug_mode:
         print(f"Unique ID={unique_id}, Deleting combination")
@@ -995,13 +966,11 @@ def delete_combination(unique_id):
 
     # Checking Combo type, and map con_id to contract
     for leg_obj_ in all_leg_objs:
-
         if leg_obj_.sec_type in ["OPT", "FOP"]:
             only_stk_fut = False
 
     # Processing all legs and canceling sub if required
     for leg_obj in all_leg_objs:
-
         # ConId of leg
         con_id = leg_obj.contract.conId
 
@@ -1014,13 +983,11 @@ def delete_combination(unique_id):
 
         # Decrease the Count which data is required how many times for CAS
         if only_stk_fut:
-
             variables.cas_map_con_id_to_action_type_and_combo_type[con_id][action][
                 "1D"
             ] -= 1
 
         else:
-
             variables.cas_map_con_id_to_action_type_and_combo_type[con_id][action][
                 "1H"
             ] -= 1
@@ -1062,13 +1029,11 @@ def delete_combination(unique_id):
 
         # Checking Combo type, and map con_id to contract
         for leg_obj_ in all_leg_objs:
-
             if leg_obj_.sec_type in ["OPT", "FOP"]:
                 only_stk_fut = False
 
         # Processing all legs and canceling sub if required
         for leg_obj in all_leg_objs:
-
             # ConId of leg
             con_id = leg_obj.contract.conId
 
@@ -1077,12 +1042,10 @@ def delete_combination(unique_id):
 
             # Decrease the Count which data is required how many times for CAS
             if only_stk_fut:
-
                 variables.cas_conditional_legs_map_con_id_to_action_type_and_combo_type[
                     con_id
                 ][action]["1D"] -= 1
             else:
-
                 variables.cas_conditional_legs_map_con_id_to_action_type_and_combo_type[
                     con_id
                 ][action]["1H"] -= 1
@@ -1095,7 +1058,6 @@ def delete_combination(unique_id):
     # print(order_time_list)
     # Remove if orders are present in order book
     if len(order_time_list):
-
         variables.screen.remove_row_from_order_book(order_time_list)
 
     # Move all the data from active table to archive database
@@ -1128,7 +1090,6 @@ def delete_combination(unique_id):
 
 # Gets all the combination order from DB, then Inserts combo_order_status inside order_book_tab - screen gui
 def insert_combo_order_status_in_order_book(order_book_last_cleaned_time=None):
-
     # Get all the orders from the DB.
     combo_order_status_dataframe = get_all_combinaiton_orders_from_db(
         order_book_last_cleaned_time
@@ -1136,7 +1097,6 @@ def insert_combo_order_status_in_order_book(order_book_last_cleaned_time=None):
 
     # Insert each order from DB to Screen GUI
     for _, row in combo_order_status_dataframe.iterrows():
-
         # Init
         unique_id = row["Unique ID"]
         action = row["Action"]
@@ -1162,7 +1122,7 @@ def insert_combo_order_status_in_order_book(order_book_last_cleaned_time=None):
 
         limit_iv = row["Limit IV"].strip()
         trigger_iv = row["Trigger IV"].strip()
-        actual_entry_price = row['Actual Entry Price'].strip()
+        actual_entry_price = row["Actual Entry Price"].strip()
 
         # Formatting Values
         if entry_price != "None":
@@ -1205,7 +1165,7 @@ def insert_combo_order_status_in_order_book(order_book_last_cleaned_time=None):
             execution_engine,
             limit_iv,
             trigger_iv,
-            actual_entry_price
+            actual_entry_price,
         )
 
         # Creating dataframe for row data
@@ -1228,7 +1188,6 @@ def insert_combo_order_status_in_order_book(order_book_last_cleaned_time=None):
             int(unique_id)
             in [int(_) for _ in local_unique_id_list_of_selected_watchlist.split(",")]
         ):
-
             # Insert the value value inside of combo_order_status_order_book
             variables.screen.insert_combo_order_status_order_book(
                 (
@@ -1255,7 +1214,7 @@ def insert_combo_order_status_in_order_book(order_book_last_cleaned_time=None):
                     execution_engine,
                     limit_iv,
                     trigger_iv,
-                    actual_entry_price
+                    actual_entry_price,
                 )
             )
 
@@ -1266,7 +1225,6 @@ def insert_combo_order_status_in_order_book(order_book_last_cleaned_time=None):
 
 # Method to update execution orders
 def update_execution_engine_orders():
-
     # Print to console
     if variables.flag_debug_mode:
         print("Checking and Trying to update execution engine orders.")
@@ -1305,7 +1263,6 @@ def update_execution_engine_orders():
 
         # Check if Sent order is filled.
         for _, row in all_combo_orders_status_sent.iterrows():
-
             # Strip all the values
             order_ids_of_pending_combo = row["Order IDs"].strip()
 
@@ -1348,10 +1305,8 @@ def update_execution_engine_orders():
                 and len(all_legs) > 1
                 and execution_engine == "True"
             ):
-
                 # If any order id is in not filled state, do not update status to filled.
                 for leg_order_id in order_ids_of_pending_combo.split(","):
-
                     # Get stripped value
                     leg_order_id = leg_order_id.strip()
 
@@ -1360,7 +1315,6 @@ def update_execution_engine_orders():
                         break
 
                     else:
-
                         # get quantity
                         symbol_quantity = get_ticker_order_status_db(leg_order_id)
 
@@ -1369,7 +1323,6 @@ def update_execution_engine_orders():
 
                         # Sending order for each leg one by one
                         for leg_obj in all_legs:
-
                             # Contract
                             contract = leg_obj.contract
 
@@ -1379,15 +1332,14 @@ def update_execution_engine_orders():
                             # ticker string
                             ticker_str = (
                                 leg_obj.symbol
-                                +","
-                                +str(order_qty)
-                                +","
-                                +str(contract.conId)
+                                + ","
+                                + str(order_qty)
+                                + ","
+                                + str(contract.conId)
                             )
 
                             # skip leg with highest spread
                             if not flag_matched and ticker_str == symbol_quantity:
-
                                 # Toggle flag
                                 flag_matched = True
 
@@ -1406,7 +1358,6 @@ def update_execution_engine_orders():
                                 )
 
                             try:
-
                                 # Getting the Order Type if order is for the sequence of a ladder.
                                 if ladder_id not in [None, "None"]:
                                     order_type_scale_trade = (
@@ -1417,7 +1368,6 @@ def update_execution_engine_orders():
                                     )
 
                             except Exception as e:
-
                                 # Print to console
                                 if variables.flag_debug_mode:
                                     print(
@@ -1426,21 +1376,17 @@ def update_execution_engine_orders():
 
                             # if ladder id is present
                             if ladder_id != "None":
-
                                 # Temp, Descriptions
                                 entry_exit_order = "Limit"
                                 order_type_des = str(order_action)
 
                                 # if order is ib algo market
                                 if order_type_scale_trade == "IB Algo Market":
-
                                     ib_algo_mkt = True
 
                             else:
-
                                 # if order is ib algo market
                                 if order_type_of_original_order == "IB Algo Market":
-
                                     ib_algo_mkt = True
 
                                 # Temp, Descriptions
@@ -1470,10 +1416,8 @@ def update_execution_engine_orders():
                                 time.sleep(variables.sleep_time_db)
 
                             except Exception as e:
-
                                 # Print to console
                                 if variables.flag_debug_mode:
-
                                     print(
                                         f"Exception inside sending order afetr limit order of execution engine: Exp {e}"
                                     )
@@ -1482,10 +1426,8 @@ def update_execution_engine_orders():
                 pass
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(f"Exception inside updating execution engine orders, Exp: {e}")
 
 
@@ -1493,7 +1435,6 @@ def update_execution_engine_orders():
 # Explaination: When MKT orde is placed by user The status is set to 'Sent', When Lim, SL, TlSL, is placed status is set to 'pending'
 #               once the Lim, SL, tlSL is triggered status is updated in db as well as in order book to 'Sent', so this function only updates from 'sent' to 'filled'
 def update_combination_status_in_db_and_order_book(flag_update_scale_trade_order=False):
-
     # Print to console
     if variables.flag_debug_mode:
         print(
@@ -1534,7 +1475,6 @@ def update_combination_status_in_db_and_order_book(flag_update_scale_trade_order
 
         # Check if Sent order is filled.
         for _, row in all_combo_orders_status_sent.iterrows():
-
             # Strip all the values
             order_ids_of_pending_combo = row["Order IDs"].strip()
 
@@ -1569,22 +1509,17 @@ def update_combination_status_in_db_and_order_book(flag_update_scale_trade_order
                 len(order_ids_of_pending_combo.split(",")) < len(all_legs)
                 and flag_execution_engine == "True"
             ):
-
                 continue
             else:
-
                 pass
 
             # If any order id is in not filled state, do not update status to filled.
             for leg_order_id in order_ids_of_pending_combo.split(","):
-
                 leg_order_id = leg_order_id.strip()
 
                 if int(leg_order_id) in all_order_ids_set:
-
                     break
             else:
-
                 # Init Variables for updating
                 unique_id = row["Unique ID"]
                 original_order_time = row["Order Time"]
@@ -1615,22 +1550,24 @@ def update_combination_status_in_db_and_order_book(flag_update_scale_trade_order
                 # print([avg_fill_prices, order_action, all_legs])
 
                 # Iterate fill prices, action and leg objects
-                for price, action, leg_obj in zip(avg_fill_prices, order_action, all_legs):
-
+                for price, action, leg_obj in zip(
+                    avg_fill_prices, order_action, all_legs
+                ):
                     # If action is buy
-                    if action in ['BUY']:
-
+                    if action in ["BUY"]:
                         # calculate actual entry price
-                        actual_entry_price += float(price) * leg_obj.quantity * leg_obj.multiplier
+                        actual_entry_price += (
+                            float(price) * leg_obj.quantity * leg_obj.multiplier
+                        )
 
                     else:
-
                         # Calculate entry price
-                        actual_entry_price += float(price) * -1 * leg_obj.quantity * leg_obj.multiplier
+                        actual_entry_price += (
+                            float(price) * -1 * leg_obj.quantity * leg_obj.multiplier
+                        )
 
                 # if order action is SELL
-                if combo_order_action in ['SELL']:
-
+                if combo_order_action in ["SELL"]:
                     # make sign of actual entry price opposite
                     actual_entry_price *= -1
 
@@ -1692,7 +1629,6 @@ def update_combination_status_in_db_and_order_book(flag_update_scale_trade_order
 
                 # Check if flag for updating scale trade orers is true
                 if flag_update_scale_trade_order:
-
                     return
 
                 # Print to console
@@ -1712,11 +1648,10 @@ def update_combination_status_in_db_and_order_book(flag_update_scale_trade_order
                 )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(f"Exception in update_combination_status_in_db_and_order_book {e}")
+
 
 ##################################################
 # Version 1
@@ -1748,7 +1683,6 @@ def get_unique_id_combolegs_dict(dataframe_containing_legs):
 
         # check if unique ids is present in dict
         if unique_id in unique_id_to_combolegs_dict:
-
             # append values
             unique_id_to_combolegs_dict[unique_id].append(
                 (
@@ -1771,7 +1705,6 @@ def get_unique_id_combolegs_dict(dataframe_containing_legs):
                 )
             )
         else:
-
             # Init
             unique_id_to_combolegs_dict[unique_id] = []
 
@@ -1802,13 +1735,11 @@ def get_unique_id_combolegs_dict(dataframe_containing_legs):
 
 # Method to ad cas condition in cas condition table after app starts
 def insert_cas_conditions_in_cas_conditions_table_from_db(only_pending):
-
     # Get all the CAS Condition from DB, (DataFrame)
     all_cas_conditions = get_all_cas_conditions_from_db(only_pending)
 
     # Iterate cas condition rows
     for _, row in all_cas_conditions.iterrows():
-
         # Init
         unique_id = row["Unique ID"]
         trading_combination_unique_id = row["Trading Combination Unique ID"]
@@ -1832,16 +1763,13 @@ def insert_cas_conditions_in_cas_conditions_table_from_db(only_pending):
 
         # chekc if series id is not none
         if series_id not in ["None", "N/A", None]:
-
             # convert to int
             series_id = int(series_id)
 
         # check if cas order is add/switch
         if cas_condition_type in ["ADD", "SWITCH"]:
-
             # check if unique id is not present in dict
             if int(unique_id) not in variables.cas_unique_id_to_combo_obj:
-
                 # Init
                 cas_combo_for_unique_id = "None"
 
@@ -1858,7 +1786,6 @@ def insert_cas_conditions_in_cas_conditions_table_from_db(only_pending):
                     cas_combo_for_unique_id
                 )
         else:
-
             # Set to N/A
             incremental_combo_tickes_info_string = "N/A"
 
@@ -1904,7 +1831,6 @@ def insert_cas_conditions_in_cas_conditions_table_from_db(only_pending):
             str(unique_id) in local_unique_id_list_of_selected_watchlist.split(",")
             or local_unique_id_list_of_selected_watchlist == "ALL"
         ):
-
             # Insert the row value inside of cas_conditional_tab
             variables.screen.screen_cas_obj.insert_cas_condition_row_in_cas_condition_table(
                 (

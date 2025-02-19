@@ -20,6 +20,7 @@ from com.upload_combo_to_application import (
     make_informative_combo_string,
 )
 
+
 # Class for coditional series tab
 class ScreenConditionalSeries(object):
     def __init__(self, master_notebook):
@@ -37,7 +38,6 @@ class ScreenConditionalSeries(object):
 
     # Method to create GUI for filter tab
     def create_conditional_series_tab(self):
-
         # Create Treeview Frame for conditional_series instances
         conditional_series_table_frame = ttk.Frame(
             self.conditional_series_tab, padding=10
@@ -126,7 +126,6 @@ class ScreenConditionalSeries(object):
 
     # Method to define conditional table right click options
     def conditional_series_table_right_click(self, event):
-
         # get the Treeview row that was clicked
         row = self.conditional_series_table.identify_row(event.y)
 
@@ -141,7 +140,9 @@ class ScreenConditionalSeries(object):
             )
             menu.add_command(label="Start Series", command=lambda: self.start_series())
             menu.add_command(label="Stop Series", command=lambda: self.stop_series())
-            menu.add_command(label="Unpark Series", command=lambda: self.unpark_series())
+            menu.add_command(
+                label="Unpark Series", command=lambda: self.unpark_series()
+            )
             menu.add_command(label="Park Series", command=lambda: self.park_series())
             menu.add_command(
                 label="Delete Series", command=lambda: self.delete_series()
@@ -166,11 +167,8 @@ class ScreenConditionalSeries(object):
         old_unique_id=None,
         new_unique_id_for_old_combo=None,
     ):
-
         try:
-
             if new_unique_id != None:
-
                 update_unique_id_series_db(
                     new_unique_id,
                     old_unique_id,
@@ -248,12 +246,10 @@ class ScreenConditionalSeries(object):
 
         except Exception as e:
             if variables.flag_debug_mode:
-
                 print(e)
 
     # Method to upload csv file to app to create series
     def upload_series_from_csv_to_app(self, file_path, upload_series_button):
-
         try:
             # get csv file from file path
             series_dataframe = pd.read_csv(file_path)
@@ -283,7 +279,6 @@ class ScreenConditionalSeries(object):
             return
 
         try:
-
             # get column names
             columns_list = series_dataframe.columns
 
@@ -308,12 +303,10 @@ class ScreenConditionalSeries(object):
             ]
 
             try:
-
                 # rename columns
                 series_dataframe.columns = new_column_names
 
             except Exception as e:
-
                 # Error Message
                 error_title = f"Error, Columns are invalid, at line no: {1}"
                 error_string = f"Error, Columns are invalid, at line no: {1}"
@@ -666,7 +659,6 @@ class ScreenConditionalSeries(object):
 
             # check if df is empty
             if local_conditional_series_table.empty:
-
                 all_series_ids_in_system = []
 
             else:
@@ -708,7 +700,7 @@ class ScreenConditionalSeries(object):
                 return
 
             # Number of CAS Conditions that exists
-            '''number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(base_uid)
+            """number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(base_uid)
 
             number_of_conditions += do_cas_condition_series_exists_for_unique_id_in_db(
                 base_uid
@@ -722,16 +714,13 @@ class ScreenConditionalSeries(object):
                     f"Unique ID : {base_uid}, Conditional order or series already exists",
                     "A Conditional order or series already exists, can not add another.",
                 )
-                return'''
-
+                return"""
 
             # check account ids provide are right or not
             if account_id.count("|") > 0:
-
                 account_id = account_id.split("|")
 
                 for account in account_id:
-
                     if account not in variables.current_session_accounts:
                         # Error Message
                         error_title = f"Error, Account ID is not in system"
@@ -745,7 +734,6 @@ class ScreenConditionalSeries(object):
 
                         return
             else:
-
                 if account_id not in variables.current_session_accounts:
                     # Error Message
                     error_title = f"Error, Account ID is not in system"
@@ -804,7 +792,6 @@ class ScreenConditionalSeries(object):
 
             # check if count is more than 0 for '|'
             if account_id.count("|") > 0:
-
                 # set value to true
                 flag_multi = True
 
@@ -812,7 +799,6 @@ class ScreenConditionalSeries(object):
             for ind_seq, (seq_start, seq_end) in enumerate(
                 zip(seq_start_index, seq_end_index)
             ):
-
                 # get values
                 cas_type = series_dataframe.at[seq_start + 2, "Column 3"]
 
@@ -845,21 +831,16 @@ class ScreenConditionalSeries(object):
                     return
 
                 else:
-
                     if cas_type in ["ADD", "SWITCH"]:
-
                         temp_uid = eval_uid_seq_val
 
                     else:
-
                         temp_uid = base_uid
 
                     try:
-
                         if (
                             isinstance(temp_uid, str) and temp_uid.isnumeric()
                         ) or isinstance(temp_uid, int):
-
                             reference_price_seq = (
                                 variables.unique_id_to_prices_dict[int(temp_uid)]["BUY"]
                                 + variables.unique_id_to_prices_dict[int(temp_uid)][
@@ -868,11 +849,9 @@ class ScreenConditionalSeries(object):
                             ) / 2
 
                         else:
-
                             reference_price_seq = None
 
                     except Exception as e:
-
                         reference_price_seq = None
 
                         if variables.flag_debug_mode:
@@ -889,16 +868,13 @@ class ScreenConditionalSeries(object):
                             or isinstance(temp_uid, int)
                             and len(variables.current_session_accounts) == 1
                         ):
-
                             reference_position_seq = local_unique_id_to_positions_dict[
                                 int(temp_uid)
                             ][variables.current_session_accounts[0]]
 
                         else:
-
                             reference_position_seq = None
                     except Exception as e:
-
                         reference_position_seq = None
 
                         if variables.flag_debug_mode:
@@ -922,7 +898,6 @@ class ScreenConditionalSeries(object):
 
                 # check if order type is valid
                 if cas_type not in ["ADD", "SWITCH", "BUY", "SELL"]:
-
                     # Error Message
                     error_title = "Error, cas type value is invalid"
                     error_string = (
@@ -937,7 +912,6 @@ class ScreenConditionalSeries(object):
 
                 # check for cas type add or switch
                 if cas_type in ["ADD", "SWITCH"]:
-
                     # check if evaluation uid is numeric
                     if not eval_uid_seq_val.isnumeric():
                         # Error Message
@@ -962,7 +936,6 @@ class ScreenConditionalSeries(object):
                         return
 
                 else:
-
                     # checking if trading uid is numeric
                     if not trading_uid_seq.isnumeric():
                         # Error Message
@@ -1010,7 +983,6 @@ class ScreenConditionalSeries(object):
 
                     # checking fr flag multi
                     if flag_multi:
-
                         if not is_float(qnty_seq):
                             # Error Message
                             error_title = "Error, Quantity is invalid"
@@ -1027,7 +999,6 @@ class ScreenConditionalSeries(object):
                             return
 
                     else:
-
                         # hecking if quanity is numeric
                         if not qnty_seq.isnumeric():
                             # Error Message
@@ -1157,7 +1128,6 @@ class ScreenConditionalSeries(object):
                     cas_type in ["ADD", "SWITCH"]
                     and tags_list[indx_tag] != "#EndOfSequenceLeg"
                 ):
-
                     # check if tag is for sequence leg values
                     if tags_list[indx_tag] != "#SequenceLeg":
                         # Error Message
@@ -1212,7 +1182,6 @@ class ScreenConditionalSeries(object):
 
                 # if cas type is add or switch
                 if cas_type in ["ADD", "SWITCH"]:
-
                     # Create combination one by one
                     combination_obj = create_combo_wrapper(
                         list_of_tuple_of_values,
@@ -1260,7 +1229,6 @@ class ScreenConditionalSeries(object):
                     cas_type in ["ADD", "SWITCH"]
                     and tags_list[indx_tag] != "#EndOfSequencePosition"
                 ):
-
                     if tags_list[indx_tag] != "#SequencePosition":
                         # Error Message
                         error_title = (
@@ -1331,18 +1299,15 @@ class ScreenConditionalSeries(object):
 
                     # chekc if combo obj is not none
                     if combination_obj != None:
-
                         ticker_info_string = make_informative_combo_string(
                             combination_obj
                         )
 
                 if flag_multi and cas_type in ["BUY", "SELL"]:
-
                     # Init
                     map_account_to_quanity_dict = {}
 
                     try:
-
                         # Getting initial trigger price
                         price = (
                             variables.unique_id_to_prices_dict[int(trading_uid_seq)][
@@ -1355,10 +1320,8 @@ class ScreenConditionalSeries(object):
 
                         # Iterating account ids
                         for account in account_id.split("|"):
-
                             # Getting value of account parameter
                             if variables.account_parameter_for_order_quantity == "NLV":
-
                                 value_of_account_parameter = (
                                     variables.accounts_table_dataframe.loc[
                                         variables.accounts_table_dataframe["Account ID"]
@@ -1370,7 +1333,6 @@ class ScreenConditionalSeries(object):
                             elif (
                                 variables.account_parameter_for_order_quantity == "SMA"
                             ):
-
                                 value_of_account_parameter = (
                                     variables.accounts_table_dataframe.loc[
                                         variables.accounts_table_dataframe["Account ID"]
@@ -1382,7 +1344,6 @@ class ScreenConditionalSeries(object):
                             elif (
                                 variables.account_parameter_for_order_quantity == "CEL"
                             ):
-
                                 value_of_account_parameter = (
                                     variables.accounts_table_dataframe.loc[
                                         variables.accounts_table_dataframe["Account ID"]
@@ -1412,7 +1373,6 @@ class ScreenConditionalSeries(object):
 
                             # Calculate combo qunaity for account id
                             if float(price) != 0:
-
                                 # get quantity in percentage
                                 combo_quantity = float(qnty_seq)
 
@@ -1426,7 +1386,6 @@ class ScreenConditionalSeries(object):
                                 )
 
                             else:
-
                                 # set to zero
                                 combo_quantity_for_account = 0
 
@@ -1436,7 +1395,6 @@ class ScreenConditionalSeries(object):
                             ref_pos_dict[account] = 0
 
                     except Exception as e:
-
                         # error message
                         error_title = f"For Unique ID: {base_uid}, Could not get quantity for accounts"
                         error_string = f"For Unique ID: {base_uid}, Could not get quantity for accounts"
@@ -1503,26 +1461,21 @@ class ScreenConditionalSeries(object):
             flag_condition_passed = True
 
             try:
-
                 if (isinstance(eval_uid, str) and eval_uid.isnumeric()) or isinstance(
                     eval_uid, int
                 ):
-
                     reference_price = (
                         variables.unique_id_to_prices_dict[int(eval_uid)]["BUY"]
                         + variables.unique_id_to_prices_dict[int(eval_uid)]["SELL"]
                     ) / 2
 
                 else:
-
                     reference_price = None
 
             except Exception as e:
-
                 reference_price = None
 
                 if variables.flag_debug_mode:
-
                     print(f"Exception for getting price for combo, Exp: {e}")
 
             if (
@@ -1530,9 +1483,9 @@ class ScreenConditionalSeries(object):
                 or "Price Decrease By" in condition_text
             ) and reference_price == None:
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Reference price not available for series condition"
+                error_title = error_string = (
+                    f"Error, Reference price not available for series condition"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -1540,15 +1493,14 @@ class ScreenConditionalSeries(object):
             reference_position = None
 
             if len(variables.current_session_accounts) == 1:
-
                 if (
                     "Price Adverse Chg By" in condition_text
                     or "Price Favorable Chg By" in condition_text
                 ) and reference_price == None:
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Reference price not available for series condition"
+                    error_title = error_string = (
+                        f"Error, Reference price not available for series condition"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
@@ -1562,7 +1514,6 @@ class ScreenConditionalSeries(object):
                     if (
                         isinstance(eval_uid, str) and eval_uid.isnumeric()
                     ) or isinstance(eval_uid, int):
-
                         reference_position = local_unique_id_to_positions_dict[
                             int(eval_uid)
                         ][variables.current_session_accounts[0]]
@@ -1571,7 +1522,6 @@ class ScreenConditionalSeries(object):
                         reference_position = None
 
                 except Exception as e:
-
                     reference_position = None
 
                     if variables.flag_debug_mode:
@@ -1582,9 +1532,9 @@ class ScreenConditionalSeries(object):
                     or "Price Favorable Chg By" in condition_text
                 ) and reference_position in [None]:
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Reference position not available for series condition"
+                    error_title = error_string = (
+                        f"Error, Reference position not available for series condition"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
@@ -1594,23 +1544,22 @@ class ScreenConditionalSeries(object):
                     or "Price Favorable Chg By" in condition_text
                 ) and reference_position == 0:
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Reference position should not be 0 for series condition"
+                    error_title = error_string = (
+                        f"Error, Reference position should not be 0 for series condition"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
 
             else:
-
                 if (
                     "Price Adverse Chg By" in condition_text
                     or "Price Favorable Chg By" in condition_text
                 ):
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Price favourable/Adverse not allowed for multiple accounts\nin series condition"
+                    error_title = error_string = (
+                        f"Error, Price favourable/Adverse not allowed for multiple accounts\nin series condition"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
@@ -1618,29 +1567,27 @@ class ScreenConditionalSeries(object):
                 condition_list = sequence_df["Condition"].to_list()
 
                 for condition_item in condition_list:
-
                     if (
                         "Price Adverse Chg By" in condition_item
                         or "Price Favorable Chg By" in condition_item
                     ):
                         # Error Message
-                        error_title = (
-                            error_string
-                        ) = f"Error, Price favourable/Adverse not allowed for multiple accounts\nin sequence condition"
+                        error_title = error_string = (
+                            f"Error, Price favourable/Adverse not allowed for multiple accounts\nin sequence condition"
+                        )
                         variables.screen.display_error_popup(error_title, error_string)
 
                         return
 
             # check if conition text is not none
             if condition_text != "None":
-
                 # Validate Condition Here
                 flag_condition_passed, error_string = check_basic_condition(
                     condition_text, None, reference_price, None
                 )
 
             # check if both conditions are empty
-            '''if condition_text == "None" and series_id_cond == "None":
+            """if condition_text == "None" and series_id_cond == "None":
                 # Error Message
                 error_title = (
                     f"Error, Both combination condition and series condition are empty"
@@ -1651,13 +1598,15 @@ class ScreenConditionalSeries(object):
 
                 variables.screen.display_error_popup(error_title, error_string)
 
-                return'''
+                return"""
 
             # check if eval uid is not present
             if condition_text != "None" and eval_uid == "None":
                 # Error Message
                 error_title = f"Error, Evalaution unique id should be present"
-                error_string = f"Error, Evalaution unique id should be present, at line no: {3}"
+                error_string = (
+                    f"Error, Evalaution unique id should be present, at line no: {3}"
+                )
 
                 error_string = make_multiline_mssg_for_gui_popup(error_string)
 
@@ -1669,8 +1618,20 @@ class ScreenConditionalSeries(object):
             if condition_text != "None" and not flag_condition_passed:
                 # Error Message
                 error_title = f"Error, Condition is invalid"
+                error_string = f"Error, Condition is invalid, at line no: {3}"
+
+                error_string = make_multiline_mssg_for_gui_popup(error_string)
+
+                variables.screen.display_error_popup(error_title, error_string)
+
+                return
+
+            # check if eval uid is valid
+            if condition_text != "None" and not eval_uid.isnumeric():
+                # Error Message
+                error_title = f"Error, Evaluation unique id should be numeric"
                 error_string = (
-                    f"Error, Condition is invalid, at line no: {3}"
+                    f"Error, Evaluation unique id should be numeric, at line no: {3}"
                 )
 
                 error_string = make_multiline_mssg_for_gui_popup(error_string)
@@ -1679,24 +1640,12 @@ class ScreenConditionalSeries(object):
 
                 return
 
-
-
             # check if eval uid is valid
-            if condition_text != "None" and not eval_uid.isnumeric():
+            if condition_text == "None" and eval_uid != "None":
                 # Error Message
-                error_title = f"Error, Evaluation unique id should be numeric"
-                error_string = f"Error, Evaluation unique id should be numeric, at line no: {3}"
-
-                error_string = make_multiline_mssg_for_gui_popup(error_string)
-
-                variables.screen.display_error_popup(error_title, error_string)
-
-                return
-
-            # check if eval uid is valid
-            if condition_text == "None" and eval_uid != 'None':
-                # Error Message
-                error_title = f"Error, For evaluation unique id condition text not available"
+                error_title = (
+                    f"Error, For evaluation unique id condition text not available"
+                )
                 error_string = f"Error, For evaluation unique id condition text not available, at line no: {3}"
 
                 error_string = make_multiline_mssg_for_gui_popup(error_string)
@@ -1709,7 +1658,9 @@ class ScreenConditionalSeries(object):
             if eval_uid.isnumeric() and int(eval_uid) not in all_unique_ids_in_system:
                 # Error Message
                 error_title = f"Error, Evalaution unique id is not in system"
-                error_string = f"Error, Evalaution unique id is not in system, at line no: {3}"
+                error_string = (
+                    f"Error, Evalaution unique id is not in system, at line no: {3}"
+                )
 
                 error_string = make_multiline_mssg_for_gui_popup(error_string)
 
@@ -1721,9 +1672,7 @@ class ScreenConditionalSeries(object):
             if not series_id_cond.isnumeric() and series_id_cond != "None":
                 # Error Message
                 error_title = f"Error, Series id should be numeric"
-                error_string = (
-                    f"Error, Series id should be numeric, at line no: {3}"
-                )
+                error_string = f"Error, Series id should be numeric, at line no: {3}"
 
                 error_string = make_multiline_mssg_for_gui_popup(error_string)
 
@@ -1738,9 +1687,7 @@ class ScreenConditionalSeries(object):
             ):
                 # Error Message
                 error_title = f"Error, Series id not in system"
-                error_string = (
-                    f"Error, Series id not in system, at line no: {3}"
-                )
+                error_string = f"Error, Series id not in system, at line no: {3}"
 
                 error_string = make_multiline_mssg_for_gui_popup(error_string)
 
@@ -1785,11 +1732,9 @@ class ScreenConditionalSeries(object):
 
             # get boolean value for execution engine flag
             if execution_engine in ["TRUE", "True", "true"]:
-
                 execution_engine = True
 
             else:
-
                 execution_engine = False
 
             condition_text = condition_text.replace("%", "%%")
@@ -1856,7 +1801,6 @@ class ScreenConditionalSeries(object):
             for target_position, reference_position, sequence_id in zip(
                 target_positions_list, reference_positions_list, sequence_id_list
             ):
-
                 if target_position not in ["None", None]:
                     pos_query = insert_positions_for_series(
                         reference_position,
@@ -1882,7 +1826,6 @@ class ScreenConditionalSeries(object):
 
             # insert combo objects of sequences
             for combo_obj, sequence_id_combo in zip(combo_obj_list, sequence_id_list):
-
                 if combo_obj not in ["None", None]:
                     cas_legs_query = insert_cas_legs_for_series_db(
                         combo_obj,
@@ -1927,12 +1870,10 @@ class ScreenConditionalSeries(object):
             # print('success')
 
         except Exception as e:
-
             print(f"Exception inside 'import series', Exp: {e}")
 
     # Method to upload series from app to csv file
     def import_series(self, upload_series_button):
-
         # Disabled upload combinations button
         upload_series_button.config(state="disabled")
 
@@ -1950,7 +1891,6 @@ class ScreenConditionalSeries(object):
             upload_combo_thread.start()
 
         else:
-
             # enabled upload combinations button
             upload_series_button.config(state="normal")
 
@@ -1966,9 +1906,7 @@ class ScreenConditionalSeries(object):
         indx,
         unique_id,
     ):
-
         try:
-
             # Get latest combo prices
             prices_unique_id = copy.deepcopy(variables.unique_id_to_prices_dict)
 
@@ -1986,7 +1924,6 @@ class ScreenConditionalSeries(object):
 
         # Limit Orders
         if order_type == "LIMIT":
-
             order_type = "LIMIT"
             try:
                 limit_price = float(limit_price)
@@ -2023,10 +1960,8 @@ class ScreenConditionalSeries(object):
 
         # Stop Loss Orders
         elif order_type == "STOP LOSS":
-
             # Check if both trigger price and atr multiple is empty
             if trigger_price == "None" and atr_multiple == "None":
-
                 error_title = (
                     f"Error, Row no - {indx + 2}, Invalid combination of values"
                 )
@@ -2059,7 +1994,6 @@ class ScreenConditionalSeries(object):
             elif (trigger_price == "None" and atr_multiple != "None") or (
                 trigger_price != "None" and atr_multiple != "None"
             ):
-
                 # Get ATR value
                 atr = get_atr_value_for_unique_id(unique_id)
 
@@ -2120,10 +2054,8 @@ class ScreenConditionalSeries(object):
 
         # Trailing Stop Loss Orders
         elif order_type == "TRAILING STOP LOSS":
-
             # Check if both trail value and atr multiple is empty
             if trail_value == "None" and atr_multiple == "None":
-
                 error_title = (
                     f"Error, Row no - {indx + 2}, Invalid combination of values"
                 )
@@ -2148,7 +2080,6 @@ class ScreenConditionalSeries(object):
             elif (trail_value == "None" and atr_multiple != "None") or (
                 trail_value != "None" and atr_multiple != "None"
             ):
-
                 # Get ATR value
                 atr = get_atr_value_for_unique_id(unique_id)
 
@@ -2189,16 +2120,12 @@ class ScreenConditionalSeries(object):
 
     # Method to download series to csv file
     def export_series(self):
-
         try:
-
             try:
-
                 # get values from selected rows
                 selected_item = self.conditional_series_table.selection()[0]
 
             except Exception as e:
-
                 return
 
             # get the item ID of the selected row
@@ -2368,13 +2295,11 @@ class ScreenConditionalSeries(object):
             target_postions_lst = []
 
             # check sequence id, cas type and quanity for each row
-            for (seq_id, cas_type_db, qnty) in zip(
+            for seq_id, cas_type_db, qnty in zip(
                 sequence_ids_list, cas_type_lst, qnty_lst
             ):
-
                 # check if cas type is add or switch
                 if cas_type_db in ["ADD", "SWITCH"]:
-
                     # Creates and return combolegs dict, for further process (combo_creation, inserting in cas condition table and viewing)
                     sequence_id_to_combolegs_df = get_series_cas_legs_df(seq_id)
 
@@ -2449,7 +2374,6 @@ class ScreenConditionalSeries(object):
                     target_postions_lst.append(account_target_positions_dict)
 
                 else:
-
                     # check if quantity is none for buy or sell
                     if qnty in ["None"]:
                         # get position for add or switch
@@ -2479,7 +2403,6 @@ class ScreenConditionalSeries(object):
                         ref_position_lst.append(account_reference_positions_dict)
 
                     else:
-
                         # append
                         combo_obj_lst.append("None")
                         ref_position_lst.append("None")
@@ -2493,7 +2416,6 @@ class ScreenConditionalSeries(object):
             series_seq_df_db["Target Position"] = target_postions_lst
 
             for ind, row in series_seq_df_db.iterrows():
-
                 palce_holder_list = [""] * (15)
 
                 # create list for start of combination row
@@ -2591,7 +2513,6 @@ class ScreenConditionalSeries(object):
 
                 # in case of add or switch
                 if cas_type in ["ADD", "SWITCH"]:
-
                     # create list for start of combination row
                     data_list = [
                         [
@@ -2632,7 +2553,6 @@ class ScreenConditionalSeries(object):
                     all_legs = buy_legs + sell_legs
 
                     for leg_obj in all_legs:
-
                         # create list for start of combination row
                         data_list = [
                             [
@@ -2762,22 +2682,15 @@ class ScreenConditionalSeries(object):
                 # Save the DataFrame as a CSV file
                 series_dataframe_to_csv.to_csv(file_path, index=False)
         except Exception as e:
-
             print(f"Exception Inoside 'export_series Exp: {e}")
-
-
-
 
     # Method to edit series
     def edit_series(self):
-
         try:
-
             # get values from selected rows
             selected_item = self.conditional_series_table.selection()[0]
 
         except Exception as e:
-
             return
 
         # get the item ID of the selected row
@@ -2831,7 +2744,6 @@ class ScreenConditionalSeries(object):
         account_lst = account_id.split(",")
 
         if not positions_df.empty:
-
             account_lst = account_id.split(",") + positions_df["Account ID"].to_list()
 
             account_lst = list(set(account_lst))
@@ -2852,12 +2764,10 @@ class ScreenConditionalSeries(object):
         fail_account_lst = []
 
         for accnt_id in account_lst:
-
             if accnt_id not in variables.current_session_accounts:
                 fail_account_lst.append(accnt_id)
 
         if fail_account_lst != []:
-
             error_string = make_multiline_mssg_for_gui_popup(
                 f"Account ID: {account_lst} not present in current session"
             )
@@ -2928,14 +2838,11 @@ class ScreenConditionalSeries(object):
 
     # Method to relaucn series
     def relaunch_series(self):
-
         try:
-
             # get values from selected rows
             selected_item = self.conditional_series_table.selection()[0]
 
         except Exception as e:
-
             return
 
         # get the item ID of the selected row
@@ -2953,7 +2860,6 @@ class ScreenConditionalSeries(object):
                 "A Conditional series is not completed or terminated,\nso can not be relaunched.",
             )
             return
-
 
         # get values for selected series
         unique_id = int(values[1])
@@ -2991,7 +2897,6 @@ class ScreenConditionalSeries(object):
         fail_account_lst = []
 
         for accnt_id in account_lst:
-
             if accnt_id not in variables.current_session_accounts:
                 fail_account_lst.append(accnt_id)
 
@@ -3011,7 +2916,6 @@ class ScreenConditionalSeries(object):
         flag_multi = False
 
         if mulit_account in ["True", True]:
-
             flag_multi = True
 
         # get all sequences for series
@@ -3073,7 +2977,6 @@ class ScreenConditionalSeries(object):
         flag_series=False,
         series_id=None,
     ):
-
         update_unique_id_series_db(
             new_combo_unique_id,
             unique_id,
@@ -3084,16 +2987,12 @@ class ScreenConditionalSeries(object):
 
     # Method to delete series
     def delete_series(self, selected_item=None):
-
         if selected_item == None:
-
             try:
-
                 # get values from selected rows
                 selected_item = self.conditional_series_table.selection()[0]
 
             except Exception as e:
-
                 return
 
         values = self.conditional_series_table.item(
@@ -3118,18 +3017,14 @@ class ScreenConditionalSeries(object):
 
     # Method to start series
     def start_series(self, selected_item=None):
-
         flag_place_nxt_order = True
 
         if selected_item == None:
-
             try:
-
                 # get values from selected rows
                 selected_item = self.conditional_series_table.selection()[0]
 
             except Exception as e:
-
                 return
             # get the item ID of the selected row
 
@@ -3155,7 +3050,6 @@ class ScreenConditionalSeries(object):
             flag_multi = True
 
         if account_id.count(",") == 0:
-
             if account_id not in variables.current_session_accounts:
                 # Throw Error Popup
                 variables.screen.display_error_popup(
@@ -3165,11 +3059,9 @@ class ScreenConditionalSeries(object):
                 return
 
         else:
-
             fail_account_lst = []
 
             for accnt_id in account_id.split(","):
-
                 if accnt_id not in variables.current_session_accounts:
                     fail_account_lst.append(accnt_id)
 
@@ -3191,12 +3083,10 @@ class ScreenConditionalSeries(object):
             status in ["Active", "Completed", "Failed", "Terminated"]
             and not flag_place_nxt_order
         ):
-
             return
 
         # check if status is already active
         if status in ["Terminated"] and flag_place_nxt_order:
-
             return
 
         # check if status is already active
@@ -3204,7 +3094,7 @@ class ScreenConditionalSeries(object):
             return
 
         # Number of CAS Conditions that exists
-        '''number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(unique_id)
+        """number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(unique_id)
 
         # If a condition already exists, display error popup
         if number_of_conditions > 0:
@@ -3214,8 +3104,7 @@ class ScreenConditionalSeries(object):
                 f"Unique ID : {unique_id}, Condition already exists",
                 "A Condition already exists, can not add another.",
             )
-            return'''
-
+            return"""
 
         # get active sequence for series
         active_sequence_item = get_all_sequences_of_series(series_id, flag_active=True)
@@ -3246,7 +3135,6 @@ class ScreenConditionalSeries(object):
 
         # Trying to get the reference price
         try:
-
             local_combo_buy_sell_price_dict = copy.deepcopy(
                 variables.unique_id_to_prices_dict[int(evalaution_unique_id)]
             )
@@ -3259,7 +3147,6 @@ class ScreenConditionalSeries(object):
             )
         except Exception as e:
             if variables.flag_debug_mode:
-
                 print(e)
             # TODO
             variables.screen.display_error_popup(
@@ -3278,7 +3165,6 @@ class ScreenConditionalSeries(object):
         flag_multi_account = False
 
         if flag_multi and cas_type not in ["ADD", "SWITCH"]:
-
             # get position for add or switch
             positions_df = get_positions_from_series_positions_table(sequence_id)
 
@@ -3297,27 +3183,20 @@ class ScreenConditionalSeries(object):
 
             # getting current reference position
             try:
-
                 for account in account_reference_positions_dict:
-
                     if (
                         int(evalaution_unique_id) in local_unique_id_to_positions_dict
                         and account
                         in local_unique_id_to_positions_dict[int(evalaution_unique_id)]
                     ):
-
-                        account_reference_positions_dict[
-                            account
-                        ] = local_unique_id_to_positions_dict[
-                            int(evalaution_unique_id)
-                        ][
-                            account
-                        ]
+                        account_reference_positions_dict[account] = (
+                            local_unique_id_to_positions_dict[
+                                int(evalaution_unique_id)
+                            ][account]
+                        )
 
             except Exception as e:
-
                 if variables.flag_debug_mode:
-
                     print(
                         f"Exception inside getting current reference posisiton, Exp: {e}"
                     )
@@ -3327,14 +3206,12 @@ class ScreenConditionalSeries(object):
         if not flag_multi and cas_type not in ["ADD", "SWITCH"]:
             # Trying to get the reference positions
             try:
-
                 reference_position = local_unique_id_to_positions_dict[
                     int(evalaution_unique_id)
                 ][account_id]
 
                 account_reference_positions_dict = reference_position
             except Exception as e:
-
                 reference_position = 0
 
                 if variables.flag_debug_mode:
@@ -3349,7 +3226,6 @@ class ScreenConditionalSeries(object):
 
         # if cas type is add or switch
         if cas_type in ["ADD", "SWITCH"]:
-
             # Creates and return combolegs dict, for further process (combo_creation, inserting in cas condition table and viewing)
             sequence_id_to_combolegs_df = get_series_cas_legs_df(sequence_id)
 
@@ -3405,24 +3281,18 @@ class ScreenConditionalSeries(object):
 
             # get current positions for new sequence
             try:
-
                 for account in account_reference_positions_dict:
-
                     if (
                         int(evalaution_unique_id) in local_unique_id_to_positions_dict
                         and account
                         in local_unique_id_to_positions_dict[int(evalaution_unique_id)]
                     ):
-
                         try:
-
-                            account_reference_positions_dict[
-                                account
-                            ] = local_unique_id_to_positions_dict[
-                                int(evalaution_unique_id)
-                            ][
-                                account
-                            ]
+                            account_reference_positions_dict[account] = (
+                                local_unique_id_to_positions_dict[
+                                    int(evalaution_unique_id)
+                                ][account]
+                            )
 
                         except Exception as e:
                             if variables.flag_debug_mode:
@@ -3431,7 +3301,6 @@ class ScreenConditionalSeries(object):
                                 )
 
             except Exception as e:
-
                 if variables.flag_debug_mode:
                     print(
                         f"Exception inside getting current reference posisiton, Exp: {e}"
@@ -3490,14 +3359,11 @@ class ScreenConditionalSeries(object):
 
     # Method to unpark series
     def unpark_series(self):
-
         try:
-
             # get values from selected rows
             selected_item = self.conditional_series_table.selection()[0]
 
         except Exception as e:
-
             return
 
         # get the item ID of the selected row
@@ -3508,12 +3374,8 @@ class ScreenConditionalSeries(object):
         series_id = int(values[0])
         base_uid = int(values[1])
 
-
-
-
-
         # check if status is already active
-        if status in ["Inactive", "Completed", "Failed", "Terminated", 'Active']:
+        if status in ["Inactive", "Completed", "Failed", "Terminated", "Active"]:
             return
 
         # Number of CAS Conditions that exists
@@ -3533,8 +3395,6 @@ class ScreenConditionalSeries(object):
             )
             return
 
-
-
         # values to update
         values_dict = {"Status": "Inactive"}
 
@@ -3546,15 +3406,11 @@ class ScreenConditionalSeries(object):
 
     # Method to park series
     def park_series(self):
-
-
         try:
-
             # get values from selected rows
             selected_item = self.conditional_series_table.selection()[0]
 
         except Exception as e:
-
             return
 
         # get the item ID of the selected row
@@ -3566,18 +3422,13 @@ class ScreenConditionalSeries(object):
         unique_id = int(values[1])
 
         # check if status is already active
-        if status in ["Completed", "Failed", "Terminated", 'Parked']:
+        if status in ["Completed", "Failed", "Terminated", "Parked"]:
             return
 
-        if status == 'Active':
-
+        if status == "Active":
             self.stop_series(series_id=series_id)
 
-
             self.cancel_conditional_orders(series_id, unique_id)
-
-
-
 
         # values to update
         values_dict = {"Status": "Parked"}
@@ -3590,18 +3441,14 @@ class ScreenConditionalSeries(object):
 
     # Method to stop series
     def stop_series(self, series_id=None, unique_id=None):
-
         status = "Active"
 
         if series_id == None:
-
             try:
-
                 # get values from selected rows
                 selected_item = self.conditional_series_table.selection()[0]
 
             except Exception as e:
-
                 return
 
             # get the item ID of the selected row
@@ -3615,18 +3462,13 @@ class ScreenConditionalSeries(object):
             self.cancel_conditional_orders(series_id, unique_id)
 
         else:
-
             try:
-
                 values = self.conditional_series_table.item(
                     int(series_id), "values"
                 )  # get the values of the selected row
                 status = values[5]
 
-
-
             except Exception as e:
-
                 return
 
         # check if status is already active
@@ -3648,14 +3490,12 @@ class ScreenConditionalSeries(object):
 
     # Method to cancel conditioonal order
     def cancel_conditional_orders(self, series_id, unique_id):
-
         try:
             # Get all orders dataframe
             local_orders_table_dataframe = get_table_db(variables.sql_table_cas_status)
 
             # If dataframe is empty
             if local_orders_table_dataframe.empty:
-
                 return
 
             # convert ladder id column to string format
@@ -3670,29 +3510,23 @@ class ScreenConditionalSeries(object):
             ].values
 
             if len(unique_id_values) > 0:
-
                 variables.screen.screen_cas_obj.delete_cas_condition(
                     unique_id=unique_id, series_id=series_id
                 )
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(f"Exception inside 'cancel_conditional_orders', Exp: {e}")
 
     # Method to view series details
     def view_series_details(self):
-
         try:
-
             try:
-
                 # get values from selected rows
                 selected_item = self.conditional_series_table.selection()[0]
 
             except Exception as e:
-
                 return
 
             # get the item ID of the selected row
@@ -3766,9 +3600,9 @@ class ScreenConditionalSeries(object):
             )
 
             # Set columns for filter table
-            self.conditional_series_details_table[
-                "columns"
-            ] = conditional_series_table_columns
+            self.conditional_series_details_table["columns"] = (
+                conditional_series_table_columns
+            )
 
             # Creating Column
             self.conditional_series_details_table.column("#0", width=0, stretch="no")
@@ -3809,7 +3643,6 @@ class ScreenConditionalSeries(object):
 
             # Itereate rows
             for indx, row in sequeces_df.iterrows():
-
                 # get sequence id
                 sequence_id = row["Sequence ID"]
 
@@ -3818,7 +3651,6 @@ class ScreenConditionalSeries(object):
 
                 # add rows
                 if counter % 2 == 1:
-
                     self.conditional_series_details_table.insert(
                         "",
                         "end",
@@ -3829,7 +3661,6 @@ class ScreenConditionalSeries(object):
                     )
 
                 else:
-
                     self.conditional_series_details_table.insert(
                         "",
                         "end",
@@ -3841,30 +3672,26 @@ class ScreenConditionalSeries(object):
 
                 counter += 1
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Exception inside 'view_series_details', Exp: {e}")
 
     # Method to add series
     def add_conditional_series(
         self, unique_id, flag_multi=False, values_relaunch=None, flag_edit=False
     ):
-
         # check if alreay conditional order is ening created
         if not isinstance(variables.series_sequence_table_df, list):
             # Error Message
-            error_title = (
-                error_string
-            ) = f"Error, Conditional series pop up is already opened"
+            error_title = error_string = (
+                f"Error, Conditional series pop up is already opened"
+            )
             variables.screen.display_error_popup(error_title, error_string)
 
             return
 
         if values_relaunch == None:
-
             # Number of CAS Conditions that exists
-            '''number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(
+            """number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(
                 unique_id
             )
 
@@ -3880,7 +3707,7 @@ class ScreenConditionalSeries(object):
                     f"Unique ID : {unique_id}, Condition already exists",
                     "A Condition already exists, can not add another.",
                 )
-                return'''
+                return"""
             pass
 
         # create series sequence table df
@@ -3900,25 +3727,21 @@ class ScreenConditionalSeries(object):
             )
 
         elif values_relaunch != None and flag_edit:
-
             create_conditional_series_popup.title(
                 f"Edit Conditional Series, Unique ID: {unique_id}"
             )
 
         else:
-
             create_conditional_series_popup.title(
                 f"Add Conditional Series, Unique ID: {unique_id}"
             )
 
         # check for flag multi account ids
         if not flag_multi:
-
             # set height
             custom_height = 780
 
         else:
-
             custom_height = 850
 
         # set dimensions
@@ -3958,7 +3781,6 @@ class ScreenConditionalSeries(object):
 
         # action to take after user close window
         def pop_up_close():
-
             # create series sequence table df
             variables.series_sequence_table_df = []
 
@@ -4021,7 +3843,6 @@ class ScreenConditionalSeries(object):
 
         # check if pop up is not for relauching series
         if values_relaunch == None:
-
             # make entry disabled
             rows_entry.config(state="readonly")
 
@@ -4097,7 +3918,6 @@ class ScreenConditionalSeries(object):
 
         # check flag for multi account
         if not flag_multi:
-
             # Create a list of options
             account_id_options = variables.current_session_accounts
 
@@ -4115,7 +3935,6 @@ class ScreenConditionalSeries(object):
             )
 
         else:
-
             # Create a frame for the input fields
             trade_input_frame_acc = ttk.Frame(
                 create_conditional_series_frame, padding=0
@@ -4163,18 +3982,14 @@ class ScreenConditionalSeries(object):
 
             # for edit series and relaunch series
             if values_relaunch != None and flag_multi:
-
                 # get account id list
                 account_lst = values_relaunch["Account ID"]
 
                 # get every account
                 for account_lst_item in account_lst.split(","):
-
                     # select already available items
                     if account_lst_item in variables.current_session_accounts:
-
                         try:
-
                             listbox.select_set(
                                 variables.current_session_accounts.index(
                                     account_lst_item
@@ -4182,9 +3997,7 @@ class ScreenConditionalSeries(object):
                             )
 
                         except Exception as e:
-
                             if variables.flag_debug_mode:
-
                                 print(e)
 
             listbox.pack()
@@ -4255,7 +4068,6 @@ class ScreenConditionalSeries(object):
 
         # Create headings for filter table
         for column_name in series_sequence_table_columns:
-
             self.series_sequence_table.heading(
                 column_name, text=column_name, anchor="center"
             )
@@ -4269,7 +4081,6 @@ class ScreenConditionalSeries(object):
 
         # check if pop up is for relauching series
         if values_relaunch != None:
-
             # store old unique
             unique_id_old = unique_id
 
@@ -4295,13 +4106,11 @@ class ScreenConditionalSeries(object):
             target_postions_lst = []
 
             # check sequence id, cas type and quanity for each row
-            for (seq_id, cas_type_db, qnty) in zip(
+            for seq_id, cas_type_db, qnty in zip(
                 sequence_ids_list, cas_type_lst, qnty_lst
             ):
-
                 # check if cas type is add or switch
                 if cas_type_db in ["ADD", "SWITCH"]:
-
                     # Creates and return combolegs dict, for further process (combo_creation, inserting in cas condition table and viewing)
                     sequence_id_to_combolegs_df = get_series_cas_legs_df(seq_id)
 
@@ -4376,7 +4185,6 @@ class ScreenConditionalSeries(object):
                     target_postions_lst.append(account_target_positions_dict)
 
                 else:
-
                     # check if quantity is none for buy or sell
                     if flag_multi:
                         # get position for add or switch
@@ -4406,7 +4214,6 @@ class ScreenConditionalSeries(object):
                         ref_position_lst.append(account_reference_positions_dict)
 
                     else:
-
                         # append
                         combo_obj_lst.append("None")
                         ref_position_lst.append("None")
@@ -4429,7 +4236,6 @@ class ScreenConditionalSeries(object):
             variables.series_sequence_table_df = series_seq_df_db.copy()
 
             if not flag_edit:
-
                 # Change the value of column 'A' to 100 where the value is 10
                 variables.series_sequence_table_df["Status"] = "Queued"
 
@@ -4461,21 +4267,16 @@ class ScreenConditionalSeries(object):
             )
 
             if not flag_multi:
-
                 try:
-
                     account_id_options_combo_box.current(
                         account_id_options.index(values_relaunch["Account ID"])
                     )
 
                 except Exception as e:
-
                     if variables.flag_debug_mode:
-
                         print(e)
 
         def modify_sequence():
-
             # get Ladder ID of selected row
             selected_item = self.series_sequence_table.selection()[0]
 
@@ -4491,9 +4292,7 @@ class ScreenConditionalSeries(object):
             # get row of existing coditional order
             row_df = variables.series_sequence_table_df[
                 variables.series_sequence_table_df["Table ID"] == table_id
-            ].head(
-                1
-            )  # variables.series_sequence_table_df.iloc[table_id - 1]
+            ].head(1)  # variables.series_sequence_table_df.iloc[table_id - 1]
 
             row_df = row_df.iloc[0]
 
@@ -4503,9 +4302,9 @@ class ScreenConditionalSeries(object):
             # check if stauts is completed
             if status_row == "Completed":
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Cannot edit completed conditional order"
+                error_title = error_string = (
+                    f"Error, Cannot edit completed conditional order"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -4513,7 +4312,6 @@ class ScreenConditionalSeries(object):
             on_click_create_button(modify_seq_data=row_dict)
 
         def delete_sequence_item():
-
             # get Ladder ID of selected row
             selected_item = self.series_sequence_table.selection()[0]
 
@@ -4529,9 +4327,9 @@ class ScreenConditionalSeries(object):
             # check if stauts is completed
             if status_row == "Completed":
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Cannot edit completed conditional order"
+                error_title = error_string = (
+                    f"Error, Cannot edit completed conditional order"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -4546,16 +4344,12 @@ class ScreenConditionalSeries(object):
             )
 
             try:
-
                 if not variables.series_sequence_table_df.empty:
-
                     # Change the value of column 'status' to active for first row
                     variables.series_sequence_table_df.loc[0, "Status"] = "Active"
 
             except Exception as e:
-
                 if variables.flag_debug_mode:
-
                     print(
                         f"Exception inside 'delete order from series pop up', Exp: {e}"
                     )
@@ -4564,12 +4358,10 @@ class ScreenConditionalSeries(object):
             self.update_create_series_pop_up_table()
 
         def series_sequence_table_right_click(event):
-
             # get the Treeview row that was clicked
             row = self.series_sequence_table.identify_row(event.y)
 
             if values_relaunch != None and not flag_edit:
-
                 return
 
             if row:
@@ -4591,14 +4383,12 @@ class ScreenConditionalSeries(object):
 
         # Method to validate unique id and create combination pop up
         def on_click_create_button(modify_seq_data=None, index=None):
-
             # check if flag is false for details confirmation
             if not self.flag_add_conditional_order_confirm:
-
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Please confirm details before adding conditional order"
+                error_title = error_string = (
+                    f"Error, Please confirm details before adding conditional order"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -4606,28 +4396,23 @@ class ScreenConditionalSeries(object):
             unique_id = int(rows_entry.get().strip())
 
             if modify_seq_data == None:
-
                 # get cas add or switch type
                 cas_add_or_switch = conditional_order_options_combo_box.get().strip()
                 cas_add_or_switch = cas_add_or_switch.split(" ")[1].upper()
 
             else:
-
                 cas_add_or_switch = modify_seq_data["Add/Switch/Buy/Sell"]
 
             if not flag_multi:
-
                 # account ID
                 account_id = account_id_options_combo_box.get().strip()
 
             else:
-
                 # Init
                 account_id_list = []
 
                 # Get list of selections
                 for i in listbox.curselection():
-
                     # Split item in listbox
                     accounts_type = listbox.get(i).split(":")[0]
 
@@ -4681,16 +4466,13 @@ class ScreenConditionalSeries(object):
 
             # get boolean value for execution engine flag
             if flag_execution_engine == "True":
-
                 flag_execution_engine = True
 
             else:
-
                 flag_execution_engine = False
 
             # Trying to get the reference price
             try:
-
                 local_combo_buy_sell_price_dict = copy.deepcopy(
                     variables.unique_id_to_prices_dict[unique_id]
                 )
@@ -4704,7 +4486,6 @@ class ScreenConditionalSeries(object):
 
             except Exception as e:
                 if variables.flag_debug_mode:
-
                     print(e)
                 # TODO
                 variables.screen.display_error_popup(
@@ -4720,11 +4501,9 @@ class ScreenConditionalSeries(object):
                 )
                 reference_position = local_unique_id_to_positions_dict[unique_id]
             except Exception as e:
-
                 reference_position = None
 
                 if variables.flag_debug_mode:
-
                     print(e)
                 # TODO
                 variables.screen.display_error_popup(
@@ -4736,10 +4515,8 @@ class ScreenConditionalSeries(object):
 
             # If Condition ADD or Switch
             if cas_add_or_switch in ["ADD", "SWITCH"]:
-
                 # get previosu target positions
                 if not variables.series_sequence_table_df.empty:
-
                     target_positions_lst = variables.series_sequence_table_df[
                         "Target Position"
                     ].to_list()
@@ -4759,19 +4536,13 @@ class ScreenConditionalSeries(object):
                     ) in enumerate(
                         zip(target_positions_lst, cas_type_lst, table_ids_list)
                     ):
-
                         try:
-
                             if modify_seq_data != None:
-
                                 if modify_seq_data["Table ID"] == table_id_item:
-
                                     break
 
                         except Exception as e:
-
                             if variables.flag_debug_mode:
-
                                 print(
                                     f"Error getting refer position for modify sequence, Exp: {e}"
                                 )
@@ -4780,7 +4551,6 @@ class ScreenConditionalSeries(object):
                             "ADD",
                             "SWITCH",
                         ]:
-
                             reference_position = dict_target
 
                         if (
@@ -4788,7 +4558,6 @@ class ScreenConditionalSeries(object):
                             and isinstance(index, int)
                             and index - 1 == indx_df
                         ):
-
                             # modify_seq_data['Reference Position'] = dict_target
 
                             break
@@ -4807,7 +4576,6 @@ class ScreenConditionalSeries(object):
                     index=index,
                 )
             else:
-
                 popup_title = None
                 flag_cas_order = True
 
@@ -4829,9 +4597,7 @@ class ScreenConditionalSeries(object):
                 )
 
         def on_click_create_series_button():
-
             unique_id = int(rows_entry.get().strip())
-
 
             # get evaluation uid
             eval_uid = evaluation_uid_entry.get().strip()
@@ -4843,21 +4609,21 @@ class ScreenConditionalSeries(object):
             series_condition_text = condition_entry.get().strip()
 
             # check if eval uid and series id for condition are both empty
-            '''if series_id_condition == "" and series_condition_text == "":
+            """if series_id_condition == "" and series_condition_text == "":
                 # Error Message
                 error_title = (
                     error_string
                 ) = f"Error, Please provide at least one condition"
                 variables.screen.display_error_popup(error_title, error_string)
 
-                return'''
+                return"""
 
             # check if eval uid and series id for condition are both empty
             if eval_uid == "" and series_condition_text != "":
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Please provide evaluation unique ID"
+                error_title = error_string = (
+                    f"Error, Please provide evaluation unique ID"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -4865,34 +4631,29 @@ class ScreenConditionalSeries(object):
             # check if eval uid and series id for condition are both empty
             if eval_uid != "" and series_condition_text == "":
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Please provide condition for evaluation unique ID"
+                error_title = error_string = (
+                    f"Error, Please provide condition for evaluation unique ID"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
 
             try:
-
                 if (isinstance(eval_uid, str) and eval_uid.isnumeric()) or isinstance(
                     eval_uid, int
                 ):
-
                     reference_price = (
                         variables.unique_id_to_prices_dict[int(eval_uid)]["BUY"]
                         + variables.unique_id_to_prices_dict[int(eval_uid)]["SELL"]
                     ) / 2
 
                 else:
-
                     reference_price = None
 
             except Exception as e:
-
                 reference_price = None
 
                 if variables.flag_debug_mode:
-
                     print(f"Exception for getting price for combo, Exp: {e}")
 
             if (
@@ -4900,9 +4661,9 @@ class ScreenConditionalSeries(object):
                 or "Price Decrease By" in series_condition_text
             ) and reference_price == None:
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Reference price not available for series condition"
+                error_title = error_string = (
+                    f"Error, Reference price not available for series condition"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -4910,15 +4671,14 @@ class ScreenConditionalSeries(object):
             reference_position = None
 
             if len(variables.current_session_accounts) == 1:
-
                 if (
                     "Price Adverse Chg By" in series_condition_text
                     or "Price Favorable Chg By" in series_condition_text
                 ) and reference_price == None:
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Reference price not available for series condition"
+                    error_title = error_string = (
+                        f"Error, Reference price not available for series condition"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
@@ -4932,16 +4692,13 @@ class ScreenConditionalSeries(object):
                     if (
                         isinstance(eval_uid, str) and eval_uid.isnumeric()
                     ) or isinstance(eval_uid, int):
-
                         reference_position = local_unique_id_to_positions_dict[
                             int(eval_uid)
                         ][variables.current_session_accounts[0]]
 
                     else:
-
                         reference_position = None
                 except Exception as e:
-
                     reference_position = None
 
                     if variables.flag_debug_mode:
@@ -4952,9 +4709,9 @@ class ScreenConditionalSeries(object):
                     or "Price Favorable Chg By" in series_condition_text
                 ) and reference_position in [None]:
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Reference position not available for series condition"
+                    error_title = error_string = (
+                        f"Error, Reference position not available for series condition"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
@@ -4964,24 +4721,22 @@ class ScreenConditionalSeries(object):
                     or "Price Favorable Chg By" in series_condition_text
                 ) and reference_position == 0:
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Reference position should not be 0 for series condition"
+                    error_title = error_string = (
+                        f"Error, Reference position should not be 0 for series condition"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
 
             else:
-
                 if (
                     "Price Adverse Chg By" in series_condition_text
                     or "Price Favorable Chg By" in series_condition_text
                 ):
-
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Price favourable/Adverse not allowed for multiple accounts\nin series condition"
+                    error_title = error_string = (
+                        f"Error, Price favourable/Adverse not allowed for multiple accounts\nin series condition"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
@@ -4991,15 +4746,14 @@ class ScreenConditionalSeries(object):
                 ].to_list()
 
                 for condition_item in condition_list:
-
                     if (
                         "Price Adverse Chg By" in condition_item
                         or "Price Favorable Chg By" in condition_item
                     ):
                         # Error Message
-                        error_title = (
-                            error_string
-                        ) = f"Error, Price favourable/Adverse not allowed for multiple accounts\nin sequence condition"
+                        error_title = error_string = (
+                            f"Error, Price favourable/Adverse not allowed for multiple accounts\nin sequence condition"
+                        )
                         variables.screen.display_error_popup(error_title, error_string)
 
                         return
@@ -5014,7 +4768,6 @@ class ScreenConditionalSeries(object):
             local_conditional_series_table = get_conditional_series_df()
 
             if local_conditional_series_table.empty:
-
                 all_series_ids_in_system = []
 
             else:
@@ -5025,9 +4778,9 @@ class ScreenConditionalSeries(object):
 
             if int(unique_id) not in all_unique_ids_in_system:
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Base unique ID not present in system"
+                error_title = error_string = (
+                    f"Error, Base unique ID not present in system"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -5035,18 +4788,18 @@ class ScreenConditionalSeries(object):
             # check if eval uid is valid
             if not eval_uid.isnumeric() and eval_uid != "":
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Please provide numeric evalaution unique ID"
+                error_title = error_string = (
+                    f"Error, Please provide numeric evalaution unique ID"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
 
             if eval_uid != "" and int(eval_uid) not in all_unique_ids_in_system:
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Evalaution unique ID not present in system"
+                error_title = error_string = (
+                    f"Error, Evalaution unique ID not present in system"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -5071,11 +4824,10 @@ class ScreenConditionalSeries(object):
 
             # check if flag is false for details confirmation
             if not self.flag_add_conditional_order_confirm:
-
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Please confirm details before adding conditional series"
+                error_title = error_string = (
+                    f"Error, Please confirm details before adding conditional series"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -5083,9 +4835,9 @@ class ScreenConditionalSeries(object):
             # check if there are no codnitional orders inserted by user
             if variables.series_sequence_table_df.empty:
                 # Error Message
-                error_title = (
-                    error_string
-                ) = f"Error, Please add condtitional ordres before creating conditional series"
+                error_title = error_string = (
+                    f"Error, Please add condtitional ordres before creating conditional series"
+                )
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
@@ -5095,7 +4847,6 @@ class ScreenConditionalSeries(object):
 
             # if series id is none
             if series_id == None:
-
                 # Error Message
                 error_title = error_string = f"Error, Series ID is none."
                 variables.screen.display_error_popup(error_title, error_string)
@@ -5103,46 +4854,35 @@ class ScreenConditionalSeries(object):
                 return
 
             else:
-
                 # make empty fields None
                 if eval_uid == "":
-
                     eval_uid = "None"
 
                 # make empty fields None
                 if series_id_condition == "":
-
                     series_id_condition = "None"
 
                 # make empty fields None
                 if series_condition_text == "":
-
                     series_condition_text = "None"
 
                 # increment series id
                 series_id += 1
 
                 if flag_edit:
-
                     series_id = values_relaunch["Series ID"]
 
-                    status = get_series_column_value_from_db(series_id=series_id, column_name_as_in_db='Status')
+                    status = get_series_column_value_from_db(
+                        series_id=series_id, column_name_as_in_db="Status"
+                    )
 
-
-
-                    if status in ['Active','Completed', 'Terminated']:
+                    if status in ["Active", "Completed", "Terminated"]:
                         # Error pop up
                         error_title = f"Active or completed or terminated series can not be edited."
-                        error_string =  f"Active or completed or terminated series can not be edited."
+                        error_string = f"Active or completed or terminated series can not be edited."
 
-                        variables.screen.display_error_popup(
-                            error_title, error_string
-                        )
+                        variables.screen.display_error_popup(error_title, error_string)
                         return
-
-
-
-
 
                     self.delete_series(series_id)
 
@@ -5173,26 +4913,21 @@ class ScreenConditionalSeries(object):
 
                 # get boolean value for execution engine flag
                 if flag_execution_engine == "True":
-
                     flag_execution_engine = True
 
                 else:
-
                     flag_execution_engine = False
 
                 if not flag_multi:
-
                     # get account id
                     account_id = account_id_options_combo_box.get()
 
                 else:
-
                     # Init
                     account_id_list = []
 
                     # Get list of selections
                     for i in listbox.curselection():
-
                         # Split item in listbox
                         accounts_type = listbox.get(i).split(":")[0]
 
@@ -5202,7 +4937,6 @@ class ScreenConditionalSeries(object):
                             account_id_list.append(listbox.get(i)[8:].strip())
 
                         else:
-
                             # Get account ids in group
                             accounts_in_group = get_accounts_in_account_group_from_db(
                                 listbox.get(i)[6:].strip()
@@ -5210,16 +4944,13 @@ class ScreenConditionalSeries(object):
 
                             # Check if account group is 'all'
                             if accounts_in_group == "ALL":
-
                                 # Set value of list to list of all account in current session
                                 account_id_list = variables.current_session_accounts
                                 break
 
                             else:
-
                                 # Append account in account group on by one
                                 for account in accounts_in_group.split(","):
-
                                     # check if unique id is in current session accounts
                                     if (
                                         account
@@ -5245,13 +4976,15 @@ class ScreenConditionalSeries(object):
                 series_condition_text = series_condition_text.replace("%", "%%")
 
                 # is started once value
-                if series_condition_text in ['None', None, ''] and series_id_condition in ['None', None, '']:
-
-                    is_started_once = 'Yes'
+                if series_condition_text in [
+                    "None",
+                    None,
+                    "",
+                ] and series_id_condition in ["None", None, ""]:
+                    is_started_once = "Yes"
 
                 else:
-
-                    is_started_once = 'No'
+                    is_started_once = "No"
 
                 # create list of values
                 values_list = [
@@ -5336,13 +5069,11 @@ class ScreenConditionalSeries(object):
                     trading_uid_list,
                     quantity_list,
                 ):
-
                     if (
                         flag_multi
                         and cas_type_item in ["BUY", "SELL"]
                         and values_relaunch != None
                     ):
-
                         # Init
                         map_account_to_quanity_dict = {}
 
@@ -5351,7 +5082,6 @@ class ScreenConditionalSeries(object):
                         reference_position = {}
 
                         try:
-
                             # Getting initial trigger price
                             price = (
                                 variables.unique_id_to_prices_dict[
@@ -5364,13 +5094,11 @@ class ScreenConditionalSeries(object):
 
                             # Iterating account ids
                             for account in account_id.split(","):
-
                                 # Getting value of account parameter
                                 if (
                                     variables.account_parameter_for_order_quantity
                                     == "NLV"
                                 ):
-
                                     value_of_account_parameter = (
                                         variables.accounts_table_dataframe.loc[
                                             variables.accounts_table_dataframe[
@@ -5385,7 +5113,6 @@ class ScreenConditionalSeries(object):
                                     variables.account_parameter_for_order_quantity
                                     == "SMA"
                                 ):
-
                                     value_of_account_parameter = (
                                         variables.accounts_table_dataframe.loc[
                                             variables.accounts_table_dataframe[
@@ -5400,7 +5127,6 @@ class ScreenConditionalSeries(object):
                                     variables.account_parameter_for_order_quantity
                                     == "CEL"
                                 ):
-
                                     value_of_account_parameter = (
                                         variables.accounts_table_dataframe.loc[
                                             variables.accounts_table_dataframe[
@@ -5434,7 +5160,6 @@ class ScreenConditionalSeries(object):
 
                                 # Calculate combo qunaity for account id
                                 if float(price) != 0:
-
                                     # get quantity in percentage
                                     combo_quantity = float(qnty_seq)
 
@@ -5448,7 +5173,6 @@ class ScreenConditionalSeries(object):
                                     )
 
                                 else:
-
                                     # set to zero
                                     combo_quantity_for_account = 0
 
@@ -5459,16 +5183,13 @@ class ScreenConditionalSeries(object):
                                     variables.map_unique_id_to_positions
                                 )
 
-                                reference_position[
-                                    account
-                                ] = local_unique_id_to_positions_dict[
-                                    int(trading_uid_item)
-                                ][
-                                    account
-                                ]
+                                reference_position[account] = (
+                                    local_unique_id_to_positions_dict[
+                                        int(trading_uid_item)
+                                    ][account]
+                                )
 
                         except Exception as e:
-
                             # error message
                             error_title = f"For Unique ID: {trading_uid_item}, Could not get quantity for accounts"
                             error_string = f"For Unique ID: {trading_uid_item}, Could not get quantity for accounts"
@@ -5505,7 +5226,6 @@ class ScreenConditionalSeries(object):
                 for combo_obj, sequence_id_combo in zip(
                     combo_obj_list, sequence_id_list
                 ):
-
                     if combo_obj not in ["None", None]:
                         cas_legs_query = insert_cas_legs_for_series_db(
                             combo_obj,
@@ -5536,7 +5256,6 @@ class ScreenConditionalSeries(object):
 
                 # insert sequences
                 for row_dict in row_dicts:
-
                     sequence_query = insert_conditional_series_sequence_instance_values_to_conditional_series_sequence_table(
                         row_dict, return_only=True
                     )
@@ -5563,18 +5282,16 @@ class ScreenConditionalSeries(object):
                 self.update_conditional_series_table()
 
         def on_click_confirm_details_button():
-
             # get updated unique id
             unique_id = rows_entry.get().strip()
 
             # check if pop up is for relauching
             if values_relaunch != None:
-
                 if not unique_id.isnumeric():
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Please provide valid base unique ID"
+                    error_title = error_string = (
+                        f"Error, Please provide valid base unique ID"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
@@ -5591,17 +5308,16 @@ class ScreenConditionalSeries(object):
                 # check if unique id is not present system
                 if unique_id not in all_unique_ids_in_system:
                     # Error Message
-                    error_title = (
-                        error_string
-                    ) = f"Error, Base unique ID not present in system"
+                    error_title = error_string = (
+                        f"Error, Base unique ID not present in system"
+                    )
                     variables.screen.display_error_popup(error_title, error_string)
 
                     return
 
                 if not flag_edit:
-
                     # Number of CAS Conditions that exists
-                    '''number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(
+                    """number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(
                         unique_id
                     )
 
@@ -5617,13 +5333,12 @@ class ScreenConditionalSeries(object):
                             f"Unique ID : {unique_id}, Condition already exists",
                             "A Condition already exists, can not add another.",
                         )
-                        return'''
+                        return"""
                     pass
 
                 if flag_edit:
-
                     # Number of CAS Conditions that exists
-                    '''number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(
+                    """number_of_conditions = do_cas_condition_exists_for_unique_id_in_db(
                         unique_id
                     )
 
@@ -5639,7 +5354,7 @@ class ScreenConditionalSeries(object):
                             f"Unique ID : {unique_id}, Condition already exists",
                             "A Condition already exists, can not add another.",
                         )
-                        return'''
+                        return"""
                     pass
 
                 # set new value for column
@@ -5677,12 +5392,10 @@ class ScreenConditionalSeries(object):
             self.flag_add_conditional_order_confirm = True
 
             if not flag_multi:
-
                 # disabled dropdown
                 account_id_options_combo_box.config(state="disabled")
 
             else:
-
                 # init
                 selected_items = []
 
@@ -5711,18 +5424,14 @@ class ScreenConditionalSeries(object):
 
                 # insert only selcted items in listbox
                 for ind, item in enumerate(selected_items):
-
                     listbox.insert(i, item)
 
                 # make it selected
                 for i in range(listbox.size()):
-
                     try:
-
                         listbox.select_set(i)
 
                     except Exception as e:
-
                         if variables.flag_debug_mode:
                             print(e)
 
@@ -5741,20 +5450,16 @@ class ScreenConditionalSeries(object):
             flag_execution_engine_combo_box.config(state="disabled")
 
         def on_click_combination_condition_button():
-
             try:
-
                 reference_price = (
                     variables.unique_id_to_prices_dict[unique_id]["BUY"]
                     + variables.unique_id_to_prices_dict[unique_id]["SELL"]
                 ) / 2
 
             except Exception as e:
-
                 reference_price = None
 
                 if variables.flag_debug_mode:
-
                     print(f"Exception for getting price for combo, Exp: {e}")
 
             # method to get condition
@@ -5796,7 +5501,6 @@ class ScreenConditionalSeries(object):
             index_entry.grid(column=1, row=3, padx=5, pady=5)
 
             def on_click_proceed_button():
-
                 index = index_entry.get().strip()
 
                 if not index.isnumeric():
@@ -5815,11 +5519,9 @@ class ScreenConditionalSeries(object):
                 status_lst = variables.series_sequence_table_df["Status"].to_list()
 
                 if status_lst.count("Active") > 0:
-
                     low_margin = status_lst.index("Active") + 1
 
                 else:
-
                     low_margin = len(variables.series_sequence_table_df)
 
                 if (
@@ -5856,7 +5558,6 @@ class ScreenConditionalSeries(object):
             enter_index_frame.place(y=30)
 
         if flag_edit:
-
             # Add a button to create the conditional order
             create_button = ttk.Button(
                 create_conditional_series_frame,
@@ -5867,7 +5568,6 @@ class ScreenConditionalSeries(object):
             create_button.grid(column=1, row=7, padx=0, pady=0)
 
         else:
-
             # Add a button to create the conditional order
             create_button = ttk.Button(
                 create_conditional_series_frame,
@@ -5878,7 +5578,6 @@ class ScreenConditionalSeries(object):
             create_button.grid(column=1, row=7, padx=0, pady=0)
 
         if values_relaunch != None and not flag_edit:
-
             create_button.config(state="disabled")
 
         # Add a button to confirm details
@@ -5914,7 +5613,6 @@ class ScreenConditionalSeries(object):
 
     # Update create series pop up table
     def update_create_series_pop_up_table(self):
-
         local_series_sequence_table = copy.deepcopy(variables.series_sequence_table_df)
         # print(local_series_sequence_table.to_string())
 
@@ -5934,7 +5632,6 @@ class ScreenConditionalSeries(object):
 
         # Iterate rowws in df
         for indx, row in local_series_sequence_table.iterrows():
-
             # table id
             table_id = row["Table ID"]
 
@@ -5943,7 +5640,6 @@ class ScreenConditionalSeries(object):
 
             # add rows
             if counter % 2 == 1:
-
                 self.series_sequence_table.insert(
                     "",
                     "end",
@@ -5954,7 +5650,6 @@ class ScreenConditionalSeries(object):
                 )
 
             else:
-
                 self.series_sequence_table.insert(
                     "",
                     "end",
@@ -5968,14 +5663,12 @@ class ScreenConditionalSeries(object):
 
     # Method to make series failed
     def make_series_failed(self, unique_id):
-
         series_fail_for_deleted_unique_id(unique_id)
 
         self.update_conditional_series_table()
 
     # Method to update conditional series table
     def update_conditional_series_table(self):
-
         # get copy of data frame
         local_conditional_series_table = get_conditional_series_df()
         # print(local_series_sequence_table.to_string())
@@ -5996,7 +5689,6 @@ class ScreenConditionalSeries(object):
 
         # Iterate rowws in df
         for indx, row in local_conditional_series_table.iterrows():
-
             # table id
             table_id = row["Series ID"]
 
@@ -6005,7 +5697,6 @@ class ScreenConditionalSeries(object):
 
             # add rows
             if counter % 2 == 1:
-
                 self.conditional_series_table.insert(
                     "",
                     "end",
@@ -6016,7 +5707,6 @@ class ScreenConditionalSeries(object):
                 )
 
             else:
-
                 self.conditional_series_table.insert(
                     "",
                     "end",
@@ -6030,7 +5720,6 @@ class ScreenConditionalSeries(object):
 
     # Method to monitor trigger condition of series
     def monitor_conditional_series(self):
-
         try:
             # get copy of data frame
             local_conditional_series_table = get_conditional_series_df(
@@ -6046,7 +5735,6 @@ class ScreenConditionalSeries(object):
 
             # iterate rows
             for ind, row in local_conditional_series_table.iterrows():
-
                 # get values of series
                 user_condition = row["Combination Condition"]
 
@@ -6088,12 +5776,10 @@ class ScreenConditionalSeries(object):
                 fail_account_lst = []
 
                 for accnt_id in account_lst:
-
                     if accnt_id not in variables.current_session_accounts:
                         fail_account_lst.append(accnt_id)
 
                 if fail_account_lst != []:
-
                     continue
 
                 refer_price = row["Reference Price"]
@@ -6109,7 +5795,6 @@ class ScreenConditionalSeries(object):
 
                 # check if evaluation uniuqe id is present
                 if eval_uid != "None":
-
                     # convert it to integer
                     eval_uid = int(eval_uid)
 
@@ -6136,7 +5821,6 @@ class ScreenConditionalSeries(object):
 
                 # check if condition is resent
                 if user_condition != "None":
-
                     # filter the DataFrame to get the row where "Unique ID" is equal to unique_id
                     filtered_df = cas_table_data_frame[
                         cas_table_data_frame["Unique ID"] == eval_uid
@@ -6146,7 +5830,6 @@ class ScreenConditionalSeries(object):
                         # get the first row of the filtered DataFrame using .iloc
                         cas_row = filtered_df.iloc[0]
                     except Exception as e:
-
                         # Print to console
                         if variables.flag_debug_mode:
                             print(f"\nUnique ID: {unique_id}")
@@ -6171,14 +5854,11 @@ class ScreenConditionalSeries(object):
                     eval_result = bool(eval_result)
 
                 else:
-
                     if variables.flag_series_condition.upper() == "AND":
-
                         # set to true
                         eval_result = True
 
                     else:
-
                         # set to false
                         eval_result = False
 
@@ -6194,12 +5874,10 @@ class ScreenConditionalSeries(object):
 
                 # Check if series id condition is not none
                 if series_id_cond not in ["None", None]:
-
                     # get copy of data frame
                     local_conditional_series_table = get_conditional_series_df()
 
                     if local_conditional_series_table.empty:
-
                         all_series_ids_in_system = []
 
                     else:
@@ -6225,44 +5903,33 @@ class ScreenConditionalSeries(object):
 
                     # check status of evaluation series id
                     if series_id_cond_status == "Completed":
-
                         series_id_cond_status = True
 
                     else:
-
                         series_id_cond_status = False
 
                 else:
-
                     if variables.flag_series_condition.upper() == "AND":
-
                         # set to true
                         series_id_cond_status = True
 
                     else:
-
                         # set to false
                         series_id_cond_status = False
 
                     # set to true in case no condition available
                     # series_id_cond_status = True
 
-
                 if variables.flag_series_condition.upper() == "AND":
-
                     # check and value of both conditions
                     if eval_result and series_id_cond_status:
-
                         self.start_series(selected_item=series_id)
 
                 else:
-
                     # check and value of both conditions
                     if eval_result or series_id_cond_status:
                         self.start_series(selected_item=series_id)
 
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Exception inside 'monitor_conditional_series', Exp: {e}")

@@ -18,9 +18,11 @@ class BarType(str, Enum):
     ASK = "ASK"
     QUOTES = "QUOTES"
 
+
 class OptionRightType(str, Enum):
     CALL = "C"
     PUT = "P"
+
 
 class DurationUnit(str, Enum):
     SECOND = "second"
@@ -28,8 +30,8 @@ class DurationUnit(str, Enum):
     HOUR = "hour"
     DAY = "day"
 
-class TickType(str, Enum):
 
+class TickType(str, Enum):
     ASK = "ASK"
     BID = "BID"
     ASK_SIZE = "ASK_SIZE"

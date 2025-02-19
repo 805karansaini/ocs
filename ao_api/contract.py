@@ -14,7 +14,6 @@ class ContractType(str, Enum):
 
 
 class Contract(BaseModel):
-
     contract_type: ContractType
     ticker: str
     conId: int = 0
@@ -37,23 +36,24 @@ class Contract(BaseModel):
     # combos
     comboLegsDescrip: str = ""
     comboLegs: None = None
-    deltaNeutralContract: str|None = None
+    deltaNeutralContract: str | None = None
 
     @property
     def symbol(self):
         return self.ticker
-    
+
     @property
     def secType(self):
         return self.contract_type.value
-    
+
     @property
     def tradingClass(self):
         return self.trading_class
-    
+
     @property
     def lastTradeDateOrContractMonth(self):
         return self.expiry
+
 
 def get_contract_obj(contract: str) -> Contract:
     """Converts a contract json string to a Contract object."""
@@ -72,7 +72,6 @@ def contract_to_json(contract: Contract) -> str:
 
 
 class AOContractDetails(BaseModel):
-
     contract: Contract
     marketName: str = ""
     minTick: float = 0.0
@@ -121,10 +120,11 @@ class AOContractDetails(BaseModel):
 
 def get_contract_details_obj(contract_details: str) -> AOContractDetails:
     """Converts a contract_details json string to a AOContractDetails object."""
-    
 
     contract_details_dict = json.loads(contract_details)
-    contract_details_dict["contract"] = get_contract_obj(json.dumps(contract_details_dict["contract"]))
+    contract_details_dict["contract"] = get_contract_obj(
+        json.dumps(contract_details_dict["contract"])
+    )
     contract_details_obj = AOContractDetails(**contract_details_dict)
 
     return contract_details_obj

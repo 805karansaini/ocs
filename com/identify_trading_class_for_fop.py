@@ -7,7 +7,6 @@ from com.variables import *
 
 # Method to get trading class for FOP
 async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None):
-
     # Base return value, empty list for non-fops and for exceptions
     all_trading_class = []
 
@@ -85,7 +84,6 @@ async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None)
 
     # Validation for exchange and symbol values
     if len(fut_expiry_to_conid_dict) < 1:
-
         # Print to console
         if variables.flag_debug_mode:
             print("")
@@ -105,8 +103,9 @@ async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None)
         # Sorting the dict with date
         fut_expiry_to_conid_dict = dict(sorted(fut_expiry_to_conid_dict.items()))
 
-        for date_number, (date_, fut_con_id) in enumerate(fut_expiry_to_conid_dict.items()):
-
+        for date_number, (date_, fut_con_id) in enumerate(
+            fut_expiry_to_conid_dict.items()
+        ):
             if date_number >= 3:
                 break
 
@@ -116,16 +115,19 @@ async def identify_the_trading_class_for_fop(fop_row_of_values, leg_number=None)
             if sec_type in ["IND"]:
                 print(symbol, fut_con_id, exchange, "IND", "", reqId)
                 # ReqSecDef
-                await get_list_of_strikes_and_expiries_async(symbol, fut_con_id, "", "IND", "", reqId)
+                await get_list_of_strikes_and_expiries_async(
+                    symbol, fut_con_id, "", "IND", "", reqId
+                )
             else:
                 print(symbol, fut_con_id, exchange, "FUT", "", reqId)
                 # ReqSecDef
-                await get_list_of_strikes_and_expiries_async(symbol, fut_con_id, exchange, "FUT", "", reqId)
+                await get_list_of_strikes_and_expiries_async(
+                    symbol, fut_con_id, exchange, "FUT", "", reqId
+                )
 
             all_trading_class.extend(variables.map_reqid_to_all_trading_class[reqId])
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print("")
@@ -173,7 +175,6 @@ async def identify_the_trading_class_for_all_the_fop_leg_in_combination_async(
     filtered_leg_rows_list_containing_fop_legs = []
 
     for leg_number, leg_row_values in enumerate(leg_row_values_list):
-
         # User Input for leg
         [
             action,
@@ -195,7 +196,6 @@ async def identify_the_trading_class_for_all_the_fop_leg_in_combination_async(
 
         # If sec_type is FOP, symbol and exchange must be available and append the values to "filtered_leg_rows_list_containing_fop_legs"
         if sec_type in ["FOP", "IND"]:
-
             # Formatting values
             symbol = symbol.strip().upper()
             exchange = exchange.strip().upper()

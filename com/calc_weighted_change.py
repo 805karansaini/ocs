@@ -1,9 +1,9 @@
 import pandas as pd
 from com.variables import *
 
+
 # Method to get last day close price for each leg
 def get_last_day_close_for_each_leg(combo_daily_open_close_df, combo_obj):
-
     # Init
     close_price_for_legs_list = []
 
@@ -40,7 +40,6 @@ def get_last_day_close_for_each_leg(combo_daily_open_close_df, combo_obj):
         legs_last_day_close = list(second_last_row[close_cols])
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
             print(f"Error inside getting last day close price, is {e}")
@@ -49,14 +48,12 @@ def get_last_day_close_for_each_leg(combo_daily_open_close_df, combo_obj):
 
     # Iterate two values from two list to get last close price for each leg
     for _, (leg_obj, leg_close) in enumerate(zip(all_legs, legs_last_day_close)):
-
         # Last Close
         try:
             # Confirm This
             close_price = float(leg_close)
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print("Unable to get Combo close")
@@ -69,7 +66,6 @@ def get_last_day_close_for_each_leg(combo_daily_open_close_df, combo_obj):
 
     # check if a number of legs is equal to number of close prices system got
     if len(close_price_for_legs_list) != len(all_legs):
-
         # set to none
         close_price_for_legs_list = "N/A"
 
@@ -82,7 +78,6 @@ def get_values_for_each_leg(
     combo_obj,
     combo_price_type_highest_or_lowest_or_current=None,
 ):
-
     # Init
     values_for_legs_list = []
 
@@ -93,19 +88,16 @@ def get_values_for_each_leg(
 
     # When value for price_type_highest_or_lowest_or_current is set none then get day open values for legs
     if combo_price_type_highest_or_lowest_or_current == None:
-
         # Get the row corresponding to the first row
         df_row = combo_daily_open_close_df.iloc[0]
 
     # When value for price_type_highest_or_lowest_or_current is set none then get current values for legs
     elif combo_price_type_highest_or_lowest_or_current == "Current":
-
         # Get the row corresponding to the first row
         df_row = combo_daily_open_close_df.iloc[-1]
 
     # When value for price_type_highest_or_lowest_or_current is set "Highest" then get day values for legs at timestamp of highest combo price
     elif combo_price_type_highest_or_lowest_or_current == "Highest":
-
         # Get the index of the row where the highest price of column 'Combination Close' occurred
         index_of_highest_price = combo_daily_open_close_df["Combination Close"].idxmax()
 
@@ -114,7 +106,6 @@ def get_values_for_each_leg(
 
     # When value for price_type_highest_or_lowest_or_current is set "Lowest" then get day values for legs at timestamp of lowest combo price
     elif combo_price_type_highest_or_lowest_or_current == "Lowest":
-
         # Get the index of the row where the lowest price of column 'Combination Close' occurred
         index_of_lowest_price = combo_daily_open_close_df["Combination Close"].idxmin()
 
@@ -131,14 +122,12 @@ def get_values_for_each_leg(
 
     # Iterate over values of legs list and current day price list
     for _, (leg_obj, leg_open) in enumerate(zip(all_legs, legs_current_day_values)):
-
         # Last Close
         try:
             # Confirm This
             price_for_leg = float(leg_open)
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print("Unable to get current day open for the leg")
@@ -153,6 +142,7 @@ def get_values_for_each_leg(
 
     return values_for_legs_list
 
+
 # Calculated weighted average method
 def calc_weighted_change_legs_based(
     combo_obj,
@@ -161,7 +151,6 @@ def calc_weighted_change_legs_based(
     flag=False,
     unique_id=None,
 ):
-
     # Buy legs and Sell legs
     buy_legs = combo_obj.buy_legs
     sell_legs = combo_obj.sell_legs
@@ -179,7 +168,6 @@ def calc_weighted_change_legs_based(
     # Processing "Buy" Legs to calculate prices
     for leg_indx, (leg_obj, leg_price) in enumerate(zip(all_legs, leg_wise_price)):
         try:
-
             # Init
             quantity = int(float(leg_obj.quantity))
             con_id = leg_obj.con_id
@@ -188,7 +176,6 @@ def calc_weighted_change_legs_based(
 
             # if most_recent_value_for_day_in_lookback is None
             if most_recent_value_for_day_in_lookback == None:
-
                 # get bid ask value
                 req_id = variables.con_id_to_req_id_dict[con_id]
                 bid, ask = variables.bid_price[req_id], variables.ask_price[req_id]
@@ -200,7 +187,6 @@ def calc_weighted_change_legs_based(
                 if unique_id != None:
                     pass  # print(f"{unique_id=}, {leg_indx=}, {current_price=}")
             else:
-
                 # get current price from most_recent_value_for_day_in_lookback list
                 current_price = most_recent_value_for_day_in_lookback[leg_indx]
 
@@ -225,7 +211,6 @@ def calc_weighted_change_legs_based(
             weights_for_legs.append(weight_for_leg)
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print(
@@ -241,22 +226,18 @@ def calc_weighted_change_legs_based(
         )
 
     try:
-
         # validate if system has all required change in price and weights
         if len(weights_for_legs) == len(all_legs):
-
             # Calculate the weighted average
             weighted_change_in_price = np.average(
                 change_in_price_for_all_legs, weights=weights_for_legs
             )
 
         else:
-
             # Set to N/A
             weighted_change_in_price = "N/A"
 
     except Exception as e:
-
         # Set to N/A
         weighted_change_in_price = "N/A"
 

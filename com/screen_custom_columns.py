@@ -4,6 +4,7 @@ from com.json_io_custom_columns import *
 from tkinter.scrolledtext import ScrolledText
 from com.utilities import *
 
+
 # Class for custom columns tab
 class CustomColumns(object):
     def __init__(self, master_notebook):
@@ -21,7 +22,6 @@ class CustomColumns(object):
 
     # Method to create GUI for custom columns tab
     def create_custom_columns_tab(self):
-
         # Get frame for button to add custom columns
         custom_column_button_frame = ttk.Frame(self.custom_columns_tab, padding=10)
         custom_column_button_frame.pack(pady=10)
@@ -89,24 +89,20 @@ class CustomColumns(object):
 
         # Creating columns for custom columns table
         for column_name in custom_columns_table_columns:
-
             # For "Column No" column set width to 100
             if column_name == "Column ID":
-
                 self.custom_columns_table.column(
                     column_name, anchor="center", width=100
                 )
 
             # For "Column Name" column set width to 200
             elif column_name == "Column Name":
-
                 self.custom_columns_table.column(
                     column_name, anchor="center", width=200
                 )
 
             # For "Column Expression" and "Column Description" column set width to 626
             else:
-
                 self.custom_columns_table.column(
                     column_name, anchor="center", width=626
                 )
@@ -116,7 +112,6 @@ class CustomColumns(object):
 
         # Create headings for custom columns table
         for column_heading in custom_columns_table_columns:
-
             self.custom_columns_table.heading(
                 column_heading, text=column_heading, anchor="center"
             )
@@ -127,29 +122,24 @@ class CustomColumns(object):
 
     # Method to get selected custom columns and delete them
     def delete_selected_custom_columns(self):
-
         # Get values of selected rows
         selected_items = self.custom_columns_table.selection()
 
         # Iterate every selected column id
         for column_id in selected_items:
-
             try:
                 # Delete custom column
                 self.delete_custom_column(column_id)
 
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
-
                     print(
                         f"For column ID: {column_id}, Exception occures while deleting custom column, Exp: {e}"
                     )
 
     # Method to delete custom columns
     def delete_custom_column(self, column_id):
-
         # Delete custom column
         delete_custom_column_from_json(column_id)
 
@@ -164,7 +154,6 @@ class CustomColumns(object):
 
     # Method to adde custom column
     def add_custom_column(self, add_custom_column_button):
-
         # Disabled button
         # add_custom_column_button.config(state="Disabled")
 
@@ -172,7 +161,6 @@ class CustomColumns(object):
 
     # Create pop up to add custom column
     def get_add_custom_column_popup(self):
-
         # title for pop up
         title_string = f"Add Custom Column"
 
@@ -221,7 +209,6 @@ class CustomColumns(object):
         # custom_column_button_frame.pack(pady=10)
 
         def get_input_from_popup():
-
             # Column attribute's values dict
             column_data_dict = {}
 
@@ -240,7 +227,6 @@ class CustomColumns(object):
 
             # If column name is valid
             if is_column_name_unique:
-
                 # destroy pop up
                 popup.destroy()
 
@@ -255,10 +241,9 @@ class CustomColumns(object):
                 )
 
             else:
-
-                error_title = (
-                    error_string
-                ) = "Column name matches with already available columns in CAS table"
+                error_title = error_string = (
+                    "Column name matches with already available columns in CAS table"
+                )
 
                 variables.screen.display_error_popup(error_title, error_string)
 
@@ -283,7 +268,6 @@ class CustomColumns(object):
 
     # Method to update table of custom columns
     def update_custom_column_table(self):
-
         # Get updated custom columns from json
         get_all_custom_columns_from_json()
 
@@ -299,7 +283,6 @@ class CustomColumns(object):
 
         # Update the rows
         for i, row_val in local_custom_columns_table_dataframe.iterrows():
-
             # Column Id of row val
             column_id = int(float(row_val["Column ID"]))
 
@@ -324,13 +307,11 @@ class CustomColumns(object):
 
         # Move According to data Color here, Change Color
         for i, row in local_custom_columns_table_dataframe.iterrows():
-
             # Ladder Id of row val
             column_id = str(row["Column ID"])
 
             # If unique_id in table
             if column_id in all_column_id_in_scale_trade_table:
-
                 self.custom_columns_table.move(column_id, "", counter_row)
 
                 if counter_row % 2 == 0:
@@ -344,7 +325,6 @@ class CustomColumns(object):
 
 # Method to calculate values of secondary columns
 def get_dataframe_for_seconday_columns_in_cas_table(cas_table_values):
-
     # Get copy of cas tble values
     cas_table_update_values = copy.deepcopy(cas_table_values)
 
@@ -362,18 +342,14 @@ def get_dataframe_for_seconday_columns_in_cas_table(cas_table_values):
     secondary_columns_values = []
 
     try:
-
         # Iterate each row in dataframe
         for index, cas_row in cas_table_update_values_df.iterrows():
-
             # Initialize a tuple
             values_for_row = ()
 
             # Iterate each custom column
             for column_name in local_map_secondary_columns_to_expression_in_cas_table:
-
                 try:
-
                     # Get Expression and flag for valid results to eval further
                     _, expression = evaluate_condition(
                         variables.cas_table_fields_for_expression,
@@ -391,20 +367,16 @@ def get_dataframe_for_seconday_columns_in_cas_table(cas_table_values):
                     # Add value in tuple
                     # values_for_row += (str(expression_value),)
                     if isinstance(expression_value, bool):
-
                         values_for_row += (str(expression_value),)
 
                     else:
-
                         values_for_row += (f"{(expression_value):,.2f}",)
 
                 except Exception as e:
-
                     values_for_row += ("N/A",)
 
                     # Print  to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"Exception while calculating values of secondary columns, Exp: {e}"
                         )
@@ -416,14 +388,12 @@ def get_dataframe_for_seconday_columns_in_cas_table(cas_table_values):
         return cas_table_update_values
 
     except Exception as e:
-
         # In case of exception ad all N/A values
         # getting copy of primary column values
         cas_table_update_values = copy.deepcopy(cas_table_values)
 
         # Iterate each row in dataframe
         for index, cas_row in cas_table_update_values_df.iterrows():
-
             # Initialize a tuple and add 'N/A'
             values_for_row = ("N/A",) * len(
                 local_map_secondary_columns_to_expression_in_cas_table
@@ -433,7 +403,6 @@ def get_dataframe_for_seconday_columns_in_cas_table(cas_table_values):
 
         # Print  to console
         if variables.flag_debug_mode:
-
             print(f"Exception while adding values of secondary columns, Exp: {e}")
 
         # returning merged list of vlaues for both primary and secondary columns

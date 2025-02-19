@@ -60,7 +60,6 @@ class MarketDataFetcher:
 
         # Use API Bridge
         if variables.use_api_bridge:
-
             # Convert the ibapi contract to the api bridge contract
             contract = IBkrAlgoOneAdapter.convert_ibapi_to_ao_contract(contract)
 
@@ -122,7 +121,6 @@ class MarketDataFetcher:
                     and variables.last_price[reqId] is not None
                 )
             ):
-
                 # Unsubscribe market data
                 if variables.use_api_bridge:
                     variables.ds_client.unsubscribe_real_time_quotes(reqId, priority=1)
@@ -197,7 +195,6 @@ class MarketDataFetcher:
         result = []
 
         for indx, batch in enumerate(contract_batches):
-
             result += await asyncio.gather(
                 *[
                     MarketDataFetcher.get_option_delta_and_implied_volatility(
@@ -254,7 +251,6 @@ class MarketDataFetcher:
 
         # Use API Bridge
         if variables.use_api_bridge:
-
             # Convert the ibapi contract to the api bridge contract
             contract = IBkrAlgoOneAdapter.convert_ibapi_to_ao_contract(contract)
 

@@ -11,16 +11,18 @@ from com.contracts import get_contract, get_contract_details
 from com.option_comobo_scanner_idetif import (
     find_closest_expiry_for_fop_given_fut_expiries_and_trading_class,
     find_nearest_expiry_and_all_strikes_for_stk_given_dte,
-    find_nearest_expiry_for_future_given_fut_dte)
+    find_nearest_expiry_for_future_given_fut_dte,
+)
 from com.variables import variables
 from option_combo_scanner.database.sql_queries import SqlQueries
 from option_combo_scanner.gui.utils import Utils as GUIUtils
-from option_combo_scanner.indicators_calculator.market_data_fetcher import \
-    MarketDataFetcher
+from option_combo_scanner.indicators_calculator.market_data_fetcher import (
+    MarketDataFetcher,
+)
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 
-class IndicatorHelper:
 
+class IndicatorHelper:
     @staticmethod
     def get_strike_and_closet_expiry_for_fop(
         symbol,
@@ -116,7 +118,6 @@ class IndicatorHelper:
         )
 
         if all_strikes is not None:
-
             # Removing  {  }
             all_strikes = [float(_) for _ in all_strikes[1:-1].split(",")]
 
@@ -126,14 +127,24 @@ class IndicatorHelper:
 
     @staticmethod
     def get_underlying_contract_and_all_strikes(
-        indicator_object, symbol, expiry, sec_type, underlying_sec_type, exchange, currency, multiplier, trading_class
+        indicator_object,
+        symbol,
+        expiry,
+        sec_type,
+        underlying_sec_type,
+        exchange,
+        currency,
+        multiplier,
+        trading_class,
     ):
         underlying_contract, all_strikes = None, None
 
         try:
             # Get the current date
             current_date_for_dte = datetime.datetime.today().strftime("%Y%m%d")
-            current_date_obj_for_dte = datetime.datetime.strptime(current_date_for_dte, "%Y%m%d")
+            current_date_obj_for_dte = datetime.datetime.strptime(
+                current_date_for_dte, "%Y%m%d"
+            )
             expiry_date_obj_for_dte = datetime.datetime.strptime(expiry, "%Y%m%d")
 
             dte = abs(current_date_obj_for_dte - expiry_date_obj_for_dte).days
@@ -164,8 +175,9 @@ class IndicatorHelper:
 
                 # Complete contract with expiry and everything
                 contract_details = get_contract_details(underlying_contract)
-                underlying_contract.lastTradeDateOrContractMonth = contract_details.contract.lastTradeDateOrContractMonth
-
+                underlying_contract.lastTradeDateOrContractMonth = (
+                    contract_details.contract.lastTradeDateOrContractMonth
+                )
 
                 # Get contract details.
                 # Update uncontrcat details
@@ -194,7 +206,9 @@ class IndicatorHelper:
             else:
                 pass
         except Exception as e:
-            print(f"Inside IndicatorHelper.get_underlying_contract_and_all_strikes Exception: {e}")
+            print(
+                f"Inside IndicatorHelper.get_underlying_contract_and_all_strikes Exception: {e}"
+            )
 
         return underlying_contract, all_strikes
 
@@ -211,7 +225,6 @@ class IndicatorHelper:
         trading_class,
         all_strikes,
     ):
-
         # Sec Type for IND Support gets OPT
         if sec_type == "IND":
             sec_type = "OPT"
@@ -226,7 +239,6 @@ class IndicatorHelper:
 
         # Get the Strike, Delta, IV for all the Option Contracts on both Call and Put sides
         for right in list_of_rights:
-
             # Creating and appending the option contracts to the above list
             for strike in all_strikes:
                 opt_contract = get_contract(
@@ -253,7 +265,12 @@ class IndicatorHelper:
 
     @staticmethod
     def get_mkt_data_df_for_call_and_put_options(
-        list_of_all_call_option_contracts, list_of_all_put_option_contracts, snapshot, generic_tick_list, instrument_id=None, indicator_id=None 
+        list_of_all_call_option_contracts,
+        list_of_all_put_option_contracts,
+        snapshot,
+        generic_tick_list,
+        instrument_id=None,
+        indicator_id=None,
     ):
         """
         Loop for Call and put, reqMktData and return dataframes
@@ -290,14 +307,19 @@ class IndicatorHelper:
 
         # Loop for Call and put, reqMktData and return dataframes
         for indx in range(2):
-
             # Check for early termination
-            if GUIUtils.flag_check_early_termination_of_indicator(indicator_id=indicator_id, instrument_id=instrument_id):
+            if GUIUtils.flag_check_early_termination_of_indicator(
+                indicator_id=indicator_id, instrument_id=instrument_id
+            ):
                 return call_option_mkt_data_df, put_option_mkt_data_df
-            
+
             data_frame_dict = {col: [] for col in columns}
 
-            list_of_all_option_contracts = list_of_all_call_option_contracts if indx == 0 else list_of_all_put_option_contracts
+            list_of_all_option_contracts = (
+                list_of_all_call_option_contracts
+                if indx == 0
+                else list_of_all_put_option_contracts
+            )
             # Fetch Data for all the Contracts
             list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple = asyncio.run(
                 MarketDataFetcher.get_option_delta_and_implied_volatility_for_contracts_list_async(
@@ -326,8 +348,6 @@ class IndicatorHelper:
                 list_of_all_option_contracts,
                 list_of_delta_iv_ask_iv_bid_iv_last_bid_ask_price_call_oi_put_oi_tuple,
             ):
-                
-
                 data_frame_dict["Symbol"].append(contract.symbol)
                 data_frame_dict["Strike"].append(contract.strike)
                 data_frame_dict["Delta"].append(delta)
@@ -366,8 +386,8 @@ class IndicatorHelper:
             if value is None:
                 continue
             values_dict_for_db[key] = f"{value}" + f"|{current_time}"
-            
-        # If vale dict empty simply return 
+
+        # If vale dict empty simply return
         if not values_dict_for_db:
             return
         where_condition = f" WHERE `indicator_id` = {indicator_id};"
@@ -386,10 +406,12 @@ class IndicatorHelper:
             pass
             # print(f"IV values not updated in DB", {indicator_id})
             # return
-        
+
         # Update Values here
         if indicator_id in StrategyVariables.map_indicator_id_to_indicator_object:
-            StrategyVariables.map_indicator_id_to_indicator_object[indicator_id].update_attr_value(values_dict_for_db)
+            StrategyVariables.map_indicator_id_to_indicator_object[
+                indicator_id
+            ].update_attr_value(values_dict_for_db)
         try:
             GUIUtils.update_indicator_row_in_gui(indicator_id)
         except Exception as e:

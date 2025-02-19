@@ -16,12 +16,13 @@ class OrderAction(str, Enum):
     BUY = "BUY"
     SELL = "SELL"
 
+
 class TagValue(BaseModel):
     tag: str
     value: str
 
-class Order(BaseModel):
 
+class Order(BaseModel):
     # Main order fields
     action: OrderAction  # BUY or SELL
     totalQuantity: float
@@ -42,7 +43,7 @@ class Order(BaseModel):
     transmit: bool = True  # if false, order will be created but not transmitted
     parentId: int = 0  # Parent order Id, to associate Auto STP or TRAIL orders with the original order.
     outsideRth: bool = False
-    triggerMethod: int = 0 # 0=Default, 1=Double_Bid_Ask, 2=Last, 3=Double_Last, 4=Bid_Ask, 7=Last_or_Bid_Ask, 8=Mid-point
+    triggerMethod: int = 0  # 0=Default, 1=Double_Bid_Ask, 2=Last, 3=Double_Last, 4=Bid_Ask, 7=Last_or_Bid_Ask, 8=Mid-point
 
     # ALGO ORDERS ONLY
     algoStrategy: str = ""
@@ -58,14 +59,12 @@ class Order(BaseModel):
 
 
 def json_to_order(json_data) -> Order:
-
     order_obj = Order.model_validate_json(json_data)
 
     return order_obj
 
 
 def order_to_json(order: Order):
-
     order_json = order.model_dump_json(exclude_none=True, exclude_unset=True)
 
     return order_json
@@ -92,14 +91,12 @@ class OrderState(BaseModel):
 
 
 def json_to_order_state(json_data) -> OrderState:
-
     order_state_obj = OrderState.model_validate_json(json_data)
 
     return order_state_obj
 
 
 def order_state_to_json(order_state: OrderState):
-
     order_state_json = order_state.model_dump_json(
         exclude_none=True, exclude_unset=True, exclude_defaults=True
     )

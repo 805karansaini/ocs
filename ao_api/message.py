@@ -28,6 +28,7 @@ class IN:
     MARKET_RULE = "market_rule"
     TICK_GENERIC = "tick_generic"
 
+
 class OUT:
     pass
 

@@ -48,7 +48,6 @@ class Decoder:
                 handleInfo.wrapperParams = sig.parameters
 
     def interpret(self, response_mssg):
-
         # Get response type
         response_type = response_mssg["response_type"]
 
@@ -73,7 +72,9 @@ class Decoder:
                 handleInfo.processMeth(self, response_mssg)
 
         except Exception as e:
-            print(f"Decorder Interpret error: request_id: {response_mssg['request_id']}, error: {e}")
+            print(
+                f"Decorder Interpret error: request_id: {response_mssg['request_id']}, error: {e}"
+            )
             # TODO - Check
             # theBadMsg = ",".join(response_mssg)
             # self.wrapper.error(
@@ -82,7 +83,6 @@ class Decoder:
             # raise
 
     def process_error_msg(self, response_mssg):
-
         reqId = response_mssg["request_id"]
         error_code = response_mssg.get("error_code", None)
         error_msg = response_mssg.get("error_msg", None)
@@ -91,7 +91,6 @@ class Decoder:
         self.wrapper.error(reqId, error_code, error_msg, advance_order_reject_json)
 
     def process_warning_msg(self, response_mssg):
-
         reqId = response_mssg["request_id"]
         warning_msg = response_mssg.get("warning_msg", None)
         self.wrapper.warning(reqId, warning_msg)
@@ -104,10 +103,11 @@ class Decoder:
             for bar in itemCount:
                 self.wrapper.historical_data(reqId, bar)
         except Exception as e:
-            print(f"Error in process_historical_data_msg: {e} Traceback: {traceback.format_exc()}")
-            
-    def process_historical_data_end_msg(self, response_mssg):
+            print(
+                f"Error in process_historical_data_msg: {e} Traceback: {traceback.format_exc()}"
+            )
 
+    def process_historical_data_end_msg(self, response_mssg):
         try:
             reqId = response_mssg["request_id"]
             self.wrapper.historical_data_end(
@@ -117,7 +117,6 @@ class Decoder:
             print("Error in process_historical_data_end_msg", e, traceback.format_exc())
 
     def process_option_contracts_data_msg(self, response_mssg):
-
         try:
             reqId = response_mssg["request_id"]
             itemCount = response_mssg["result"]
@@ -129,13 +128,20 @@ class Decoder:
                 multiplier = option_contract["multiplier"]
                 expirations = set(option_contract["expirations"])
                 strikes = set(option_contract["strikes"])
-                self.wrapper.option_contracts_data(reqId, underlyingConId, exchange, trading_class, multiplier, expirations, strikes)
+                self.wrapper.option_contracts_data(
+                    reqId,
+                    underlyingConId,
+                    exchange,
+                    trading_class,
+                    multiplier,
+                    expirations,
+                    strikes,
+                )
 
         except Exception as e:
             print("Error in process_tick_price_msg", e)
 
     def process_option_contracts_data_end_msg(self, response_mssg):
-
         try:
             reqId = response_mssg["request_id"]
             self.wrapper.option_contracts_data_end(
@@ -187,7 +193,16 @@ class Decoder:
                 pvDividend = data["pvDividend"]
 
                 self.wrapper.tick_option_computation(
-                    reqId, tick_type, delta, gamma, vega, theta, iv, underlying_price, option_price, pvDividend
+                    reqId,
+                    tick_type,
+                    delta,
+                    gamma,
+                    vega,
+                    theta,
+                    iv,
+                    underlying_price,
+                    option_price,
+                    pvDividend,
                 )
         except Exception as e:
             print("Error in process_tick_option_computation_msg", e)
@@ -243,7 +258,16 @@ class Decoder:
                 last_fill_price = res["last_fill_price"]
                 why_held = res["why_held"]
                 mkt_cap_price = res["mkt_cap_price"]
-                self.wrapper.order_status(reqId, status, filled, remaining, avg_fill_price, last_fill_price, why_held, mkt_cap_price)
+                self.wrapper.order_status(
+                    reqId,
+                    status,
+                    filled,
+                    remaining,
+                    avg_fill_price,
+                    last_fill_price,
+                    why_held,
+                    mkt_cap_price,
+                )
         except Exception as e:
             print(e)
 
@@ -385,7 +409,9 @@ class Decoder:
                 unrealized_pnl = res["unrealized_pnl"]
                 realized_pnl = res["realized_pnl"]
                 value = res["value"]
-                self.wrapper.pnl_single(reqId, pos, daily_pnl, unrealized_pnl, realized_pnl, value)
+                self.wrapper.pnl_single(
+                    reqId, pos, daily_pnl, unrealized_pnl, realized_pnl, value
+                )
         except Exception as e:
             print(e)
 

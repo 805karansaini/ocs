@@ -21,7 +21,7 @@ class CustomLogger:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         log_dir = "Logs"
         log_dir = os.path.join(script_dir, "..", log_dir)
-        
+
         os.makedirs(log_dir, exist_ok=True)
 
         # Create a file handler and specify the log file path

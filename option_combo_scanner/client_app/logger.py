@@ -19,13 +19,13 @@ class CustomLogger:
 
         # Current Date in YYYYMMDD
         current_date = datetime.datetime.now().strftime("%Y%m%d")
-        
+
         # Create the log directory if it doesn't exist
         # Get the script directory
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        log_dir = fr"Logs\{current_date}"
-        log_dir = os.path.join(script_dir, "..", "..",log_dir)
-        
+        log_dir = rf"Logs\{current_date}"
+        log_dir = os.path.join(script_dir, "..", "..", log_dir)
+
         # Create the log directory if it doesn't exist
         os.makedirs(log_dir, exist_ok=True)
 

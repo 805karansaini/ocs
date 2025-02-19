@@ -3,7 +3,6 @@ Copyright (C) 2019 Interactive Brokers LLC. All rights reserved. This code is su
  and conditions of the IB API Non-Commercial License or the IB API Commercial License, as applicable.
 """
 
-
 """ 
     Simple enum implementation
 """
@@ -12,7 +11,7 @@ Copyright (C) 2019 Interactive Brokers LLC. All rights reserved. This code is su
 class Enum:
     def __init__(self, *args):
         self.idx2name = {}
-        for (idx, name) in enumerate(args):
+        for idx, name in enumerate(args):
             setattr(self, name, idx)
             self.idx2name[idx] = name
 

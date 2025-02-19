@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 
 
 class EClient(object):
-
     def __init__(self, wrapper, loop):
         self.msg_queue = queue.Queue()
         self.wrapper = wrapper
@@ -175,7 +174,9 @@ class EClient(object):
     ################## Real time quotes
     #########################################################################
 
-    def subscribe_real_time_quotes(self, request_id: int, contract: Contract, priority: int = 1):
+    def subscribe_real_time_quotes(
+        self, request_id: int, contract: Contract, priority: int = 1
+    ):
         """
         required params:
             request_id: str,
@@ -235,7 +236,14 @@ class EClient(object):
 
         self.sendMsg(request_json)
 
-    def req_market_snapshot(self, request_id: int, contract: Contract, genericTickList: str = "", flag_tws_only: bool = False, priority: int = 1):
+    def req_market_snapshot(
+        self,
+        request_id: int,
+        contract: Contract,
+        genericTickList: str = "",
+        flag_tws_only: bool = False,
+        priority: int = 1,
+    ):
         """
         required params:
             request_id: str,
@@ -283,7 +291,7 @@ class EClient(object):
         as_of_date: str = "",
         flag_use_tws_only: bool = False,
         priority: int = 1,
-    ) ->  None:
+    ) -> None:
         """
         required params:
             request_id: str,
@@ -331,7 +339,7 @@ class EClient(object):
         request_id: int,
         contract: Contract,
         priority: int = 1,
-    ) ->  None:
+    ) -> None:
         """
         required params:
             request_id: str,
@@ -495,10 +503,10 @@ class EClient(object):
         self.sendMsg(request)
 
     def req_open_orders(
-            self,
-            request_id: int,
-            broker: Broker,
-            priority: int = 1,
+        self,
+        request_id: int,
+        broker: Broker,
+        priority: int = 1,
     ):
         """
         required params:
@@ -533,11 +541,11 @@ class EClient(object):
         self.sendMsg(request)
 
     def req_executions(
-            self,
-            request_id: int,
-            broker: Broker,
-            execution_filter: ExecutionFilter,
-            priority: int = 1,
+        self,
+        request_id: int,
+        broker: Broker,
+        execution_filter: ExecutionFilter,
+        priority: int = 1,
     ):
         """
         required params:
@@ -574,9 +582,9 @@ class EClient(object):
         self.sendMsg(request)
 
     def req_next_request_id(
-            self,
-            request_id: int,
-            priority: int = 1,
+        self,
+        request_id: int,
+        priority: int = 1,
     ):
         """
         required params:
@@ -607,10 +615,10 @@ class EClient(object):
         self.sendMsg(request)
 
     def req_positions(
-            self,
-            request_id: int,
-            broker: Broker,
-            priority: int = 1,
+        self,
+        request_id: int,
+        broker: Broker,
+        priority: int = 1,
     ):
         """
         required params:
@@ -645,11 +653,11 @@ class EClient(object):
         self.sendMsg(request)
 
     def req_account_updates(
-            self,
-            request_id: int,
-            broker: Broker,
-            account: str,
-            priority: int = 1,
+        self,
+        request_id: int,
+        broker: Broker,
+        account: str,
+        priority: int = 1,
     ):
         """
         required params:
@@ -686,11 +694,11 @@ class EClient(object):
         self.sendMsg(request)
 
     def req_pnl(
-            self,
-            request_id: int,
-            broker: Broker,
-            account: str,
-            priority: int = 1,
+        self,
+        request_id: int,
+        broker: Broker,
+        account: str,
+        priority: int = 1,
     ):
         """
         required params:
@@ -727,12 +735,12 @@ class EClient(object):
         self.sendMsg(request)
 
     def req_pnl_single(
-            self,
-            request_id: int,
-            broker: Broker,
-            account: str,
-            contract: Contract,
-            priority: int = 1,
+        self,
+        request_id: int,
+        broker: Broker,
+        account: str,
+        contract: Contract,
+        priority: int = 1,
     ):
         """
         required params:
@@ -850,10 +858,10 @@ class EClient(object):
         self.sendMsg(request)
 
     def cancel_pnl(
-            self,
-            request_id: int,
-            broker: Broker = Broker.TWS,
-            priority: int = 1,
+        self,
+        request_id: int,
+        broker: Broker = Broker.TWS,
+        priority: int = 1,
     ):
         """
         required params:
@@ -890,10 +898,10 @@ class EClient(object):
         self.sendMsg(request)
 
     def cancel_pnl_single(
-            self,
-            request_id: int,
-            broker: Broker = Broker.TWS,
-            priority: int = 1,
+        self,
+        request_id: int,
+        broker: Broker = Broker.TWS,
+        priority: int = 1,
     ):
         """
         required params:
@@ -973,6 +981,7 @@ class EClient(object):
         Acc, Read, Write
         self.logAnswer(current_fn_name(), vars())
     """
+
     def req_managed_accounts(
         self,
         request_id: int,

@@ -14,7 +14,6 @@ def price_increment_from_json(price_increment_json: str) -> AOPriceIncrement:
 
 # PriceIncrement to json
 def price_increment_to_json(price_increment: AOPriceIncrement):
-
     return price_increment.model_dump_json(
         exclude_none=True, exclude_defaults=True, exclude_unset=True
     )

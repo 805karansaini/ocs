@@ -7,7 +7,9 @@ import tabulate
 from com.variables import variables
 from option_combo_scanner.cache.data_store import DataStore
 from option_combo_scanner.gui.utils import Utils
-from option_combo_scanner.indicators_calculator.historical_data_fetcher import HistoricalDataFetcher
+from option_combo_scanner.indicators_calculator.historical_data_fetcher import (
+    HistoricalDataFetcher,
+)
 from option_combo_scanner.strategy.strategy_variables import StrategyVariables
 from option_combo_scanner.strategy.utilities import StrategyUtils
 
@@ -44,7 +46,9 @@ class BinarySearchDeltaIV:
             list_of_target_deltas = [-1 * _ for _ in list_of_target_deltas]
 
         # Cal Delta, Indx computed delta, iv
-        list_of_strike_delta_iv_tuple = [(None, None, None) for _ in list_of_target_deltas]
+        list_of_strike_delta_iv_tuple = [
+            (None, None, None) for _ in list_of_target_deltas
+        ]
 
         try:
             for i, target_delta in enumerate(list_of_target_deltas):
@@ -73,7 +77,9 @@ class BinarySearchDeltaIV:
                 print(tabulate.tabulate(df_temp, headers="keys", tablefmt="psql"))
                 """
 
-                temp_list_of_strike = [float(contract.strike) for contract in list_of_new_contracts]
+                temp_list_of_strike = [
+                    float(contract.strike) for contract in list_of_new_contracts
+                ]
                 # print(f"TargetDate: {target_date} Right: {right} Target Delta: {target_delta}")
                 # print(f"List of Strikes: {temp_list_of_strike}")
                 # print(f"Map Strike to Calculated Delta: {map_strike_to_calculated_delta}")
@@ -91,13 +97,17 @@ class BinarySearchDeltaIV:
                         if list_of_strike_delta_iv_tuple[i] == (None, None, None):
                             list_of_strike_delta_iv_tuple[i] = (strike, delta, iv)
                         else:
-                            old_strike, old_delta, old_iv = list_of_strike_delta_iv_tuple[i]
+                            old_strike, old_delta, old_iv = (
+                                list_of_strike_delta_iv_tuple[i]
+                            )
 
-                            if abs(target_delta - old_delta) > abs(target_delta - delta):
+                            if abs(target_delta - old_delta) > abs(
+                                target_delta - delta
+                            ):
                                 list_of_strike_delta_iv_tuple[i] = (strike, delta, iv)
         except Exception as e:
             pass
-        
+
         return list_of_strike_delta_iv_tuple
 
     @staticmethod
@@ -128,17 +138,29 @@ class BinarySearchDeltaIV:
             strike = float(contract.strike)
 
             # if value of delta already exists for the given strike, do binary search
-            if strike in map_strike_to_calculated_delta and map_strike_to_calculated_delta[strike] == target_delta:
+            if (
+                strike in map_strike_to_calculated_delta
+                and map_strike_to_calculated_delta[strike] == target_delta
+            ):
                 break
             # Move current delta is greater than target delta, we need to decrease the delta
             # Delta is always decreasing, move to right handside
-            elif strike in map_strike_to_calculated_delta and map_strike_to_calculated_delta[strike] > target_delta:
+            elif (
+                strike in map_strike_to_calculated_delta
+                and map_strike_to_calculated_delta[strike] > target_delta
+            ):
                 left = mid + 1
             # Move current delta is lower than target delta, we need to increase the delta
             # Delta is always decreasing, move to left handside
-            elif strike in map_strike_to_calculated_delta and map_strike_to_calculated_delta[strike] < target_delta:
+            elif (
+                strike in map_strike_to_calculated_delta
+                and map_strike_to_calculated_delta[strike] < target_delta
+            ):
                 right = mid - 1
-            elif strike in map_strike_to_calculated_delta and map_strike_to_calculated_delta[strike] == float("NaN"):
+            elif (
+                strike in map_strike_to_calculated_delta
+                and map_strike_to_calculated_delta[strike] == float("NaN")
+            ):
                 # Delete the index from the list:
                 del list_of_all_contracts[mid]
 
@@ -151,7 +173,9 @@ class BinarySearchDeltaIV:
                 data_frame = DataStore.get_data(key)
 
                 # Get Option Price Here
-                opt_premium = BinarySearchDeltaIV.get_historical_data_for_opt(target_date, contract, data_frame)
+                opt_premium = BinarySearchDeltaIV.get_historical_data_for_opt(
+                    target_date, contract, data_frame
+                )
                 # print(f"Date: {target_date} {key}: {opt_premium}")
 
                 if opt_premium is None:
@@ -179,11 +203,14 @@ class BinarySearchDeltaIV:
 
                 # print(f"Date: {target_date} Strike: {strike} Delta: {calucalted_delta} IV: {calucalted_iv} Indx: {mid}")
 
-        return list_of_all_contracts, map_strike_to_calculated_delta, map_strike_to_calculated_iv
+        return (
+            list_of_all_contracts,
+            map_strike_to_calculated_delta,
+            map_strike_to_calculated_iv,
+        )
 
     @staticmethod
     def get_historical_data_for_opt(target_date, contract, data_frame=None):
-
         # Get the historical data for the contract and the target date
         if data_frame is not None:
             temp_data_frame = data_frame.copy()
@@ -191,7 +218,9 @@ class BinarySearchDeltaIV:
 
             if target_date in temp_data_frame["Date"].unique():
                 target_df = temp_data_frame[temp_data_frame["Date"] == target_date]
-                take_last_close = target_df["Close"].iloc[-1] if not target_df.empty else None
+                take_last_close = (
+                    target_df["Close"].iloc[-1] if not target_df.empty else None
+                )
             else:
                 take_last_close = None
             return take_last_close
@@ -201,8 +230,10 @@ class BinarySearchDeltaIV:
         bar_size_price = StrategyVariables.historical_price_data_bar_size
         duration_size_price = f"{StrategyVariables.avg_iv_lookback_days} D"
 
-        contract_reqid_price = HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
-            [contract], bar_size_price, [duration_size_price], what_to_show_price
+        contract_reqid_price = (
+            HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
+                [contract], bar_size_price, [duration_size_price], what_to_show_price
+            )
         )
 
         req_id = contract_reqid_price[0]
@@ -212,9 +243,13 @@ class BinarySearchDeltaIV:
 
         # If flag is True store CSV Files
         if StrategyVariables.flag_store_csv_files:
-            folder_name = f"DeltaIV\{contract.symbol}_{contract.right}_{contract.tradingClass}"
+            folder_name = (
+                f"DeltaIV\{contract.symbol}_{contract.right}_{contract.tradingClass}"
+            )
             file_name = rf"{key}"
-            StrategyUtils.save_option_combo_scanner_csv_file(contract_df, folder_name, file_name)
+            StrategyUtils.save_option_combo_scanner_csv_file(
+                contract_df, folder_name, file_name
+            )
 
         DataStore.store_data(key, contract_df)
 
@@ -222,7 +257,9 @@ class BinarySearchDeltaIV:
 
         if target_date in contract_df["Date"].unique():
             target_df = contract_df[contract_df["Date"] == target_date]
-            take_last_close = target_df["Close"].iloc[-1] if not target_df.empty else None
+            take_last_close = (
+                target_df["Close"].iloc[-1] if not target_df.empty else None
+            )
         else:
             take_last_close = None
         return take_last_close
@@ -238,7 +275,6 @@ class BinarySearchDeltaIV:
     def get_historical_data_for_list_of_contracts_and_store_in_data_store(
         list_of_contracts,
     ):
-
         N = len(list_of_contracts)
 
         # If the data is not present in the data store, fetch the data from the IBKR
@@ -247,11 +283,18 @@ class BinarySearchDeltaIV:
         duration_size_price = f"{StrategyVariables.avg_iv_lookback_days} D"
         list_of_duration_size = [duration_size_price] * N
 
-        list_of_req_id_for_historical_data = HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
-            list_of_contracts, bar_size_price, list_of_duration_size, what_to_show_price
+        list_of_req_id_for_historical_data = (
+            HistoricalDataFetcher.fetch_historical_data_for_list_of_contracts(
+                list_of_contracts,
+                bar_size_price,
+                list_of_duration_size,
+                what_to_show_price,
+            )
         )
 
-        for req_id, contract in zip(list_of_req_id_for_historical_data, list_of_contracts):
+        for req_id, contract in zip(
+            list_of_req_id_for_historical_data, list_of_contracts
+        ):
             contract_df = variables.map_req_id_to_historical_data_dataframe[req_id]
             key = BinarySearchDeltaIV.get_key_from_contract(contract)
 
@@ -259,6 +302,8 @@ class BinarySearchDeltaIV:
             if StrategyVariables.flag_store_csv_files:
                 folder_name = f"DeltaIV\{contract.symbol}_{contract.right}_{contract.tradingClass}"
                 file_name = rf"{key}"
-                StrategyUtils.save_option_combo_scanner_csv_file(contract_df, folder_name, file_name)
+                StrategyUtils.save_option_combo_scanner_csv_file(
+                    contract_df, folder_name, file_name
+                )
 
             DataStore.store_data(key, contract_df)

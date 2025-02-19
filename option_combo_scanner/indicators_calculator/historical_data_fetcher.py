@@ -23,7 +23,6 @@ class HistoricalDataFetcher:
     def request_historical_data_for_contract(
         contract, bar_size, duration_size, what_to_show, req_id=None, cas_app=True
     ):
-
         # print(f"IBKR: {contract}")
         # If req_id was not provided, getting request ID
         if req_id == None:
@@ -126,7 +125,6 @@ class HistoricalDataFetcher:
     def fetch_historical_data_for_list_of_contracts(
         list_of_all_option_contracts, bar_size, list_of_duration_size, what_to_show
     ):
-
         # Historical Data Batch Size
         batch_size = StrategyVariables.batch_size_historical_data
 
@@ -151,7 +149,6 @@ class HistoricalDataFetcher:
             for indx, (contract, duration_size) in enumerate(
                 zip(contract_batch, duration_batch)
             ):
-
                 # Getting req_id
                 reqId = variables.cas_app.nextorderId
                 variables.cas_app.nextorderId += 1
@@ -168,7 +165,6 @@ class HistoricalDataFetcher:
             while variables.cas_wait_time_for_historical_data > (
                 counter * variables.sleep_time_between_iters
             ):
-
                 # Waitting for the request to end or give error
                 if all(
                     [

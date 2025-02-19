@@ -4,6 +4,7 @@ from com.prices import *
 from com.combination_helper import *
 from com.trade_rm_check_result_module import *
 
+
 # Method to validate if value is float
 def is_float_upload_order(value):
     try:
@@ -14,13 +15,12 @@ def is_float_upload_order(value):
         return True
 
     except Exception as e:
-
         # Return false if value cannot be converted to float
         return False
 
+
 # Check validaity of values in csv file
 def check_validity_of_dataframe(orders_dataframe_to_be_checked):
-
     # Getting list of valid columns
     columns_for_orders_csv = copy.deepcopy(variables.columns_for_download_orders_to_csv)
 
@@ -29,7 +29,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
     # check if number of columns in csv file is correct
     if len(columns_for_orders_csv) != len(order_dataframe_columns):
-
         error_title = f"Error columns are not matching"
         error_string = f"Columns are not matching in file, Number of columns is wrong"
 
@@ -39,9 +38,7 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
     for allowed_columns_name, user_input_col_name in zip(
         columns_for_orders_csv, order_dataframe_columns
     ):
-
         if allowed_columns_name != user_input_col_name:
-
             error_title = f"Error columns are not matching"
             error_string = f"Columns are not matching in file, Invalid column: '{user_input_col_name}'"
 
@@ -52,8 +49,18 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
     # Valid values for column order type
     valid_values_in_order_type = set(
-        ["MARKET", "LIMIT", "STOP LOSS", "TRAILING STOP LOSS", "IB ALGO MARKET", "STOP LOSS PREMIUM", "TAKE PROFIT PREMIUM", "TRAILING SL PREMIUM",
-         "STOP LOSS CANDLE", "TAKE PROFIT CANDLE"]
+        [
+            "MARKET",
+            "LIMIT",
+            "STOP LOSS",
+            "TRAILING STOP LOSS",
+            "IB ALGO MARKET",
+            "STOP LOSS PREMIUM",
+            "TAKE PROFIT PREMIUM",
+            "TRAILING SL PREMIUM",
+            "STOP LOSS CANDLE",
+            "TAKE PROFIT CANDLE",
+        ]
     )
 
     # Convert all values in column 'Action' to upper case
@@ -82,7 +89,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
     # To check values are valid or not
     for indx, row in orders_dataframe_to_be_checked.iterrows():
-
         # Get values from row to validate
         unique_id = str(row["Unique ID"]).strip()
         buy_sell_action = str(row["Action"]).strip()
@@ -100,7 +106,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
         # Checking if unique id is non - integer
         if not is_integer(unique_id):
-
             error_in_column_unique_id_action_order_type_quantity += "Unique Id, "
 
             flag_is_error_inside_unique_id_action_order_type_quantity = True
@@ -110,7 +115,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
         # Checking if account id is present in current session accounts
         if account_id not in variables.current_session_accounts:
-
             error_title = f"Error Row no - {indx + 2}, Account Id Not Available"
             error_string = f"Row no - {indx + 2}, Provided Account Id is Not Available in Current Session"
 
@@ -118,28 +122,24 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
         # Checking if Action value none of 'BUY' or 'SELL'
         if buy_sell_action not in valid_values_in_action:
-
             error_in_column_unique_id_action_order_type_quantity += "Action, "
 
             flag_is_error_inside_unique_id_action_order_type_quantity = True
 
         # Checking if Order Type value is invalid
         if order_type not in valid_values_in_order_type:
-
             error_in_column_unique_id_action_order_type_quantity += "Order Type, "
 
             flag_is_error_inside_unique_id_action_order_type_quantity = True
 
         # Checking if quantity is non integer
         if not is_integer(quantity):
-
             error_in_column_unique_id_action_order_type_quantity += "Quantity, "
 
             flag_is_error_inside_unique_id_action_order_type_quantity = True
 
         # Creating error string for error in unique id, action, order type, quantity
         if flag_is_error_inside_unique_id_action_order_type_quantity:
-
             error_title = f"Error Row no - {indx + 2}, Invalid values"
             error_string = make_multiline_mssg_for_gui_popup(
                 f"Row no - {indx + 2}, Please provide a valid values for {error_in_column_unique_id_action_order_type_quantity[:-2]} columns."
@@ -207,8 +207,11 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
                 return error_title, error_string
 
-        if order_type in ['STOP LOSS PREMIUM', 'TAKE PROFIT PREMIUM', 'TRAILING SL PREMIUM']:
-
+        if order_type in [
+            "STOP LOSS PREMIUM",
+            "TAKE PROFIT PREMIUM",
+            "TRAILING SL PREMIUM",
+        ]:
             # get combo object
             # Get combo object using unique ids
             local_unique_id_to_combo_obj = copy.deepcopy(
@@ -225,11 +228,9 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
             # check if any leg is OPT or FOP
             for leg_obj in all_legs:
-
-                if leg_obj.sec_type in ['OPT', 'FOP']:
+                if leg_obj.sec_type in ["OPT", "FOP"]:
                     # set value to True
                     flag_premium = True
-
 
             # if flag is true
             if not flag_premium:
@@ -240,8 +241,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
             premium_dict = variables.screen.get_premium_for_orders(all_legs)
 
-
-
             if premium_dict == None:
                 error_title = f"Error Row no - {indx + 2}, Could not get premium for premium order"
                 error_string = f"Row no - {indx + 2}, Unique-Id - {unique_id}, Could not get premium for premium order"
@@ -249,9 +248,10 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
                 return False, error_title, error_string
 
             try:
-
                 # dict for combo prices
-                local_unique_id_to_prices_dict = copy.deepcopy(variables.unique_id_to_prices_dict)
+                local_unique_id_to_prices_dict = copy.deepcopy(
+                    variables.unique_id_to_prices_dict
+                )
 
                 current_buy_price, current_sell_price = (
                     local_unique_id_to_prices_dict[unique_id]["BUY"],
@@ -261,233 +261,217 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
                 current_price = (current_buy_price + current_sell_price) / 2
 
             except Exception as e:
-
                 if variables.flag_debug_mode:
-                    print(f"Exception inside getting current price for stop loss premium, Exp: {e}")
+                    print(
+                        f"Exception inside getting current price for stop loss premium, Exp: {e}"
+                    )
 
-                current_price = 'N/A'
+                current_price = "N/A"
 
                 error_title = f"Error Row no - {indx + 2}, Could not get current price for premium order"
                 error_string = f"Row no - {indx + 2}, Unique-Id - {unique_id}, Could not get current price for premium order"
 
                 return False, error_title, error_string
 
-
             # set order type based on premium order type provided
-            if order_type == 'STOP LOSS PREMIUM':
-
-                order_type = 'STOP LOSS'
+            if order_type == "STOP LOSS PREMIUM":
+                order_type = "STOP LOSS"
 
                 # getting value of trigger price to refill
                 if premium_dict != None and is_float_upload_order(current_price):
-
-                    net_premium = premium_dict['Stop Loss Premium']
+                    net_premium = premium_dict["Stop Loss Premium"]
 
                     # check if it is float
                     if is_float_upload_order(net_premium):
-
                         # get trigger price
-                        if buy_sell_action.upper() == 'BUY':
+                        if buy_sell_action.upper() == "BUY":
                             value_to_prefill = current_price + abs(net_premium)
 
                         else:
-
                             value_to_prefill = current_price - abs(net_premium)
 
                         value_to_prefill = round(value_to_prefill, 2)
 
                     else:
-
-                        value_to_prefill = 'N/A'
+                        value_to_prefill = "N/A"
 
                 else:
-
-                    value_to_prefill = 'N/A'
+                    value_to_prefill = "N/A"
 
                 # overwrite values
                 trigger_price = value_to_prefill
 
-                atr_multiple = 'None'
+                atr_multiple = "None"
 
                 # Make change in df
-                orders_dataframe_to_be_checked.at[indx, 'Order Type'] = order_type
+                orders_dataframe_to_be_checked.at[indx, "Order Type"] = order_type
 
-                orders_dataframe_to_be_checked.at[indx, 'Trigger Price'] = trigger_price
+                orders_dataframe_to_be_checked.at[indx, "Trigger Price"] = trigger_price
 
-                orders_dataframe_to_be_checked.at[indx, 'ATR Multiple'] = 'None'
+                orders_dataframe_to_be_checked.at[indx, "ATR Multiple"] = "None"
 
-
-            elif order_type == 'TAKE PROFIT PREMIUM':
-
-                order_type = 'LIMIT'
+            elif order_type == "TAKE PROFIT PREMIUM":
+                order_type = "LIMIT"
 
                 # getting value of trigger price to refill
                 if premium_dict != None and is_float_upload_order(current_price):
-
-                    net_premium = premium_dict['Take Profit Premium']
+                    net_premium = premium_dict["Take Profit Premium"]
 
                     # check if it is float
                     if is_float_upload_order(net_premium):
-
                         # get trigger price
-                        if buy_sell_action.upper() == 'BUY':
+                        if buy_sell_action.upper() == "BUY":
                             value_to_prefill = current_price - abs(net_premium)
 
                         else:
-
                             value_to_prefill = current_price + abs(net_premium)
 
                         value_to_prefill = round(value_to_prefill, 2)
 
                     else:
-
-                        value_to_prefill = 'N/A'
+                        value_to_prefill = "N/A"
 
                 else:
-
-                    value_to_prefill = 'N/A'
+                    value_to_prefill = "N/A"
 
                 # overwrite values
                 limit_price = value_to_prefill
 
-                atr_multiple = 'None'
+                atr_multiple = "None"
 
                 # Make change in df
-                orders_dataframe_to_be_checked.at[indx, 'Order Type'] = order_type
+                orders_dataframe_to_be_checked.at[indx, "Order Type"] = order_type
 
-                orders_dataframe_to_be_checked.at[indx, 'Limit Price'] = limit_price
+                orders_dataframe_to_be_checked.at[indx, "Limit Price"] = limit_price
 
-                orders_dataframe_to_be_checked.at[indx, 'ATR Multiple'] = 'None'
+                orders_dataframe_to_be_checked.at[indx, "ATR Multiple"] = "None"
 
-            elif order_type == 'TRAILING SL PREMIUM':
-
-                order_type = 'TRAILING STOP LOSS'
+            elif order_type == "TRAILING SL PREMIUM":
+                order_type = "TRAILING STOP LOSS"
 
                 # getting value of trigger price to refill
                 if premium_dict != None and is_float_upload_order(current_price):
-
-                    net_premium = premium_dict['Trailing Stop Loss Premium']
+                    net_premium = premium_dict["Trailing Stop Loss Premium"]
 
                     # check if it is float
                     if is_float_upload_order(net_premium):
-
                         value_to_prefill = abs(net_premium)
 
                         value_to_prefill = round(value_to_prefill, 2)
 
                     else:
-
-                        value_to_prefill = 'N/A'
+                        value_to_prefill = "N/A"
 
                 else:
-
-                    value_to_prefill = 'N/A'
+                    value_to_prefill = "N/A"
 
                 # overwrite values
                 trail_value = value_to_prefill
-                atr_multiple = 'None'
+                atr_multiple = "None"
 
                 # Make change in df
-                orders_dataframe_to_be_checked.at[indx, 'Order Type'] = order_type
+                orders_dataframe_to_be_checked.at[indx, "Order Type"] = order_type
 
-                orders_dataframe_to_be_checked.at[indx, 'Trail Value'] = trail_value
+                orders_dataframe_to_be_checked.at[indx, "Trail Value"] = trail_value
 
-                orders_dataframe_to_be_checked.at[indx, 'ATR Multiple'] = 'None'
+                orders_dataframe_to_be_checked.at[indx, "ATR Multiple"] = "None"
 
-        if order_type in ['STOP LOSS CANDLE', 'TAKE PROFIT CANDLE']:
-
+        if order_type in ["STOP LOSS CANDLE", "TAKE PROFIT CANDLE"]:
             # set order type based on premium order type provided
-            if order_type == 'STOP LOSS CANDLE':
-
-                order_type = 'STOP LOSS'
+            if order_type == "STOP LOSS CANDLE":
+                order_type = "STOP LOSS"
 
                 # Init
-                value_to_prefill = 'N/A'
+                value_to_prefill = "N/A"
 
                 # get last candle high or low price
                 try:
-
                     # check if action is sell
-                    if buy_sell_action.upper() == 'BUY':
-
-                        value_to_prefill = variables.map_unique_id_to_candle_for_order_values[unique_id][
-                            'High Candle Value']
+                    if buy_sell_action.upper() == "BUY":
+                        value_to_prefill = (
+                            variables.map_unique_id_to_candle_for_order_values[
+                                unique_id
+                            ]["High Candle Value"]
+                        )
 
                     # check if action is buy
                     else:
-
-                        value_to_prefill = variables.map_unique_id_to_candle_for_order_values[unique_id][
-                            'Low Candle Value']
+                        value_to_prefill = (
+                            variables.map_unique_id_to_candle_for_order_values[
+                                unique_id
+                            ]["Low Candle Value"]
+                        )
 
                 except Exception as e:
-
                     # print to console
                     if variables.flag_debug_mode:
-                        print(f"Exception inside getting current price for stop loss premium, Exp: {e}")
+                        print(
+                            f"Exception inside getting current price for stop loss premium, Exp: {e}"
+                        )
 
                     # set value to N/A
-                    value_to_prefill = 'N/A'
+                    value_to_prefill = "N/A"
 
                 # overwrite values
                 trigger_price = value_to_prefill
 
-                atr_multiple = 'None'
+                atr_multiple = "None"
 
                 # Make change in df
-                orders_dataframe_to_be_checked.at[indx, 'Order Type'] = order_type
+                orders_dataframe_to_be_checked.at[indx, "Order Type"] = order_type
 
-                orders_dataframe_to_be_checked.at[indx, 'Trigger Price'] = trigger_price
+                orders_dataframe_to_be_checked.at[indx, "Trigger Price"] = trigger_price
 
-                orders_dataframe_to_be_checked.at[indx, 'ATR Multiple'] = 'None'
+                orders_dataframe_to_be_checked.at[indx, "ATR Multiple"] = "None"
 
-
-            elif order_type == 'TAKE PROFIT CANDLE':
-
-                order_type = 'LIMIT'
+            elif order_type == "TAKE PROFIT CANDLE":
+                order_type = "LIMIT"
 
                 # Init
-                value_to_prefill = 'N/A'
+                value_to_prefill = "N/A"
 
                 # get last candle high or low price
                 try:
-
                     # check if action is sell
-                    if buy_sell_action.upper() == 'SELL':
-
-                        value_to_prefill = variables.map_unique_id_to_candle_for_order_values[unique_id][
-                            'High Candle Value']
+                    if buy_sell_action.upper() == "SELL":
+                        value_to_prefill = (
+                            variables.map_unique_id_to_candle_for_order_values[
+                                unique_id
+                            ]["High Candle Value"]
+                        )
 
                     # check if action is buy
                     else:
-
-                        value_to_prefill = variables.map_unique_id_to_candle_for_order_values[unique_id][
-                            'Low Candle Value']
+                        value_to_prefill = (
+                            variables.map_unique_id_to_candle_for_order_values[
+                                unique_id
+                            ]["Low Candle Value"]
+                        )
 
                 except Exception as e:
-
                     # print to console
                     if variables.flag_debug_mode:
-                        print(f"Exception inside getting current price for stop loss premium, Exp: {e}")
+                        print(
+                            f"Exception inside getting current price for stop loss premium, Exp: {e}"
+                        )
 
                     # set value to N/A
-                    value_to_prefill = 'N/A'
+                    value_to_prefill = "N/A"
 
                 # overwrite values
                 limit_price = value_to_prefill
 
-                atr_multiple = 'None'
+                atr_multiple = "None"
 
                 # Make change in df
-                orders_dataframe_to_be_checked.at[indx, 'Order Type'] = order_type
+                orders_dataframe_to_be_checked.at[indx, "Order Type"] = order_type
 
-                orders_dataframe_to_be_checked.at[indx, 'Limit Price'] = limit_price
+                orders_dataframe_to_be_checked.at[indx, "Limit Price"] = limit_price
 
-                orders_dataframe_to_be_checked.at[indx, 'ATR Multiple'] = 'None'
-
+                orders_dataframe_to_be_checked.at[indx, "ATR Multiple"] = "None"
 
         # Limit Orders
         if order_type == "LIMIT":
-
             order_type = "LIMIT"
             try:
                 limit_price = float(limit_price)
@@ -524,12 +508,10 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
         # Stop Loss Orders
         elif order_type == "STOP LOSS":
-
             print(atr_multiple)
 
             # Check if both trigger price and atr multiple is empty
             if trigger_price == "None" and atr_multiple == "None":
-
                 error_title = (
                     f"Error, Row no - {indx + 2}, Invalid combination of values"
                 )
@@ -562,13 +544,11 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
             elif (trigger_price == "None" and atr_multiple != "None") or (
                 trigger_price != "None" and atr_multiple != "None"
             ):
-
                 # Get ATR value
                 atr = get_atr_value_for_unique_id(unique_id)
 
                 # If atr is N/A return error
                 if atr == "N/A":
-
                     error_title = f"Error, Row no - {indx + 2}, For Unique ID: {unique_id}, Unable to get ATR"
                     error_string = f"Error, Row no - {indx + 2}, For Unique ID: {unique_id}, Unable to get ATR"
 
@@ -583,7 +563,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
                     # check if atrr multiple is less than or equal to zero
                     if atr_multiple <= 0:
-
                         raise Exception("Invalid ATR Multiple")
 
                 except Exception as e:
@@ -598,7 +577,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
                 )
 
                 if trigger_price == "N/A":
-
                     error_title = f"Error, Row no - {indx + 2},Invalid Trigger Price"
                     error_string = f"Error, Row no - {indx + 2},Unable to get valid Trigger Price based on ATR Multiple: {atr_multiple}, \nATR: {atr}"
 
@@ -626,12 +604,8 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
         # Trailing Stop Loss Orders
         elif order_type == "TRAILING STOP LOSS":
-
-
-
             # Check if both trail value and atr multiple is empty
             if trail_value == "None" and atr_multiple == "None":
-
                 error_title = (
                     f"Error, Row no - {indx + 2}, Invalid combination of values"
                 )
@@ -656,7 +630,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
             elif (trail_value == "None" and atr_multiple != "None") or (
                 trail_value != "None" and atr_multiple != "None"
             ):
-
                 # Get ATR value
                 atr = get_atr_value_for_unique_id(unique_id)
 
@@ -676,7 +649,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 
                     # check if atr multiple is less than or equal to zero
                     if atr_multiple <= 0:
-
                         raise Exception("Invalid ATR Multiple")
 
                 except Exception as e:
@@ -689,7 +661,6 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
                 trail_value = get_trail_value_for_trailing_stop_loss(atr_multiple, atr)
 
                 if trail_value == "N/A":
-
                     error_title = f"Error, Row no - {indx + 2},Invalid Trigger Price"
                     error_string = f"Error, Row no - {indx + 2},Unable to get valid Trail Value based on ATR Multiple: {atr_multiple} and ATR: {atr}"
 
@@ -707,32 +678,26 @@ def check_validity_of_dataframe(orders_dataframe_to_be_checked):
 def update_values_based_on_order_type(
     order_type, limit_price, trigger_price, trail_value, atr_multiple, atr
 ):
-
     order_type = order_type.upper()
 
     # For order type "Market"
     if order_type == "MARKET":
-
         limit_price = trigger_price = trail_value = atr_multiple = atr = ""
 
     # For order type "Limit"
     elif order_type == "LIMIT":
-
         trigger_price = trail_value = atr_multiple = atr = ""
 
     # For order type "Stop loss"
     elif order_type == "STOP LOSS":
-
         limit_price = trail_value = ""
 
     # For order type "Trailing Stop Loss"
     elif order_type == "TRAILING STOP LOSS":
-
         limit_price = trigger_price = ""
 
     # For order type "IB Algo Market"
     elif order_type == "IB ALGO MARKET":
-
         limit_price = trigger_price = trail_value = atr_multiple = atr = ""
 
     # Return updated values
@@ -741,14 +706,11 @@ def update_values_based_on_order_type(
 
 # Method to get trail value for atr multiple and atr
 def get_trail_value_for_trailing_stop_loss(atr_multiple, atr):
-
     try:
-
         # Get trigger price
         trail_value = atr_multiple * atr
 
     except Exception as e:
-
         # Init
         trail_value = "N/A"
 
@@ -757,7 +719,6 @@ def get_trail_value_for_trailing_stop_loss(atr_multiple, atr):
 
 # Method to get trigger price for atr multiple and atr
 def get_trigger_price_for_stop_loss(unique_id, buy_sell_action, atr_multiple, atr):
-
     # checking if trigger price calculations are valid
     try:
         # Init
@@ -773,13 +734,11 @@ def get_trigger_price_for_stop_loss(unique_id, buy_sell_action, atr_multiple, at
 
         # When action is BUY
         if buy_sell_action == "BUY":
-
             # Get trigger price
             trigger_price = avg_price_combo + atr_multiple * atr
 
         # When action is SELL
         elif buy_sell_action == "SELL":
-
             # Get trigger price
             trigger_price = avg_price_combo - atr_multiple * atr
 
@@ -788,15 +747,14 @@ def get_trigger_price_for_stop_loss(unique_id, buy_sell_action, atr_multiple, at
 
     return trigger_price
 
+
 # Method to get atr value
 def get_atr_value_for_unique_id(unique_id):
-
     # atr for order dict
     order_atr_values = copy.deepcopy(variables.map_unique_id_to_atr_for_order_values)
 
     # Get atr value
     try:
-
         unique_id = int(unique_id)
 
         # Get ATR value
@@ -808,19 +766,15 @@ def get_atr_value_for_unique_id(unique_id):
 
         # Check if atr is float
         if not is_float_upload_order(atr):
-
             # In case of exception set it to N/A
             atr = "N/A"
 
         else:
-
             return atr
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(f"Exceptions in getting ATR, Exp: {e}")
 
         # In case of exception set it to N/A
@@ -828,9 +782,9 @@ def get_atr_value_for_unique_id(unique_id):
 
     return atr
 
+
 # Method to place order based on csv data
 def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_button):
-
     try:
         # get csv file from file path
         orders_dataframe = pd.read_csv(orders_dataframe_path)
@@ -870,7 +824,6 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
 
     # Show pop in event of file format is not correct
     if not is_orders_df_valid:
-
         # Make error string multiline
         error_title_validation = make_multiline_mssg_for_gui_popup(
             error_title_validation
@@ -894,7 +847,6 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
     try:
         # Iterate dataframe
         for indx, row in orders_dataframe.iterrows():
-
             # Get all value for order
             unique_id, buy_sell_action, order_type, combo_quantity = (
                 int(float(row["Unique ID"])),
@@ -902,9 +854,6 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
                 row["Order Type"],
                 row["#Lots"],
             )
-
-
-
 
             limit_price, trigger_price, trail_value, atr_multiple = (
                 row["Limit Price"],
@@ -925,7 +874,6 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
                 and variables.flag_enable_rm_account_rules
                 and variables.flag_account_liquidation_mode[account_id]
             ):
-
                 time.sleep(variables.rm_checks_interval_if_failed)
 
                 # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -942,13 +890,10 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
                     continue
 
             elif not trade_level_rm_check_result(bypass_rm_check, unique_id):
-
                 time.sleep(variables.rm_checks_interval_if_failed)
 
                 if not trade_level_rm_check_result(bypass_rm_check, unique_id):
-
                     continue
-
 
             # Get order type in upper case
             order_type_upper_case = order_type.upper()
@@ -972,7 +917,6 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
                 atr_multiple not in ["", "None"]
                 and order_type_upper_case == "TRAILING STOP LOSS"
             ):
-
                 trail_value = get_trail_value_for_trailing_stop_loss(
                     float(atr_multiple), float(atr)
                 )
@@ -983,7 +927,6 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
                 and atr_multiple in ["", "None"]
                 and order_type_upper_case == "TRAILING STOP LOSS"
             ):
-
                 atr = "None"
 
             # In case of stop loss ATR order trigger price will be empty
@@ -991,7 +934,6 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
                 atr_multiple not in ["", "None"]
                 and order_type_upper_case == "STOP LOSS"
             ):
-
                 trigger_price = get_trigger_price_for_stop_loss(
                     unique_id, buy_sell_action, float(atr_multiple), float(atr)
                 )
@@ -1002,17 +944,14 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
                 and atr_multiple in ["", "None"]
                 and order_type_upper_case == "STOP LOSS"
             ):
-
                 atr = "None"
 
             # Make aTR multiple None if it is empty string
             if atr_multiple in ["", "None"]:
-
                 atr_multiple = "None"
 
             # Make aTR None if it is empty string
             if atr in ["", "None"]:
-
                 atr = "None"
 
             # Converting value to int
@@ -1058,6 +997,7 @@ def upload_orders_from_csv_to_app(orders_dataframe_path, upload_order_from_csv_b
     # Enabled upload orders button
     upload_order_from_csv_button.config(state="enabled")
 
+
 # Method to make message multiline
 def make_multiline_mssg_for_gui_popup(error_string):
     # Split in to line
@@ -1075,6 +1015,3 @@ def make_multiline_mssg_for_gui_popup(error_string):
         line_len += len(word)
 
     return new_string
-
-
-

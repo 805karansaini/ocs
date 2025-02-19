@@ -3,7 +3,9 @@ from pprint import pprint
 from option_combo_scanner.custom_logger.logger import CustomLogger
 from option_combo_scanner.gui.utils import Utils
 from option_combo_scanner.ibapi_ao.variables import Variables as variables
-from option_combo_scanner.strategy.strategy_variables import StrategyVariables as strategy_variables
+from option_combo_scanner.strategy.strategy_variables import (
+    StrategyVariables as strategy_variables,
+)
 
 logger = CustomLogger.logger
 
@@ -18,14 +20,17 @@ class Instrument:
         # Manage Conid, contract, Subscription
         self.map_instrument_id_to_instrument_object()
         self.instrument_id = int(self.instrument_id)
-        
 
     def map_instrument_id_to_instrument_object(self):
         # Map instrument_id to Instrument Object
-        strategy_variables.map_instrument_id_to_instrument_object[self.instrument_id] = self
+        strategy_variables.map_instrument_id_to_instrument_object[
+            self.instrument_id
+        ] = self
 
     def __str__(self) -> str:
-        attributes_str = ", ".join([f"{key}={value}" for key, value in vars(self).items()])
+        attributes_str = ", ".join(
+            [f"{key}={value}" for key, value in vars(self).items()]
+        )
         return f"Instrument: {attributes_str}"
 
     def update_attr_value(self, values_dict):
@@ -62,4 +67,6 @@ class Instrument:
         self,
     ):
         print(f"Deleteing the instrumen: {self.instrument_id}")
-        del strategy_variables.map_instrument_id_to_instrument_object[self.instrument_id]
+        del strategy_variables.map_instrument_id_to_instrument_object[
+            self.instrument_id
+        ]

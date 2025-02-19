@@ -126,14 +126,20 @@ class Utils:
 
         char_count = 65
         # Add New Line after every 'char_count' characters
-        error_string = "\n".join([error_string[i : i + char_count] for i in range(0, len(error_string), char_count)])
+        error_string = "\n".join(
+            [
+                error_string[i : i + char_count]
+                for i in range(0, len(error_string), char_count)
+            ]
+        )
         # Add labels and entry fields for each column in the table
-        error_label = ttk.Label(message_frame, text=error_string, width=80, anchor="center")
+        error_label = ttk.Label(
+            message_frame, text=error_string, width=80, anchor="center"
+        )
         error_label.place(relx=0.5, rely=0.5, anchor="center")
 
     @staticmethod
     def display_treeview_popup(title, list_of_columns_header, list_of_row_tuple):
-
         # Add some style
         style = ttk.Style()
 
@@ -164,7 +170,9 @@ class Utils:
         treeview_popup.title(title)
         custom_height = min(max((num_rows * 20) + 100, 150), 210)
 
-        custom_width = 80 * len(list_of_row_tuple[0]) + 60  # 60 = 20 * 2(padding) + 20(scrollbar)
+        custom_width = (
+            80 * len(list_of_row_tuple[0]) + 60
+        )  # 60 = 20 * 2(padding) + 20(scrollbar)
         treeview_popup.geometry(f"{custom_width}x{custom_height}")
 
         # Create a frame for the input fields
@@ -230,13 +238,11 @@ class Utils:
     # Method to sort string numeric values
     @staticmethod
     def custom_sort(val):
-
         # Replace 'N/A' with a large value
         if val in ["N/A", "inf", "-inf"]:
             return 10**15
 
         elif type(val) == str and (val[0].isnumeric() or val[0] == "-"):
-
             # Replace "," with ""
             val = val.replace(",", "")
             val = val.replace(":", "")
@@ -252,7 +258,6 @@ class Utils:
     @staticmethod
     # Method to sort cas rows
     def sort_cas_row_values_by_column(values):
-
         # Sort Values Based on the User selected column
         key, reverse = list(variables.cas_table_sort_by_column.items())[0]
 
@@ -260,21 +265,23 @@ class Utils:
         col_index = variables.map_cas_column_name_to_index[key]
 
         # Sort Values
-        values = sorted(values, key=lambda row: Utils.custom_sort(row[col_index]), reverse=reverse)
+        values = sorted(
+            values, key=lambda row: Utils.custom_sort(row[col_index]), reverse=reverse
+        )
 
         return values
 
     @staticmethod
     def clear_scanner_combination_table():
-
         list_of_combo_ids = Utils.scanner_combination_tab_object.scanner_combination_table.get_children()
 
         # Remove rows from scanned combo table
-        Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(list_of_combo_ids)
+        Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(
+            list_of_combo_ids
+        )
 
     @staticmethod
     def get_list_of_combo_ids_for_based_on_config_id(config_id):
-
         # Query to fetch Combo ID such that config is is same
         where_condition = f" WHERE `config_id` = '{config_id}';"
         select_query = SqlQueries.create_select_query(
@@ -286,7 +293,9 @@ class Utils:
         # Get all the combo ids for config_id
         list_of_results_dict = SqlQueries.execute_select_query(select_query)
 
-        list_of_combo_ids = [int(float(_temp["combo_id"])) for _temp in list_of_results_dict]
+        list_of_combo_ids = [
+            int(float(_temp["combo_id"])) for _temp in list_of_results_dict
+        ]
 
         return list_of_combo_ids
 
@@ -303,27 +312,41 @@ class Utils:
         # Remove all the combinations based on the list_of_combo_ids
         if list_of_combo_ids is not None:
             # Remove rows from scanned combo table
-            Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(list_of_combo_ids)
+            Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(
+                list_of_combo_ids
+            )
 
         if instrument_id is not None:
             list_of_combo_ids = []
             list_of_all_combo_ids_in_table = Utils.scanner_combination_tab_object.scanner_combination_table.get_children()
 
             for combo_id in list_of_all_combo_ids_in_table:
-                row_value = Utils.scanner_combination_tab_object.scanner_combination_table.item(combo_id, "values")
+                row_value = (
+                    Utils.scanner_combination_tab_object.scanner_combination_table.item(
+                        combo_id, "values"
+                    )
+                )
 
                 row_instrume_id = row_value[0]
                 if int(row_instrume_id) == int(instrument_id):
                     list_of_combo_ids.append(str(combo_id))
 
             # Remove rows from scanned combo table
-            Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(list_of_combo_ids)
+            Utils.scanner_combination_tab_object.remove_row_from_scanner_combination_table(
+                list_of_combo_ids
+            )
 
-        for index, row_id in enumerate(Utils.scanner_combination_tab_object.scanner_combination_table.get_children()):
+        for index, row_id in enumerate(
+            Utils.scanner_combination_tab_object.scanner_combination_table.get_children()
+        ):
             if index % 2 == 0:
-                Utils.scanner_combination_tab_object.scanner_combination_table.item(row_id, tags=("evenrow",))
+                Utils.scanner_combination_tab_object.scanner_combination_table.item(
+                    row_id, tags=("evenrow",)
+                )
             else:
-                Utils.scanner_combination_tab_object.scanner_combination_table.item(row_id, tags=("oddrow",))
+                Utils.scanner_combination_tab_object.scanner_combination_table.item(
+                    row_id, tags=("oddrow",)
+                )
 
     @staticmethod
     def remove_row_from_indicator_table(
@@ -333,39 +356,59 @@ class Utils:
         # Remove all the indicator based on the list_of_indicator_ids
         if list_of_indicator_ids is not None:
             # Remove rows from indicator table
-            Utils.scanner_indicator_tab_object.remove_row_from_indicator_table(list_of_indicator_ids)
+            Utils.scanner_indicator_tab_object.remove_row_from_indicator_table(
+                list_of_indicator_ids
+            )
 
         if instrument_id is not None:
             list_of_indicator_ids = []
-            list_of_all_indicator_ids_in_table = Utils.scanner_indicator_tab_object.option_indicator_table.get_children()
+            list_of_all_indicator_ids_in_table = (
+                Utils.scanner_indicator_tab_object.option_indicator_table.get_children()
+            )
 
             for indicator_id in list_of_all_indicator_ids_in_table:
-                row_value = Utils.scanner_indicator_tab_object.option_indicator_table.item(indicator_id, "values")
+                row_value = (
+                    Utils.scanner_indicator_tab_object.option_indicator_table.item(
+                        indicator_id, "values"
+                    )
+                )
 
                 row_instrume_id = row_value[1]
                 if int(row_instrume_id) == int(instrument_id):
                     list_of_indicator_ids.append(str(indicator_id))
 
             # Remove rows from indicator table
-            Utils.scanner_indicator_tab_object.remove_row_from_indicator_table(list_of_indicator_ids)
+            Utils.scanner_indicator_tab_object.remove_row_from_indicator_table(
+                list_of_indicator_ids
+            )
 
-        for index, row_id in enumerate(Utils.scanner_indicator_tab_object.option_indicator_table.get_children()):
+        for index, row_id in enumerate(
+            Utils.scanner_indicator_tab_object.option_indicator_table.get_children()
+        ):
             if index % 2 == 0:
-                Utils.scanner_indicator_tab_object.option_indicator_table.item(row_id, tags=("evenrow",))
+                Utils.scanner_indicator_tab_object.option_indicator_table.item(
+                    row_id, tags=("evenrow",)
+                )
             else:
-                Utils.scanner_indicator_tab_object.option_indicator_table.item(row_id, tags=("oddrow",))
+                Utils.scanner_indicator_tab_object.option_indicator_table.item(
+                    row_id, tags=("oddrow",)
+                )
 
     @staticmethod
     def update_indicator_row_in_gui(indicator_id: int):
         indicator_id = int(indicator_id)
         # Update if exits
         if indicator_id in StrategyVariables.map_indicator_id_to_indicator_object:
-            row_values = StrategyVariables.map_indicator_id_to_indicator_object[indicator_id].get_tuple()
+            row_values = StrategyVariables.map_indicator_id_to_indicator_object[
+                indicator_id
+            ].get_tuple()
             indicator_id = str(indicator_id)
 
             try:
                 # Update the row at once.
-                Utils.scanner_indicator_tab_object.option_indicator_table.item(indicator_id, values=row_values)
+                Utils.scanner_indicator_tab_object.option_indicator_table.item(
+                    indicator_id, values=row_values
+                )
             except Exception as e:
                 print(f"Execption {e}")
 
@@ -419,8 +462,10 @@ class Utils:
         # Set guess range
         guess_lower = 0.0001
         guess_upper = 0.50
-        while Utils.get_theoretical_premium(S, r1, r2, t, X, guess_upper, opt_type) < market_premium:
-
+        while (
+            Utils.get_theoretical_premium(S, r1, r2, t, X, guess_upper, opt_type)
+            < market_premium
+        ):
             # Update upper bound
             guess_upper = guess_upper * 2.0
 
@@ -429,13 +474,16 @@ class Utils:
                 return guess_upper
 
         # Run iteration
-        while pd.isnull(guess_mid) or (abs(market_premium - theoretical_premium) / market_premium > tolerance):
-
+        while pd.isnull(guess_mid) or (
+            abs(market_premium - theoretical_premium) / market_premium > tolerance
+        ):
             # Calculate mid
             guess_mid = (guess_upper + guess_lower) / 2.0
 
             # Get theoretical premium
-            theoretical_premium = Utils.get_theoretical_premium(S, r1, r2, t, X, guess_mid, opt_type)
+            theoretical_premium = Utils.get_theoretical_premium(
+                S, r1, r2, t, X, guess_mid, opt_type
+            )
 
             """
             # Print diagnostics
@@ -471,9 +519,13 @@ class Utils:
         d2 = d1 - sigma_t
 
         if opt_type == "CALL":
-            return S * math.exp((r1 - r2) * t) * norm.cdf(d1) - X * math.exp(-r2 * t) * norm.cdf(d2)
+            return S * math.exp((r1 - r2) * t) * norm.cdf(d1) - X * math.exp(
+                -r2 * t
+            ) * norm.cdf(d2)
         elif opt_type == "PUT":
-            return X * math.exp(-r2 * t) * norm.cdf(-d2) - S * math.exp((r1 - r2) * t) * norm.cdf(-d1)
+            return X * math.exp(-r2 * t) * norm.cdf(-d2) - S * math.exp(
+                (r1 - r2) * t
+            ) * norm.cdf(-d1)
         else:
             return 0.01
             # sys.exit("Unknown opt_type = " + opt_type)
@@ -510,12 +562,10 @@ class Utils:
             return float("NaN"), float("NaN")
 
         try:
-
             sigma_t = sigma * math.sqrt(t)
             d1 = (math.log(S / X) + ((r1 + math.pow(sigma, 2) / 2) * t)) / sigma_t
 
             if opt_type == "CALL":
-
                 return scipy.stats.norm.cdf(d1), sigma
 
             elif opt_type == "PUT":
@@ -525,12 +575,18 @@ class Utils:
             return float("NaN"), float("NaN")
 
     @staticmethod
-    def deletion_indicator_rows_based_on_config_tuple_relation(list_of_config_relation_tuple_for_deletion):
-
-        for config_id, instrument_id, expiry in list_of_config_relation_tuple_for_deletion:
-
+    def deletion_indicator_rows_based_on_config_tuple_relation(
+        list_of_config_relation_tuple_for_deletion,
+    ):
+        for (
+            config_id,
+            instrument_id,
+            expiry,
+        ) in list_of_config_relation_tuple_for_deletion:
             # Query to get the rows count
-            where_condition = f" WHERE `instrument_id` = {instrument_id} AND `expiry` = {expiry};"
+            where_condition = (
+                f" WHERE `instrument_id` = {instrument_id} AND `expiry` = {expiry};"
+            )
             select_query = SqlQueries.create_select_query(
                 table_name="config_indicator_relation",
                 columns="Count(*)",
@@ -549,8 +605,12 @@ class Utils:
                     columns="indicator_id",
                     where_clause=where_condition,
                 )
-                dict_of_all_indicator_ids = SqlQueries.execute_select_query(select_query)
-                list_of_indicator_ids = [row["indicator_id"] for row in dict_of_all_indicator_ids]
+                dict_of_all_indicator_ids = SqlQueries.execute_select_query(
+                    select_query
+                )
+                list_of_indicator_ids = [
+                    row["indicator_id"] for row in dict_of_all_indicator_ids
+                ]
 
                 scanner_logger.info(
                     f"      Config ID: --  Inside Utils.deletion_indicator_rows_based_on_config_tuple_relation, Delete Indicator IDs: {list_of_indicator_ids}> "
@@ -562,20 +622,28 @@ class Utils:
     def delete_indicator_row_from_db_gui_and_system(list_of_indicator_ids_deletion):
         for indicator_id in list_of_indicator_ids_deletion:
             where_condition = f"WHERE `indicator_id` = {indicator_id}"
-            delete_query = SqlQueries.create_delete_query(table_name="indicator_table", where_clause=where_condition)
+            delete_query = SqlQueries.create_delete_query(
+                table_name="indicator_table", where_clause=where_condition
+            )
             res = SqlQueries.execute_delete_query(delete_query)
 
         # Remove from system
         if list_of_indicator_ids_deletion:
-            Utils.remove_row_from_indicator_table(list_of_indicator_ids=list_of_indicator_ids_deletion)
+            Utils.remove_row_from_indicator_table(
+                list_of_indicator_ids=list_of_indicator_ids_deletion
+            )
 
     @staticmethod
-    def flag_check_early_termination_of_indicator(instrument_id=None, indicator_id=None):
-
+    def flag_check_early_termination_of_indicator(
+        instrument_id=None, indicator_id=None
+    ):
         try:
             if instrument_id:
                 instrument_id = int(float(instrument_id))
-                if not instrument_id in StrategyVariables.map_instrument_id_to_instrument_object:
+                if (
+                    not instrument_id
+                    in StrategyVariables.map_instrument_id_to_instrument_object
+                ):
                     return True
         except Exception as e:
             pass
@@ -583,7 +651,10 @@ class Utils:
         try:
             if indicator_id:
                 indicator_id = int(float(indicator_id))
-                if not indicator_id in StrategyVariables.map_indicator_id_to_indicator_object:
+                if (
+                    not indicator_id
+                    in StrategyVariables.map_indicator_id_to_indicator_object
+                ):
                     return True
         except Exception as e:
             pass

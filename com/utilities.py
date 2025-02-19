@@ -4,7 +4,6 @@ Created on 20-Apr-2023
 @author: Karan
 """
 
-
 from com.mysql_io import *
 from com.order_execution import *
 import re
@@ -18,15 +17,14 @@ from com.positions import update_combo_positions_in_positions_tab
 # importing Function in process_cas_add_condition_for_combo, process_cas_switch_condition_for_combo
 # from com.combination_helper import create_combination, subscribe_mktdata_combo_obj, insert_combination_db
 
+
 # Method to sort string numeric values
 def custom_sort(val):
-
     # Replace 'N/A' with a large value
     if val == "N/A":
         return 10**15
 
     elif type(val) == str and (val[0].isnumeric() or val[0] == "-"):
-
         # Replace "," with ""
         val = val.replace(",", "")
         val = val.replace(":", "")
@@ -39,9 +37,9 @@ def custom_sort(val):
     else:
         return val
 
+
 # Method to sort cas rows
 def sort_cas_row_values_by_column(values):
-
     # Sort Values Based on the User selected column
     key, reverse = list(variables.cas_table_sort_by_column.items())[0]
 
@@ -55,12 +53,11 @@ def sort_cas_row_values_by_column(values):
 
     return values
 
+
 # Method to check if format of brackets in string is correct
 def check_valid_brackets(condition_string):
-
     stack = []
     for ch in condition_string:
-
         if ch == "(":
             stack.append("(")
         elif ch == ")":
@@ -76,6 +73,7 @@ def check_valid_brackets(condition_string):
 
     return True
 
+
 # Method to check if condition is in right format or not
 def check_basic_condition(
     condition_string,
@@ -84,12 +82,10 @@ def check_basic_condition(
     refer_position,
     flag_check_expression=False,
 ):
-
     # local copy of allowed tokens
     set_allowed_tokens = copy.deepcopy(variables.set_allowed_tokens)
 
     if len(variables.current_session_accounts) > 1:
-
         set_allowed_tokens.remove("Price Adverse Chg By")
         set_allowed_tokens.remove("Price Favorable Chg By")
 
@@ -98,7 +94,6 @@ def check_basic_condition(
 
     # Checking for valid brackets
     if not check_valid_brackets(condition_string_copy):
-
         error_string = "Invalid brackets, Please check the condition."
         return False, error_string
 
@@ -132,7 +127,6 @@ def check_basic_condition(
         num_val = num_val.strip()
 
         if num_val != "":
-
             try:
                 float(num_val)
             except:
@@ -141,7 +135,6 @@ def check_basic_condition(
 
     # Check if expression is being checked
     if flag_check_expression:
-
         # Get list of column for expression
         user_input_fields = copy.deepcopy(variables.cas_table_fields_for_expression)
 
@@ -169,7 +162,6 @@ def check_basic_condition(
 
     # Check if expression is being checked
     if flag_check_expression:
-
         # Get the column names of the DataFrame
         columns = cas_table_data_frame.columns
 
@@ -180,7 +172,6 @@ def check_basic_condition(
         cas_row = na_values
 
     else:
-
         if filtered_df.empty:
             # Get the column names of the DataFrame
             columns = cas_table_data_frame.columns
@@ -203,9 +194,9 @@ def check_basic_condition(
         first_time_checking=True,
     )
 
+
 # Method to validate account condition is in right format or not
 def check_account_condition(condition_string):
-
     # local copy of allowed tokens
     set_allowed_tokens = set(
         [
@@ -221,7 +212,6 @@ def check_account_condition(condition_string):
 
     # Checking for valid brackets
     if not check_valid_brackets(condition_string_copy):
-
         error_string = "Invalid brackets, Please check the condition."
         return False, error_string
 
@@ -248,7 +238,6 @@ def check_account_condition(condition_string):
 
     # Checking for Tokens
     for token in set_allowed_tokens:
-
         condition_string_copy = condition_string_copy.replace(token, " ")
 
     # Checking Floats
@@ -256,20 +245,16 @@ def check_account_condition(condition_string):
         num_val = num_val.strip()
 
         if num_val != "":
-
             try:
                 # Check if term has % in it
                 if num_val.count("%") == 1:
-
                     num_val = num_val.replace("%", "")
 
                     float(num_val)
 
                 else:
-
                     float(num_val)
             except:
-
                 error_string = "Invalid Values, Please check the condition."
                 return False, error_string
 
@@ -302,6 +287,7 @@ def check_account_condition(condition_string):
         first_time_checking=True,
     )
 
+
 # Method to evaluate condition
 def evaluate_condition(
     user_input_fields,
@@ -311,7 +297,6 @@ def evaluate_condition(
     refer_position,
     first_time_checking=False,
 ):
-
     # define the global and local namespaces for eval
     globals_dict = {}
     locals_dict = {}
@@ -325,7 +310,6 @@ def evaluate_condition(
 
     # Replace date_times with variables and add that to globals dict
     for date_time in date_times_list:
-
         # Mark flag to True
         flag_date_time_present = True
 
@@ -343,7 +327,6 @@ def evaluate_condition(
 
     # replace times with variables and add that to globals dict
     for _time_ in times_list:
-
         # Mark flag to True
         flag_time_present = True
 
@@ -357,7 +340,6 @@ def evaluate_condition(
     # user_input_fields contains all the different tokens that user can give
     # Replace Token with Value
     for token in user_input_fields:
-
         # check if this token in condition string
         is_token_present = condition_string.find(token)
 
@@ -369,7 +351,6 @@ def evaluate_condition(
             "Price Adverse Chg By",
             "Price Favorable Chg By",
         ]:
-
             """if refer_position == 0:
 
                 error_string = f"Can not use '{token}' as current position is 0."
@@ -377,7 +358,6 @@ def evaluate_condition(
 
             else:"""
             try:
-
                 # Get current price buy and sell price of combo from cas
                 combo_buy_price = cas_row["Buy Price"]
                 combo_sell_price = cas_row["Sell Price"]
@@ -393,20 +373,16 @@ def evaluate_condition(
                 if (refer_position > 0 and token == "Price Favorable Chg By") or (
                     refer_position < 0 and token == "Price Adverse Chg By"
                 ):
-
                     price_change = current_price - refer_price
                 else:
-
                     price_change = refer_price - current_price
 
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print("error,", e)
                 # If the price are not available use these value only to test the condition when it is added by the user
                 if first_time_checking:
-
                     # If Price were not available when user wanted to insert condition, we are giving default price so we can insert condition
                     current_price = 10000
                     price_change = 1000
@@ -422,7 +398,6 @@ def evaluate_condition(
             continue
 
         elif token in ["Price Increase By", "Price Decrease By"]:
-
             try:
                 # Get current price buy and sell price of combo from cas
                 combo_buy_price = cas_row["Buy Price"]
@@ -434,10 +409,8 @@ def evaluate_condition(
 
                 current_price = (float(combo_buy_price) + float(combo_sell_price)) / 2
             except Exception as e:
-
                 # If the price are not available use these value only to test the condition when it is added by the user
                 if first_time_checking:
-
                     current_price = 10000
                 else:
                     return False, False
@@ -452,7 +425,6 @@ def evaluate_condition(
             continue
 
         elif token in ["Intraday Low Time", "Intraday High Time"]:
-
             # Token Value
             token_val = cas_row[f"{token}"]
 
@@ -464,10 +436,10 @@ def evaluate_condition(
                 return False, False
 
             # Add to globals_dict (time object)
-            globals_dict[
-                f"dates{dates_counter}"
-            ] = variables.target_timezone_obj.localize(
-                datetime.datetime.strptime(token_val, "%H:%M:%S")
+            globals_dict[f"dates{dates_counter}"] = (
+                variables.target_timezone_obj.localize(
+                    datetime.datetime.strptime(token_val, "%H:%M:%S")
+                )
             )
             condition_string = condition_string.replace(
                 token, f" dates{dates_counter} "
@@ -478,7 +450,6 @@ def evaluate_condition(
 
         # Normal Tokens
         else:
-
             token_val = str(cas_row[f"{token}"]).replace(",", "")
 
         # If the field is not available use this value only to test the condition when it is added by the user
@@ -498,19 +469,16 @@ def evaluate_condition(
         condition_string = condition_string.replace(f"{token}", f"{token_val}")
 
     try:
-
         result_of_condition_eval = eval(condition_string, globals_dict, locals_dict)
 
         # If we are able to evaluate the condition when it is added by the user(but eval resulted in False, still returning True)
         if first_time_checking:
             return True, None
 
-
         # when checking condition for triggering the CAS
         return result_of_condition_eval, condition_string
 
     except Exception as e:
-
         # If we are able to evaluate the condition when it is added by the user
         if first_time_checking:
             error_string = "Unable to evaluate condition, Please check the condition."
@@ -519,9 +487,9 @@ def evaluate_condition(
         # if not able to evaluate (maybe value is  "N/A" return False)
         return False, False
 
+
 # Method to monitor and manage conditional orders
 def monitor_and_trigger_cas_condition():
-
     try:
         # Get all cas conditions in the DB.
         cas_conditions_df = get_all_cas_conditions_from_db(only_pending=True)
@@ -535,7 +503,6 @@ def monitor_and_trigger_cas_condition():
 
         # For each condition evaluate the condition
         for indx, cas_condition_row in cas_conditions_df.iterrows():
-
             unique_id = cas_condition_row["Unique ID"]
             trading_combination_unique_id = cas_condition_row[
                 "Trading Combination Unique ID"
@@ -563,11 +530,9 @@ def monitor_and_trigger_cas_condition():
 
             # set boolan value of execution engine
             if flag_use_execution_engine == "True":
-
                 flag_use_execution_engine = True
 
             else:
-
                 flag_use_execution_engine = False
 
             # If status is not pending continue
@@ -583,7 +548,6 @@ def monitor_and_trigger_cas_condition():
                 # get the first row of the filtered DataFrame using .iloc
                 cas_row = filtered_df.iloc[0]
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
                     print(f"\nUnique ID: {unique_id}")
@@ -614,10 +578,7 @@ def monitor_and_trigger_cas_condition():
                 reference_position,
             )
 
-
-
             if eval_result and variables.flag_account_checks_completed_first_time:
-
                 # It will be show in popup that happend when codition is triggered (CAS)
                 solved_condition_string = (
                     f"{condition.strip()} \n{solved_condition_string.strip()}"
@@ -634,9 +595,6 @@ def monitor_and_trigger_cas_condition():
 
                 # If we have conditional order to place(BUY, SELL)
                 if cas_condition_type in ["BUY", "SELL"]:
-
-
-
                     if account_id not in variables.current_session_accounts:
                         # update value
                         variables.cas_condition_table_dataframe.loc[
@@ -672,7 +630,6 @@ def monitor_and_trigger_cas_condition():
 
                         # check if order was originated from conditional series
                         if series_id not in ["None", "N/A", None]:
-
                             if series_id not in [None, "None"]:
                                 terminate_series(unique_id, series_id)
 
@@ -693,7 +650,6 @@ def monitor_and_trigger_cas_condition():
                         int(trading_combination_unique_id)
                         in all_the_unique_ids_in_the_system
                     ):
-
                         rm_checks_result = True
 
                         # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -702,7 +658,6 @@ def monitor_and_trigger_cas_condition():
                             and variables.flag_enable_rm_account_rules
                             and variables.flag_account_liquidation_mode[account_id]
                         ):
-
                             time.sleep(variables.rm_checks_interval_if_failed)
 
                             # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -711,7 +666,6 @@ def monitor_and_trigger_cas_condition():
                                 and variables.flag_enable_rm_account_rules
                                 and variables.flag_account_liquidation_mode[account_id]
                             ):
-
                                 # variables.screen.cancel_order(selected_item=order_time, updated_status='Failed')
                                 # update value
 
@@ -760,7 +714,6 @@ def monitor_and_trigger_cas_condition():
 
                                 # check if order was originated from conditional series
                                 if series_id not in ["None", "N/A", None]:
-
                                     if series_id not in [None, "None"]:
                                         terminate_series(unique_id, series_id)
 
@@ -773,7 +726,6 @@ def monitor_and_trigger_cas_condition():
                         if not trade_level_rm_check_result(
                             bypass_rm_check, trading_combination_unique_id
                         ):
-
                             time.sleep(variables.rm_checks_interval_if_failed)
 
                             if not trade_level_rm_check_result(
@@ -818,7 +770,6 @@ def monitor_and_trigger_cas_condition():
 
                                 # check if order was originated from conditional series
                                 if series_id not in ["None", "N/A", None]:
-
                                     if series_id not in [None, "None"]:
                                         terminate_series(unique_id, series_id)
 
@@ -910,7 +861,6 @@ def monitor_and_trigger_cas_condition():
                         variables.screen.screen_cas_obj.update_cas_condition_after_cas_condition_deleted()
 
                         if pending_count == 0:
-
                             # check if order was originated from conditional series
                             if series_id not in ["None", "N/A", None]:
                                 # variables.screen.screen_cas_obj.delete_cas_condition(unique_id)
@@ -920,7 +870,6 @@ def monitor_and_trigger_cas_condition():
                                 )
 
                     else:
-
                         # Move this row from the table to archive table.
                         move_active_data_to_archive_db(
                             unique_id,
@@ -955,7 +904,6 @@ def monitor_and_trigger_cas_condition():
 
                 # Mark the orders cancelled
                 for i, pending_order_row in all_pending_order.iterrows():
-
                     # Init value
                     r_unique_id = int(pending_order_row["Unique ID"])
                     order_time = pending_order_row["Order Time"]
@@ -963,7 +911,6 @@ def monitor_and_trigger_cas_condition():
 
                     # Cancel order if unique Id matches
                     if r_unique_id == unique_id:
-
                         try:
                             mark_pending_combo_order_cancelled(
                                 unique_id,
@@ -975,12 +922,10 @@ def monitor_and_trigger_cas_condition():
                             )
                         except Exception as e:
                             if variables.flag_debug_mode:
-
                                 print(e)
 
                 # Positions Add or Switch.
                 if cas_condition_type == "ADD":
-
                     process_cas_add_condition_for_combo(
                         unique_id,
                         solved_condition_string,
@@ -991,7 +936,6 @@ def monitor_and_trigger_cas_condition():
                         series_id=series_id,
                     )
                 elif cas_condition_type == "SWITCH":
-
                     process_cas_switch_condition_for_combo(
                         unique_id,
                         solved_condition_string,
@@ -1002,11 +946,10 @@ def monitor_and_trigger_cas_condition():
                     )
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(f"Exception inside 'monitor_and_trigger_cas_condition', Exp: {e}")
+
 
 # Method to check if value is float or not
 def is_float(value):
@@ -1018,9 +961,9 @@ def is_float(value):
         return True
 
     except Exception as e:
-
         # Return false if value cannot be converted to float
         return False
+
 
 # Method to place dummy order
 def insert_order_when_conditional_add_switch_fails(
@@ -1029,13 +972,9 @@ def insert_order_when_conditional_add_switch_fails(
     positions_to_trade,
     ticker_string=None,
     execution_engine=False,
-        entry_price = None,
+    entry_price=None,
 ):
-
     try:
-
-
-
         try:
             # Get combo object using unique ids
             local_unique_id_to_combo_obj = copy.deepcopy(
@@ -1044,34 +983,27 @@ def insert_order_when_conditional_add_switch_fails(
 
             combo_obj = local_unique_id_to_combo_obj[int(new_unique_id)]
 
-
             # get all legs
             all_legs = combo_obj.buy_legs + combo_obj.sell_legs
 
             for leg_obj in all_legs:
-
                 # get current price
                 try:
                     req_id = variables.con_id_to_req_id_dict[leg_obj.con_id]
                     bid, ask = variables.bid_price[req_id], variables.ask_price[req_id]
                     current_price = (ask + bid) / 2
 
-
-
                 except Exception as e:
-
                     if variables.flag_debug_mode:
                         print(f"Exception inside getting leg's bid-ask price, Exp: {e}")
 
                     return
 
         except Exception as e:
-
             if variables.flag_debug_mode:
                 print(f"Exception inside adding dummy order status, Exp: {e}")
 
             return
-
 
         positions_to_trade = int(positions_to_trade)
 
@@ -1080,14 +1012,14 @@ def insert_order_when_conditional_add_switch_fails(
 
         # calculate actual entry price
         try:
-
-            actual_entry_price = variables.unique_id_to_actual_prices_dict[int(new_unique_id)][buy_sell_action]
+            actual_entry_price = variables.unique_id_to_actual_prices_dict[
+                int(new_unique_id)
+            ][buy_sell_action]
 
             if not is_float(actual_entry_price):
                 return
 
         except Exception as e:
-
             return
 
         # Position
@@ -1095,7 +1027,6 @@ def insert_order_when_conditional_add_switch_fails(
 
         # Cehck if combo quanity is 0 ####################################################################
         if combo_quantity == 0:
-
             return
 
         # Init value
@@ -1103,10 +1034,8 @@ def insert_order_when_conditional_add_switch_fails(
         limit_price, trigger_price, trail_value = "None", "None", "None"
 
         if entry_price != None:
-
             entry_price = str(entry_price)
         else:
-
             return
 
         status = "Filled"
@@ -1121,8 +1050,8 @@ def insert_order_when_conditional_add_switch_fails(
         reference_price = None
         bypass_rm_check = "False"
         reason_for_failed = "None"
-        limit_iv = 'None'
-        trigger_iv = 'None'
+        limit_iv = "None"
+        trigger_iv = "None"
 
         insert_combination_order_in_combo_status_db(
             new_unique_id,
@@ -1197,8 +1126,7 @@ def insert_order_when_conditional_add_switch_fails(
             str(execution_engine),
             limit_iv,
             trigger_iv,
-            actual_entry_price
-
+            actual_entry_price,
         )
 
         # Creating dataframe for row data
@@ -1247,7 +1175,7 @@ def insert_order_when_conditional_add_switch_fails(
                     str(execution_engine),
                     limit_iv,
                     trigger_iv,
-                    actual_entry_price
+                    actual_entry_price,
                 )
             )
 
@@ -1259,14 +1187,12 @@ def insert_order_when_conditional_add_switch_fails(
 
             combo_obj = local_unique_id_to_combo_obj[int(new_unique_id)]
 
-
             # get all legs
             all_legs = combo_obj.buy_legs + combo_obj.sell_legs
 
             action_for_leg = buy_sell_action
 
             for leg_obj in all_legs:
-
                 # get current price
                 try:
                     req_id = variables.con_id_to_req_id_dict[leg_obj.con_id]
@@ -1274,44 +1200,38 @@ def insert_order_when_conditional_add_switch_fails(
                     current_price = (ask + bid) / 2
 
                 except Exception as e:
-
                     current_price = None
 
-                if buy_sell_action in 'BUY':
-
+                if buy_sell_action in "BUY":
                     action_for_leg = leg_obj.action
 
                 else:
-
-                    if leg_obj.action in 'BUY':
-
-                        action_for_leg = 'SELL'
+                    if leg_obj.action in "BUY":
+                        action_for_leg = "SELL"
 
                     else:
-
-                        action_for_leg = 'BUY'
-
-
+                        action_for_leg = "BUY"
 
                 legs_quantity = combo_quantity * leg_obj.quantity
 
-                insert_dummy_order_in_order_status(new_unique_id,
-                                                leg_obj,
-                                                action_for_leg,
-                                                legs_quantity,
-                                                account_id,
-                                                order_time, current_price)
+                insert_dummy_order_in_order_status(
+                    new_unique_id,
+                    leg_obj,
+                    action_for_leg,
+                    legs_quantity,
+                    account_id,
+                    order_time,
+                    current_price,
+                )
 
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(f"Exception inside adding dummy order status, Exp: {e}")
 
     except Exception as e:
         if variables.flag_debug_mode:
-
             print(e)
+
 
 # Method to process cas add order after trigger
 def process_cas_add_condition_for_combo(
@@ -1323,7 +1243,6 @@ def process_cas_add_condition_for_combo(
     cas_conditions_df,
     series_id="None",
 ):
-
     # Filter df for unique id
     cas_conditions_df = cas_conditions_df.loc[
         cas_conditions_df["Unique ID"] == unique_id
@@ -1361,7 +1280,6 @@ def process_cas_add_condition_for_combo(
     # series_id = "None"
 
     try:
-
         # Get Ticker String
         # Get combo obj
         local_stored_copy_of_combo_object = variables.unique_id_to_combo_obj[unique_id]
@@ -1370,17 +1288,14 @@ def process_cas_add_condition_for_combo(
         ticker_string = make_informative_combo_string(local_stored_copy_of_combo_object)
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f"Exception inside getting ticker string inside conditional add, Exp: {e}"
             )
 
     # Get account id list which were present when condition add was placed but not in current session
     try:
-
         # account ids when not present when condition add was placed but in current session
         account_id_not_in_df = [
             account_id_item
@@ -1389,10 +1304,8 @@ def process_cas_add_condition_for_combo(
         ]
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f"Exception inside getting account id list in conditional add, Exp: {e}"
             )
@@ -1401,29 +1314,25 @@ def process_cas_add_condition_for_combo(
 
     # Iterate account ids
     for account_id in account_id_not_in_df:
-
         try:
-
             # Current Position of existing combo
             existing_position = local_map_unique_id_to_positions[unique_id][account_id]
 
         except Exception as e:
-
             # set value to zero
             existing_position = 0
 
-        dummy_orders_list.append([account_id,
-                                new_unique_id_for_old_combo,
-                                existing_position,
-                                ticker_string])
+        dummy_orders_list.append(
+            [account_id, new_unique_id_for_old_combo, existing_position, ticker_string]
+        )
 
         # Insert order without placing on TWS
-        '''insert_order_when_conditional_add_switch_fails(
+        """insert_order_when_conditional_add_switch_fails(
             account_id,
             new_unique_id_for_old_combo,
             existing_position,
             ticker_string=ticker_string,
-        )'''
+        )"""
 
     # Display
     variables.screen.screen_cas_obj.display_condition_triggered_informative_popup(
@@ -1442,9 +1351,9 @@ def process_cas_add_condition_for_combo(
     cas_combo_object_with_new_unique_id.unique_id = new_unique_id
 
     # Make it available to class variables Add this combo to unique ID
-    variables.unique_id_to_combo_obj[
-        new_unique_id
-    ] = cas_combo_object_with_new_unique_id
+    variables.unique_id_to_combo_obj[new_unique_id] = (
+        cas_combo_object_with_new_unique_id
+    )
 
     # Account_id list
     account_id_list = []
@@ -1459,7 +1368,6 @@ def process_cas_add_condition_for_combo(
 
     # Iterate rows
     for indx, row in cas_conditions_df.iterrows():
-
         # Check status
         status = row["Status"]
 
@@ -1479,16 +1387,13 @@ def process_cas_add_condition_for_combo(
         # print([bypass_rm_check, variables.flag_enable_rm_account_rules,variables.flag_account_liquidation_mode[account_id],account_id])
         # Check if status is failed
         if status == "Failed":
-
             continue
 
         try:
-
             # Current Position of existing combo
             existing_position = local_map_unique_id_to_positions[unique_id][account_id]
 
         except Exception as e:
-
             # Set value to 0
             existing_position = 0
 
@@ -1497,37 +1402,36 @@ def process_cas_add_condition_for_combo(
 
         # Check if exsting position is not zero
         if existing_position != 0:
-
             positions_to_trade_for_old_combo = target_position - existing_position
 
         # Check if existing poition is zero
         elif existing_position == 0:
-
             positions_to_trade_for_old_combo = target_position
 
         else:
-
             pass
 
         try:
             # print([bypass_rm_check ,variables.flag_enable_rm_account_rules, variables.flag_account_liquidation_mode[account_id], account_id])
 
             if account_id not in variables.current_session_accounts:
+                dummy_orders_list.append(
+                    [
+                        account_id,
+                        new_unique_id_for_old_combo,
+                        existing_position,
+                        ticker_string,
+                    ]
+                )
 
-                dummy_orders_list.append([account_id,
-                                          new_unique_id_for_old_combo,
-                                          existing_position,
-                                          ticker_string])
-
-                '''insert_order_when_conditional_add_switch_fails(
+                """insert_order_when_conditional_add_switch_fails(
                     account_id,
                     new_unique_id_for_old_combo,
                     existing_position,
                     ticker_string=ticker_string,
-                )'''
+                )"""
 
                 try:
-
                     # variables.screen.cancel_order(selected_item=order_time, updated_status='Failed')
                     # update value
                     variables.cas_condition_table_dataframe.loc[
@@ -1573,10 +1477,8 @@ def process_cas_add_condition_for_combo(
                     )"""
 
                 except Exception as e:
-
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"Exception inside adding failed row for conditional add, Exp: {e}"
                         )
@@ -1588,7 +1490,6 @@ def process_cas_add_condition_for_combo(
                 and variables.flag_enable_rm_account_rules
                 and variables.flag_account_liquidation_mode[account_id]
             ):
-
                 time.sleep(variables.rm_checks_interval_if_failed)
 
                 # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -1597,7 +1498,6 @@ def process_cas_add_condition_for_combo(
                     and variables.flag_enable_rm_account_rules
                     and variables.flag_account_liquidation_mode[account_id]
                 ):
-
                     insert_order_when_conditional_add_switch_fails(
                         account_id,
                         new_unique_id_for_old_combo,
@@ -1606,7 +1506,6 @@ def process_cas_add_condition_for_combo(
                     )
 
                     try:
-
                         # variables.screen.cancel_order(selected_item=order_time, updated_status='Failed')
                         # update value
                         variables.cas_condition_table_dataframe.loc[
@@ -1652,10 +1551,8 @@ def process_cas_add_condition_for_combo(
                         )"""
 
                     except Exception as e:
-
                         # Print to console
                         if variables.flag_debug_mode:
-
                             print(
                                 f"Exception inside adding failed row for conditional add, Exp: {e}"
                             )
@@ -1663,11 +1560,9 @@ def process_cas_add_condition_for_combo(
                     continue
 
             elif not trade_level_rm_check_result(bypass_rm_check, unique_id):
-
                 time.sleep(variables.rm_checks_interval_if_failed)
 
                 if not trade_level_rm_check_result(bypass_rm_check, unique_id):
-
                     insert_order_when_conditional_add_switch_fails(
                         account_id,
                         new_unique_id_for_old_combo,
@@ -1676,7 +1571,6 @@ def process_cas_add_condition_for_combo(
                     )
 
                     try:
-
                         # variables.screen.cancel_order(selected_item=order_time, updated_status='Failed')
                         # update value
                         variables.cas_condition_table_dataframe.loc[
@@ -1716,7 +1610,6 @@ def process_cas_add_condition_for_combo(
                         )"""
 
                     except Exception as e:
-
                         # Print to console
                         if variables.flag_debug_mode:
                             print(
@@ -1726,7 +1619,6 @@ def process_cas_add_condition_for_combo(
                     continue
 
         except Exception as e:
-
             if variables.flag_debug_mode:
                 print(f"Checking if ")
 
@@ -1739,7 +1631,6 @@ def process_cas_add_condition_for_combo(
         # Check comment inside the 'send_order' at the starting of function refering to 'local_stored_copy_of_combo_object'
         # Position to trade is not 'zero' for old combo
         if positions_to_trade_for_old_combo != 0:
-
             # Action
             buy_sell_action = "BUY" if positions_to_trade_for_old_combo > 0 else "SELL"
 
@@ -1922,7 +1813,6 @@ def process_cas_add_condition_for_combo(
 
     # check series id
     if series_id not in ["None", "N/A", None]:
-
         variables.screen.screen_conditional_series_tab.update_unique_id_series(
             new_combo_unique_id,
             unique_id,
@@ -1932,7 +1822,6 @@ def process_cas_add_condition_for_combo(
         )
 
     else:
-
         variables.screen.screen_conditional_series_tab.update_unique_id_series(
             new_combo_unique_id, unique_id, new_unique_id_for_old_combo
         )
@@ -1946,14 +1835,11 @@ def process_cas_add_condition_for_combo(
         )
 
     try:
-
         # Delete the existing combo
         variables.screen.delete_row(unique_id)
 
     except Exception as e:
-
         if variables.flag_debug_mode:
-
             print(f"Exception for delteing combo in cas add trigger function, Exp: {e}")
 
     for account_id, bypass_rm_check, target_position, existing_position in zip(
@@ -1962,14 +1848,12 @@ def process_cas_add_condition_for_combo(
         target_position_list,
         existing_position_list,
     ):
-
         # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
         if (
             bypass_rm_check == "False"
             and variables.flag_enable_rm_account_rules
             and variables.flag_account_liquidation_mode[account_id]
         ):
-
             time.sleep(variables.rm_checks_interval_if_failed)
 
             # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -1981,7 +1865,6 @@ def process_cas_add_condition_for_combo(
                 continue
 
         elif not trade_level_rm_check_result(bypass_rm_check, new_unique_id):
-
             time.sleep(variables.rm_checks_interval_if_failed)
 
             if not trade_level_rm_check_result(bypass_rm_check, unique_id):
@@ -2000,7 +1883,6 @@ def process_cas_add_condition_for_combo(
             # Init value
             order_type = "Market"
             limit_price, trigger_price, trail_value = "", "", ""
-
 
             # Place order for incremental combo
             # Take position: Send order in a separate thread
@@ -2045,11 +1927,7 @@ def process_cas_add_condition_for_combo(
 
         current_price = (current_buy_price + current_sell_price) / 2
 
-
-
     except Exception as e:
-
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -2058,11 +1936,10 @@ def process_cas_add_condition_for_combo(
 
         current_price = None
 
-
-
     for row in dummy_orders_list:
-
-        insert_order_when_conditional_add_switch_fails(row[0], row[1], row[2], ticker_string=row[3], entry_price=current_price)
+        insert_order_when_conditional_add_switch_fails(
+            row[0], row[1], row[2], ticker_string=row[3], entry_price=current_price
+        )
 
     # Create a thread and pass the result_queue as an argument
     new_combo_values_thread = threading.Thread(
@@ -2076,6 +1953,7 @@ def process_cas_add_condition_for_combo(
     # Start the thread
     new_combo_values_thread.start()
 
+
 # Method to process cas switch order after trigger
 def process_cas_switch_condition_for_combo(
     unique_id,
@@ -2085,7 +1963,6 @@ def process_cas_switch_condition_for_combo(
     target_position,
     cas_conditions_df,
 ):
-
     # New Unique Id for new combo
     new_unique_id = variables.unique_id
 
@@ -2129,7 +2006,6 @@ def process_cas_switch_condition_for_combo(
     series_id = "None"
 
     try:
-
         # Get Ticker String
         # Get combo obj
         local_stored_copy_of_combo_object = variables.unique_id_to_combo_obj[unique_id]
@@ -2138,16 +2014,13 @@ def process_cas_switch_condition_for_combo(
         ticker_string = make_informative_combo_string(local_stored_copy_of_combo_object)
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f"Exception inside getting ticker string inside conditional switch, Exp: {e}"
             )
 
     try:
-
         # account ids when not present when condition add was placed but in current session
         account_id_not_in_df = [
             account_id_item
@@ -2156,47 +2029,39 @@ def process_cas_switch_condition_for_combo(
         ]
 
     except Exception as e:
-
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f"Exception inside getting account id list inside conditional switch, Exp: {e}"
             )
 
     # Iterate account ids
     for account_id in account_id_not_in_df:
-
         try:
-
             # Current Position of existing combo
             existing_position = local_map_unique_id_to_positions[unique_id][account_id]
 
         except Exception as e:
-
             # Set value to 0
             existing_position = 0
 
-        dummy_orders_list.append([account_id,
-                                  new_unique_id_for_old_combo,
-                                  existing_position,
-                                  ticker_string])
+        dummy_orders_list.append(
+            [account_id, new_unique_id_for_old_combo, existing_position, ticker_string]
+        )
 
         # Insert order without placing on TWS
-        '''insert_order_when_conditional_add_switch_fails(
+        """insert_order_when_conditional_add_switch_fails(
             account_id,
             new_unique_id_for_old_combo,
             existing_position,
             ticker_string=ticker_string,
-        )'''
+        )"""
 
     # Iterate rows
     for indx, row in cas_conditions_df.iterrows():
-
         # Get account id and target positions
         account_id = row["Account ID"]
         target_position = row["Target Position"]
-
 
         # Check status
         status = row["Status"]
@@ -2212,11 +2077,9 @@ def process_cas_switch_condition_for_combo(
 
         # Check if status is failed
         if status == "Failed":
-
             continue
 
         if account_id in variables.current_session_accounts:
-
             # Current Position of existing combo
             existing_position = local_map_unique_id_to_positions[unique_id][account_id]
 
@@ -2225,23 +2088,24 @@ def process_cas_switch_condition_for_combo(
             sell_legs = existing_combo.sell_legs
             existing_all_legs = buy_legs + sell_legs
 
-
         if account_id not in variables.current_session_accounts:
+            dummy_orders_list.append(
+                [
+                    account_id,
+                    new_unique_id_for_old_combo,
+                    target_position,
+                    ticker_string,
+                ]
+            )
 
-            dummy_orders_list.append([account_id,
-                                      new_unique_id_for_old_combo,
-                                      target_position,
-                                      ticker_string])
-
-            '''insert_order_when_conditional_add_switch_fails(
+            """insert_order_when_conditional_add_switch_fails(
                 account_id,
                 new_unique_id_for_old_combo,
                 existing_position,
                 ticker_string,
-            )'''
+            )"""
 
             try:
-
                 # variables.screen.cancel_order(selected_item=order_time, updated_status='Failed')
                 # update value
                 variables.cas_condition_table_dataframe.loc[
@@ -2287,10 +2151,8 @@ def process_cas_switch_condition_for_combo(
                 )"""
 
             except Exception as e:
-
                 # Print to console
                 if variables.flag_debug_mode:
-
                     print(
                         f"Exception inside adding failed row for conditional add, Exp: {e}"
                     )
@@ -2302,7 +2164,6 @@ def process_cas_switch_condition_for_combo(
             and variables.flag_enable_rm_account_rules
             and variables.flag_account_liquidation_mode[account_id]
         ):
-
             time.sleep(variables.rm_checks_interval_if_failed)
 
             # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -2311,7 +2172,6 @@ def process_cas_switch_condition_for_combo(
                 and variables.flag_enable_rm_account_rules
                 and variables.flag_account_liquidation_mode[account_id]
             ):
-
                 insert_order_when_conditional_add_switch_fails(
                     account_id,
                     new_unique_id_for_old_combo,
@@ -2320,7 +2180,6 @@ def process_cas_switch_condition_for_combo(
                 )
 
                 try:
-
                     # variables.screen.cancel_order(selected_item=order_time, updated_status='Failed')
                     # update value
                     variables.cas_condition_table_dataframe.loc[
@@ -2366,10 +2225,8 @@ def process_cas_switch_condition_for_combo(
                     )"""
 
                 except Exception as e:
-
                     # Print to console
                     if variables.flag_debug_mode:
-
                         print(
                             f"Exception inside adding failed row for conditional add, Exp: {e}"
                         )
@@ -2377,11 +2234,9 @@ def process_cas_switch_condition_for_combo(
                 continue
 
         if not trade_level_rm_check_result(bypass_rm_check, unique_id):
-
             time.sleep(variables.rm_checks_interval_if_failed)
 
             if not trade_level_rm_check_result(bypass_rm_check, unique_id):
-
                 insert_order_when_conditional_add_switch_fails(
                     account_id,
                     new_unique_id_for_old_combo,
@@ -2438,7 +2293,6 @@ def process_cas_switch_condition_for_combo(
 
         # Close position if not 'zero'
         if existing_position != 0:
-
             # Action
             buy_sell_action = "SELL" if existing_position > 0 else "BUY"
 
@@ -2512,7 +2366,6 @@ def process_cas_switch_condition_for_combo(
 
         # Display Error Popup
         if show_error_popup == True and indx == 1:
-
             # It should never happen technically
             variables.screen.display_error_popup(error_title, error_string)
             return
@@ -2545,7 +2398,6 @@ def process_cas_switch_condition_for_combo(
         while (
             counter_time < 10 and variables.flag_account_checks_completed_wait == False
         ):
-
             counter_time += 0.5
             time.sleep(0.5)
 
@@ -2570,12 +2422,9 @@ def process_cas_switch_condition_for_combo(
     )
 
     try:
-
         unique_id = int(unique_id)
     except Exception as e:
-
         if variables.flag_debug_mode:
-
             print(e)
 
     # Removing deleted cas condition from watchlist cas condition dataframe
@@ -2631,7 +2480,6 @@ def process_cas_switch_condition_for_combo(
 
     # check series id
     if series_id not in ["None", "N/A", None]:
-
         variables.screen.screen_conditional_series_tab.update_unique_id_series(
             new_combo_unique_id,
             unique_id,
@@ -2641,43 +2489,37 @@ def process_cas_switch_condition_for_combo(
         )
 
     else:
-
         variables.screen.screen_conditional_series_tab.update_unique_id_series(
             new_combo_unique_id, unique_id, new_unique_id_for_old_combo
         )
 
     # check if order was originated from conditional series
     if series_id not in ["None", "N/A", None]:
-
         # variables.screen.screen_cas_obj.delete_cas_condition(unique_id)
 
         variables.screen.screen_conditional_series_tab.update_conditional_order_after_order_completed(
             series_id, new_combo_unique_id, unique_id, new_unique_id_for_old_combo
         )
 
-
     try:
-
         # Delete the existing combo
         variables.screen.delete_row(unique_id)
 
     except Exception as e:
-
         if variables.flag_debug_mode:
-
-            print(f"Exception for delteing combo in cas switch triiger function, Exp: {e}")
+            print(
+                f"Exception for delteing combo in cas switch triiger function, Exp: {e}"
+            )
 
     for target_position, account_id, bypass_rm_check in zip(
         target_position_list, account_id_list, bypass_rm_check_list
     ):
-
         # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
         if (
             bypass_rm_check == "False"
             and variables.flag_enable_rm_account_rules
             and variables.flag_account_liquidation_mode[account_id]
         ):
-
             time.sleep(variables.rm_checks_interval_if_failed)
 
             # if bypass rm checks value is false, flag_enable_rm_account_rules value is True and account is in liquidation mode
@@ -2686,15 +2528,12 @@ def process_cas_switch_condition_for_combo(
                 and variables.flag_enable_rm_account_rules
                 and variables.flag_account_liquidation_mode[account_id]
             ):
-
                 continue
 
         elif not trade_level_rm_check_result(bypass_rm_check, new_unique_id):
-
             time.sleep(variables.rm_checks_interval_if_failed)
 
             if not trade_level_rm_check_result(bypass_rm_check, unique_id):
-
                 continue
 
         target_position = int(float(target_position))
@@ -2702,7 +2541,6 @@ def process_cas_switch_condition_for_combo(
         # Take Position in the new incremental combo
         # Close position if not 'zero'
         if target_position != 0:
-
             # Action
             buy_sell_action = "BUY" if target_position > 0 else "SELL"
 
@@ -2712,7 +2550,6 @@ def process_cas_switch_condition_for_combo(
             # None value
 
             limit_price, trigger_price, trail_value = "", "", ""
-
 
             # Take new position in new combo: Send order in a separate thread
             take_new_position_thread = threading.Thread(
@@ -2727,7 +2564,6 @@ def process_cas_switch_condition_for_combo(
                     trail_value,
                 ),
                 kwargs={
-
                     "account_id": account_id,
                     "bypass_rm_check": bypass_rm_check,
                 },
@@ -2736,7 +2572,9 @@ def process_cas_switch_condition_for_combo(
             time.sleep(0.5)
 
     try:
-        current_price_unique_id = variables.unique_id_to_prices_dict[new_unique_id_for_old_combo]
+        current_price_unique_id = variables.unique_id_to_prices_dict[
+            new_unique_id_for_old_combo
+        ]
 
         current_buy_price, current_sell_price = (
             current_price_unique_id["BUY"],
@@ -2745,11 +2583,7 @@ def process_cas_switch_condition_for_combo(
 
         current_price = (current_buy_price + current_sell_price) / 2
 
-
-
     except Exception as e:
-
-
         # Print to console
         if variables.flag_debug_mode:
             print(
@@ -2758,10 +2592,10 @@ def process_cas_switch_condition_for_combo(
 
         current_price = None
 
-
-
     for row in dummy_orders_list:
-        insert_order_when_conditional_add_switch_fails(row[0], row[1], row[2], ticker_string=row[3], entry_price=current_price)
+        insert_order_when_conditional_add_switch_fails(
+            row[0], row[1], row[2], ticker_string=row[3], entry_price=current_price
+        )
 
     # check if order was originated from conditional series
     """if series_id not in ["None", "N/A", None]:
@@ -2774,19 +2608,18 @@ def process_cas_switch_condition_for_combo(
     # Delete the existing combo
     variables.screen.delete_row(unique_id)"""
 
+
 # Method to get new values for new combo
 def get_values_for_new_combo(combo_obj_list, new_unique_id_list):
-
     from com.single_combo_value_calculations import single_combo_values
 
     for combo_obj, unique_id_added in zip(combo_obj_list, new_unique_id_list):
-
         # Create a thread and pass the result_queue as an argument
         single_combo_values(combo_obj, unique_id_added)
 
+
 # Method to get leg values to create combo
 def get_list_of_leg_values_for_combo_creation(target_unique_id, all_legs):
-
     # This map will be use to eliminate the duplicate conid(as well as adjusting the net qty for buy/sell)
     map_con_id_to_leg_info = {}
 
@@ -2795,21 +2628,18 @@ def get_list_of_leg_values_for_combo_creation(target_unique_id, all_legs):
 
     # Processing legs, to have info in desired format
     for leg_obj in all_legs:
-
         con_id = int(leg_obj.con_id)
         action = (leg_obj.action).strip()
         quantity = int(leg_obj.quantity)
 
         # If conid already exists update the qty and action
         if con_id in map_con_id_to_leg_info:
-
             # Already existing leg values
             old_qty = int(map_con_id_to_leg_info[con_id][7])
             old_action = map_con_id_to_leg_info[con_id][1].strip()
 
             # Adjusting the qty and the action
             if old_action == action:
-
                 # Action is same, Add qty
                 new_qty = old_qty + quantity
 
@@ -2821,7 +2651,6 @@ def get_list_of_leg_values_for_combo_creation(target_unique_id, all_legs):
 
                 # Same qty delete the leg
                 if old_qty == quantity:
-
                     del map_con_id_to_leg_info[con_id]
                 elif old_qty < quantity:
                     # New adjusted Qty
@@ -2863,7 +2692,6 @@ def get_list_of_leg_values_for_combo_creation(target_unique_id, all_legs):
 
     # Convert the legs value to strings
     for con_id, leg_info_list in map_con_id_to_leg_info.items():
-
         # Converting to String
         leg_info_list = [str(item) for item in leg_info_list]
 

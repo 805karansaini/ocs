@@ -3,15 +3,13 @@ from com.mysql_io_accounts import *
 import re
 from com.utilities import *
 
+
 # add acoount rows in df design to keep track of account values
 def add_accounts_in_df():
-
     # Check if df is empty
     if variables.accounts_table_dataframe.empty:
-
         # Get all account ids>
         for account_id in variables.current_session_accounts:
-
             # Values to add in df
             account_table_row_values = (
                 account_id,

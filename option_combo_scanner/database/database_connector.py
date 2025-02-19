@@ -15,7 +15,9 @@ logger = CustomLogger.logger
 config = configparser.ConfigParser()
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
-option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..",  "..", "option_scanner_user_inputs.ini")
+option_scanner_user_inputs_ini_file_path = os.path.join(
+    script_dir, "..", "..", "option_scanner_user_inputs.ini"
+)
 
 config.read(option_scanner_user_inputs_ini_file_path)
 
@@ -48,10 +50,10 @@ class DatabaseConnector:
                 return connection
             except Exception as exp:
                 print(
-                    f"Try No. {retries+1}/10... Unable to connect to database. Retrying in 0.1 seconds. Error: {exp}"
+                    f"Try No. {retries + 1}/10... Unable to connect to database. Retrying in 0.1 seconds. Error: {exp}"
                 )
                 logger.error(
-                    f"Try No. {retries+1}/10... Unable to connect to database. Retrying in 0.1 seconds. Error: {exp}"
+                    f"Try No. {retries + 1}/10... Unable to connect to database. Retrying in 0.1 seconds. Error: {exp}"
                 )
                 retries += 1
                 time.sleep(0.1)

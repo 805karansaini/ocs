@@ -3,6 +3,7 @@ Created on 18-Apr-2023
 
 @author: Karan
 """
+
 import copy
 import time
 import tkinter
@@ -34,7 +35,6 @@ class ScreenCAS(object):
 
     # Method to create CAS table
     def create_cas_table(self):
-
         # Create Treeview Frame for active combo table
         cas_table_frame = ttk.Frame(self.cas_tab, padding=10)
         cas_table_frame.pack(pady=10)
@@ -94,8 +94,7 @@ class ScreenCAS(object):
         # Creating Columns
         self.cas_table.column("#0", width=0, stretch="no")
 
-        for (column_name, column_heading) in variables.cas_table_columns_name_heading:
-
+        for column_name, column_heading in variables.cas_table_columns_name_heading:
             if column_name == "Tickers":
                 self.cas_table.column(
                     column_name, anchor="center", width=125, minwidth=125
@@ -107,20 +106,17 @@ class ScreenCAS(object):
 
         # Iterate secondary columns
         for column_name in secondary_columns_in_cas_table:
-
             # Adding column to table
             self.cas_table.column(column_name, anchor="center", width=85, minwidth=85)
 
         # Create Headings
         self.cas_table.heading("#0", text="\n", anchor="center")
 
-        for (column_name, column_heading) in variables.cas_table_columns_name_heading:
-
+        for column_name, column_heading in variables.cas_table_columns_name_heading:
             self.cas_table.heading(column_name, text=column_heading, anchor="center")
 
         # Iterate secondary columns
         for column_heading in secondary_columns_in_cas_table:
-
             # Adding column to table
             self.cas_table.heading(column_heading, text=column_heading, anchor="center")
 
@@ -139,7 +135,6 @@ class ScreenCAS(object):
 
     # Method to update cas table for secondary column
     def update_cas_tale_gui(self):
-
         # Get secondary columns mapped to expression dictionary
         local_map_secondary_columns_to_expression_in_cas_table = copy.deepcopy(
             variables.map_secondary_columns_to_expression_in_cas_table
@@ -158,8 +153,7 @@ class ScreenCAS(object):
         # Creating Columns
         self.cas_table.column("#0", width=0, stretch="no")
 
-        for (column_name, column_heading) in variables.cas_table_columns_name_heading:
-
+        for column_name, column_heading in variables.cas_table_columns_name_heading:
             if column_name == "Tickers":
                 self.cas_table.column(
                     column_name, anchor="center", width=125, minwidth=125
@@ -171,20 +165,17 @@ class ScreenCAS(object):
 
         # Iterate secondary columns
         for column_name in secondary_columns_in_cas_table:
-
             # Adding column to table
             self.cas_table.column(column_name, anchor="center", width=85, minwidth=85)
 
         # Create Headings
         self.cas_table.heading("#0", text="\n", anchor="center")
 
-        for (column_name, column_heading) in variables.cas_table_columns_name_heading:
-
+        for column_name, column_heading in variables.cas_table_columns_name_heading:
             self.cas_table.heading(column_name, text=column_heading, anchor="center")
 
         # Iterate secondary columns
         for column_heading in secondary_columns_in_cas_table:
-
             # Adding column to table
             self.cas_table.heading(column_heading, text=column_heading, anchor="center")
 
@@ -192,7 +183,6 @@ class ScreenCAS(object):
     def create_cas_condition_status_table(
         self,
     ):
-
         # Create Treeview Frame for active combo table
         cas_condition_table_frame = ttk.Frame(self.cas_tab, padding=10)
         cas_condition_table_frame.pack(pady=10)
@@ -369,13 +359,15 @@ class ScreenCAS(object):
 
     # Method to organize leg-to-combo table columns
     def edit_leg_to_combo_columns(self):
-
         # Get current session accounts
         local_current_session_columns = copy.deepcopy(
             variables.cas_table_columns_name_heading
         )
 
-        local_current_session_columns = [column_name for (column_name, column_heading) in local_current_session_columns]
+        local_current_session_columns = [
+            column_name
+            for (column_name, column_heading) in local_current_session_columns
+        ]
 
         try:
             all_columns_in_system = (
@@ -395,8 +387,6 @@ class ScreenCAS(object):
         # get columns present in json file
         local_columns_selected = get_all_custom_ltc_columns_from_json()
 
-
-
         # Create a popup window
         edit_popup_frame = tk.Toplevel()
 
@@ -412,10 +402,6 @@ class ScreenCAS(object):
         edit_popup_frame.geometry(
             f"{width_of_pop_up}x{height_of_pop_up}"
         )  # Make the size dynamic (Number UID in system, Row in a single row) min() dynamic
-
-
-
-
 
         # frame table for the columns not in crrent time
         pop_up_frame = ttk.Frame(edit_popup_frame, padding=0)
@@ -479,9 +465,9 @@ class ScreenCAS(object):
         columns_in_non_selected_columns_table = ("Account ID",)
 
         # Define Our Columns
-        self.treeview_non_selected_columns[
-            "columns"
-        ] = columns_in_non_selected_columns_table
+        self.treeview_non_selected_columns["columns"] = (
+            columns_in_non_selected_columns_table
+        )
 
         # First Column hiding it
         self.treeview_non_selected_columns.column("#0", width=0, stretch="no")
@@ -490,25 +476,19 @@ class ScreenCAS(object):
         )
 
         # Defining headings for table
-        self.treeview_non_selected_columns.heading(
-            "#0", text="", anchor="center"
-        )
+        self.treeview_non_selected_columns.heading("#0", text="", anchor="center")
         self.treeview_non_selected_columns.heading(
             "Account ID", text="Account ID", anchor="center"
         )
 
-        self.treeview_non_selected_columns.tag_configure(
-            "oddrow", background="white"
-        )
+        self.treeview_non_selected_columns.tag_configure("oddrow", background="white")
         self.treeview_non_selected_columns.tag_configure(
             "evenrow", background="lightblue"
         )
 
         # Method to transfer selcted column to selcted table
         def on_click_transfer_column_to_selected():
-
             try:
-
                 # Get columns for selected row
                 selected_item = (
                     self.treeview_non_selected_columns.selection()
@@ -534,9 +514,7 @@ class ScreenCAS(object):
 
         # Method to transefer selected column to non selected tabel
         def on_click_transfer_column_to_non_selected():
-
             try:
-
                 # Get unique ids for selected row
                 selected_item = (
                     self.treeview_selected_columns.selection()
@@ -561,7 +539,6 @@ class ScreenCAS(object):
 
         # Method to edit list of columns
         def edit_list_of_column_for_watchlist():
-
             # Get all selected column which is present in selected table
             all_selected_columns = local_columns_selected
 
@@ -573,7 +550,7 @@ class ScreenCAS(object):
                 return
 
             # Convert the list to a comma-separated string
-            result_string = ','.join(all_selected_columns)
+            result_string = ",".join(all_selected_columns)
 
             add_custom_ltc_column_in_json(result_string)
 
@@ -625,35 +602,25 @@ class ScreenCAS(object):
         columns_in_selected_columns_table = ("Account ID",)
 
         # Define Our Columns
-        self.treeview_selected_columns[
-            "columns"
-        ] = columns_in_selected_columns_table
+        self.treeview_selected_columns["columns"] = columns_in_selected_columns_table
 
         # First Column hiding it
         self.treeview_selected_columns.column("#0", width=0, stretch="no")
-        self.treeview_selected_columns.column(
-            "Account ID", anchor="center", width=320
-        )
+        self.treeview_selected_columns.column("Account ID", anchor="center", width=320)
 
         self.treeview_selected_columns.heading("#0", text="", anchor="center")
         self.treeview_selected_columns.heading(
             "Account ID", text="Account ID", anchor="center"
         )
 
-        self.treeview_selected_columns.tag_configure(
-            "oddrow", background="white"
-        )
-        self.treeview_selected_columns.tag_configure(
-            "evenrow", background="lightblue"
-        )
+        self.treeview_selected_columns.tag_configure("oddrow", background="white")
+        self.treeview_selected_columns.tag_configure("evenrow", background="lightblue")
 
         # Method to fill non slected table
         def fill_non_selected_columns_table(
-                local_current_session_columns, local_columns_selected
+            local_current_session_columns, local_columns_selected
         ):
-
             try:
-
                 # Get all item IDs in the Treeview
                 item_ids = self.treeview_non_selected_columns.get_children()
 
@@ -673,7 +640,6 @@ class ScreenCAS(object):
 
                 # Iterate through selected columns
                 for column in columns_not_in_selected:
-
                     values = (column,)
 
                     if num_items % 2 == 1:
@@ -703,11 +669,9 @@ class ScreenCAS(object):
 
         # Method to fill selecteed table
         def fill_selected_columns_table(
-                local_current_session_columns, local_columns_selected
+            local_current_session_columns, local_columns_selected
         ):
-
             try:
-
                 # Get all item IDs in the Treeview
                 item_ids = self.treeview_selected_columns.get_children()
 
@@ -763,7 +727,6 @@ class ScreenCAS(object):
 
     # Method to delete account group
     def delete_account_group(self):
-
         group_id = self.accounts_group_table.selection()[
             0
         ]  # get the item ID of the selected row
@@ -790,7 +753,6 @@ class ScreenCAS(object):
         self.update_account_group_table()
 
         try:
-
             # Get all account groups
             account_group_df = get_all_account_groups_from_db()
 
@@ -826,12 +788,10 @@ class ScreenCAS(object):
             variables.screen.update_orders_book_table_watchlist_changed()
 
         except Exception as e:
-
             all_account_groups = ["ALL"]
 
     # Method to remove all failed cas conditional orders
     def purge_cas_conditions(self):
-
         # Removing failed cas condition from  cas condition dataframe
         local_cas_condition_table_dataframe = variables.cas_condition_table_dataframe[
             variables.cas_condition_table_dataframe["Status"] == "Failed"
@@ -849,7 +809,6 @@ class ScreenCAS(object):
         table_id_list = []
 
         for table_id in table_id_list_all:
-
             # get the item ID of the selected row
             values = self.cas_condition_table.item(table_id, "values")
 
@@ -857,7 +816,6 @@ class ScreenCAS(object):
                 table_id_list.append(table_id)
 
         for table_id in table_id_list:
-
             self.cas_condition_table.delete(table_id)
 
         purge_cas_conditions()
@@ -875,7 +833,6 @@ class ScreenCAS(object):
 
     # Method to insert cas row in GUI table
     def insert_cas_row_in_cas_table(self, value):
-
         # unique_id
         unique_id = value[0]
 
@@ -903,7 +860,6 @@ class ScreenCAS(object):
 
     # Method to insert row to cas condition table
     def insert_cas_condition_row_in_cas_condition_table(self, value):
-
         # unique_id
         unique_id = value[0]
 
@@ -934,12 +890,10 @@ class ScreenCAS(object):
 
     # Method to update cas condition row in cas condition table
     def update_cas_condition_row_in_cas_condition_table(self, table_id, value):
-
         self.cas_condition_table.item(table_id, value)
 
     # function to sort the cas_table
     def sort_cas_table(self, column, reverse):
-
         data = [
             (self.cas_table.set(child, column), child)
             for child in self.cas_table.get_children("")
@@ -986,9 +940,9 @@ class ScreenCAS(object):
         # Show Error popup
         if unique_id not in local_unique_id_to_combo_obj:
             # Error Message
-            error_title = (
-                error_string
-            ) = f"Error - UID: {unique_id} unable to find combination"
+            error_title = error_string = (
+                f"Error - UID: {unique_id} unable to find combination"
+            )
             variables.screen.display_error_popup(error_title, error_string)
             return
 
@@ -1002,7 +956,6 @@ class ScreenCAS(object):
 
         # Adding leg information in addition with leg-to-combo values
         for indx, leg_obj in enumerate(all_legs):
-
             row_value_list = [
                 leg_obj.action,
                 leg_obj.symbol,
@@ -1011,10 +964,8 @@ class ScreenCAS(object):
             ]
 
             try:
-
                 # If we have value for unique id get the value for wach leg and append to the sub list
                 if unique_id in local_unique_id_to_leg_combo_comparision_val:
-
                     hv_leg_to_combo = local_unique_id_to_leg_combo_comparision_val[
                         unique_id
                     ][f"Leg {indx + 1}"]["HV for leg to Combo Comparison"]
@@ -1048,7 +999,6 @@ class ScreenCAS(object):
                     )
 
             except Exception as e:
-
                 # Append "N/A" if no data is present for the unique id
                 row_value_list.extend(
                     [
@@ -1128,7 +1078,6 @@ class ScreenCAS(object):
 
         # Table Columns and Heading
         for indx, column_name in enumerate(columns_for_leg_to_combo_comparision):
-
             # Width for 1st 4 column 120 then 190
             width = 120 if indx < 4 else 190
             self.treeview_table.column(
@@ -1144,11 +1093,9 @@ class ScreenCAS(object):
         flag_for_row_style = True
 
         for row_value in leg_to_combo_values:
-
             # Combine the values into a tuple
             combined_tuple = tuple(row_value)
             if flag_for_row_style:
-
                 # Inserting in the table
                 self.treeview_table.insert(
                     parent="",
@@ -1159,7 +1106,6 @@ class ScreenCAS(object):
                 )
                 flag_for_row_style = False
             else:
-
                 # Inserting in the table
                 self.treeview_table.insert(
                     parent="",
@@ -1237,7 +1183,6 @@ class ScreenCAS(object):
 
     # Method to display leg-to-combo table
     def create_custom_leg_to_combo_table(self):
-
         # Unique ID
         selected_item = self.cas_table.selection()[
             0
@@ -1248,13 +1193,17 @@ class ScreenCAS(object):
         unique_id = int(values[0])
 
         # N days High And Low
-        long_term_high_low = copy.deepcopy(variables.map_unique_id_to_long_term_high_low)
+        long_term_high_low = copy.deepcopy(
+            variables.map_unique_id_to_long_term_high_low
+        )
 
         # HV Related Column
         hv_related_values = copy.deepcopy(variables.map_unique_id_to_hv_related_values)
 
         # Days Open, High Low
-        intraday_open_high_low = copy.deepcopy(variables.map_unique_id_to_intraday_high_low)
+        intraday_open_high_low = copy.deepcopy(
+            variables.map_unique_id_to_intraday_high_low
+        )
 
         # Volume Related columns
         volume_related_column_values = copy.deepcopy(
@@ -1266,16 +1215,18 @@ class ScreenCAS(object):
             variables.map_unique_id_to_support_resistance_and_relative_fields
         )
 
-        legs_uid_list = copy.deepcopy(variables.map_unique_id_to_legs_unique_id[unique_id]['Leg Unique Ids'])
+        legs_uid_list = copy.deepcopy(
+            variables.map_unique_id_to_legs_unique_id[unique_id]["Leg Unique Ids"]
+        )
 
-        combo_list = copy.deepcopy(variables.map_unique_id_to_legs_unique_id[unique_id]['Combo Obj List'])
+        combo_list = copy.deepcopy(
+            variables.map_unique_id_to_legs_unique_id[unique_id]["Combo Obj List"]
+        )
 
         legs_uid_list.append(unique_id)
 
         # Get combo obj
-        local_unique_id_to_combo_obj = copy.deepcopy(
-            variables.unique_id_to_combo_obj
-        )
+        local_unique_id_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
         combo_obj = local_unique_id_to_combo_obj[int(float(unique_id))]
 
         combo_list.append(combo_obj)
@@ -1288,42 +1239,41 @@ class ScreenCAS(object):
         )
 
         try:
-
             # get cas table columns
-            local_current_session_columns = [column_name for (column_name, column_heading) in local_current_session_columns]
+            local_current_session_columns = [
+                column_name
+                for (column_name, column_heading) in local_current_session_columns
+            ]
 
             # get columns present in json file
             local_columns_selected = get_all_custom_ltc_columns_from_json()
-    
+
             # If column returned are None then set default columns
             if local_columns_selected in [None]:
-                local_columns_selected = ['Unique ID', 'Tickers']
+                local_columns_selected = ["Unique ID", "Tickers"]
 
             # Sort the second list based on the order in the first list
-            local_columns_selected = sorted(local_columns_selected, key=lambda x: local_current_session_columns.index(x))
+            local_columns_selected = sorted(
+                local_columns_selected,
+                key=lambda x: local_current_session_columns.index(x),
+            )
 
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
+                print(
+                    f"Exception inside getting columns for leg to column table, Exp {e}"
+                )
 
-                print(f"Exception inside getting columns for leg to column table, Exp {e}")
-
-            local_columns_selected = ['Unique ID', 'Tickers']
+            local_columns_selected = ["Unique ID", "Tickers"]
 
         leg_no = 1
 
         try:
             for legs_uid, combo_obj in zip(legs_uid_list, combo_list):
-
-
-
-
                 try:
-
                     # N-Day High Low
                     if legs_uid in long_term_high_low:
-
                         n_day_high = (
                             None
                             if long_term_high_low[legs_uid]["N-Day High"] == "N/A"
@@ -1352,9 +1302,9 @@ class ScreenCAS(object):
                         last_day_close_price_for_leg_list = (
                             "N/A"
                             if long_term_high_low[legs_uid][
-                                   "Last Day Close Price For Legs"
-                               ]
-                               == "N/A"
+                                "Last Day Close Price For Legs"
+                            ]
+                            == "N/A"
                             else long_term_high_low[legs_uid][
                                 "Last Day Close Price For Legs"
                             ]
@@ -1367,9 +1317,9 @@ class ScreenCAS(object):
                         avg_chg_in_price_for_n_days = (
                             None
                             if long_term_high_low[legs_uid][
-                                   "Avg chg In Price For Last N days"
-                               ]
-                               == "N/A"
+                                "Avg chg In Price For Last N days"
+                            ]
+                            == "N/A"
                             else long_term_high_low[legs_uid][
                                 "Avg chg In Price For Last N days"
                             ]
@@ -1387,7 +1337,6 @@ class ScreenCAS(object):
                         avg_chg_in_price_for_n_days = None
 
                 except Exception as e:
-
                     if variables.flag_debug_mode:
                         print(f"Exception in getting long term values, Exp: {e}")
 
@@ -1403,7 +1352,6 @@ class ScreenCAS(object):
                     avg_chg_in_price_for_n_days = None
 
                 try:
-
                     # Current Day Open High Low
                     if legs_uid in intraday_open_high_low:
                         day_open = (
@@ -1430,43 +1378,47 @@ class ScreenCAS(object):
                         intraday_support = (
                             "N/A"
                             if intraday_open_high_low[legs_uid]["Intraday Support"]
-                               == "N/A"
+                            == "N/A"
                             else f"{intraday_open_high_low[legs_uid]['Intraday Support']:,.2f}"
                         )
                         intraday_resistance = (
                             "N/A"
                             if intraday_open_high_low[legs_uid]["Intraday Resistance"]
-                               == "N/A"
+                            == "N/A"
                             else f"{intraday_open_high_low[legs_uid]['Intraday Resistance']:,.2f}"
                         )
                         intraday_support_count = (
                             "N/A"
-                            if intraday_open_high_low[legs_uid]["Intraday Support Count"]
-                               == "N/A"
+                            if intraday_open_high_low[legs_uid][
+                                "Intraday Support Count"
+                            ]
+                            == "N/A"
                             else f"{intraday_open_high_low[legs_uid]['Intraday Support Count']:,}"
                         )
                         intraday_resistance_count = (
                             "N/A"
                             if intraday_open_high_low[legs_uid][
-                                   "Intraday Resistance Count"
-                               ]
-                               == "N/A"
+                                "Intraday Resistance Count"
+                            ]
+                            == "N/A"
                             else f"{intraday_open_high_low[legs_uid]['Intraday Resistance Count']:,}"
                         )
                         current_day_open_for_legs_list = (
                             "N/A"
                             if intraday_open_high_low[legs_uid][
-                                   "Current Day Open Price For Legs"
-                               ]
-                               == "N/A"
+                                "Current Day Open Price For Legs"
+                            ]
+                            == "N/A"
                             else intraday_open_high_low[legs_uid][
                                 "Current Day Open Price For Legs"
                             ]
                         )
                         highest_price_comparison_intraday = (
                             "N/A"
-                            if intraday_open_high_low[legs_uid]["Highest Price Comparison"]
-                               == "N/A"
+                            if intraday_open_high_low[legs_uid][
+                                "Highest Price Comparison"
+                            ]
+                            == "N/A"
                             else str(
                                 intraday_open_high_low[legs_uid][
                                     "Highest Price Comparison"
@@ -1475,26 +1427,30 @@ class ScreenCAS(object):
                         )
                         lowest_price_comparison_intraday = (
                             "N/A"
-                            if intraday_open_high_low[legs_uid]["Lowest Price Comparison"]
-                               == "N/A"
+                            if intraday_open_high_low[legs_uid][
+                                "Lowest Price Comparison"
+                            ]
+                            == "N/A"
                             else str(
-                                intraday_open_high_low[legs_uid]["Lowest Price Comparison"]
+                                intraday_open_high_low[legs_uid][
+                                    "Lowest Price Comparison"
+                                ]
                             )
                         )
                         intraday_price_range_ratio = (
                             "N/A"
                             if intraday_open_high_low[legs_uid][
-                                   "Intraday Price Range Ratio"
-                               ]
-                               == "N/A"
+                                "Intraday Price Range Ratio"
+                            ]
+                            == "N/A"
                             else f"{intraday_open_high_low[legs_uid]['Intraday Price Range Ratio']:,.2f}"
                         )
                         price_at_highest_combo_price_time_for_legs_list = (
                             "N/A"
                             if intraday_open_high_low[legs_uid][
-                                   "Current Day Highest Price For Legs"
-                               ]
-                               == "N/A"
+                                "Current Day Highest Price For Legs"
+                            ]
+                            == "N/A"
                             else intraday_open_high_low[legs_uid][
                                 "Current Day Highest Price For Legs"
                             ]
@@ -1502,9 +1458,9 @@ class ScreenCAS(object):
                         price_at_lowest_combo_price_time_for_legs_list = (
                             "N/A"
                             if intraday_open_high_low[legs_uid][
-                                   "Current Day Lowest Price For Legs"
-                               ]
-                               == "N/A"
+                                "Current Day Lowest Price For Legs"
+                            ]
+                            == "N/A"
                             else intraday_open_high_low[legs_uid][
                                 "Current Day Lowest Price For Legs"
                             ]
@@ -1512,9 +1468,9 @@ class ScreenCAS(object):
                         values_to_calculate_change_from_open_value = (
                             "N/A"
                             if intraday_open_high_low[legs_uid][
-                                   "Current Day Current Candle For Legs"
-                               ]
-                               == "N/A"
+                                "Current Day Current Candle For Legs"
+                            ]
+                            == "N/A"
                             else intraday_open_high_low[legs_uid][
                                 "Current Day Current Candle For Legs"
                             ]
@@ -1522,9 +1478,9 @@ class ScreenCAS(object):
                         day_open_or_current_candle_price = (
                             "N/A"
                             if intraday_open_high_low[legs_uid][
-                                   "Day Open Or Current Candle"
-                               ]
-                               == "N/A"
+                                "Day Open Or Current Candle"
+                            ]
+                            == "N/A"
                             else intraday_open_high_low[legs_uid][
                                 "Day Open Or Current Candle"
                             ]
@@ -1532,13 +1488,15 @@ class ScreenCAS(object):
                         support_price_ration_in_range_intraday = (
                             "N/A"
                             if intraday_open_high_low[legs_uid]["Price Support Ratio"]
-                               == "N/A"
+                            == "N/A"
                             else f"{intraday_open_high_low[legs_uid]['Price Support Ratio']:,.4f}"
                         )
                         resistance_price_ration_in_range_intraday = (
                             "N/A"
-                            if intraday_open_high_low[legs_uid]["Price Resistance Ratio"]
-                               == "N/A"
+                            if intraday_open_high_low[legs_uid][
+                                "Price Resistance Ratio"
+                            ]
+                            == "N/A"
                             else f"{intraday_open_high_low[legs_uid]['Price Resistance Ratio']:,.4f}"
                         )
                     else:
@@ -1570,7 +1528,6 @@ class ScreenCAS(object):
                             resistance_price_ration_in_range_intraday,
                         ) = ("N/A", "N/A", "N/A")
                 except Exception as e:
-
                     if variables.flag_debug_mode:
                         print(f"Exception in getting long term values, Exp: {e}")
 
@@ -1605,11 +1562,12 @@ class ScreenCAS(object):
                 try:
                     # HV Related Coulmns
                     if legs_uid in hv_related_values:
-
                         # HV Val for the unique ID
                         data = hv_related_values[legs_uid]
                         hv_value = (
-                            "N/A" if data["H. V."] == "N/A" else f"{data['H. V.']:,.2f}%"
+                            "N/A"
+                            if data["H. V."] == "N/A"
+                            else f"{data['H. V.']:,.2f}%"
                         )
                         hv_value_without_annualized = (
                             "N/A"
@@ -1623,14 +1581,16 @@ class ScreenCAS(object):
                         )
 
                     else:
-
-                        (hv_value, candle_volatility_val, hv_value_without_annualized) = (
+                        (
+                            hv_value,
+                            candle_volatility_val,
+                            hv_value_without_annualized,
+                        ) = (
                             "N/A",
                             "N/A",
                             "N/A",
                         )
                 except Exception as e:
-
                     (hv_value, candle_volatility_val, hv_value_without_annualized) = (
                         "N/A",
                         "N/A",
@@ -1643,7 +1603,6 @@ class ScreenCAS(object):
                 try:
                     # Volume Related Coulmns
                     if legs_uid in volume_related_column_values:
-
                         # Volume Related Values for the unique ID
                         data = volume_related_column_values[legs_uid]
 
@@ -1653,22 +1612,34 @@ class ScreenCAS(object):
                             else f"{data['Mean of Net Volume']:,.2f}"
                         )
                         std_plus_1 = (
-                            "N/A" if data["STD +1"] == "N/A" else f"{data['STD +1']:,.2f}"
+                            "N/A"
+                            if data["STD +1"] == "N/A"
+                            else f"{data['STD +1']:,.2f}"
                         )
                         std_negative_1 = (
-                            "N/A" if data["STD -1"] == "N/A" else f"{data['STD -1']:,.2f}"
+                            "N/A"
+                            if data["STD -1"] == "N/A"
+                            else f"{data['STD -1']:,.2f}"
                         )
                         std_plus_2 = (
-                            "N/A" if data["STD +2"] == "N/A" else f"{data['STD +2']:,.2f}"
+                            "N/A"
+                            if data["STD +2"] == "N/A"
+                            else f"{data['STD +2']:,.2f}"
                         )
                         std_negative_2 = (
-                            "N/A" if data["STD -2"] == "N/A" else f"{data['STD -2']:,.2f}"
+                            "N/A"
+                            if data["STD -2"] == "N/A"
+                            else f"{data['STD -2']:,.2f}"
                         )
                         std_plus_3 = (
-                            "N/A" if data["STD +3"] == "N/A" else f"{data['STD +3']:,.2f}"
+                            "N/A"
+                            if data["STD +3"] == "N/A"
+                            else f"{data['STD +3']:,.2f}"
                         )
                         std_negative_3 = (
-                            "N/A" if data["STD -3"] == "N/A" else f"{data['STD -3']:,.2f}"
+                            "N/A"
+                            if data["STD -3"] == "N/A"
+                            else f"{data['STD -3']:,.2f}"
                         )
                     else:
                         (
@@ -1692,10 +1663,8 @@ class ScreenCAS(object):
                     ) = ("N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
 
                 try:
-
                     # Both price and Volume Related Coulmns
                     if legs_uid in support_resistance_and_relative_fields_values:
-
                         # Both price and Volume Related value for the unique ID
                         data = support_resistance_and_relative_fields_values[legs_uid]
 
@@ -1705,7 +1674,9 @@ class ScreenCAS(object):
                             else f"{data['Resistance']:,.2f}"
                         )
                         support = (
-                            "N/A" if data["Support"] == "N/A" else f"{data['Support']:,.2f}"
+                            "N/A"
+                            if data["Support"] == "N/A"
+                            else f"{data['Support']:,.2f}"
                         )
                         resitance_count = (
                             "N/A"
@@ -1758,7 +1729,9 @@ class ScreenCAS(object):
                             else f"{data['Relative Volume on Negative Candles']:,.2f}"
                         )
                         relative_atr = (
-                            "N/A" if data["Relative ATR"] == "N/A" else data["Relative ATR"]
+                            "N/A"
+                            if data["Relative ATR"] == "N/A"
+                            else data["Relative ATR"]
                         )
                         relative_volume = (
                             "N/A"
@@ -1812,7 +1785,6 @@ class ScreenCAS(object):
                         )
 
                     else:
-
                         (
                             resistance,
                             support,
@@ -1823,7 +1795,17 @@ class ScreenCAS(object):
                             relative_volume,
                             relative_volume_last_n_minutes,
                             relative_change_last_n_minutes,
-                        ) = ("N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
+                        ) = (
+                            "N/A",
+                            "N/A",
+                            "N/A",
+                            "N/A",
+                            "N/A",
+                            "N/A",
+                            "N/A",
+                            "N/A",
+                            "N/A",
+                        )
 
                         (
                             relative_atr_derivative,
@@ -1903,30 +1885,42 @@ class ScreenCAS(object):
                         relative_volume_higher,
                     ) = ("N/A", "N/A", "N/A", "N/A")
 
-
-
-                local_map_unique_id_to_legs_unique_id = copy.deepcopy(variables.map_unique_id_to_legs_unique_id)
+                local_map_unique_id_to_legs_unique_id = copy.deepcopy(
+                    variables.map_unique_id_to_legs_unique_id
+                )
 
                 all_legs = combo_obj.buy_legs + combo_obj.sell_legs
 
                 try:
-
                     if legs_uid < 0:
-
                         for leg_obj in all_legs:
                             req_id = variables.con_id_to_req_id_dict[leg_obj.con_id]
-                            bid, ask = variables.bid_price[req_id], variables.ask_price[req_id]
+                            bid, ask = (
+                                variables.bid_price[req_id],
+                                variables.ask_price[req_id],
+                            )
 
-                            ask = ask * leg_obj.quantity * leg_obj.multiplier * (1 if leg_obj.action in 'BUY' else -1)
+                            ask = (
+                                ask
+                                * leg_obj.quantity
+                                * leg_obj.multiplier
+                                * (1 if leg_obj.action in "BUY" else -1)
+                            )
 
-                            bid = bid * leg_obj.quantity * leg_obj.multiplier * (1 if leg_obj.action in 'BUY' else -1)
+                            bid = (
+                                bid
+                                * leg_obj.quantity
+                                * leg_obj.multiplier
+                                * (1 if leg_obj.action in "BUY" else -1)
+                            )
 
                             buy_price, sell_price = ask, bid
 
                     else:
-
                         # dict for combo prices
-                        local_unique_id_to_prices_dict = copy.deepcopy(variables.unique_id_to_prices_dict)
+                        local_unique_id_to_prices_dict = copy.deepcopy(
+                            variables.unique_id_to_prices_dict
+                        )
 
                         buy_price, sell_price = (
                             local_unique_id_to_prices_dict[unique_id]["BUY"],
@@ -1937,11 +1931,8 @@ class ScreenCAS(object):
                     total_abs_cost_value = abs(buy_price + sell_price) / 2
 
                 except Exception as e:
-
-                    buy_price, sell_price = 'N/A', 'N/A'
-                    total_abs_cost_value = 'N/A'
-
-
+                    buy_price, sell_price = "N/A", "N/A"
+                    total_abs_cost_value = "N/A"
 
                 try:
                     # Calculate average price of combo
@@ -1950,7 +1941,6 @@ class ScreenCAS(object):
                     # Calculate bid ask spread
                     bid_ask_spread = bid - ask
                 except Exception as e:
-
                     # set value to none
                     avg_price_combo = None
                     bid_ask_spread = None
@@ -1963,16 +1953,14 @@ class ScreenCAS(object):
 
                 # Calcualte bid ask related columns
                 try:
-
                     # check if values are valid
                     if avg_chg_in_price_for_n_days not in [
                         0,
                         None,
                         "N/A",
                     ] and avg_bid_ask_spread not in [None, "N/A"]:
-
                         avg_bid_ask_div_by_avg_chg = (
-                                avg_bid_ask_spread / avg_chg_in_price_for_n_days
+                            avg_bid_ask_spread / avg_chg_in_price_for_n_days
                         )
 
                         # check if value is valid and if yes then format it
@@ -1982,7 +1970,6 @@ class ScreenCAS(object):
                             )
 
                     else:
-
                         # Set value to N/A
                         avg_bid_ask_div_by_avg_chg = "N/A"
 
@@ -1992,9 +1979,8 @@ class ScreenCAS(object):
                         None,
                         "N/A",
                     ] and bid_ask_spread not in [None, "N/A"]:
-
                         bid_ask_div_by_avg_chg = (
-                                bid_ask_spread / avg_chg_in_price_for_n_days
+                            bid_ask_spread / avg_chg_in_price_for_n_days
                         )
 
                         # check if value is valid and if yes then format it
@@ -2006,7 +1992,6 @@ class ScreenCAS(object):
                         bid_ask_div_by_avg_chg = "N/A"
 
                 except Exception as e:
-
                     # Set value to N/A
                     avg_bid_ask_div_by_avg_chg = "N/A"
                     bid_ask_div_by_avg_chg = "N/A"
@@ -2017,7 +2002,6 @@ class ScreenCAS(object):
                     None,
                     "None",
                 ]:
-
                     # Calcualtion for change open dollar value
                     chg_open = avg_price_combo - day_open
 
@@ -2026,7 +2010,6 @@ class ScreenCAS(object):
                         chg_open = f"{chg_open:,.2f}"
 
                 else:
-
                     chg_open = "N/A"
 
                 # Calculate change close dollar value
@@ -2035,7 +2018,6 @@ class ScreenCAS(object):
                     None,
                     "None",
                 ] and avg_price_combo not in ["N/A", None, "None"]:
-
                     # Calcualtion for change close dollar value
                     chg_close = avg_price_combo - last_close_price
 
@@ -2044,18 +2026,16 @@ class ScreenCAS(object):
                         chg_close = f"{chg_close:,.2f}"
 
                 else:
-
                     chg_close = "N/A"
 
                 # Calculate Relative volume div by relative cange for last n minutes in lookback days
                 if (
-                        relative_volume_last_n_minutes != "N/A"
-                        and relative_change_last_n_minutes not in ["N/A", 0]
+                    relative_volume_last_n_minutes != "N/A"
+                    and relative_change_last_n_minutes not in ["N/A", 0]
                 ):
-
                     # Relative volume div by relative cange for last n minutes in lookback days
                     rel_volume_div_by_rel_chg_last_n_minutes = (
-                            relative_volume_last_n_minutes / relative_change_last_n_minutes
+                        relative_volume_last_n_minutes / relative_change_last_n_minutes
                     )
 
                     # Format value of change from lowest price percent
@@ -2064,7 +2044,6 @@ class ScreenCAS(object):
                     )
 
                 else:
-
                     # set value to N/A
                     rel_volume_div_by_rel_chg_last_n_minutes = "N/A"
 
@@ -2074,8 +2053,6 @@ class ScreenCAS(object):
                 change_from_low_percent = "N/A"
                 change_from_open_for_rel_chg = "N/A"
 
-
-
                 # Getting combo objects mapped to unique ids
                 local_unique_id_to_combo_obj = copy.deepcopy(
                     variables.unique_id_to_combo_obj
@@ -2083,27 +2060,22 @@ class ScreenCAS(object):
 
                 # Update From Open if the flag_weighted_change_in_price is False
                 if (
-                        (avg_price_combo != None)
-                        and (day_open != None)
-                        and not variables.flag_weighted_change_in_price
+                    (avg_price_combo != None)
+                    and (day_open != None)
+                    and not variables.flag_weighted_change_in_price
                 ):
                     # Change from open percent
                     change_from_open_percent = math.log(
                         abs(avg_price_combo) + 1
                     ) * math.copysign(1, avg_price_combo) - math.log(
                         abs(day_open) + 1
-                    ) * math.copysign(
-                        1, day_open
-                    )
+                    ) * math.copysign(1, day_open)
 
                 # Update From Open if the flag_weighted_change_in_price is True
                 if (
-                        current_day_open_for_legs_list != "N/A"
-                        and variables.flag_weighted_change_in_price
+                    current_day_open_for_legs_list != "N/A"
+                    and variables.flag_weighted_change_in_price
                 ):
-
-
-
                     # print(f"Unique ID: {unique_id} Change From Open")
                     change_from_open_percent = calc_weighted_change_legs_based(
                         combo_obj,
@@ -2112,23 +2084,21 @@ class ScreenCAS(object):
 
                 # Update From Open if the flag_weighted_change_in_price is False
                 if (
-                        (avg_price_combo != None)
-                        and (day_open != None)
-                        and not variables.flag_weighted_change_in_price
+                    (avg_price_combo != None)
+                    and (day_open != None)
+                    and not variables.flag_weighted_change_in_price
                 ):
                     # Change from open percent
                     change_from_open_for_rel_chg = math.log(
                         abs(avg_price_combo) + 1
                     ) * math.copysign(1, avg_price_combo) - math.log(
                         abs(day_open_or_current_candle_price) + 1
-                    ) * math.copysign(
-                        1, day_open_or_current_candle_price
-                    )
+                    ) * math.copysign(1, day_open_or_current_candle_price)
 
                 # Update From Open if the flag_weighted_change_in_price is True
                 if (
-                        current_day_open_for_legs_list not in ["N/A", "None", None]
-                        and variables.flag_weighted_change_in_price
+                    current_day_open_for_legs_list not in ["N/A", "None", None]
+                    and variables.flag_weighted_change_in_price
                 ):
                     # print(f"Unique ID: {unique_id} Change From Open")
                     change_from_open_for_rel_chg = calc_weighted_change_legs_based(
@@ -2142,7 +2112,6 @@ class ScreenCAS(object):
                     "None",
                     None,
                 ]:
-
                     # Get value of change from high percent
                     change_from_high_percent = calc_weighted_change_legs_based(
                         combo_obj,
@@ -2152,7 +2121,9 @@ class ScreenCAS(object):
 
                     if change_from_high_percent not in ["N/A", "None", None]:
                         # Format value of change from highest price percent
-                        change_from_high_percent = f"{change_from_high_percent * 100:,.2f}%"
+                        change_from_high_percent = (
+                            f"{change_from_high_percent * 100:,.2f}%"
+                        )
 
                 # Calculate change from low
                 if price_at_lowest_combo_price_time_for_legs_list not in [
@@ -2160,7 +2131,6 @@ class ScreenCAS(object):
                     "None",
                     None,
                 ]:
-
                     # Get value of change from low percent
                     change_from_low_percent = calc_weighted_change_legs_based(
                         combo_obj,
@@ -2170,14 +2140,16 @@ class ScreenCAS(object):
 
                     if change_from_low_percent not in ["N/A", "None", None]:
                         # Format value of change from lowest price percent
-                        change_from_low_percent = f"{change_from_low_percent * 100:,.2f}%"
+                        change_from_low_percent = (
+                            f"{change_from_low_percent * 100:,.2f}%"
+                        )
 
                 # Net change since market opened divided by historical volatility value
                 try:
                     if (
-                            hv_value_without_annualized != 0
-                            and hv_value_without_annualized not in ["N/A", "None", None]
-                            and change_from_open_percent not in ["N/A", "None", None]
+                        hv_value_without_annualized != 0
+                        and hv_value_without_annualized not in ["N/A", "None", None]
+                        and change_from_open_percent not in ["N/A", "None", None]
                     ):
                         net_change_from_open_by_hv = round(
                             change_from_open_percent / hv_value_without_annualized, 4
@@ -2196,12 +2168,12 @@ class ScreenCAS(object):
                 # Candle volatility divided by net change since market opened
                 try:
                     if (
-                            change_from_open_percent != 0
-                            and change_from_open_percent not in ["N/A"]
-                            and candle_volatility_val not in ["N/A"]
+                        change_from_open_percent != 0
+                        and change_from_open_percent not in ["N/A"]
+                        and candle_volatility_val not in ["N/A"]
                     ):
                         cv_by_net_chng_from_open = (
-                                candle_volatility_val / change_from_open_percent
+                            candle_volatility_val / change_from_open_percent
                         )
                         cv_by_net_chng_from_open = round(cv_by_net_chng_from_open, 4)
                     else:
@@ -2216,18 +2188,16 @@ class ScreenCAS(object):
                         )
 
                 try:
-
                     # print(f"{avg_of_abs_changes_in_prices_for_lookback=}{change_from_open_percent=}")
                     if avg_of_abs_changes_in_prices_for_lookback not in [
                         0,
                         "N/A",
                         None,
                     ] and change_from_open_for_rel_chg not in ["N/A", None]:
-
                         # Calculating Relative Change
                         relative_change_in_price = (
-                                abs(change_from_open_for_rel_chg)
-                                / avg_of_abs_changes_in_prices_for_lookback
+                            abs(change_from_open_for_rel_chg)
+                            / avg_of_abs_changes_in_prices_for_lookback
                         )  # change_from_open_percent been in use for many things
 
                     else:
@@ -2246,7 +2216,7 @@ class ScreenCAS(object):
                     ] and relative_change_in_price not in ["N/A", None]:
                         # Calculate relative chnage in price divided by relative ATR
                         relative_change_div_by_relative_atr = (
-                                relative_change_in_price / relative_atr
+                            relative_change_in_price / relative_atr
                         )
                     else:
                         relative_change_div_by_relative_atr = "N/A"
@@ -2258,12 +2228,12 @@ class ScreenCAS(object):
 
                 # Calculate Relative change in price divided by Relative volume
                 if (
-                        (relative_change_in_price != "N/A")
-                        and (relative_volume != "N/A")
-                        and (relative_volume != 0)
+                    (relative_change_in_price != "N/A")
+                    and (relative_volume != "N/A")
+                    and (relative_volume != 0)
                 ):
                     relative_change_in_price_div_by_relative_volume = (
-                            relative_change_in_price / relative_volume
+                        relative_change_in_price / relative_volume
                     )
 
                     relative_change_in_price_div_by_relative_volume = (
@@ -2274,15 +2244,15 @@ class ScreenCAS(object):
 
                 # Calculate [ATR/Total absolute cost] / points from lowest price (intraday prices)
                 if (
-                        (total_abs_cost_value != "N/A")
-                        and (atr != "N/A")
-                        and (avg_price_combo != None)
-                        and (day_low != None)
+                    (total_abs_cost_value != "N/A")
+                    and (atr != "N/A")
+                    and (avg_price_combo != None)
+                    and (day_low != None)
                 ):
                     try:
                         atr_div_by_total_abs_cost_div_by_point_from_lowest_price = (
-                                                                                           atr / total_abs_cost_value
-                                                                                   ) / (avg_price_combo - day_low)
+                            atr / total_abs_cost_value
+                        ) / (avg_price_combo - day_low)
 
                         atr_div_by_total_abs_cost_div_by_point_from_lowest_price = f"{float(atr_div_by_total_abs_cost_div_by_point_from_lowest_price):,.2f}"
                     except Exception as e:
@@ -2298,11 +2268,10 @@ class ScreenCAS(object):
 
                 # Calculate Relative volume / Relative ATR
                 if (
-                        (relative_volume != "N/A")
-                        and (relative_atr != "N/A")
-                        and (relative_atr != 0)
+                    (relative_volume != "N/A")
+                    and (relative_atr != "N/A")
+                    and (relative_atr != 0)
                 ):
-
                     relative_volume_div_by_relative_atr = relative_volume / relative_atr
 
                     relative_volume_div_by_relative_atr = (
@@ -2313,20 +2282,21 @@ class ScreenCAS(object):
 
                 # Calculate [ATR/Total absolute cost] / points from highest price (intraday prices)
                 if (
-                        (total_abs_cost_value != "N/A")
-                        and (atr != "N/A")
-                        and (avg_price_combo != None)
-                        and (day_high != None)
+                    (total_abs_cost_value != "N/A")
+                    and (atr != "N/A")
+                    and (avg_price_combo != None)
+                    and (day_high != None)
                 ):
-
                     try:
                         atr_div_by_total_abs_cost_div_by_point_from_highest_price = (
-                                                                                            atr / total_abs_cost_value
-                                                                                    ) / (avg_price_combo - day_high)
+                            atr / total_abs_cost_value
+                        ) / (avg_price_combo - day_high)
 
                         atr_div_by_total_abs_cost_div_by_point_from_highest_price = f"{(atr_div_by_total_abs_cost_div_by_point_from_highest_price):,.2f}"
                     except Exception as e:
-                        atr_div_by_total_abs_cost_div_by_point_from_highest_price = "N/A"
+                        atr_div_by_total_abs_cost_div_by_point_from_highest_price = (
+                            "N/A"
+                        )
 
                         # Print to console
                         if variables.flag_debug_mode:
@@ -2341,29 +2311,25 @@ class ScreenCAS(object):
 
                 # Calculate Size of Opening Gap as a %
                 if (
-                        day_open != None
-                        and last_close_price != None
-                        and not variables.flag_weighted_change_in_price
+                    day_open != None
+                    and last_close_price != None
+                    and not variables.flag_weighted_change_in_price
                 ):
-
-                    size_of_opening_gap_value = math.log(abs(day_open) + 1) * math.copysign(
-                        1, day_open
-                    ) - math.log(abs(last_close_price) + 1) * math.copysign(
-                        1, last_close_price
-                    )
+                    size_of_opening_gap_value = math.log(
+                        abs(day_open) + 1
+                    ) * math.copysign(1, day_open) - math.log(
+                        abs(last_close_price) + 1
+                    ) * math.copysign(1, last_close_price)
 
                     if size_of_opening_gap_value not in ["N/A", "None", None]:
-
                         size_of_opening_gap_value = (
                             f"{(size_of_opening_gap_value * 100):,.2f}%"
                         )
 
                     else:
-
                         size_of_opening_gap_value = "N/A"
 
                 elif variables.flag_weighted_change_in_price:
-
                     size_of_opening_gap_value = calc_weighted_change_legs_based(
                         combo_obj,
                         last_day_close_price_for_leg_list,
@@ -2371,7 +2337,6 @@ class ScreenCAS(object):
                     )
 
                     if size_of_opening_gap_value not in ["N/A", "None", None]:
-
                         # check if values are vlaid
                         if size_of_opening_gap_value not in [
                             0,
@@ -2379,27 +2344,23 @@ class ScreenCAS(object):
                             "None",
                             None,
                         ] and relative_volume not in ["N/A", "None", None]:
-
                             # calculate indicator value
                             rel_vol_div_by_opening_gap = (
-                                    relative_volume / size_of_opening_gap_value
+                                relative_volume / size_of_opening_gap_value
                             )
 
                             # check if values are valid
                             if rel_vol_div_by_opening_gap not in ["N/A", "None", None]:
-
                                 # Format value
                                 rel_vol_div_by_opening_gap = (
                                     f"{(rel_vol_div_by_opening_gap):,.2f}"
                                 )
 
                             else:
-
                                 # set value to N/A
                                 rel_vol_div_by_opening_gap = "N/A"
 
                         else:
-
                             # set value to N/A
                             rel_vol_div_by_opening_gap = "N/A"
 
@@ -2407,12 +2368,13 @@ class ScreenCAS(object):
                             f"{(size_of_opening_gap_value * 100):,.2f}%"
                         )
                 else:
-
                     size_of_opening_gap_value = "N/A"
 
                 # Formatting relative_change_in_price
                 if relative_change_in_price != "N/A":
-                    relative_change_in_price = f"{(float(relative_change_in_price)):,.2f}"
+                    relative_change_in_price = (
+                        f"{(float(relative_change_in_price)):,.2f}"
+                    )
                 else:
                     relative_change_in_price = "N/A"
 
@@ -2436,20 +2398,20 @@ class ScreenCAS(object):
 
                 # Update High- Low Range N %, and Update High - Low Abs N-Days
                 if (
-                        (avg_price_combo != None)
-                        and (n_day_low != None)
-                        and (n_day_high != None)
+                    (avg_price_combo != None)
+                    and (n_day_low != None)
+                    and (n_day_high != None)
                 ):
-
                     # To Avoid by Zero error
                     try:
                         # HL range N-Days
                         hl_range_n_day_percent = (avg_price_combo - n_day_low) / (
-                                n_day_high - n_day_low
+                            n_day_high - n_day_low
                         )
-                        hl_range_n_day_percent = f"{(hl_range_n_day_percent * 100):,.2f}%"
+                        hl_range_n_day_percent = (
+                            f"{(hl_range_n_day_percent * 100):,.2f}%"
+                        )
                     except Exception as e:
-
                         # Print to console
                         if variables.flag_debug_mode:
                             print(
@@ -2483,18 +2445,15 @@ class ScreenCAS(object):
 
                 # Update From Close if the flag_weighted_change_in_price is False
                 if (
-                        (avg_price_combo != None)
-                        and (last_close_price != None)
-                        and not variables.flag_weighted_change_in_price
+                    (avg_price_combo != None)
+                    and (last_close_price != None)
+                    and not variables.flag_weighted_change_in_price
                 ):
-
                     change_from_close_percent = math.log(
                         abs(avg_price_combo) + 1
                     ) * math.copysign(1, avg_price_combo) - math.log(
                         abs(last_close_price) + 1
-                    ) * math.copysign(
-                        1, last_close_price
-                    )
+                    ) * math.copysign(1, last_close_price)
 
                     # Format the Value
                     if not isinstance(change_from_close_percent, str):
@@ -2504,9 +2463,8 @@ class ScreenCAS(object):
 
                 # Update From Open if the flag_weighted_change_in_price is True
                 if (
-                        last_day_close_price_for_leg_list != "N/A"
+                    last_day_close_price_for_leg_list != "N/A"
                 ) and variables.flag_weighted_change_in_price:
-
                     # print(f"Unique ID: {unique_id} Change From Close")
                     change_from_close_percent = calc_weighted_change_legs_based(
                         combo_obj,
@@ -2533,13 +2491,16 @@ class ScreenCAS(object):
                     correlation = "N/A"
 
                 # Update High Low Range 1 %
-                if (avg_price_combo != None) and (day_low != None) and (day_high != None):
-
+                if (
+                    (avg_price_combo != None)
+                    and (day_low != None)
+                    and (day_high != None)
+                ):
                     # To Avoid by Zero error
                     try:
                         # HL range N-Days
                         hl_range_current_day_percent = (avg_price_combo - day_low) / (
-                                day_high - day_low
+                            day_high - day_low
                         )
                         hl_range_current_day_percent = (
                             f"{int(hl_range_current_day_percent * 100):,.2f}%"
@@ -2604,12 +2565,12 @@ class ScreenCAS(object):
                     current_time = datetime.datetime.now(variables.target_timezone_obj)
 
                     if (
-                            variables.lut_for_long_term_values is not None
-                            and current_time
-                            >= variables.lut_for_long_term_values
-                            + datetime.timedelta(
-                        minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
-                    )
+                        variables.lut_for_long_term_values is not None
+                        and current_time
+                        >= variables.lut_for_long_term_values
+                        + datetime.timedelta(
+                            minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
+                        )
                     ):
                         n_day_high, n_day_low, atr, last_close_price, beta_value = (
                             "N/A",
@@ -2620,12 +2581,12 @@ class ScreenCAS(object):
                         )
 
                     if (
-                            variables.lut_for_intraday_values is not None
-                            and current_time
-                            >= variables.lut_for_intraday_values
-                            + datetime.timedelta(
-                        minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
-                    )
+                        variables.lut_for_intraday_values is not None
+                        and current_time
+                        >= variables.lut_for_intraday_values
+                        + datetime.timedelta(
+                            minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
+                        )
                     ):
                         day_open, day_high, day_low, low_timestamp, high_timestamp = (
                             "N/A",
@@ -2652,25 +2613,28 @@ class ScreenCAS(object):
                         ) = ("N/A", "N/A", "N/A")
 
                     if (
-                            variables.lut_for_hv_related_columns is not None
-                            and current_time
-                            >= variables.lut_for_hv_related_columns
-                            + datetime.timedelta(
-                        minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
-                    )
+                        variables.lut_for_hv_related_columns is not None
+                        and current_time
+                        >= variables.lut_for_hv_related_columns
+                        + datetime.timedelta(
+                            minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
+                        )
                     ):
-                        (hv_value, candle_volatility_val,) = (
+                        (
+                            hv_value,
+                            candle_volatility_val,
+                        ) = (
                             "N/A",
                             "N/A",
                         )
 
                     if (
-                            variables.lut_for_volume_related_fields is not None
-                            and current_time
-                            >= variables.lut_for_volume_related_fields
-                            + datetime.timedelta(
-                        minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
-                    )
+                        variables.lut_for_volume_related_fields is not None
+                        and current_time
+                        >= variables.lut_for_volume_related_fields
+                        + datetime.timedelta(
+                            minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
+                        )
                     ):
                         (
                             mean_of_net_volume,
@@ -2683,12 +2647,13 @@ class ScreenCAS(object):
                         ) = ("N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A")
 
                     if (
-                            variables.lut_for_price_based_relative_indicators_values is not None
-                            and current_time
-                            >= variables.lut_for_price_based_relative_indicators_values
-                            + datetime.timedelta(
-                        minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
-                    )
+                        variables.lut_for_price_based_relative_indicators_values
+                        is not None
+                        and current_time
+                        >= variables.lut_for_price_based_relative_indicators_values
+                        + datetime.timedelta(
+                            minutes=variables.time_buffer_for_keep_updating_lut_time_for_fetched_values
+                        )
                     ):
                         (
                             resistance,
@@ -2730,7 +2695,6 @@ class ScreenCAS(object):
                             relative_volume_lower,
                             relative_volume_higher,
                         ) = ("N/A", "N/A", "N/A", "N/A")
-
 
                 # List of values to check if it is 'N/A'
                 values_for_cas_table = [
@@ -2812,85 +2776,65 @@ class ScreenCAS(object):
 
                 leg_no += 1
 
-                values_dict = dict(zip(local_current_session_columns, values_for_cas_table))
+                values_dict = dict(
+                    zip(local_current_session_columns, values_for_cas_table)
+                )
 
                 values_for_cas_table = []
 
                 for column_name in local_columns_selected:
-
                     try:
-
-
                         values_for_cas_table.append(values_dict[column_name])
 
                     except Exception as e:
-
-                        values_for_cas_table.append('N/A')
-
+                        values_for_cas_table.append("N/A")
 
                 list_of_value_rows.append(values_for_cas_table)
 
         except:
-
             pass
-
-
-
 
         combo_values = list_of_value_rows[-1]
 
         leg_rows_list = []
 
-
         for row in list_of_value_rows[:-1]:  # Iterate up to the second-to-last item
-
-
-
             new_row = []
 
-
-
             for ind in range(0, len(row)):
-
                 try:
-
                     if isinstance(row[ind], str):
-
                         # Remove ',' and '%' from the string
-                        row[ind] = row[ind].replace(',', '').replace('%', '')
+                        row[ind] = row[ind].replace(",", "").replace("%", "")
 
                     if isinstance(combo_values[ind], str):
-
                         # Remove ',' and '%' from the string
-                        combo_values[ind] = combo_values[ind].replace(',', '').replace('%', '')
+                        combo_values[ind] = (
+                            combo_values[ind].replace(",", "").replace("%", "")
+                        )
 
-                    if is_float(row[ind]) and is_float(combo_values[ind]) and local_columns_selected[ind] not in ['Unique ID']:
-
+                    if (
+                        is_float(row[ind])
+                        and is_float(combo_values[ind])
+                        and local_columns_selected[ind] not in ["Unique ID"]
+                    ):
                         try:
-
                             temp_value = float(row[ind]) / float(combo_values[ind])
 
                             temp_value = round(temp_value, 2)
 
                             new_row.append(temp_value)
 
-
-
                         except Exception as e:
+                            new_row.append("N/A")
 
-                            new_row.append('N/A')
-
-                    elif row[ind] not in ['None', None, 'N/A']:
-
+                    elif row[ind] not in ["None", None, "N/A"]:
                         new_row.append(row[ind])
                     else:
-                        new_row.append('N/A')
-
-
+                        new_row.append("N/A")
 
                 except Exception as e:
-
-                    new_row.append('N/A')
+                    new_row.append("N/A")
 
             leg_rows_list.append(new_row)
 
@@ -2901,14 +2845,8 @@ class ScreenCAS(object):
 
         columns_for_leg_to_combo_comparision = local_columns_selected
 
-
-
-
-
         # 25 row high,  20 * 2(padding)
-        custom_width = (
-                1200
-        )  # 60 = 20 * 2(padding) + 20(scrollbar)
+        custom_width = 1200  # 60 = 20 * 2(padding) + 20(scrollbar)
         treeview_popup.geometry(f"{custom_width}x{custom_height}")
 
         # Create a frame for the input fields
@@ -2930,7 +2868,6 @@ class ScreenCAS(object):
             height=15,
             xscrollcommand=tree_scroll_x.set,
             selectmode="extended",
-
         )
 
         # Pack to the screen
@@ -2947,20 +2884,21 @@ class ScreenCAS(object):
         # First Column hiding it
         self.treeview_table.column("#0", width=0, stretch="no")
 
-
         # Table Columns and Heading
         for indx, column_name in enumerate(columns_for_leg_to_combo_comparision):
             # Width for 1st 4 column 120 then 190
             width = 200
             self.treeview_table.column(
-                column_name, anchor="center", width=width, minwidth=width,
+                column_name,
+                anchor="center",
+                width=width,
+                minwidth=width,
             )
 
         self.treeview_table.heading("#0", text="\n", anchor="center")
 
         # Table Columns and Heading
         for indx, column_name in enumerate(columns_for_leg_to_combo_comparision):
-
             self.treeview_table.heading(column_name, text=column_name, anchor="center")
 
         # Create striped row tags
@@ -2970,11 +2908,9 @@ class ScreenCAS(object):
         counter = 0
 
         for row_value in leg_rows_list:
-
             # Combine the values into a tuple
             combined_tuple = tuple(row_value)
             if counter % 2 == 0:
-
                 # Inserting in the table
                 self.treeview_table.insert(
                     parent="",
@@ -2985,7 +2921,6 @@ class ScreenCAS(object):
                 )
 
             else:
-
                 # Inserting in the table
                 self.treeview_table.insert(
                     parent="",
@@ -2995,10 +2930,6 @@ class ScreenCAS(object):
                     tags=("oddrow",),
                 )
             counter += 1
-
-
-
-
 
     # Method to define cas condition table right click options
     def cas_condition_table_right_click(self, event):
@@ -3032,7 +2963,6 @@ class ScreenCAS(object):
 
     # Method to dispaly order details
     def view_order_details(self):
-
         # Unique ID
         selected_item = self.cas_condition_table.selection()[0]
 
@@ -3047,7 +2977,6 @@ class ScreenCAS(object):
 
         # Can not display order info popup for add and switch
         if cas_condition_type in ["ADD", "SWITCH"]:
-
             # Display error popup and return
             variables.screen.display_error_popup(
                 "Error Order Details",
@@ -3088,7 +3017,6 @@ class ScreenCAS(object):
                 all_cas_condition_dataframe.values.tolist()[0]
             )
         except Exception as e:
-
             # Display error popup and return
             variables.screen.display_error_popup(
                 "Error Order Details", f"Unable to get conditional order details."
@@ -3171,7 +3099,6 @@ class ScreenCAS(object):
 
     # # Method to display cas condition for cas condition order
     def display_cas_condition(self):
-
         # Unique ID
         selected_item = self.cas_condition_table.selection()[
             0
@@ -3195,7 +3122,6 @@ class ScreenCAS(object):
 
     # Method to display some text in pop up
     def display_text_box_popup(self, text_to_display, title_of_popup):
-
         # Create a enter_legs popup window
         text_box_poup = tk.Toplevel()
         text_box_poup.title(title_of_popup)
@@ -3219,9 +3145,7 @@ class ScreenCAS(object):
 
     # Method to remove cas condition from system
     def delete_cas_condition(self, unique_id=None, series_id=None):
-
         if unique_id == None:
-
             # Unique ID
             selected_item = self.cas_condition_table.selection()[
                 0
@@ -3244,14 +3168,12 @@ class ScreenCAS(object):
         table_ids = self.cas_condition_table.get_children()
 
         for table_id in table_ids:
-
             values = self.cas_condition_table.item(
                 table_id, "values"
             )  # get the values of the selected row
             unique_id_to_check = int(values[0])
 
             if unique_id_to_check == unique_id:
-
                 # Remove condition from the table
                 self.cas_condition_table.delete(table_id)
 
@@ -3259,14 +3181,12 @@ class ScreenCAS(object):
         self.update_cas_condition_after_cas_condition_deleted()
         # Removing deleted cas condition from watchlist cas condition dataframe
         try:
-
             variables.cas_condition_table_dataframe = (
                 variables.cas_condition_table_dataframe.loc[
                     variables.cas_condition_table_dataframe["Unique ID"] != unique_id
                 ]
             )
         except Exception as e:
-
             # Print to console
             if variables.flag_debug_mode:
                 print("Can not update cas conditon dataframe for watchlist change", e)
@@ -3279,7 +3199,6 @@ class ScreenCAS(object):
             # variables.cas_condition_table_dataframe = variables.cas_condition_table_dataframe.loc[variables.cas_condition_table_dataframe["Unique ID"] != unique_id]
 
         except Exception as e:
-
             # Print to console TODO
             if variables.flag_debug_mode:
                 print("Error, Can not delete cas combo: ", e)
@@ -3288,7 +3207,6 @@ class ScreenCAS(object):
     def update_cas_condition_table_watchlist_change(
         self,
     ):
-
         # All the Unique IDs in the System
         # Get combo details dataframe
         local_cas_condition_details_df = copy.deepcopy(
@@ -3334,7 +3252,6 @@ class ScreenCAS(object):
 
         # Update the rows
         for i, row_val in local_cas_condition_details_df.iterrows():
-
             # Unique ID of row val
             unique_id = row_val["Unique ID"]
 
@@ -3342,7 +3259,6 @@ class ScreenCAS(object):
             table_id = row_val["Table ID Column"]
 
             if unique_id in all_unique_ids_in_watchlist:
-
                 # Tuple of vals
                 row_val = tuple(row_val)
 
@@ -3360,7 +3276,6 @@ class ScreenCAS(object):
                         tags=("oddrow",),
                     )
             else:
-
                 # If this unique_id in positions Table but not in watchlist delete it
                 if unique_id in all_unique_id_in_cas_condition_table:
                     try:
@@ -3390,7 +3305,6 @@ class ScreenCAS(object):
 
         # Move According to data Color here, Change Color
         for i, row in local_cas_condition_details_df.iterrows():
-
             # Unique_id
             unique_id = row["Unique ID"]
 
@@ -3411,7 +3325,6 @@ class ScreenCAS(object):
 
     # Method to update cas condition row in GUI table
     def update_cas_condition_table_rows_value(self, cas_table_update_values, index):
-
         # All Unique Id in cas_condition table
         list_of_unique_id_in_cas_condtion_table = (
             self.cas_condition_table.get_children()
@@ -3419,9 +3332,7 @@ class ScreenCAS(object):
 
         # Update Values in cas condition
         for unique_id, val in cas_table_update_values:
-
             for account_id in variables.current_session_accounts:
-
                 table_id = f"{unique_id}_{account_id}"
                 # Update if unique id is in cas condition table
                 if str(table_id) in list_of_unique_id_in_cas_condtion_table:
@@ -3429,10 +3340,8 @@ class ScreenCAS(object):
 
     # Method to update cas condition table after cas condition deleted
     def update_cas_condition_after_cas_condition_deleted(self):
-
         count = 0
         for combo_row in self.cas_condition_table.get_children():
-
             if count % 2 == 0:
                 self.cas_condition_table.item(combo_row, tags="evenrow")
             else:
@@ -3442,7 +3351,6 @@ class ScreenCAS(object):
 
     # Method to update cas table rows in GUI table
     def update_cas_table_rows_value(self, cas_table_update_values_df):
-
         # All the Unique IDs in the System
         all_unique_ids_in_system = cas_table_update_values_df["Unique ID"].tolist()
 
@@ -3489,12 +3397,10 @@ class ScreenCAS(object):
 
         # Update the rows
         for i, row_val in cas_table_update_values_df.iterrows():
-
             # Unique ID of row val
             unique_id = row_val["Unique ID"]
 
             if unique_id in all_unique_ids_in_watchlist:
-
                 # Tuple of vals
                 row_val = tuple(cas_table_update_values_df.iloc[i])
 
@@ -3538,7 +3444,6 @@ class ScreenCAS(object):
 
         # Move According to data Color here, Change Color
         for i, row in cas_table_update_values_df.iterrows():
-
             # Unique_id
             unique_id = str(row["Unique ID"])
 
@@ -3556,7 +3461,6 @@ class ScreenCAS(object):
 
     # Method to create conditional series
     def create_conditional_series(self, flag_multi=False):
-
         # Unique ID
         selected_item = self.cas_table.selection()[
             0
@@ -3572,7 +3476,6 @@ class ScreenCAS(object):
 
     # Method to initiate to take input for conditional add/switch order
     def conditional_add_switch_legs(self, cas_add_or_switch, flag_multi_account=False):
-
         # Unique ID
         selected_item = self.cas_table.selection()[
             0
@@ -3613,9 +3516,7 @@ class ScreenCAS(object):
             )
 
         except Exception as e:
-
             if variables.flag_debug_mode:
-
                 print(e)
             # TODO
             variables.screen.display_error_popup(
@@ -3632,7 +3533,6 @@ class ScreenCAS(object):
             reference_position = local_unique_id_to_positions_dict[unique_id]
         except Exception as e:
             if variables.flag_debug_mode:
-
                 print(e)
             # TODO
             variables.screen.display_error_popup(
@@ -3653,7 +3553,6 @@ class ScreenCAS(object):
                 reference_position,
             )
         else:
-
             popup_title = None
             flag_cas_order = True
 
@@ -3685,7 +3584,6 @@ class ScreenCAS(object):
         modify_seq_data=None,
         index=None,
     ):
-
         # Create a enter unique id popup window
         enter_unique_id_popup = tk.Toplevel()
 
@@ -3715,14 +3613,12 @@ class ScreenCAS(object):
         unique_id_entry.insert(0, unique_id)
 
         if modify_seq_data != None:
-
             unique_id_entry.delete(0, tkinter.END)
 
             # Inserting the default value
             unique_id_entry.insert(0, unique_id)
 
         def on_click_proceed_button():
-
             # Getting unique ids for active combinations
             local_unique_to_combo_obj = copy.deepcopy(variables.unique_id_to_combo_obj)
 
@@ -3735,7 +3631,6 @@ class ScreenCAS(object):
                 and int(float(trading_combo_unique_id))
                 in local_unique_to_combo_obj.keys()
             ):
-
                 trading_combo_unique_id = int(float(trading_combo_unique_id))
                 enter_unique_id_popup.destroy()
 
@@ -3761,7 +3656,6 @@ class ScreenCAS(object):
                 )
 
             else:
-
                 error_title = f"Invalid Unique ID Entered"
                 error_string = (
                     f"Please Enter Valid Unique ID which is available in system"
@@ -3792,7 +3686,6 @@ class ScreenCAS(object):
         modify_seq_data=None,
         index=None,
     ):
-
         # Create a enter_legs popup window
         enter_legs_popup = tk.Toplevel()
         enter_legs_popup.title(title)
@@ -3902,7 +3795,6 @@ class ScreenCAS(object):
         target_position_insert = refer_position
 
         if modify_seq_data != None:
-
             eval_unique_id_entry.delete(0, tkinter.END)
 
             eval_unique_id_entry.insert(0, modify_seq_data["Evaluation Unique ID"])
@@ -3913,7 +3805,6 @@ class ScreenCAS(object):
 
         # create input fields for each tading account
         for indx, account_id in enumerate(variables.current_session_accounts):
-
             positions_input_fields_dict[account_id] = {}
 
             positions_input_fields_dict[account_id]["account_id"] = ttk.Entry(
@@ -3952,7 +3843,6 @@ class ScreenCAS(object):
 
         # Method to validate unique id and create combination pop up
         def on_click_create_button():
-
             # Get unique id
             unique_id_input = unique_id_entry.get().strip()
 
@@ -3960,9 +3850,9 @@ class ScreenCAS(object):
             eval_unique_id = eval_unique_id_entry.get().strip()
 
             if eval_unique_id == "":
-                error_string = (
-                    error_title
-                ) = "Error, Evaluation Unique ID field is empty"
+                error_string = error_title = (
+                    "Error, Evaluation Unique ID field is empty"
+                )
 
                 variables.screen.display_error_popup(error_title, error_string)
 
@@ -3970,17 +3860,15 @@ class ScreenCAS(object):
 
             # Check if eval unique id is non empty
             elif not eval_unique_id.isnumeric():
-
-                error_string = (
-                    error_title
-                ) = "Error, Evaluation Unique ID must be numeric"
+                error_string = error_title = (
+                    "Error, Evaluation Unique ID must be numeric"
+                )
 
                 variables.screen.display_error_popup(error_title, error_string)
 
                 return
 
             elif eval_unique_id != "" and is_integer(eval_unique_id):
-
                 # Get combo object using unique ids
                 local_unique_id_to_combo_obj = copy.deepcopy(
                     variables.unique_id_to_combo_obj
@@ -4013,7 +3901,6 @@ class ScreenCAS(object):
                     variables.screen.display_error_popup(error_title, error_string)
 
             else:
-
                 eval_unique_id = int(eval_unique_id)
 
             # Trying to get the reference price
@@ -4041,7 +3928,6 @@ class ScreenCAS(object):
                         local_unique_id_to_positions_dict[int(eval_unique_id)][account]"""
                 # print(variables.series_sequence_table_df.to_string())
             except Exception as e:
-
                 if variables.flag_debug_mode:
                     print(e)
 
@@ -4052,7 +3938,6 @@ class ScreenCAS(object):
 
             # create input fields for each tading account
             for indx, account_id in enumerate(variables.current_session_accounts):
-
                 target_position = (
                     positions_input_fields_dict[account_id]["target_postions"]
                     .get()
@@ -4067,7 +3952,6 @@ class ScreenCAS(object):
                 )
 
                 if target_position == "":
-
                     variables.screen.display_error_popup(
                         f"For Account ID: {account_id}, Total positions must be filled",
                         f"For Account ID: {account_id}, Total positions must be filled",
@@ -4075,7 +3959,6 @@ class ScreenCAS(object):
                     return
 
                 if not is_integer(target_position):
-
                     variables.screen.display_error_popup(
                         f"For Account ID: {account_id}, Please Enter Valid Target Position",
                         f"For Account ID: {account_id}, Please Enter Valid Target Position",
@@ -4084,13 +3967,11 @@ class ScreenCAS(object):
 
             # Check if unique id is non empty
             if not is_integer(unique_id_input) and unique_id_input != "":
-
                 error_string = error_title = "Error, Target Unique ID must be numeric"
 
                 variables.screen.display_error_popup(error_title, error_string)
 
             elif unique_id_input != "" and is_integer(unique_id_input):
-
                 # Get combo object using unique ids
                 local_unique_id_to_combo_obj = copy.deepcopy(
                     variables.unique_id_to_combo_obj
@@ -4105,7 +3986,6 @@ class ScreenCAS(object):
                         raise Exception("No Unique ID")
 
                     if int(float(unique_id_input)) not in all_unique_ids_in_system:
-
                         error_title = f"Error, Target Unique ID not available in system"
                         error_string = (
                             f"Error, Target Unique ID not available in system"
@@ -4122,7 +4002,6 @@ class ScreenCAS(object):
 
                     # check if input is empty for number of legs entered
                     if num_of_legs == "":
-
                         # Buy legs and Sell legs
                         buy_legs = combo_obj.buy_legs
                         sell_legs = combo_obj.sell_legs
@@ -4151,7 +4030,6 @@ class ScreenCAS(object):
                         )
 
                     else:
-
                         # Function to open create combo pop up
                         variables.screen.create_combination_popup(
                             rows_entry,
@@ -4178,7 +4056,6 @@ class ScreenCAS(object):
                     variables.screen.display_error_popup(error_title, error_string)
 
             elif unique_id_input == "":
-
                 # Function to open create combo pop up
                 variables.screen.create_combination_popup(
                     rows_entry,
@@ -4239,13 +4116,11 @@ class ScreenCAS(object):
         index=None,
         combo_quantity_prcnt=None,
     ):
-
         # Create a enter_condition popup window
         enter_condition_popup = tk.Toplevel()
 
         # If not for entering expression
         if custom_column_data_dict == None and not flag_account_condition:
-
             # Title for the popup
             if cas_add_or_switch in ["BUY", "SELL"]:
                 title_string = f"Insert {cas_add_or_switch.capitalize()} Condition on Conditional Combo Unique ID: {unique_id}, and Trading Combo Unique ID: {trading_combination_unique_id}"
@@ -4256,14 +4131,12 @@ class ScreenCAS(object):
             enter_condition_popup.geometry("1150x400")
 
         elif custom_column_data_dict != None and not flag_account_condition:
-
             title_string = f"Insert Expression For Custom Column"
 
             # set hight and width of pop winoow
             enter_condition_popup.geometry("900x400")
 
         elif custom_column_data_dict == None and flag_account_condition:
-
             title_string = f"Insert Account Condition"
 
             # set hight and width of pop winoow
@@ -4288,7 +4161,6 @@ class ScreenCAS(object):
         condition_text_box.pack(side=tk.LEFT, pady=20)
 
         if modify_seq_data != None:
-
             condition_text_box.insert("1.0", modify_seq_data["Condition"])
 
         #############################
@@ -4342,7 +4214,6 @@ class ScreenCAS(object):
 
         # If not for entering expression and account condition
         if custom_column_data_dict == None and not flag_account_condition:
-
             # Create a frame for the Columns table fields
             quick_access_table_frame = ttk.Frame(
                 enter_condition_popup_frame, padding=20
@@ -4394,13 +4265,11 @@ class ScreenCAS(object):
 
         # If not for entering expression and account condition
         if custom_column_data_dict == None and not flag_account_condition:
-
             rows_for_column_fileds_table = copy.deepcopy(
                 variables.cas_table_fields_for_condition
             )
 
             if len(variables.current_session_accounts) < 2:
-
                 rows_for_quick_access_table = [
                     "Price Increase By",
                     "Price Decrease By",
@@ -4441,14 +4310,12 @@ class ScreenCAS(object):
 
         # If not for cas condition and account condition
         elif custom_column_data_dict != None and not flag_account_condition:
-
             rows_for_column_fileds_table = copy.deepcopy(
                 variables.cas_table_fields_for_expression
             )
 
         # If not for cas condition and entering expression
         elif custom_column_data_dict == None and flag_account_condition:
-
             rows_for_column_fileds_table = copy.deepcopy(
                 variables.accounts_table_columns[1:-1] + ["Tickers PNL"]
             )
@@ -4563,7 +4430,6 @@ class ScreenCAS(object):
 
         # If not for entering expression and account condition
         if custom_column_data_dict == None and not flag_account_condition:
-
             # Bind the Treeview tables to the click handler function
             quick_access_table.bind("<ButtonRelease-1>", handle_click)
 
@@ -4573,7 +4439,6 @@ class ScreenCAS(object):
 
         # Method to get expression
         def get_input_of_expression_and_check_it():
-
             # User Entered expression
             user_entered_expression = condition_text_box.get(1.0, tk.END).strip()
 
@@ -4586,13 +4451,10 @@ class ScreenCAS(object):
 
             # if this is for filter condition
             if key in custom_column_data_dict:
-
                 # If expression is valid
                 if flag_condition_passed:
-
                     # check if enter condition pop up is non None
                     if enter_condition_popup != None:
-
                         # Destroy pop up
                         enter_condition_popup.destroy()
 
@@ -4616,10 +4478,8 @@ class ScreenCAS(object):
                     variables.screen.display_error_popup(error_title, error_string)
 
             else:
-
                 # If expression is valid
                 if flag_condition_passed:
-
                     # check if enter condition pop up is non None
                     if enter_condition_popup != None:
                         # Destroy pop up
@@ -4643,7 +4503,6 @@ class ScreenCAS(object):
 
         # Method to get condition for account
         def get_input_of_account_condition_and_check_it():
-
             # User Entered expression
             user_entered_condition = condition_text_box.get(1.0, tk.END).strip()
 
@@ -4663,7 +4522,6 @@ class ScreenCAS(object):
 
             # If expression is valid
             if flag_condition_passed:
-
                 # check if enter condition pop up is non None
                 if enter_condition_popup != None:
                     # Destroy pop up
@@ -4682,7 +4540,6 @@ class ScreenCAS(object):
 
         # If not for entering expression
         if custom_column_data_dict == None and not flag_account_condition:
-
             # Create a frame for the condition input fields
             add_condition_frame = ttk.Frame(enter_condition_popup_frame, padding=20)
             add_condition_frame.pack(
@@ -4690,7 +4547,6 @@ class ScreenCAS(object):
             )  #  fill="x", expand=True)
 
             def on_click_insert_condition_button():
-
                 """if series_pop_up != None:
 
 
@@ -4747,7 +4603,6 @@ class ScreenCAS(object):
             add_condition_frame.place(y=350)
 
         elif custom_column_data_dict != None and not flag_account_condition:
-
             # Create a frame for the condition input fields
             add_condition_frame = ttk.Frame(enter_condition_popup_frame, padding=20)
             add_condition_frame.pack(
@@ -4769,7 +4624,6 @@ class ScreenCAS(object):
             add_condition_frame.place(y=350)
 
         elif custom_column_data_dict == None and flag_account_condition:
-
             # Create a frame for the condition input fields
             add_condition_frame = ttk.Frame(enter_condition_popup_frame, padding=20)
             add_condition_frame.pack(
@@ -4794,43 +4648,35 @@ class ScreenCAS(object):
     def check_ref_position_for_specific_tokens(
         self, reference_position, user_entered_condition
     ):
-
         # Init
         flag_condition_passed = {}
 
         # check if variable is dictionary
         if isinstance(reference_position, dict):
-
             # Iterate all accounts
             for account_id in reference_position:
-
                 # Check if ref positions is not 0 and check if conditions 'price adverse by' and 'price favourable by' present
                 if int(reference_position[account_id]) == 0 and (
                     "Price Adverse Chg By" in user_entered_condition
                     or "Price Favorable Chg By" in user_entered_condition
                 ):
-
                     # Set value to false
                     flag_condition_passed[account_id] = False
 
                 else:
-
                     # Set value to True
                     flag_condition_passed[account_id] = True
 
         else:
-
             # Check if ref positions is not 0 and check if conditions 'price adverse by' and 'price favourable by' present
             if reference_position == 0 and (
                 "Price Adverse Chg By" in user_entered_condition
                 or "Price Favorable Chg By" in user_entered_condition
             ):
-
                 # Set value to false
                 flag_condition_passed = False
 
             else:
-
                 # Set value to True
                 flag_condition_passed = True
 
@@ -4867,10 +4713,8 @@ class ScreenCAS(object):
         index=None,
         combo_quantity_prcnt=None,
     ):
-
         # check if instance is str
         if isinstance(condition_text_box, str):
-
             user_entered_condition = condition_text_box
 
         else:
@@ -4888,7 +4732,6 @@ class ScreenCAS(object):
 
         # get passed down value of execution engine
         if execution_engine != None:
-
             flag_execution_engine = execution_engine
 
         else:
@@ -4900,15 +4743,12 @@ class ScreenCAS(object):
             flag_execution_engine = False
 
         else:
-
             evalaution_unique_id = unique_id
 
         # If Condition passed
         if flag_condition_passed_res:
-
             # display condition in series pop up
             if series_pop_up != None:
-
                 # Check if it's a Pandas DataFrame
                 if not isinstance(
                     variables.series_sequence_table_df, pd.core.frame.DataFrame
@@ -4942,12 +4782,10 @@ class ScreenCAS(object):
 
             # if flag for condition series is true
             if flag_conditional_series:
-
                 # Check if it's a Pandas DataFrame
                 if not isinstance(
                     variables.series_sequence_table_df, pd.core.frame.DataFrame
                 ):
-
                     return
 
                 # replace %
@@ -4958,7 +4796,6 @@ class ScreenCAS(object):
 
                 # check if cas type is add or switch
                 if cas_type in ["ADD", "SWITCH"]:
-
                     # Incremental combo info string
                     ticker_info_string = make_informative_combo_string(combo_identified)
 
@@ -4968,7 +4805,6 @@ class ScreenCAS(object):
                     combo_quantity = "None"
 
                 else:
-
                     ticker_info_string = "N/A"
 
                     # se value of evaluation unique id
@@ -4976,7 +4812,6 @@ class ScreenCAS(object):
 
                 # if dataframe is empty
                 if variables.series_sequence_table_df.empty:
-
                     # table id init
                     table_id = 1
 
@@ -4984,7 +4819,6 @@ class ScreenCAS(object):
                     status_seq = "Active"
 
                 else:
-
                     # table id
                     """table_id = (
                         variables.series_sequence_table_df["Table ID"].iloc[-1] + 1
@@ -5002,11 +4836,9 @@ class ScreenCAS(object):
                         ].to_list()
 
                         if status_lst.count("Active") == 0:
-
                             status_seq = "Active"
 
                 if modify_seq_data != None:
-
                     table_id = modify_seq_data["Table ID"]
 
                     status_seq = modify_seq_data["Status"]
@@ -5022,7 +4854,6 @@ class ScreenCAS(object):
                             reference_position = dict"""
 
                 if flag_multi_account and cas_type in ["BUY", "SELL"]:
-
                     target_position = combo_quantity
 
                     combo_quantity = combo_quantity_prcnt
@@ -5057,7 +4888,6 @@ class ScreenCAS(object):
                 )
 
                 if modify_seq_data != None:
-
                     table_id_list = variables.series_sequence_table_df[
                         "Table ID"
                     ].to_list()
@@ -5066,14 +4896,13 @@ class ScreenCAS(object):
 
                     # print(variables.series_sequence_table_df.to_string())
 
-                    variables.series_sequence_table_df.iloc[
-                        idex
-                    ] = cas_condition_row_values
+                    variables.series_sequence_table_df.iloc[idex] = (
+                        cas_condition_row_values
+                    )
 
                     # print(variables.series_sequence_table_df.to_string())
 
                 else:
-
                     if index == None:
                         # Merge row with combo details dataframe
                         variables.series_sequence_table_df = pd.concat(
@@ -5121,7 +4950,6 @@ class ScreenCAS(object):
                 trading_combination_unique_id = unique_id
 
                 for account_id_in_system in variables.current_session_accounts:
-
                     # Init
                     status = "Pending"
                     reason_for_failed = "None"
@@ -5132,7 +4960,6 @@ class ScreenCAS(object):
                         reason_for_failed = "Reference position is 0"
 
                         if series_id not in [None, "None"]:
-
                             terminate_series(unique_id, series_id)
 
                     # Get Trigger Price Value
@@ -5171,12 +4998,10 @@ class ScreenCAS(object):
                     )
 
             else:
-
                 # set value for evaluation uniuq id
                 evalaution_unique_id = unique_id
 
                 if not flag_multi_account:
-
                     # Init
                     status = "Pending"
                     reason_for_failed = "None"
@@ -5225,10 +5050,8 @@ class ScreenCAS(object):
                     )
 
                 else:
-
                     # Iterate keys of dictionaries
                     for account in combo_quantity:
-
                         # Get value of combo quantity for account
                         combo_quantity_for_count = combo_quantity[account]
 
@@ -5299,14 +5122,13 @@ class ScreenCAS(object):
 
                 # # Checking Combo type, and map con_id to contract
                 for leg_obj_ in combo_identified.buy_legs + combo_identified.sell_legs:
-
                     if leg_obj_.sec_type in ["OPT", "FOP"]:
                         only_stk_fut = False
 
                     # Mapping con_id to contract
-                    variables.map_con_id_to_contract[
-                        leg_obj_.con_id
-                    ] = leg_obj_.contract
+                    variables.map_con_id_to_contract[leg_obj_.con_id] = (
+                        leg_obj_.contract
+                    )
 
                 # Update the values of 'cas_conditional_legs_map_con_id_to_action_type_and_combo_type' used while getting HighLowCAS prices (for Correlation)
                 for leg_obj_ in combo_identified.buy_legs + combo_identified.sell_legs:
@@ -5329,22 +5151,13 @@ class ScreenCAS(object):
                     if only_stk_fut:
                         variables.cas_conditional_legs_map_con_id_to_action_type_and_combo_type[
                             conid
-                        ][
-                            action
-                        ][
-                            "1D"
-                        ] += 1
+                        ][action]["1D"] += 1
                     else:
                         variables.cas_conditional_legs_map_con_id_to_action_type_and_combo_type[
                             conid
-                        ][
-                            action
-                        ][
-                            "1H"
-                        ] += 1
+                        ][action]["1H"] += 1
 
                 for account_id_in_system in variables.current_session_accounts:
-
                     status = "Pending"
                     reason_for_failed = "None"
 
@@ -5420,9 +5233,7 @@ class ScreenCAS(object):
                     )
 
             else:
-
                 if not flag_multi_account:
-
                     # Init
                     status = "Pending"
                     reason_for_failed = "None"
@@ -5490,9 +5301,7 @@ class ScreenCAS(object):
                         ignore_index=True,
                     )
                 else:
-
                     for account in combo_quantity:
-
                         # Init
                         status = "Pending"
                         reason_for_failed = "None"
@@ -5590,7 +5399,6 @@ class ScreenCAS(object):
         new_unique_id_for_old_combo,
         series_id=None,
     ):
-
         # Create a condition triggered_informative popup window
         condition_triggered_informative_popup = tk.Toplevel()
         condition_triggered_informative_popup.title(
@@ -5646,13 +5454,11 @@ class ScreenCAS(object):
         cas_add_switch_label_frame.pack(fill="both", expand=True)
 
         if series_id not in [None, "None", "N/A"]:
-
             origin_of_order_txt = (
                 f"Origin of Order : Conditional Series, Series ID : {series_id}"
             )
 
         else:
-
             origin_of_order_txt = (
                 f"Origin of Order : Conditional {cas_add_or_switch.capitalize()}"
             )
@@ -5760,7 +5566,6 @@ class ScreenCAS(object):
     def add_combination_detail_to_informative_popup(
         self, unique_id, base_frame, is_cas_condition
     ):
-
         (
             columns_name_list,
             rows_data_list,
@@ -5865,7 +5670,6 @@ class ScreenCAS(object):
         reference_price,
         reference_position,
     ):
-
         # Extract the times from the condition string
         date_time_list = re.findall(variables.time_regex, original_condition_string)
 
@@ -5895,7 +5699,6 @@ class ScreenCAS(object):
         counter_tokens_in_condition = 0
 
         for token in user_input_fields:
-
             # check if this token in condition string
             is_token_present = condition_string.find(token)
 
@@ -5910,7 +5713,6 @@ class ScreenCAS(object):
                 "Price Decrease By",
                 "Price Increase By",
             ]:
-
                 return "N/A"
 
             else:
@@ -5970,7 +5772,6 @@ class ScreenCAS(object):
 
         # If Solved Condition string is not false, we can calculate the trigger price
         if solved_condition_string != False:
-
             # Sign we can have
             greater_equal, lessthan_equal = ">=", "<="
 
@@ -5988,7 +5789,6 @@ class ScreenCAS(object):
 
             # If Token is Price Increase or Price Decrease in condition
             if flag_price_increase_decrease:
-
                 # Getting Later half,filtering
                 sub_condition = splitted_condition[1]
                 sub_condition = sub_condition.replace(",", "")
@@ -6000,7 +5800,6 @@ class ScreenCAS(object):
 
                 # Eval sub_condition for Trigger price
                 try:
-
                     # Print to console
                     if variables.flag_debug_mode:
                         print(
@@ -6016,7 +5815,6 @@ class ScreenCAS(object):
                     if variables.flag_debug_mode:
                         print(f"Eval trigger price: {trigger_price}")
                 except Exception as e:
-
                     # Print to console
                     if variables.flag_debug_mode:
                         print(f"Unable to calculate the Trigger Price, Error : {e}")
@@ -6066,7 +5864,6 @@ class ScreenCAS(object):
                     if variables.flag_debug_mode:
                         print(f"Eval trigger price: {trigger_price}")
                 except Exception as e:
-
                     # Print to console
                     if variables.flag_debug_mode:
                         print(f"Unable to calculate the Trigger Price, Error : {e}")
@@ -6091,7 +5888,6 @@ class ScreenCAS(object):
         trail_value,
         series_id=None,
     ):
-
         # Create a condition triggered_informative popup window
         condition_triggered_informative_popup = tk.Toplevel()
         condition_triggered_informative_popup.title(
@@ -6144,13 +5940,11 @@ class ScreenCAS(object):
             order_spec_label_text = f"Order Type: {order_type}, Quantity: {combo_quantity}, Limit Price: {limit_price}"
 
         if series_id not in [None, "None", "N/A"]:
-
             origin_of_order_txt = (
                 f"Origin of Order : Conditional Series, Series ID : {series_id}"
             )
 
         else:
-
             origin_of_order_txt = (
                 f"Origin of Order : Conditional {cas_type.capitalize()}"
             )

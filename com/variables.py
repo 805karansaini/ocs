@@ -9,7 +9,6 @@ from com.user_inputs import *
 
 
 class variables(object):
-
     ds_client = None
     use_api_bridge = True
     # TWS API Params
@@ -26,22 +25,26 @@ class variables(object):
     flag_market_open = False
     flag_use_rth = 1  # Historical data
     flag_cancel_subscription = True  # Currently not being used anywhere, this is typically used when we make a call to reqMktData
-    flag_snapshot_req_mkt_data = True  # Use snapshot data for reqMktData calls for combos
+    flag_snapshot_req_mkt_data = (
+        True  # Use snapshot data for reqMktData calls for combos
+    )
     flag_use_rth_und_data = False  # Use RTH only for real time bars for the underlying
     flag_audio_alert = False
     flag_identification_print = UserInputs.flag_identification_print
     flag_simulate_prices = UserInputs.flag_simulate_prices
     # flag_weighted_change_in_price = UserInputs.flag_weighted_change_in_price
-    flag_weighted_change_in_price = (
-        True  # When Set to 'True' for change from open and change form close will be calculated using weighted average
-    )
+    flag_weighted_change_in_price = True  # When Set to 'True' for change from open and change form close will be calculated using weighted average
 
-    flag_cache_data = UserInputs.flag_cache_data  # Flag to check if user wants cache data feature to use or not
-    flag_hv_daily = UserInputs.flag_hv_daily  # When set to true hv will be calculated on daily candles
-    flag_since_start_of_day_candles_for_relative_fields = (
-        UserInputs.flag_since_start_of_day_candles_for_relative_fields
-    )  # When set to True it will consider candles since start of day for relative fields else it will consider only current candle
-    flag_enable_rm_account_rules = UserInputs.flag_enable_rm_account_rules  # When flag set to True RM checks will be performed
+    flag_cache_data = (
+        UserInputs.flag_cache_data
+    )  # Flag to check if user wants cache data feature to use or not
+    flag_hv_daily = (
+        UserInputs.flag_hv_daily
+    )  # When set to true hv will be calculated on daily candles
+    flag_since_start_of_day_candles_for_relative_fields = UserInputs.flag_since_start_of_day_candles_for_relative_fields  # When set to True it will consider candles since start of day for relative fields else it will consider only current candle
+    flag_enable_rm_account_rules = (
+        UserInputs.flag_enable_rm_account_rules
+    )  # When flag set to True RM checks will be performed
     flag_account_checks_completed_first_time = False
     flag_account_checks_completed_wait = False
     flag_rm_checks_trade_volume_and_or = UserInputs.flag_rm_checks_trade_volume_and_or
@@ -85,10 +88,14 @@ class variables(object):
     standard_currency_for_account_value = "USD"
 
     # Account parameter selected
-    account_parameter_for_order_quantity = UserInputs.account_parameter_for_order_quantity  # NLV, SMA, CEL
+    account_parameter_for_order_quantity = (
+        UserInputs.account_parameter_for_order_quantity
+    )  # NLV, SMA, CEL
 
     # execution engine limit price
-    limit_price_selection_for_execution_engine = UserInputs.limit_price_selection_for_execution_engine
+    limit_price_selection_for_execution_engine = (
+        UserInputs.limit_price_selection_for_execution_engine
+    )
 
     # offset value for pegged type order
     offset_value_execution_engine = UserInputs.offset_value_execution_engine
@@ -99,7 +106,9 @@ class variables(object):
     sleep_time_db = 0.2
     sleep_time_ibkr_orders = 2
     sleep_time_between_iters = 1
-    sleep_time_ten_seconds = 10  # Used in recovery mode, After getting order execution details
+    sleep_time_ten_seconds = (
+        10  # Used in recovery mode, After getting order execution details
+    )
     max_wait_time_for_mkt_data = 14
     sleep_time_wait_bid_ask_legs = 10
 
@@ -131,10 +140,14 @@ class variables(object):
     custom_column_id = 0
 
     # Lookback period to compare prices occured in a day which will be divided in to 2 time frames in terms of candle number
-    time_frame_for_price_comparison_in_intraday = UserInputs.time_frame_for_price_comparison_in_intraday  # Value is for number of candles
+    time_frame_for_price_comparison_in_intraday = (
+        UserInputs.time_frame_for_price_comparison_in_intraday
+    )  # Value is for number of candles
 
     # Lookback period to compare price range occured in a past time frame to price range occured in a whole day
-    time_frame_for_price_range_ratio_in_intraday = UserInputs.time_frame_for_price_range_ratio_in_intraday  # Value is for number of minutes
+    time_frame_for_price_range_ratio_in_intraday = (
+        UserInputs.time_frame_for_price_range_ratio_in_intraday
+    )  # Value is for number of minutes
 
     expiry_dates = {}
     strike_prices = {}
@@ -175,7 +188,9 @@ class variables(object):
 
     req_sec_def_end = {}  # dict to store whether SecurityDefinitionOptionParameter response has ended
 
-    bool_account_value_available = False  # Do We have Account Value Available? (NetLiquidationByCurrency)
+    bool_account_value_available = (
+        False  # Do We have Account Value Available? (NetLiquidationByCurrency)
+    )
     bool_account_summary_end = False  # Has the account summary response ended
     account_value = None  # Account Value Net Liquidation
 
@@ -221,15 +236,21 @@ class variables(object):
     active_sql_connection_string = UserInputs.active_sql_connection_string
 
     # Establish Database connection
-    active_sqlalchemy_connection = sqlalchemy.create_engine(active_sql_connection_string)
-    active_pymysql_connection = pymysql.connect(host=sql_host, user=sql_user, password=sql_password, db=active_sql_db_name)
+    active_sqlalchemy_connection = sqlalchemy.create_engine(
+        active_sql_connection_string
+    )
+    active_pymysql_connection = pymysql.connect(
+        host=sql_host, user=sql_user, password=sql_password, db=active_sql_db_name
+    )
 
     # Archive databse
     archive_sql_db_name = UserInputs.archive_sql_db_name
     archive_sql_connection_string = UserInputs.archive_sql_connection_string
 
     # Establish Database connection
-    archive_sqlalchemy_connection = sqlalchemy.create_engine(archive_sql_connection_string)
+    archive_sqlalchemy_connection = sqlalchemy.create_engine(
+        archive_sql_connection_string
+    )
     # archive_pymysql_connection = pymysql.connect(
     #     host=sql_host, user=sql_user, password=sql_password, db=archive_sql_db_name
     # )
@@ -251,7 +272,9 @@ class variables(object):
     sql_table_account_conditions = UserInputs.sql_table_account_conditions
     sql_table_filter_table = UserInputs.sql_table_filter_table
     sql_table_conditional_series = UserInputs.sql_table_conditional_series
-    sql_table_conditional_series_sequence = UserInputs.sql_table_conditional_series_sequence
+    sql_table_conditional_series_sequence = (
+        UserInputs.sql_table_conditional_series_sequence
+    )
     sql_table_series_cas_legs = UserInputs.sql_table_series_cas_legs
     sql_table_series_positions = UserInputs.sql_table_series_positions
 
@@ -503,7 +526,9 @@ class variables(object):
     ]
 
     # Column names for scale trader table
-    scale_trader_table_columns = [col_name for col_name, x in scale_trader_table_columns_name_heading]
+    scale_trader_table_columns = [
+        col_name for col_name, x in scale_trader_table_columns_name_heading
+    ]
 
     # Sequence table columns
     sequence_table_columns = [
@@ -563,7 +588,14 @@ class variables(object):
     ]
 
     # portfolio table columns
-    portfolio_table_legs_columns = ["Leg Description", "#Net Position", "Account ID", "Realized PNL", "Unrealized PNL", "Entry Price"]
+    portfolio_table_legs_columns = [
+        "Leg Description",
+        "#Net Position",
+        "Account ID",
+        "Realized PNL",
+        "Unrealized PNL",
+        "Entry Price",
+    ]
 
     # conditional series table columns
     conditional_series_table_columns = [
@@ -651,7 +683,9 @@ class variables(object):
     accounts_table_dataframe = pd.DataFrame(columns=accounts_table_columns)
 
     # Accounts conditions dataframe
-    accounts_conditions_table_dataframe = pd.DataFrame(columns=account_conditions_table_columns)
+    accounts_conditions_table_dataframe = pd.DataFrame(
+        columns=account_conditions_table_columns
+    )
 
     # create series sequence table df
     series_sequence_table_df = []
@@ -841,17 +875,29 @@ class variables(object):
     atr_number_of_days = UserInputs.atr_number_of_days
 
     # number of buckets for relative atr in range
-    relative_atr_in_range_number_of_buckets = UserInputs.relative_atr_in_range_number_of_buckets
+    relative_atr_in_range_number_of_buckets = (
+        UserInputs.relative_atr_in_range_number_of_buckets
+    )
 
     # flag for realtive atr in rnage
     flag_relative_atr_in_range = UserInputs.flag_relative_atr_in_range
 
     # Time interval after which the CAS(Conditional Add or Switch) values will be updated
-    cas_long_term_fields_update_interval = UserInputs.cas_long_term_fields_update_interval  # Seconds
-    cas_intraday_fields_update_interval = UserInputs.cas_intraday_fields_update_interval  # Seconds
-    hv_related_fields_update_interval_time = UserInputs.hv_related_fields_update_interval_time  # Seconds
-    volume_related_fields_update_interval_time = UserInputs.volume_related_fields_update_interval_time
-    support_resistance_and_relative_fields_update_interval_time = UserInputs.support_resistance_and_relative_fields_update_interval_time
+    cas_long_term_fields_update_interval = (
+        UserInputs.cas_long_term_fields_update_interval
+    )  # Seconds
+    cas_intraday_fields_update_interval = (
+        UserInputs.cas_intraday_fields_update_interval
+    )  # Seconds
+    hv_related_fields_update_interval_time = (
+        UserInputs.hv_related_fields_update_interval_time
+    )  # Seconds
+    volume_related_fields_update_interval_time = (
+        UserInputs.volume_related_fields_update_interval_time
+    )
+    support_resistance_and_relative_fields_update_interval_time = (
+        UserInputs.support_resistance_and_relative_fields_update_interval_time
+    )
     account_table_update_interval = UserInputs.account_table_update_interval
     account_table_update_interval = UserInputs.account_table_update_interval
     rm_checks_interval_if_failed = UserInputs.rm_checks_interval_if_failed
@@ -889,14 +935,20 @@ class variables(object):
     n_day_atr = atr_number_of_days
 
     # Duration Size and Bar size for support and resistance and all the relative values (rel atr, rel chg etc)
-    support_resistance_and_relative_fields_look_back_days = UserInputs.support_resistance_and_relative_fields_look_back_days
-    support_resistance_and_relative_fields_candle_size = UserInputs.support_resistance_and_relative_fields_candle_size
+    support_resistance_and_relative_fields_look_back_days = (
+        UserInputs.support_resistance_and_relative_fields_look_back_days
+    )
+    support_resistance_and_relative_fields_candle_size = (
+        UserInputs.support_resistance_and_relative_fields_candle_size
+    )
 
     # candle size mins for volume for trade rm check
     trade_level_rm_check_volume_candle_size = CandleSize.ONE_MIN  # Default parameter
 
     # lookback mins mins for volume for trade rm check
-    trade_level_rm_check_volume_lookback_mins = UserInputs.trade_level_rm_check_volume_lookback_mins
+    trade_level_rm_check_volume_lookback_mins = (
+        UserInputs.trade_level_rm_check_volume_lookback_mins
+    )
 
     # threshold for volume trade level RM check
     volume_threshold_trade_rm_check = UserInputs.volume_threshold_trade_rm_check
@@ -914,10 +966,14 @@ class variables(object):
     volume_magnet_time_stamp = {}
 
     # threshold for bid ask spread trade level RM check
-    bid_ask_spread_threshold_trade_rm_check = UserInputs.bid_ask_spread_threshold_trade_rm_check
+    bid_ask_spread_threshold_trade_rm_check = (
+        UserInputs.bid_ask_spread_threshold_trade_rm_check
+    )
 
     # threshold for bid ask qty trade level RM check
-    bid_ask_qty_threshold_trade_rm_check = UserInputs.bid_ask_qty_threshold_trade_rm_check
+    bid_ask_qty_threshold_trade_rm_check = (
+        UserInputs.bid_ask_qty_threshold_trade_rm_check
+    )
 
     # range for support and threshold
     support_resistance_range_percent = UserInputs.support_resistance_range_percent
@@ -1018,7 +1074,9 @@ class variables(object):
     map_secondary_columns_to_expression_in_cas_table = {}
 
     # Getting columns for cache table from CAS table columns
-    cache_data_table_columns = [col_name for col_name, x in cas_table_columns_name_heading]
+    cache_data_table_columns = [
+        col_name for col_name, x in cas_table_columns_name_heading
+    ]
 
     # So that when the table is created the unique is is INT NOT NULL, and Tickers is VARCHAR(400)
     unqiue_id_col_name_for_cache = cache_data_table_columns[0]
@@ -1070,7 +1128,13 @@ class variables(object):
     ]
 
     # Allowed Tokens in CAS Conditions ( along with numbers)
-    set_allowed_tokens = set([x for x in cas_table_fields_for_condition + cas_table_operators_for_condition[1:]])
+    set_allowed_tokens = set(
+        [
+            x
+            for x in cas_table_fields_for_condition
+            + cas_table_operators_for_condition[1:]
+        ]
+    )
     set_allowed_tokens.add("(")
     set_allowed_tokens.add(")")
 
@@ -1098,13 +1162,19 @@ class variables(object):
     hv_candle_size = UserInputs.hv_candle_size  # mins
 
     # Volume Related User Inputs
-    volume_related_fileds_look_back_days = UserInputs.volume_related_fileds_look_back_days
+    volume_related_fileds_look_back_days = (
+        UserInputs.volume_related_fileds_look_back_days
+    )
     volume_related_fileds_candle_size = UserInputs.volume_related_fileds_candle_size
 
     # lookback mins for relative vollume derivative
-    relative_volume_derivation_lookback_mins = UserInputs.relative_volume_derivation_lookback_mins  # In minutes
+    relative_volume_derivation_lookback_mins = (
+        UserInputs.relative_volume_derivation_lookback_mins
+    )  # In minutes
 
-    relative_atr_derivation_lookback_mins = UserInputs.relative_atr_derivation_lookback_mins
+    relative_atr_derivation_lookback_mins = (
+        UserInputs.relative_atr_derivation_lookback_mins
+    )
 
     # Last n minutes fields User Inputs
 
@@ -1116,7 +1186,11 @@ class variables(object):
 
     # Calculating min in candle for annualized H. V. Calculation
     numeric_candle_data, time_frame = hv_candle_size.value.split()
-    hv_mins_in_candle = int(float(numeric_candle_data)) if "min" in time_frame else int(float(numeric_candle_data)) * 60
+    hv_mins_in_candle = (
+        int(float(numeric_candle_data))
+        if "min" in time_frame
+        else int(float(numeric_candle_data)) * 60
+    )
 
     # lookback days for order parameter atr
     order_parameter_atr_lookback_days = UserInputs.order_parameter_atr_lookback_days

@@ -8,7 +8,9 @@ config = configparser.ConfigParser()
 
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
-option_scanner_user_inputs_ini_file_path = os.path.join(script_dir, "..",  "..", "option_scanner_user_inputs.ini")
+option_scanner_user_inputs_ini_file_path = os.path.join(
+    script_dir, "..", "..", "option_scanner_user_inputs.ini"
+)
 
 config.read(option_scanner_user_inputs_ini_file_path)
 
@@ -35,7 +37,7 @@ def get_logger(name: str, current_time):
 
     # Create a logger
     logger = logging.getLogger(logger_name)
-    
+
     date = current_time[:8]
 
     # Create the log directory if it doesn't exist

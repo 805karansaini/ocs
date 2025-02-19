@@ -5,11 +5,11 @@ from com.hv_calculation import *
 from com import leg_identifier
 from com.calc_weighted_change import *
 
+
 # method to get leg-to-combo highest price ratio
 def highest_price_of_leg_div_by_highest_price_of_combination(
     unique_id, combo_obj, all_leg_dataframe_for_combination
 ):
-
     # Buy legs and Sell legs
     buy_legs = combo_obj.buy_legs
     sell_legs = combo_obj.sell_legs
@@ -24,7 +24,6 @@ def highest_price_of_leg_div_by_highest_price_of_combination(
             all_leg_dataframe_for_combination["Combination Close"].max()
         )
     except Exception as e:
-
         # set to N/A
         highest_value_of_combination_since_open_of_day = "N/A"
 
@@ -39,12 +38,9 @@ def highest_price_of_leg_div_by_highest_price_of_combination(
 
     # Check if highest price is not 0
     if highest_value_of_combination_since_open_of_day != 0:
-
         # Iterate over all legs object
         for leg_number, leg_obj in enumerate(all_legs, start=1):
-
             try:
-
                 # Finding highest value of leg and dividing it by highest values of combination
                 highest_price_for_leg_since_day_opened = (
                     all_leg_dataframe_for_combination[f"Close {leg_number}"].max()
@@ -59,7 +55,6 @@ def highest_price_of_leg_div_by_highest_price_of_combination(
                     "N/A",
                     None,
                 ]:
-
                     # calculate ratio of leg -to-combo value
                     max_closing_prices_for_each_leg_div_by_max_closing_prices_for_combination_list[
                         f"Highest Value of Leg {leg_number}"
@@ -70,7 +65,6 @@ def highest_price_of_leg_div_by_highest_price_of_combination(
                     )
 
             except Exception as e:
-
                 # append N/A if exception happened
                 max_closing_prices_for_each_leg_div_by_max_closing_prices_for_combination_list[
                     f"Highest Value of Leg {leg_number}"
@@ -82,7 +76,6 @@ def highest_price_of_leg_div_by_highest_price_of_combination(
                         f"Inside finding highest closing price for leg divided by highest closing price for combination since open of day, error is {e}"
                     )
     else:
-
         # Iterate over all legs object
         for leg_number, leg_obj in enumerate(all_legs, start=1):
             max_closing_prices_for_each_leg_div_by_max_closing_prices_for_combination_list[
@@ -92,6 +85,7 @@ def highest_price_of_leg_div_by_highest_price_of_combination(
     return (
         max_closing_prices_for_each_leg_div_by_max_closing_prices_for_combination_list
     )
+
 
 # Method to calculate leg-to-combo ratio of change in price
 def change_in_price_for_leg_div_by_change_in_price_for_combination(
@@ -133,7 +127,6 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
             current_day_open_for_legs_list.append(day_start_value_for_leg_close_price)
 
         except Exception as e:
-
             # Set to none
             current_day_open_for_legs_list = "N/A"
 
@@ -146,7 +139,6 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
     # Calculate change in price for combination prices since open
     if variables.flag_weighted_change_in_price:
         try:
-
             # Calculate weighted average
             # print(f"Unique ID: {unique_id} Change From Open")
             change_in_price_for_combination_value = calc_weighted_change_legs_based(
@@ -154,7 +146,6 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
             )
 
         except Exception as e:
-
             # Set to N/A
             change_in_price_for_combination_value = "N/A"
 
@@ -172,12 +163,9 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
                 1, most_recent_value_for_combination_close_prices
             ) - math.log(
                 abs(day_start_value_for_combination_close_prices) + 1
-            ) * math.copysign(
-                1, day_start_value_for_combination_close_prices
-            )
+            ) * math.copysign(1, day_start_value_for_combination_close_prices)
 
         except Exception as e:
-
             # Set to N/A
             change_in_price_for_combination_value = "N/A"
 
@@ -189,7 +177,6 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
 
     # If we have "change_in_price_for_combination_value" calculate the change in price since open for each leg
     if change_in_price_for_combination_value not in [0, "N/A"]:
-
         # Iterate over all legs object
         for leg_number, leg_obj in enumerate(all_legs):
             try:
@@ -208,7 +195,6 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
 
                 # Calculate change in price for leg prices
                 if variables.flag_weighted_change_in_price:
-
                     # Calculate change in price for each leg
                     change_ratio_for_leg_value = [
                         (
@@ -232,7 +218,6 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
                     )
 
                 else:
-
                     # Calculate change in price using log function
                     change_in_prices_for_each_leg_value = math.log(
                         abs(most_recent_value_for_leg_close_price) + 1
@@ -240,13 +225,10 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
                         1, most_recent_value_for_leg_close_price
                     ) - math.log(
                         abs(day_start_value_for_leg_close_price) + 1
-                    ) * math.copysign(
-                        1, day_start_value_for_leg_close_price
-                    )
+                    ) * math.copysign(1, day_start_value_for_leg_close_price)
 
                 # check if values are valid
                 if change_in_price_for_combination_value not in [0, "N/A", None]:
-
                     # Add results to dictionary
                     change_in_prices_for_each_leg_div_by_change_in_prices_for_combination_list[
                         f"Change in Price Value of Leg {leg_number + 1}"
@@ -257,7 +239,6 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
                     )
 
             except Exception as e:
-
                 # Set value to N/A
                 change_in_prices_for_each_leg_div_by_change_in_prices_for_combination_list[
                     f"Change in Price Value of Leg {leg_number + 1}"
@@ -279,11 +260,11 @@ def change_in_price_for_leg_div_by_change_in_price_for_combination(
 
     return change_in_prices_for_each_leg_div_by_change_in_prices_for_combination_list
 
+
 # Method get leg-to-combo ratio of HV value
 def hv_of_leg_since_open_div_by_hv_of_combination_since_open(
     unique_id, combo_obj, all_leg_dataframe_for_combination
 ):
-
     # Initializing dictionary to store HV values for legs
     hv_value_for_leg = {}
 
@@ -312,8 +293,6 @@ def hv_of_leg_since_open_div_by_hv_of_combination_since_open(
             ["Time", "Combination Open", "Combination Close"]
         ].copy()
 
-
-
         # Calculate HV for combination using the intraday prices data.
         hv_value_for_combination = calculate_hv(
             unique_id,
@@ -331,22 +310,18 @@ def hv_of_leg_since_open_div_by_hv_of_combination_since_open(
 
         # Print to console
         if variables.flag_debug_mode:
-
             print(
                 f" Calculating HV for combination with intraday values inside 'hv_of_leg_since_open_div_by_hv_of_combination_since_open', error is {e}"
             )
 
     # Iterate over all legs object
     for leg_number, leg_obj in enumerate(all_legs, start=1):
-
         # Init
         avg_price_for_leg = None
 
         try:
-
             # check if method is NATR
             if variables.hv_method.name == "NATR":
-
                 # Get con-id of leg
                 con_id = leg_obj.con_id
 
@@ -371,7 +346,6 @@ def hv_of_leg_since_open_div_by_hv_of_combination_since_open(
                     avg_price_for_leg = (ask + bid) / 2
 
                 except Exception as e:
-
                     # Set to N/A
                     avg_price_for_leg = "N/A"
 
@@ -402,7 +376,6 @@ def hv_of_leg_since_open_div_by_hv_of_combination_since_open(
 
             # check if values are valid
             if hv_value_for_combination not in [0, "N/A", None]:
-
                 # Calculating HV of leg divided by hv of combination for each leg
                 hv_of_leg_since_open_div_by_hv_of_combination_since_open_value[
                     f"HV {leg_number}"
@@ -411,7 +384,6 @@ def hv_of_leg_since_open_div_by_hv_of_combination_since_open(
                 )
 
         except Exception as e:
-
             # Assigning 'N/A' value for hv of leg
             hv_value_for_leg[f"HV {leg_number}"] = "N/A"
             if variables.flag_debug_mode:
